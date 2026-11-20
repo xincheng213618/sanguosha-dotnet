@@ -53,7 +53,8 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         if (child is CardUseFrame use)
             return use.VirtualOrdinaryTrickOrigin?.ParentProgramFrameId == frame.Id && IsShenGuoJiaVirtualUse(use);
         if (child is NativeDrawAttemptFrame draw)
-            return receipt.Stage == ShenGuoJiaStage.DrawAttempt && draw.Context.ParentFrameId == frame.Id && draw.Context.RecipientSeat == receipt.Target && draw.Context.RequestedCount == 4;
+            return receipt.Stage == ShenGuoJiaStage.DrawAttempt &&
+                CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(frame, draw, receipt.Target, 4);
         if (child is HpChangedTriggerWindowFrame health)
             return frame.PendingMovementContinuation is not null && health.ResumeFrameId == frame.Id && health.Change.ParentFrameId == frame.Id && health.Change.Kind == HpChangeKind.MaximumHp && health.Change.TargetSeat == (receipt.Operation == SkillProgramEffectOp.ResolveShenGuoJiaZuoxing ? receipt.Benefactor : frame.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Any(fact => fact.FrameId == frame.Id && fact.Seat == health.Change.TargetSeat && Math.Abs(fact.After - fact.Before) == health.Change.Amount);
         if (child is DeathFrame death)

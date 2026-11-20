@@ -66,7 +66,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         if (f.AnniversaryLiuLi is not { } r || !ValidLiuLi(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryLiuLiStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.DrawCount;
+            return r.Stage == AnniversaryLiuLiStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.DrawCount);
         if (child is CardsMovedTriggerWindowFrame m)
             return r.Stage is AnniversaryLiuLiStage.CostChildren or AnniversaryLiuLiStage.DrawChildren && m.ResumeProgramFrameId == f.Id && m.Batch.ParentFrameId == f.Id && m.Batch.OriginOwnerSeat == f.OwnerSeat && m.Batch.OriginSkillId == f.SkillId && m.Batch.OriginSkillInstanceId == f.SkillInstanceId && m.Batch.Movements.Count > 0 && m.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && move.Sequence > r.Before && move.Sequence <= r.After && (move.Reason == CardMoveReasons.Reshuffle || r.Stage == AnniversaryLiuLiStage.CostChildren && move.Reason.Value == LiuLiDiscardReason || r.Stage == AnniversaryLiuLiStage.DrawChildren && move.Reason.Value == LiuLiDrawReason));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && r.Stage == AnniversaryLiuLiStage.SkillChildren && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;

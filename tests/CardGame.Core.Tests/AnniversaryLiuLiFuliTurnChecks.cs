@@ -2,12 +2,14 @@ using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 using static BoundaryLiDianChecks;
 
 internal static class AnniversaryLiuLiFuliTurnChecks
 {
     private const string Hero = "anniversary:liu-li", Fuli = "anniversary:fuli", Binding = "reveal-discard-draw";
     private const string Owner = "fixture:fuli-owner", Peer = "fixture:fuli-peer", Deck = "fixture:fuli-deck";
+    private const string DrawWatch = "fixture:fuli-native-draw", DrawReason = "skill-program.anniversary:fuli.draw";
 
     internal static void PaidRangeSurvivesRecipientTurnAndExpiresAtSourceTurnCold()
     {
@@ -38,16 +40,46 @@ internal static class AnniversaryLiuLiFuliTurnChecks
         Reach(game, prompt => prompt.SkillPrompt?.SkillId == Fuli &&
             prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option") == "category-1"));
         Answer(game, choice => choice.Parameters.GetValueOrDefault("option") == "category-1" && choice.Cards.SequenceEqual([card.Id]));
-        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Fuli && prompt.Choices.Any(choice => choice.Targets.Contains(recipient)));
+        Reach(game, prompt => prompt is { PlayerSeat: 0, SkillPrompt.SkillId: DrawWatch });
         var started = Facts<AnniversaryLiuLiStartedEvent>().Single();
         var paid = Facts<AnniversaryLiuLiDiscardPaidEvent>().Single();
         var draw = Facts<AnniversaryLiuLiDrawIssuedEvent>().Single();
         var discard = game.CardMovements.Single(move => move.CardId == card.Id && move.Reason.Value == "skill-program.anniversary:fuli.discard");
+        var stack = game.ResolutionStack.ToArray();
+        var parent = stack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == started.FrameId);
+        var attempt = stack.OfType<NativeDrawAttemptFrame>().Single();
+        var index = Array.IndexOf(stack, attempt);
         Require(started.Source is { OwnerSeat: 0, SkillId: Fuli, BindingId: Binding } &&
-            paid is { Category: 1, Count: 1, DamageDiscarded: false } && paid.FrameId == started.FrameId &&
+            paid is { Category: 1, Count: 1, NameSum: 4, DamageDiscarded: false } && paid.FrameId == started.FrameId &&
             discard.From == CardLocation.Hand(0) && discard.To == CardLocation.DiscardPile &&
-            draw.FrameId == started.FrameId && draw.Count == 2 && game.CreateSnapshot(0).Players[0].HandCount == draw.Count,
-            "Fuli pays the complete physical trick category and returns the draw before issuing an attack-range effect.");
+            draw is { NameSum: 4, MaximumHandCount: 2, Count: 2 } && draw.FrameId == started.FrameId &&
+            parent.AnniversaryLiuLi is { Stage: AnniversaryLiuLiStage.Drawing, DrawCount: 2 } &&
+            index > 0 && stack[index - 1].Id == parent.Id && parent.NativeDraw?.ActiveAttemptId == attempt.Id &&
+            attempt.Context.ParentFrameId == parent.Id && attempt.Context is { RecipientSeat: 0, RequestedCount: 2 } &&
+            attempt.Context.Reason.Value == DrawReason && attempt.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation &&
+            game.CreateSnapshot(0).Players[0].HandCount == 0 && Facts<AnniversaryLiuLiDrawReturnedEvent>().Length == 0,
+            "The paid four-character trick is capped at two cards and pauses before the original owner draws.");
+
+        var watchPrompt = P(game)!.PromptId;
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        var restoredParent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredAttempt = game.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(frame => frame.Id == attempt.Id);
+        var runtime = game.GetRuntimeModule<CharacterLiuLiAnniversaryRuntime>();
+        Require(P(game)?.PromptId == watchPrompt && restoredAttempt.Context == attempt.Context &&
+            runtime.LiuLiFirstChild(restoredParent, restoredAttempt) &&
+            !runtime.LiuLiFirstChild(restoredParent with { NativeDraw = null }, restoredAttempt) &&
+            !runtime.LiuLiFirstChild(restoredParent, restoredAttempt with { Return = restoredAttempt.Return with { RecipientIndex = 1 } }),
+            "Cold restore accepts the original draw request and rejects a detached parent cursor or a wrong recipient index.");
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Fuli && prompt.Choices.Any(choice => choice.Targets.Contains(recipient)));
+        var returned = Facts<AnniversaryLiuLiDrawReturnedEvent>().Single();
+        var drawn = game.CardMovements.Where(move => move.Reason.Value == DrawReason).ToArray();
+        Require(returned is { Requested: 2, Actual: 2 } && returned.FrameId == parent.Id &&
+            returned.Before == attempt.Context.SequenceBefore && drawn.Length == 2 && drawn[0].CardId != drawn[1].CardId &&
+            drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) &&
+                move.Sequence > returned.Before && move.Sequence <= returned.After) &&
+            game.CreateSnapshot(0).Players[0].Hand.Select(item => item.Id).Order().SequenceEqual(drawn.Select(move => move.CardId).Order()),
+            "The original request returns exactly two physical cards before the attack-range choice.");
         Answer(game, choice => choice.Targets.SequenceEqual([recipient]));
         Settle(game);
         var issued = Facts<AnniversaryLiuLiRangeIssuedEvent>().Single();
@@ -86,7 +118,18 @@ internal static class AnniversaryLiuLiFuliTurnChecks
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, Hero);
-            builder.AddGeneral(new(Owner, "抚黎验证", "", Fuli, "shu", 3));
+            var catalog = SkillProgramCatalog.Load($$"""
+                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{DrawWatch}}","revision":1,"triggers":[
+                  {"id":"fuli-draw-request","window":"nativeDrawStarting","subject":"owner","condition":{"kind":"phaseIsPlay"},
+                   "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"draw",
+                    "options":[{"id":"continue"}]}]}]}]}
+                """, $$"""
+                {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{DrawWatch}}":{
+                  "name":"观察抚黎摸牌","description":"暂停在原生摸牌请求。","optionLabels":{"continue":"继续"} } } }
+                """);
+            builder.AddSkill(new(DrawWatch, catalog.Presentations[DrawWatch].Name, catalog.Presentations[DrawWatch].Description)
+                { Program = catalog.Programs[DrawWatch], ProgramPresentation = catalog.Presentations[DrawWatch] });
+            builder.AddGeneral(new(Owner, "抚黎验证", "", Fuli, "shu", 3, [DrawWatch]));
             builder.AddGeneral(new(Peer, "固定同桌", "", "standard:none", "wei", 10));
             builder.AddDeck(new(Deck, "抚黎固定牌堆", 0, 0, [new("standard:dodge", 40)]));
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "抚黎原回合期限", 4, 4, new Dictionary<string, int>(), Deck,

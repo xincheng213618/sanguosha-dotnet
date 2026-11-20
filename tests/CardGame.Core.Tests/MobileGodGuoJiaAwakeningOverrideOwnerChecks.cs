@@ -15,6 +15,11 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Dili = "ol:dili", Shengzhi = "ol:shengzhi";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
+    private const string DrawReason = "skill-program.mobile:huishi-gift.draw";
+    private const string WatchDraw = """
+        {"id":"native-draw","window":"nativeDrawStarting","subject":"owner","optional":false,"isSkillInvocation":false,
+         "effects":[{"op":"chooseOption","target":"owner","resultBind":"draw","options":[{"id":"continue"}]}]}
+        """;
     private const string WatchMaximum = """
         {"id":"maximum-paid","window":"afterHealthChanged","subject":"owner",
          "condition":{"kind":"healthChangeKindIs","hpChangeKind":"maximumHp"},"optional":false,"isSkillInvocation":false,
@@ -43,6 +48,52 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             UseInteractiveSetup = true, ConfirmOpeningHand = false, UseInteractiveDiscard = false,
             AdvanceAfterHumanCommands = false, MaxTurns = 8
         }, registry);
+
+    internal static void HuishiReturnsOriginalForeignFourCardDrawCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:bei-mi-hu", [], WatchDraw));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        const int recipient = 1;
+        var handBefore = match.Game.CreateSnapshot(recipient).Players[recipient].HandCount;
+        var maximumBefore = match.Owner.MaxHp;
+        match.UseHuishi(recipient);
+        match.Reach(() => match.Game.CreateSnapshot(recipient).PendingDecision is { PlayerSeat: recipient, SkillPrompt.SkillId: Watch });
+
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Huishi);
+        var draw = match.Game.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single();
+        var prompt = match.Game.CreateSnapshot(recipient).PendingDecision!;
+        match.Need(root.ShenGuoJia is { Stage: ShenGuoJiaStage.DrawAttempt, Target: recipient } &&
+            root.NativeDraw?.ActiveAttemptId == draw.Id && draw.Stage == NativeDrawAttemptStage.Programs &&
+            draw.Context is { RecipientSeat: recipient, RequestedCount: 4 } && draw.Context.ParentFrameId == root.Id &&
+            draw.Context.Reason.Value == DrawReason && draw.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation &&
+            match.Owner.MaxHp == maximumBefore && match.Facts<ShenGuoJiaMaximumPaidEvent>().Length == 0 &&
+            !match.Game.CardMovements.Any(move => move.Reason.Value == DrawReason),
+            "The original foreign recipient pauses the pending four-card draw before any movement or maximum-HP payment.");
+
+        match.Restore();
+        var restoredRoot = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id);
+        var restoredDraw = match.Game.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(frame => frame.Id == draw.Id);
+        var runtime = match.Game.GetRuntimeModule<CharacterGuoJiaMobileGodRuntime>();
+        match.Need(match.Game.CreateSnapshot(recipient).PendingDecision?.PromptId == prompt.PromptId &&
+            runtime.ShenGuoJiaFirstChild(restoredRoot, restoredDraw) &&
+            !runtime.ShenGuoJiaFirstChild(restoredRoot with { NativeDraw = null }, restoredDraw) &&
+            !runtime.ShenGuoJiaFirstChild(restoredRoot, restoredDraw with { Return = restoredDraw.Return with { RecipientIndex = 1 } }),
+            "Cold recovery retains the original request and rejects missing or different draw cursors.");
+
+        match.ReachPlay();
+        var moved = match.Game.CardMovements.Where(move => move.Reason.Value == DrawReason).ToArray();
+        var payment = match.Facts<ShenGuoJiaMaximumPaidEvent>().Single();
+        match.Need(moved.Length == 4 && moved.Select(move => move.CardId).Distinct().Count() == 4 &&
+            moved.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient)) &&
+            match.Game.CreateSnapshot(recipient).Players[recipient].HandCount == handBefore + 4 &&
+            match.Facts<NativeDrawAttemptDecidedEvent>().Count(fact => fact == new NativeDrawAttemptDecidedEvent(draw.Id, root.Id, recipient, 4, false)) == 1 &&
+            payment is { Seat: 0, Purpose: "huishi-gift" } && payment.FrameId == root.Id &&
+            payment.Before == maximumBefore && payment.After == maximumBefore - 2 && match.Owner.MaxHp == maximumBefore - 2 &&
+            match.Facts<ShenGuoJiaCompletedEvent>().SequenceEqual([new ShenGuoJiaCompletedEvent(root.Id)]) &&
+            match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Length == 0,
+            "The original draw moves four physical cards to the selected recipient and settles the two-maximum-HP payment once.");
+    }
 
     internal static void PaidHuishiWaivesBaijiaThresholdForNextPreparationCold()
     {
@@ -503,12 +554,17 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         internal void Continue() => ChooseOption("continue");
         internal void ChooseOption(string option) => Answer("option-id", option);
 
-        internal void GrantToSelf(string awakening)
+        internal void UseHuishi(int recipient)
         {
             var action = Game.GetLegalActions(0).Single(candidate =>
                 candidate.ProgramSkillId == Huishi && candidate.ProgramActivationId == "grant-awakening");
-            Need(action.SelectableTargetSeats.Contains(0), "The real limited skill offers its owner as a target.");
-            Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [0], Game.Revision, Prompt!.PromptId));
+            Need(action.SelectableTargetSeats.Contains(recipient), "The real limited skill offers its selected recipient as a target.");
+            Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [recipient], Game.Revision, Prompt!.PromptId));
+        }
+
+        internal void GrantToSelf(string awakening)
+        {
+            UseHuishi(0);
             Reach(() => Prompt?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("value") == awakening) == true);
             Answer("value", awakening);
             ReachPlay();
@@ -558,6 +614,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, ["mobile:shen-guo-jia", recipientGeneral, .. relatedGenerals]);
+            var watchRecipientDraw = watchTrigger == WatchDraw;
             var watchStates = watchTrigger == WatchBaijia ? """
                 ,"states":[{"id":"waiting-for-grants","initialValue":false,"visibility":"private","resetScope":"game",
                             "reacquirePolicy":"preserveUntilGameEnd"}]
@@ -568,14 +625,15 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
                 ]}
                 """, $$"""
                 {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{Watch}}":{
-                  "name":"体力上限已支付","description":"实际体力上限变化后暂停。","optionLabels":{"continue":"继续"} } } }
+                  "name":"{{(watchRecipientDraw ? "摸牌请求" : "体力上限已支付")}}",
+                  "description":"{{(watchRecipientDraw ? "在实际摸牌请求开始时暂停。" : "实际体力上限变化后暂停。")}}","optionLabels":{"continue":"继续"} } } }
                 """);
             builder.AddSkill(new(Watch, catalog.Presentations[Watch].Name, catalog.Presentations[Watch].Description)
                 { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
-            builder.AddGeneral(new(OwnerGeneral, "辉逝觉醒原生夹具", "supporter", Huishi, "wei", 6, [.. recipientSkills, Watch]));
+            builder.AddGeneral(new(OwnerGeneral, "辉逝觉醒原生夹具", "supporter", Huishi, "wei", 6, watchRecipientDraw ? recipientSkills : [.. recipientSkills, Watch]));
             var peers = Enumerable.Range(1, 3).Select(index => $"fixture:huishi-baijia-peer-{index}").ToArray();
             foreach (var peer in peers)
-                builder.AddGeneral(new(peer, "固定同桌", "supporter", "standard:none", "wei", 8));
+                builder.AddGeneral(new(peer, "固定同桌", "supporter", "standard:none", "wei", 8, watchRecipientDraw ? [Watch] : null));
             builder.AddDeck(new(Deck, "辉逝拜假固定牌堆", 4, 0, [new("standard:dodge", 40)]));
             builder.AddMode(new(Mode, "辉逝拜假真实准备阶段", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 },
