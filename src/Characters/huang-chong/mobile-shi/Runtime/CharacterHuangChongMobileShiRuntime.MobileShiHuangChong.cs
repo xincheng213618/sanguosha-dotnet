@@ -35,9 +35,23 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
             return SkillProgramStepOutcome.Continue;
         if (f.TriggerId == ShiHuangChongComposition.CujunClaimTrigger)
         {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuangChong = new("cujun", ShiHcStage.CujunClaimSettling) });
-            SettleShiHcClaim(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
-            return _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HuangChong: not null } settled && settled.Id == f.Id ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
+            var claim = ShiHcLedger().PendingClaim(f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)
+                ?? throw new InvalidOperationException("Shi Huang Chong lost its pending CuJun claim.");
+            DiscardRecoveryEntity[] entries = _discardPhases.Current() is { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase &&
+                phase.ActorSeat == f.OwnerSeat && phase.TurnNumber == claim.TurnNumber
+                ? _discardPhases.CurrentPhaseDiscards(phase).Where(entry => entry.OriginalFrom == CardLocation.Hand(f.OwnerSeat) &&
+                    _discardPhases.StillAvailable(entry) &&
+                    ShiHuangChongComposition.IsDamageKind(_coreAdvancedLifecycleOperations.GetAdvancedCard(entry.CardId).Kind)).ToArray()
+                : [];
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+            {
+                HuangChong = new("cujun", ShiHcStage.CujunClaimSettling)
+                {
+                    TargetSeat = claim.TargetSeat,
+                    CujunClaim = new(claim.FrameId, claim.TurnNumber, Array.AsReadOnly(entries))
+                }
+            });
+            return SettleShiHcClaim(f) ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
         }
 
         if (f.TriggerId != ShiHuangChongComposition.CujunDiscardTrigger)
@@ -141,28 +155,50 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
     }
 
     internal int ShiHcHandCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count;
-    internal void SettleShiHcClaim(ProgramSkillFrame f)
+    internal bool SettleShiHcClaim(ProgramSkillFrame f)
     {
         var r = f.HuangChong!;
-        var claim = ShiHcLedger().PendingClaim(f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber) ?? throw new InvalidOperationException("Shi Huang Chong lost its pending CuJun claim.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { HuangChong = r with { TargetSeat = claim.TargetSeat } });
-        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        r = f.HuangChong!;
-        var discardPile = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile);
-        var damageIds = discardPile.Where(card => ShiHuangChongComposition.IsDamageKind(card.Kind)).Select(card => card.Id).ToHashSet();
-        var poolIds = _coreActualDiscardLedgerDiscardPhaseHandDiscardIdsAccess._discardPhaseHandDiscardIds.Where(damageIds.Contains).ToArray();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiHcCujunClaimSettledEvent(claim.FrameId, f.Id, f.OwnerSeat, claim.TargetSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, Array.AsReadOnly(poolIds.ToArray())));
-        foreach (var cardId in poolIds)
+        var claim = r.CujunClaim ?? throw new InvalidOperationException("Shi Huang Chong lost its CuJun settlement.");
+        var recipient = CardLocation.Hand(r.TargetSeat);
+        while (r.Cursor < claim.Entries.Count && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None &&
+            _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
         {
-            if (_cardZonesOperations._cardZones.GetLocation(cardId)is not { Zone: CardZoneKind.DiscardPile })
+            var entry = claim.Entries[r.Cursor];
+            if (!_discardPhases.StillAvailable(entry))
+            {
+                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuangChong = r = r with { Cursor = r.Cursor + 1 } });
                 continue;
-            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(cardId), CardLocation.DiscardPile, CardLocation.Hand(claim.TargetSeat), new CardMoveReason(ShiHuangChongComposition.CujunClaimReason), disclosure: CardMovementDisclosure.FaceUp);
+            }
+
+            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entry.CardId),
+                CardLocation.DiscardPile, recipient, new(ShiHuangChongComposition.CujunClaimReason),
+                beforeFact: move =>
+                {
+                    var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+                    var state = active.HuangChong!;
+                    var settlement = state.CujunClaim!;
+                    _coreRuntimeOperations.ReplaceRuntimeTop(active with
+                    {
+                        HuangChong = state with
+                        {
+                            Cursor = state.Cursor + 1,
+                            CujunClaim = move.To == recipient
+                                ? settlement with { DeliveredCardIds = Array.AsReadOnly(settlement.DeliveredCardIds.Append(entry.CardId).ToArray()) }
+                                : settlement
+                        }
+                    });
+                }, disclosure: CardMovementDisclosure.FaceUp);
             if (DrainShiHc(f.Id))
-                return;
+                return true;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            r = f.HuangChong!;
+            claim = r.CujunClaim!;
         }
 
-        FinishShiHcOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiHcCujunClaimSettledEvent(
+            claim.ClaimFrameId, f.Id, f.OwnerSeat, r.TargetSeat, claim.TurnNumber, claim.DeliveredCardIds));
+        FinishShiHcOperation(f);
+        return false;
     }
 
     // ---- 死励: once per turn after the owner's first health change they may

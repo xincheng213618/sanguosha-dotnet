@@ -829,6 +829,8 @@ var tests = new (string Name, Action Body)[]
     ("Classic Xingshang: original death cleanup entries cold", ClassicCaoPiXingshangDiscardEntryChecks.XingshangClaimsUntouchedDeathEquipmentButCannotClaimTheRedroppedHandCardCold),
     ("Mobile Funan: original accepted counterspell entry", MobileFunanDiscardEntryChecks.FunanCannotClaimARediscardedCounterspellAfterAnEarlierAcceptedCandidate),
     ("Classic Zhongyong: the original Slash cannot be gifted after delivery and rediscard cold", ClassicZhongyongOriginalSlashChecks.ZhongyongCannotGiftTheRediscardedOriginalSlashCold),
+    ("Classic Upgraded Funan: original accepted counterspell entry", ClassicUpgradedFunanDiscardEntryChecks.UpgradedFunanCannotClaimARediscardedCounterspell),
+    ("Mobile Shi Huang Chong Cujun: both actual discards settle after the first gain child cold", ShiHuangChongCujunClaimChecks.CujunCompletesBothDiscardClaimsAfterFirstGainChildCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

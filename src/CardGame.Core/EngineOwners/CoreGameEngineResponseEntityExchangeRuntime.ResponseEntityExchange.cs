@@ -97,9 +97,6 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         effect.ResponseExchangeMode != ProgramResponseExchangeMode.ClaimResponseOnly &&
         !ResponseExchangeUpgraded(owner, skill, instance, effect.StateId!);
 
-    private static bool RequiresAcceptedResponseEntries(SkillProgramEffect effect, bool deliversOriginal) =>
-        effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || deliversOriginal;
-
     internal CardActionContext? ActualRespondedAction(CardActionContext response)
     {
         if (response.Type != CardActionType.Response)
@@ -133,9 +130,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             window.Action.ActionId != context.CardUse?.CardActionId ||
             !CanExchangeResponseEntities(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect, window.Action))
             return false;
-        var deliversOriginal = DeliversOriginalResponseExchangeCard(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect);
-        return !RequiresAcceptedResponseEntries(effect, deliversOriginal) ||
-            CurrentAcceptedResponseEntries(window).Count == window.Action.PhysicalCards.Count;
+        return CurrentAcceptedResponseEntries(window).Count == window.Action.PhysicalCards.Count;
     }
 
     internal SkillProgramStepOutcome BeginResponseEntityExchange(ProgramSkillFrame frame, SkillProgramEffect effect)
@@ -145,11 +140,11 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var original = ActualRespondedAction(response);
         if (original is null || !CanExchangeResponseEntities(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect, response))
             return SkillProgramStepOutcome.Continue;
-        var deliversOriginal = DeliversOriginalResponseExchangeCard(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect);
-        var originals = deliversOriginal ? original.PhysicalCards.Select(c => c.CardId).ToArray() : [];
-        var entries = RequiresAcceptedResponseEntries(effect, deliversOriginal) ? CurrentAcceptedResponseEntries(window) : null;
-        if (entries is not null && entries.Count != response.PhysicalCards.Count)
+        var entries = CurrentAcceptedResponseEntries(window);
+        if (entries.Count != response.PhysicalCards.Count)
             return SkillProgramStepOutcome.Continue;
+        var originals = DeliversOriginalResponseExchangeCard(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect)
+            ? original.PhysicalCards.Select(c => c.CardId).ToArray() : [];
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with
         {
             ResponseEntityExchange = new(original.ActionId, response.ActionId, response.ActorSeat, originals, response.PhysicalCards.Select(c => c.CardId).ToArray(), effect.StateId!, 1)
@@ -258,11 +253,10 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ResponseEntityExchange = exchange with { Stage = 2 } });
                 if (_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
                 {
-                    var current = exchange.ResponseEntries is null && exchange.OriginalCardIds.Count == 0
-                        ? exchange.ResponseCardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile)
-                        : (exchange.ResponseEntries ?? []).Where(IsCurrentResponseEntry).Select(entry => entry.CardId);
-                    ClaimResponseEntities(frame, exchange.ResponseActionId, frame.OwnerSeat,
-                        current.Where(id => !IsExchangedCardClaim(exchange.ResponseActionId, id)).ToArray(), false);
+                    var current = (exchange.ResponseEntries ?? [])
+                        .Where(entry => IsCurrentResponseEntry(entry) && !IsExchangedCardClaim(exchange.ResponseActionId, entry.CardId))
+                        .Select(entry => entry.CardId).ToArray();
+                    ClaimResponseEntities(frame, exchange.ResponseActionId, frame.OwnerSeat, current, false);
                 }
                 if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
                     _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

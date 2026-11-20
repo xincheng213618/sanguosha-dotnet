@@ -22,6 +22,11 @@ public enum ShiHcStage
     SiliBranch = 4, SiliDrawSettling = 5, SiliBeishuiSettling = 6,
 }
 
+public sealed record ShiHcCujunClaimSettlement(long ClaimFrameId, int TurnNumber, IReadOnlyList<DiscardRecoveryEntity> Entries)
+{
+    public IReadOnlyList<int> DeliveredCardIds { get; init; } = [];
+}
+
 public sealed record ShiHcReceipt(string Operation, ShiHcStage Stage)
 {
     public int TargetSeat { get; init; }
@@ -30,6 +35,8 @@ public sealed record ShiHcReceipt(string Operation, ShiHcStage Stage)
     public int Cursor { get; init; }
     public int[] GiftCards { get; init; } = [];
     public int SlashCardId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShiHcCujunClaimSettlement? CujunClaim { get; init; }
 }
 
 public sealed partial record ProgramSkillFrame
@@ -112,7 +119,7 @@ internal sealed class ResolveShiHcCujunDescriptor : ProgramOperationDescriptorBa
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ChooseOption,
         static (_, context) => context.PublicControlValue(1));
-    public override ProgramFactRequirements FactRequirements => new();
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
 }
