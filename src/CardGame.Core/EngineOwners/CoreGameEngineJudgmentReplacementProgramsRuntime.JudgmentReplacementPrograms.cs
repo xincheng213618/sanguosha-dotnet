@@ -66,7 +66,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         if (IsDeckTopJudgmentReplacement(trigger))
         {
             if (enabled && HasDeckTopJudgmentReplacementMaterial())
-                _characterWangYiMobileOperations.Value.BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
+                BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
             else
                 _coreNativeJudgmentOperations.AdvanceJudgmentCandidate(pending);
             return;
@@ -126,7 +126,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         var(program, trigger) = GetProgramJudgmentReplacement(candidate);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
         var oldJudgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The configured judgment replacement lost its current card.");
-        if (_characterWangYiMobileOperations.Value.TryResolveDeckTopJudgmentReplacement(selected, pending, candidate, program, trigger))
+        if (TryResolveDeckTopJudgmentReplacement(selected, pending, candidate, program, trigger))
             return;
         int? selectedCardId = selected.Parameters.GetValueOrDefault("action") switch
         {
@@ -185,7 +185,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         var oldFrom = CardLocation.Judgment(pending.TargetSeat);
         if (_cardZonesOperations._cardZones.GetLocation(oldJudgmentCard.Id) != oldFrom)
             throw new InvalidOperationException("The current judgment card is no longer in its judgment zone.");
-        var topInput = exactRiceLocation is null && _characterWangYiMobileOperations.Value.IsDeckTopJudgmentReplacementInput(pending, owner, replacement);
+        var topInput = exactRiceLocation is null && IsDeckTopJudgmentReplacementInput(pending, owner, replacement);
         var replacementFrom = exactRiceLocation ?? (topInput ? CardLocation.DrawPile : _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(owner, replacement));
         if (exactRiceLocation is not null ? replacementFrom.Zone != CardZoneKind.PublicPersistentPile || replacementFrom.OwnerSeat != owner.Seat || _cardZonesOperations._cardZones.GetLocation(replacement.Id) != replacementFrom || !_coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.Values.Any(p => p.Location == replacementFrom && _coreRicePileOperations.RiceProducer(p)) : !topInput && replacementFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("The configured replacement card is not in an owned input zone.");

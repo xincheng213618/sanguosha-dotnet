@@ -50,6 +50,22 @@ internal static class MobileWangYiRetrialCandidateChecks
              game.CardMovements.All(move => move.Reason != CardMoveReasons.Reshuffle),
             "The original Wang Yi offer is private and blind, with no paid movement or reshuffle.");
 
+        var declined = Cold(game, content);
+        var declineOffer = Reach(declined, IsRetrial);
+        Need(declineOffer.PromptId == offer.PromptId, "The decline branch restores the same unpaid offer.");
+        Answer(declined, declineOffer, "action", "program-judgment-replace-skip");
+        Reach(declined, IsOpenPlay);
+        var unchanged = declined.Events.Select(entry => entry.Payload).OfType<JudgmentResolvedEvent>().Single(fact => fact.Reason == Reason);
+        var skipped = declined.Events.Select(entry => entry.Payload).OfType<ProgramJudgmentReplacementResolvedEvent>()
+            .Single(fact => fact.SkillId == Skill);
+        Need(unchanged.ResolutionId == judgment.Id && unchanged.ParentResolutionId == original.Id &&
+             unchanged.CardId == drawCard.CardId && unchanged.Suit == Suit.Heart &&
+             skipped is { Activated: false, ReplacementCardId: null } && skipped.JudgmentFrameId == judgment.Id &&
+             skipped.OldCardId == drawCard.CardId && Location(declined, alcohol.Id) == CardLocation.DiscardPile &&
+             declined.CardMovements.All(move => move.Reason != CardMoveReasons.Reshuffle &&
+                 move.Reason != CardMoveReasons.ProgramJudgmentReplace && (move.CardId != alcohol.Id || move.Sequence <= firstEntry.Sequence)),
+            "Declining finishes the original Dodge judgment and leaves the used Alcohol in discard without a shuffle or payment.");
+
         game = Cold(game, content);
         var restoredOffer = Reach(game, IsRetrial);
         Need(restoredOffer.PromptId == offer.PromptId && restoredOffer.ValidCardIds.Count == 0 &&
