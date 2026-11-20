@@ -133,7 +133,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         }
 
         var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
-        if (location == CardLocation.WoodenOxGrain(owner.Seat) && _characterHuCheErMouOperations.MouHuCheErEquipmentDisabled(owner.Seat))
+        if (location == CardLocation.WoodenOxGrain(owner.Seat) && owner.SkillGrants.ArePrintedEquipmentEffectsSuppressed)
             return[];
         var zone = location == CardLocation.Hand(owner.Seat) || _characterGongsunZanMouMobileOperations.IsMouGszHuCard(owner, card.Id) || _characterLuSuMobileShiOperations.IsShiLsHandAccess2(owner.Seat, card.Id) ? CardZoneKind.Hand : location == CardLocation.Equipment(owner.Seat) ? CardZoneKind.Equipment : location == CardLocation.Authority(owner.Seat) ? CardZoneKind.Authority : location == CardLocation.WoodenOxGrain(owner.Seat) ? CardZoneKind.WoodenOxGrain : location == CardLocation.Judgment(owner.Seat) ? CardZoneKind.Judgment : location.Zone == CardZoneKind.PublicPersistentPile && location.OwnerSeat == owner.Seat ? CardZoneKind.PublicPersistentPile : (CardZoneKind? )null;
         if (zone is null || _coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, [card.Id], forResponse && !dyingUse))
@@ -166,7 +166,14 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             return[];
         var context = _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner);
         var dyingUse = forResponse && outputKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat;
-        var eligibleHand = _characterLuSuMobileShiOperations.AppendShiLsPlayableCards(owner, _corePhysicalOwnedCardQueriesOperations.GetHand(owner)).Concat(_characterGongsunZanMouMobileOperations.MouGszHuCards(owner)).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Concat(_characterHuCheErMouOperations.KongwuUsableWoodenOxGrain(owner)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card) && !HasProgramCardIdentity(owner, card)).OrderBy(card => card.Id).ToArray();
+        IReadOnlyList<Card> grain = owner.SkillGrants.ArePrintedEquipmentEffectsSuppressed
+            ? [] : _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(owner);
+        var eligibleHand = _characterLuSuMobileShiOperations.AppendShiLsPlayableCards(owner, _corePhysicalOwnedCardQueriesOperations.GetHand(owner))
+            .Concat(_characterGongsunZanMouMobileOperations.MouGszHuCards(owner))
+            .Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner))
+            .Concat(grain)
+            .Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card) && !HasProgramCardIdentity(owner, card))
+            .OrderBy(card => card.Id).ToArray();
         var selections = new List<ProgramMultiCardViewAsSelection>();
         foreach (var instance in bindings.Where(instance => instance.Program.ViewAs.Count != 0))
             foreach (var rule in instance.Program.ViewAs.Where(rule => CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) > 1 && !rule.VariableInputCount && (rule.OutputKind == outputKind || forResponse && rule.ExtendedUse && outputKind == CardKind.Slash && rule.OutputKind == CardKind.FireSlash || !forResponse && rule.RoundDistinctBasicUse is not null && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && (requestedUseTarget is not null ? rule.ForResponse || rule.ForPlay : forResponse ? rule.ForResponse || rule.RoundDistinctBasicUse is not null && dyingUse && rule.ForPlay : rule.ForPlay) && (rule.RoundDistinctBasicUse is not null || !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, outputKind, forResponse ? CardActionType.Response : CardActionType.Use)) && (rule.XieweiBaitBasicUse is null || _characterGuanHaiOlOperations.XieweiNativeDirection(owner, outputKind, forResponse)) && _coreRoundDistinctBasicUseOperations.Value.CanUseRoundDistinctBasicConversion(owner, instance, rule, forResponse, dyingUse) && rule.Condition.Evaluate(context)))

@@ -49,6 +49,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native armor qualification reads effective physical cards from the field equipment owner. An individual armor query still applies its original response and virtual armor conditions. A requirement for an empty armor slot reads actual equipment occupancy. The departure effect for Silver Lion qualifies the original departing entity and its owner on the movement path.
 
+- View-as candidates from Wooden Ox grain read the owner's typed equipment suppression. Both the single-card read and the multi-card candidate pool omit suppressed grain. The selected rule still qualifies its material zones and each card's original entry, and payment and private grain views retain their own boundaries.
+
 - The native physical Peach rescue uses the same live response legality for its published options and submitted payment. A category restriction reads the actual responder and the effective Peach identity. An issued directed restriction checks that responder against the original dying recipient before the rescue offers materials.
 
 - Faction-supplied Slash target eligibility uses `IProvidedSlashPaymentTargets`; do not gate actual-material validation on a character or distance/color privilege. Candidate conversion and final-kind issuance query the same actual materials separately.

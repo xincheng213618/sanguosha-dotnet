@@ -3,12 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
 {
-    internal bool MouHuCheErEquipmentDisabled(int target) =>
-        _coreMatchParticipantsPlayersAccess._players[target].SkillGrants.ArePrintedEquipmentEffectsSuppressed;
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) =>
         _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
-    internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(player);
 
     [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 40)]
     internal void AddKongwuDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)

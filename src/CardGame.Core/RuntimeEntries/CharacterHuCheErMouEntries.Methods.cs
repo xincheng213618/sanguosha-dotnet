@@ -11,11 +11,9 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal void IssueMouHuCheErSlash(ProgramSkillFrame f) => _resolve().IssueMouHuCheErSlash(f);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) => _resolve().KongwuEffectiveEquipment(player);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment2(int seat) => _resolve().KongwuEffectiveEquipment(seat);
-    internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => _resolve().KongwuUsableWoodenOxGrain(player);
     internal bool MouHuCheErAdvanceChildren() => _resolve().MouHuCheErAdvanceChildren();
     internal bool MouHuCheErDying() => _resolve().MouHuCheErDying();
     internal bool MouHuCheErEdge(int i) => _resolve().MouHuCheErEdge(i);
-    internal bool MouHuCheErEquipmentDisabled(int target) => _resolve().MouHuCheErEquipmentDisabled(target);
     internal bool MouHuCheErFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouHuCheErFirstChild(f, child);
     internal bool MouHuCheErMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => _resolve().MouHuCheErMovement(f, op, p);
     internal bool MouHuCheErRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouHuCheErRecoveryParent(f, recovery);
