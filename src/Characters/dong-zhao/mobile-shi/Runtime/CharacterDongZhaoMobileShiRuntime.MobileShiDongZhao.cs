@@ -11,7 +11,7 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     internal IReadOnlyList<PromptChoice> ShiDzPayments(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Discard, canSelect: (zone, card) => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, new(zone, f.OwnerSeat), OwnedCardMoveIntent.Discard));
     internal MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary)
     {
-        if (_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != beneficiary || !_coreMatchParticipantsPlayersAccess._players[beneficiary].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramExtraTurnPendedEvent>().LastOrDefault()is not { SkillId: ShiDzYingjia } last || last.Seat != beneficiary)
+        if (_coreActualTurnsOperations.PendingExtraTurnForPrelude(beneficiary, ShiDzYingjia) is not { } last)
             return null;
         return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiDongZhaoExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.TargetSeat == beneficiary && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Source.SkillId == ShiDzYingjia && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiDzYingjia).Program!.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiDongZhaoExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
     }

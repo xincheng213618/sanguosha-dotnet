@@ -4,6 +4,17 @@ namespace CardGame.Core.EngineOwners;
 
 internal sealed partial class CoreActualTurnsRuntime
 {
+    internal ProgramExtraTurnPendedEvent? PendingExtraTurnForPrelude(int recipientSeat, string skillId)
+    {
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra ||
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != recipientSeat ||
+            !_coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive)
+            return null;
+
+        var pending = _eventHistory.Read<ProgramExtraTurnPendedEvent>().LastOrDefault();
+        return pending is not null && pending.SkillId == skillId && pending.Seat == recipientSeat ? pending : null;
+    }
+
     internal bool ValidBeforeTurnPrelude(BeiMiHuBeforeTurnProof proof)
     {
         if (_resolutionStackOperations._resolutionStack.FirstOrDefault() is not BeiMiHuTurnPreludeFrame parent ||

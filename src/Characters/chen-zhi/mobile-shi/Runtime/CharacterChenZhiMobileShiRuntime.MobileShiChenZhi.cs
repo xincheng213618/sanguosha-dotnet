@@ -34,7 +34,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
 
     internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner)
     {
-        if (_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramExtraTurnPendedEvent>().LastOrDefault()is not { SkillId: ShiCzQuanchong } last || last.Seat != owner)
+        if (_coreActualTurnsOperations.PendingExtraTurnForPrelude(owner, ShiCzQuanchong) is not { } last)
             return null;
         return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.Source.OwnerSeat == owner && e.Source.SkillId == ShiCzQuanchong && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiCzQuanchong).Program!.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
     }

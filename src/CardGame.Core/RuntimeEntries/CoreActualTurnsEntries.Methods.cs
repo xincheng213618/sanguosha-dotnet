@@ -25,6 +25,7 @@ internal sealed partial class CoreActualTurnsEntries
     internal bool HasBeforeTurnPreludeBindingWork(CharacterState owner) => _resolve().HasBeforeTurnPreludeBindingWork(owner);
     internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _resolve().HasJudgmentEffectiveCard(player, kind);
     internal long OpenBeforeTurnPrelude(CharacterState owner) => _resolve().OpenBeforeTurnPrelude(owner);
+    internal ProgramExtraTurnPendedEvent? PendingExtraTurnForPrelude(int recipientSeat, string skillId) => _resolve().PendingExtraTurnForPrelude(recipientSeat, skillId);
     internal void ReturnBeforeTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame window) => _resolve().ReturnBeforeTurnPreludeWindow(window);
     internal bool ValidBeforeTurnPrelude(BeiMiHuBeforeTurnProof proof) => _resolve().ValidBeforeTurnPrelude(proof);
     internal bool ValidBeforeTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame frame) => _resolve().ValidBeforeTurnPreludeWindow(frame);
