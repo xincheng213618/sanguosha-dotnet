@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class SunRuWeimianRecoveryChecks
 {
@@ -98,9 +99,21 @@ internal static class SunRuWeimianRecoveryChecks
         var ownerFrame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id);
         Need(health.Change is { Kind: HpChangeKind.Recovery, SourceSeat: 0, TargetSeat: 0, Amount: 1 } &&
             health.Change.ParentFrameId == healthParent &&
+            health.Continuation == (replacement is null ? PostEventContinuation.Program : PostEventContinuation.RecoveryReplacement) &&
             (replacement is not null || ownerFrame.RecoveryApplications?.Single().HpChangeId == health.Change.Id) &&
             Owner().Hp == hpBefore + 1 && Facts<RecoveryAppliedEvent>().Count(fact => fact.TargetSeat == 0) == 1,
             "The selected recovery yields one native HP child under the actual owner.");
+        var runtime = game.GetRuntimeModule<CharacterSunRuOlRuntime>();
+        if (replacement is null)
+        {
+            Need(runtime.SunRuOlFirstChild(ownerFrame, health) &&
+                !runtime.SunRuOlFirstChild(ownerFrame, health with { Change = health.Change with { ParentFrameId = health.Id } }) &&
+                !runtime.SunRuOlFirstChild(ownerFrame, health with { ResumeFrameId = health.Id }) &&
+                !runtime.SunRuOlFirstChild(ownerFrame, health with { Continuation = PostEventContinuation.RecoveryReplacement }),
+                "The actual direct recovery matches only its original Weimian parent, resume frame and Program continuation.");
+        }
+        else
+            Need(!runtime.SunRuOlFirstChild(ownerFrame, health), "The replacement's actual HP child belongs to the replacement frame.");
         Restore();
         Need(JsonSerializer.Serialize(game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.Id == health.Id)) ==
             JsonSerializer.Serialize(health), "Cold restore keeps the same paid HP child.");

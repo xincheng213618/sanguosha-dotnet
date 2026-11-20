@@ -53,7 +53,10 @@ internal sealed partial class CharacterCaoTengOlRuntime
         }
 
         if (child is HpChangedTriggerWindowFrame hp)
-            return r.Stage == CaoTengStage.YongzuChildren && r.Option == "recover" && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == CaoTengChooser(f) && hp.Change.Amount > 0;
+            return r.Stage == CaoTengStage.YongzuChildren && r.Option == "recover" &&
+                ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&
+                hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat &&
+                hp.Change.TargetSeat == CaoTengChooser(f) && hp.Change.Amount > 0;
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
             return r.Stage == CaoTengStage.YongzuChildren && r.Option == "restore" && state.ResumeProgramFrameId == f.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && state.OwnerSeat == CaoTengChooser(f) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         return child is ProgramLifecycleTriggerWindowFrame skills && ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, skills);

@@ -39,7 +39,7 @@ internal sealed partial class CharacterSunRuOlRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsSunRuOlRecoveryParent(root, recovery);
         if (child is HpChangedTriggerWindowFrame hp && root.SunRuOlWeimian is { Paid: true } w)
-            return hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Continuation == PostEventContinuation.Program &&
+            return ProgramChildWindowRuntime.MatchesHpChangedChild(root.Id, hp, PostEventContinuation.Program) &&
                 hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 &&
                 (w.Stage == SunRuOlWeimianStage.CostChildren && hp.Change.TargetSeat == root.OwnerSeat ||
                  w.Stage == SunRuOlWeimianStage.RecoveryChildren && hp.Change.TargetSeat == w.RecipientSeat &&
