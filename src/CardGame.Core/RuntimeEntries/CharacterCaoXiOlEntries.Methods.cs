@@ -10,7 +10,6 @@ internal sealed partial class CharacterCaoXiOlEntries
     internal bool CanOfferCaoXi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().CanOfferCaoXi(c, t, context);
     internal IReadOnlyList<PromptChoice> CaoXiChoices(ProgramSkillFrame f) => _resolve().CaoXiChoices(f);
     internal bool CaoXiFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().CaoXiFirstChild(f, child);
-    internal int CaoXiGangshuBonus(CharacterState player, SkillRuleQuery query) => _resolve().CaoXiGangshuBonus(player, query);
     internal ProgramSkillFrame? CaoXiObserverRoot() => _resolve().CaoXiObserverRoot();
     internal void CaptureCaoXiGangshuDrawUse(CharacterState player, IReadOnlyList<CaoXiGangshuIncreasedEvent> frozen) => _resolve().CaptureCaoXiGangshuDrawUse(player, frozen);
     internal void CaptureCaoXiGangshuSlashOffset(NativeOwners.CardAttackHandle attack) => _resolve().CaptureCaoXiGangshuSlashOffset(attack);

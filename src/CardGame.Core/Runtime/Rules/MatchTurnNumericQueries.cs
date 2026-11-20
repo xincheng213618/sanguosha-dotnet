@@ -37,7 +37,6 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 
 internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 {
-    int GangshuBonus { get; }
     int KuangguSlashBonus { get; }
     int CujunSlashBonus { get; }
     int XiezhiOverflowCount { get; }
@@ -118,7 +117,7 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         if (query.HasZhajiangPreUsePrivilege) contributions.Add(new UnlimitedRuleQueryContribution("skill:mou-mobile:zhajiang:first-lost-hp-uses"));
         AddFiniteContribution(contributions, $"issued:{query.Seat}:yang-feng:qujia:slash-limit", query.QujiaSlashBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:boundary:juzhan-mobile:slash-limit", query.JuzhanSlashBonus);
-        AddFiniteContribution(contributions, $"state:{query.Seat}:cao-xi:gangshu:slash-limit", query.GangshuBonus);
+        pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.SlashLimit, contributions);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shunshi:slash-limit", query.ShunshiBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-mobile:yangwei:slash-limit", query.HasYangweiBonus ? 1 : 0);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-mobile:duojing:slash-limit", query.DuojingSlashBonus);

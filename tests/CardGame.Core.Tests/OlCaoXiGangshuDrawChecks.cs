@@ -85,6 +85,74 @@ internal static class OlCaoXiGangshuDrawChecks
         _ = Cold(game, content);
     }
 
+    internal static void GangshuSlashLimitAdmitsOneMoreNativeSlashCold()
+    {
+        var stock = Enumerable.Repeat(new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 2), 64).ToArray();
+        var probe = Start(ContentRegistry.Build(new StandardContentPackage(), new Fixture(stock)));
+        var placement = probe.CreateSnapshot(0).Players[0].Hand.Take(4).Select(card => card.Id).ToArray();
+        Require(placement.Length == 4, "The fixed opening supplies slots for one Draw Two and three real Slashes.");
+        var study = placement[0];
+        var slashes = placement[1..];
+        stock[study - 1] = new("standard:draw_two", Suit.Heart, 7);
+        foreach (var slash in slashes)
+            stock[slash - 1] = new("standard:slash", Suit.Spade, 5);
+
+        var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture(stock));
+        var beforeChoice = Start(content);
+        Play(beforeChoice, 0, study);
+        Reach(beforeChoice, prompt => prompt.SkillPrompt?.SkillId == Gangshu && HasChoice(prompt, "program-action", "activate"));
+        Activate(beforeChoice);
+        Reach(beforeChoice, prompt => prompt is { PlayerSeat: 0, IsPrivate: true } && HasChoice(prompt, "query", "SlashLimit"));
+        var started = Facts<CaoXiGangshuStartedEvent>(beforeChoice).Single();
+        var turn = beforeChoice.State.TurnNumber;
+        foreach (var (query, baseValue, permitted) in new[] { (SkillRuleQuery.DrawCount, 2, 1), (SkillRuleQuery.SlashLimit, 1, 2) })
+        {
+            var game = Cold(beforeChoice, content);
+            Answer(game, choice => choice.Parameters.GetValueOrDefault("query") == query.ToString());
+            Settle(game);
+            var grant = Facts<CaoXiGangshuIncreasedEvent>(game).Single();
+            Require(grant.Query == query && grant.BeforeValue == baseValue && grant.AfterValue == baseValue + 1 &&
+                grant.FrameId == started.FrameId && grant.Source == started.Source &&
+                Facts<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == started.CardUseFrameId &&
+                    fact.CardId == study && fact.CardKind == CardKind.DrawTwo) == 1,
+                "The selected point comes from the same completed physical Draw Two use in both branches.");
+
+            var actionIds = new List<long>();
+            foreach (var slash in slashes.Take(permitted))
+            {
+                Play(game, 0, slash, 1);
+                Reach(game, prompt => prompt is { PlayerSeat: 1, Kind: DecisionKind.RespondDodge });
+                var use = game.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.CardId == slash);
+                Require(use is { SourceSeat: 0, CardKind: CardKind.Slash,
+                        Action: { Type: CardActionType.Use, ActorSeat: 0, EffectiveKind: CardKind.Slash } } &&
+                    use.TargetSeats.SequenceEqual([1]) && use.Action.PhysicalCards.Single().CardId == slash,
+                    "Each admitted Slash holds its original hand entity and adjacent target on a live native use.");
+                actionIds.Add(use.Action!.ActionId);
+                Answer(game, choice => choice.Parameters.GetValueOrDefault("response") == "take-damage");
+                Settle(game);
+                Require(game.State.TurnNumber == turn &&
+                    game.CardMovements.Count(move => move.CardId == slash && move.From == CardLocation.Hand(0) &&
+                        move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use) == 1 &&
+                    Facts<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == use.Id && fact.CardId == slash) == 1,
+                    "Each admitted native Slash pays and settles once in Cao Xi's original Play phase.");
+            }
+
+            var blocked = slashes[permitted];
+            var movesBefore = game.CardMovements.Count;
+            var usesBefore = Facts<CardUseDeclaredEvent>(game).Length;
+            var revision = game.Revision;
+            Require(actionIds.Distinct().Count() == permitted &&
+                game.CreateSnapshot(0).Players[0].Hand.Any(card => card.Id == blocked) &&
+                game.GetLegalActions(0).All(action => action.CardId != blocked),
+                $"After {permitted} distinct physical Slashes, the next hand Slash has no legal action.");
+            var refused = game.Submit(new PlayCardCommand(0, blocked, [1], revision, P(game)!.PromptId, CardKind.Slash));
+            Require(!refused.Accepted && game.Revision == revision && game.CardMovements.Count == movesBefore &&
+                Facts<CardUseDeclaredEvent>(game).Length == usesBefore,
+                "Public submission of the over-limit Slash cannot declare the card or spend its physical entity.");
+            _ = Cold(game, content);
+        }
+    }
+
     private static ActualDrawPhaseCompletedEvent NextDraw(GameEngine game, int afterTurn, int quantity)
     {
         for (var turn = 0; turn < game.PlayerCount && (game.State.TurnNumber <= afterTurn || P(game)!.PlayerSeat != 0); turn++)

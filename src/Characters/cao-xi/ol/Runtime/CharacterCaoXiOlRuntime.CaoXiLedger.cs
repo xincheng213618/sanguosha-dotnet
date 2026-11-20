@@ -30,7 +30,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
         return unit.GrantedAfterActualPhaseToken < draw.Token && unit.GrantedInDrawPhaseToken != draw.Token && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiGangshuDrawUnitIssuedEvent>().Any(e => e.GrantFrameId == unit.FrameId && e.Phase.Token != draw.Token);
     }
 
-    internal int CaoXiGangshuBonus(CharacterState player, SkillRuleQuery query)
+    private int CaoXiGangshuBonus(CharacterState player, SkillRuleQuery query)
     {
         if (!HasCaoXiGangshuCapability || !player.IsAlive || query is not (SkillRuleQuery.AttackRange or SkillRuleQuery.DrawCount or SkillRuleQuery.SlashLimit))
             return 0;
@@ -118,11 +118,17 @@ internal sealed partial class CharacterCaoXiOlRuntime
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 10)]
-    internal void AddCaoXiGangshuDrawCountContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    internal void AddCaoXiGangshuTurnNumericContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (query != SkillRuleQuery.DrawCount)
+        var source = query switch
+        {
+            SkillRuleQuery.DrawCount => "draw",
+            SkillRuleQuery.SlashLimit => "slash-limit",
+            _ => null
+        };
+        if (source is null)
             return;
-        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{seat}:cao-xi:gangshu:draw",
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{seat}:cao-xi:gangshu:{source}",
             CaoXiGangshuBonus(_coreMatchParticipantsPlayersAccess._players[seat], query));
     }
 
