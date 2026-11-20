@@ -40,7 +40,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodEntries
     internal CardConversionSource? SkillInvocationMovementOrigin() => _resolve().SkillInvocationMovementOrigin();
     internal bool SkillInvocationStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().SkillInvocationStructuralEdge(parent, child);
     internal bool TryBeginConvertedSkillInvocations(ProgramCardTriggerWindowFrame f) => _resolve().TryBeginConvertedSkillInvocations(f);
-    internal bool TryBeginProgramSkillInvocation(long id) => _resolve().TryBeginProgramSkillInvocation(id);
     internal bool TryBeginSkillInvocation(long parentFrameId, int actorSeat, string skillKey, string occurrenceKey, string? skillInstanceId = default, SkillInvocationReturnKind returnKind = (SkillInvocationReturnKind)0) => _resolve().TryBeginSkillInvocation(parentFrameId, actorSeat, skillKey, occurrenceKey, skillInstanceId, returnKind);
     internal bool HasSkillInvocationObservers { get => _resolve().HasSkillInvocationObservers; }
 }

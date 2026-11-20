@@ -43,6 +43,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native multi-stage instructions reuse `ProgramStageRuntime`: declare the next stage before issuing a paid child, reread the original receipt after draining children, and keep dynamic termination rules in the recipe. Ordered random acquisition from other seats uses `ProgramRandomSeatAcquisitionRuntime`; version policies retain selection priority, turnover rules and event projection without repeating the movement loop or scanning history to prove completed payments.
 
+- Native program execution offers `TryBeginProgramInvocation` before the resume catalog and before direct execution. A registered observer can start an invocation on the original program frame. Its issuing qualification and typed return stay with the observer. The resume catalog and step executor retain their existing entry points.
+
 ## Selections and expression bindings
 
 - Expression card sets carry only known frozen facts and original physical residency. Derived bindings inherit source locations and entry tokens, including unknown tokens, rather than sampling a new origin; use the shared zone-entry query. Accepted after-turn-ended calls retain only their declared original-frame invocation permission, independently of owner-death draining.

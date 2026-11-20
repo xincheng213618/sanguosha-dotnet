@@ -899,6 +899,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Xingbu: two red skips the next actual discard cold", XingbuRevealChecks.TwoRedForecastSkipsTheNextDiscardWithoutAnActualPhaseEndCold),
     ("Delayed Nullification: held Indulgence owns original counterspell payment cold", DelayedNullificationOwnerChecks.HeldIndulgenceOwnsItsNativeCounterspellPaymentCold),
     ("Shi Xiahou Ba Libing: finite attack range lasts through the original Slash cold", ShiXiahouBaLibingRangeChecks.LibingEnablesAnOrdinaryDistantSlashUntilItCompletesCold),
+    ("Program invocation entry: Luxin and Jingyu preserve the original program cold", CardGame.Core.Tests.ProgramInvocationEntryChecks.LuxinInterruptsNextTrueInvocationAndJingyuCountsEachNameOnce),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

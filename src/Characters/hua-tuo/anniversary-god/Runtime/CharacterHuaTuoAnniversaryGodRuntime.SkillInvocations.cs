@@ -8,6 +8,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
 
     internal static string InvocationSourceKey(int actor, string skill, string occurrence) => actor + "|" + skill + "|" + occurrence;
     internal static string SkillInvocationSourceFingerprint(ResolutionFrame frame) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(frame, frame.GetType()))));
+    [ProgramPipelineHook(ProgramPipelinePhase.TryBeginProgramInvocation, 10)]
     internal bool TryBeginProgramSkillInvocation(long id)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.InstructionIndex != 0 || f.TriggerId is not null && !_coreProgramLifecycleOperations.GetProgramTrigger(f).IsSkillInvocation)
