@@ -166,7 +166,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
                 ValidCardIds = Array.AsReadOnly(cards.Select(c => c.Id).ToArray()),
-                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, required, pending.IncomingCard, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(actor, card, required), bagua, responder: actor)
+                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, required, pending.IncomingCard, includeBagua: bagua, responder: actor)
             };
         }
         else if (pending.Kind == DecisionKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } counter)

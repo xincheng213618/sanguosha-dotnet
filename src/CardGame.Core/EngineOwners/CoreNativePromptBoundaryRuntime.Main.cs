@@ -54,7 +54,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
 
     internal PromptId CreatePromptId() => new(++_corePlayerDecisionNextPromptIdAccess._nextPromptId);
     internal static IReadOnlyList<PromptChoice> CreatePlayChoices(IReadOnlyList<LegalAction> legalActions) => RuntimeSkills.RuntimeRules_Core_CommonRules.CreatePlayChoices(legalActions);
-    internal IReadOnlyList<PromptChoice> CreateResponseChoices(IReadOnlyList<Card> responseCards, CardKind requiredCardKind, CardKind? incomingCard = null, Func<Card, CardKind>? effectiveCardKindSelector = null, bool includeBagua = false, bool includeFactionDefense = false, bool includeFactionSlash = false, CharacterState? responder = null)
+    internal IReadOnlyList<PromptChoice> CreateResponseChoices(IReadOnlyList<Card> responseCards, CardKind requiredCardKind, CardKind? incomingCard = null, bool includeBagua = false, bool includeFactionDefense = false, bool includeFactionSlash = false, CharacterState? responder = null)
     {
         var responseName = CardCatalog.Get(requiredCardKind).DisplayName;
         var isDodge = requiredCardKind == CardKind.Dodge;
@@ -71,13 +71,12 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
             // pay it. Do not parse that material as an independent card.
             if (responder is not null && !_coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(responder, card, requiredCardKind))
                 return Array.Empty<PromptChoice>();
-            var effectiveCardKind = effectiveCardKindSelector?.Invoke(card) ?? requiredCardKind;
             var cardDescription = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(card.DisplayName)}】当作【{(responseName)}】";
             var description = isDodge ? isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelable && _coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(uncancelable) ? $"{(cardDescription)}，响应这次{(incomingAttackName)}；此杀不能被抵消。" : $"{(cardDescription)}，抵消这次{(incomingAttackName)}。" : isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : $"{(cardDescription)}，继续应战【决斗】。";
-            var programSources = responder is null ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, effectiveCardKind, forResponse: true);
+            var programSources = responder is null ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, requiredCardKind, forResponse: true);
             var hasIdentity = responder is not null && _coreCardConversionsOperations.HasProgramCardIdentity(responder, card);
-            var identitySources = responder is null ? [] : _coreCardConversionsOperations.GetProgramCardIdentitySources(responder, card, effectiveCardKind, forResponse: true);
-            var originalPile = responder is not null && _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(responder, card, effectiveCardKind, true);
+            var identitySources = responder is null ? [] : _coreCardConversionsOperations.GetProgramCardIdentitySources(responder, card, requiredCardKind, forResponse: true);
+            var originalPile = responder is not null && _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(responder, card, requiredCardKind, true);
             var includeUnspecified = !hasIdentity && (responder is null || !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(responder, card) || originalPile) && CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind);
             var sources = new List<CardConversionSource?>();
             if (includeUnspecified)
@@ -95,7 +94,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
                 {
                     ["response"] = responseAction,
                     ["required-card"] = responseName,
-                    ["response-card-kind"] = effectiveCardKind.ToString()
+                    ["response-card-kind"] = requiredCardKind.ToString()
                 };
                 if (source is null && originalPile)
                     parameters["native-original-public-pile"] = "true";
@@ -167,7 +166,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
         {
             PromptId = CreatePromptId(),
             ValidCardIds = responseCards.Select(card => card.Id).ToArray(),
-            Choices = CreateResponseChoices(responseCards, requiredCardKind, pending.IncomingCard, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(responder, card, requiredCardKind), includeBagua, responder: responder)
+            Choices = CreateResponseChoices(responseCards, requiredCardKind, pending.IncomingCard, includeBagua: includeBagua, responder: responder)
         };
     }
 

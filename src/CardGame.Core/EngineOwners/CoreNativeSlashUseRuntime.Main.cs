@@ -437,7 +437,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.RespondDodge, target.Seat, responsePrompt, dodges.Select(card => card.Id).ToArray(), [], source.Seat, playedCardKind)
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, playedCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(target, card, CardKind.Dodge), includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, responder: target),
+                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, playedCardKind, includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, responder: target),
                 RequiredCardKind = CardKind.Dodge
             };
             _coreMatchOutcomeStatusAccess._status = EngineStatus.AwaitingHumanResponse;
@@ -454,7 +454,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.RespondDodge, target.Seat, attack.RequiredDodgeResponses > 1 ? $"{(source.Name)} 的【无双】要求 {(target.Name)} 打出第 {(responseOrdinal)} 张【闪】，AI 将选择是否响应。" : $"{(source.Name)} 对 {(target.Name)} 使用了【{(slashName)}】，AI 将选择是否打出【闪】。", dodges.Select(card => card.Id).ToArray(), [], source.Seat, playedCardKind)
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, playedCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(target, card, CardKind.Dodge), includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, responder: target),
+                Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, playedCardKind, includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, responder: target),
                 RequiredCardKind = CardKind.Dodge
             };
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ResponseRequestedEvent(source.Seat, target.Seat, playedCardKind, CardKind.Dodge));

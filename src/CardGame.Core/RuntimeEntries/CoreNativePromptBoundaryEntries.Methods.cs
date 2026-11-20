@@ -4,7 +4,7 @@ internal sealed partial class CoreNativePromptBoundaryEntries
 {
     internal void ClearPendingDecision() => _resolve().ClearPendingDecision();
     internal PromptId CreatePromptId() => _resolve().CreatePromptId();
-    internal IReadOnlyList<PromptChoice> CreateResponseChoices(IReadOnlyList<Card> responseCards, CardKind requiredCardKind, CardKind? incomingCard = default, Func<Card, CardKind>? effectiveCardKindSelector = default, bool includeBagua = false, bool includeFactionDefense = false, bool includeFactionSlash = false, CharacterState? responder = default) => _resolve().CreateResponseChoices(responseCards, requiredCardKind, incomingCard, effectiveCardKindSelector, includeBagua, includeFactionDefense, includeFactionSlash, responder);
+    internal IReadOnlyList<PromptChoice> CreateResponseChoices(IReadOnlyList<Card> responseCards, CardKind requiredCardKind, CardKind? incomingCard = default, bool includeBagua = false, bool includeFactionDefense = false, bool includeFactionSlash = false, CharacterState? responder = default) => _resolve().CreateResponseChoices(responseCards, requiredCardKind, incomingCard, includeBagua, includeFactionDefense, includeFactionSlash, responder);
     internal void EnsureStarted() => _resolve().EnsureStarted();
     internal bool IsAiDyingResponsePending() => _resolve().IsAiDyingResponsePending();
     internal bool IsAiFireAttackPending() => _resolve().IsAiFireAttackPending();

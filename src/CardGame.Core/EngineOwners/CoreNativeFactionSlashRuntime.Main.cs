@@ -471,7 +471,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             RequiredCardKind = CardKind.Slash,
-            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(slashes, CardKind.Slash, incomingCard, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(owner, card, CardKind.Slash), includeFactionSlash: false, responder: owner)
+            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(slashes, CardKind.Slash, incomingCard, includeFactionSlash: false, responder: owner)
         };
         _coreMatchOutcomeStatusAccess._status = owner.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }

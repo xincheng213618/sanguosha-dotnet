@@ -106,7 +106,7 @@ internal sealed partial class CoreNativeGroupAttackRuntime
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(decisionKind, target.Seat, $"{(_coreMatchParticipantsPlayersAccess._players[group.SourceSeat].Name)} 使用了【{(incomingName)}】，{(responseQuestion)}", responseCards.Select(card => card.Id).Concat(zhangbaPairs.SelectMany(pair => pair.Select(card => card.Id))).Concat(programMultiCardResponses.SelectMany(item => item.Cards.Select(card => card.Id))).Distinct().ToArray(), [], group.SourceSeat, group.Card.Kind)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(responseCards, requiredCardKind, group.Card.Kind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(target, card, requiredCardKind), includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, includeFactionSlash: canRequestFactionSlash, responder: target),
+            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(responseCards, requiredCardKind, group.Card.Kind, includeBagua: hasBagua, includeFactionDefense: canRequestFactionDefense, includeFactionSlash: canRequestFactionSlash, responder: target),
             RequiredCardKind = requiredCardKind
         };
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ResponseRequestedEvent(group.SourceSeat, target.Seat, group.Card.Kind, requiredCardKind));

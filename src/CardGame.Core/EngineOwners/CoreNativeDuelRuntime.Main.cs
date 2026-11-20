@@ -67,7 +67,7 @@ internal sealed partial class CoreNativeDuelRuntime
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.RespondSlash, responder.Seat, requiredSlashResponses > 1 ? $"{(opponent.Name)} 的【无双】要求你打出第 {(responseOrdinal)} 张【杀】响应【决斗】，是否响应？" : $"{(opponent.Name)} 对你使用了【决斗】，是否打出【杀】？", slashes.Select(card => card.Id).Concat(zhangbaPairs.SelectMany(pair => pair.Select(card => card.Id))).Concat(programMultiCardResponses.SelectMany(item => item.Cards.Select(card => card.Id))).Concat(friendResponses.SelectMany(choice => choice.Cards)).Distinct().ToArray(), [], duel.OpponentSeat, CardKind.Duel)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(slashes, CardKind.Slash, effectiveCardKindSelector: card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(responder, card, CardKind.Slash), includeFactionSlash: canRequestFactionSlash, responder: responder).Concat(friendResponses).ToArray(),
+            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(slashes, CardKind.Slash, includeFactionSlash: canRequestFactionSlash, responder: responder).Concat(friendResponses).ToArray(),
             RequiredCardKind = CardKind.Slash
         };
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ResponseRequestedEvent(duel.OpponentSeat, responder.Seat, CardKind.Duel, CardKind.Slash));

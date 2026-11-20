@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEngineBaguaResponsesRuntime
             cards = cards.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(responder, card)) == requireRed).ToList();
         if (defense is null)
             _coreNativeResponseWindowsOperations.PushResponseWindow(attack.ResolutionId, attack.SourceSeat, responder.Seat, attack.EffectiveCardKind ?? CardKind.Slash, CardKind.Dodge);
-        var choices = defense is not null ? _coreNativeFactionDefenseOperations.CreateFactionDefenseResponseChoices(responder, defense, cards, includeBagua: false) : _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, CardKind.Dodge, attack.EffectiveCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(responder, card, CardKind.Dodge), includeBagua: false, includeFactionDefense: _coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionDefense(responder, attack), responder: responder);
+        var choices = defense is not null ? _coreNativeFactionDefenseOperations.CreateFactionDefenseResponseChoices(responder, defense, cards, includeBagua: false) : _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, CardKind.Dodge, attack.EffectiveCardKind, includeBagua: false, includeFactionDefense: _coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionDefense(responder, attack), responder: responder);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.RespondDodge, responder.Seat, "【八卦阵】判定失败，是否继续打出【闪】？", cards.Select(card => card.Id).ToArray(), [], attack.SourceSeat, attack.EffectiveCardKind)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),

@@ -100,7 +100,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             RequiredCardKind = CardKind.Dodge,
-            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, attack.EffectiveCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(owner, card, CardKind.Dodge), includeBagua: hasBagua, includeFactionDefense: false, responder: owner)
+            Choices = _coreNativePromptBoundaryOperations.CreateResponseChoices(dodges, CardKind.Dodge, attack.EffectiveCardKind, includeBagua: hasBagua, includeFactionDefense: false, responder: owner)
         };
         _coreMatchOutcomeStatusAccess._status = owner.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
