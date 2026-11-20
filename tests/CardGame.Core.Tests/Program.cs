@@ -896,6 +896,7 @@ var tests = new (string Name, Action Body)[]
     ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),
     ("OL Cao Xi Gangshu: finite Slash limit admits one additional payment cold", OlCaoXiGangshuDrawChecks.GangshuSlashLimitAdmitsOneMoreNativeSlashCold),
     ("Classic Wusheng: red equipment Play and Duel preserve original conversion cold", ClassicWushengResponseChecks.RedEquipmentKeepsItsClassicSourceInPlayAndDuelCold),
+    ("OL Xingbu: two red skips the next actual discard cold", XingbuRevealChecks.TwoRedForecastSkipsTheNextDiscardWithoutAnActualPhaseEndCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
