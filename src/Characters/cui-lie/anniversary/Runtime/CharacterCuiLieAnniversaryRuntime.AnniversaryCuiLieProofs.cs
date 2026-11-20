@@ -70,7 +70,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == AnniversaryCuiLieStage.RecoveryChildren && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)
-            return hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
+            return ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.AwaitedProgramMovement);
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
     }
 

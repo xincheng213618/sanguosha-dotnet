@@ -8,7 +8,8 @@ namespace CardGame.Core.Tests;
 internal static class SpPangTongRuntimeChecks
 {
     private const string Hero = "ol:pang-tong-sp", Driver = "fixture:sp-pt-driver", Quiet = "fixture:sp-pt-quiet",
-        Watch = "fixture:sp-pt-watch", GrantWatch = "fixture:sp-pt-grant-watch", Peer = "fixture:sp-pt-peer", Deck = "fixture:sp-pt-deck";
+        Watch = "fixture:sp-pt-watch", GrantWatch = "fixture:sp-pt-grant-watch", RecoveryWatch = "fixture:sp-pt-recovery-watch",
+        Peer = "fixture:sp-pt-peer", Deck = "fixture:sp-pt-deck";
 
     public static void GuolunExchangeReturnsOriginalPaidChildrenCold()
     {
@@ -46,13 +47,32 @@ internal static class SpPangTongRuntimeChecks
     {
         foreach (var wounded in new[] { false, true })
         {
-            var s = Scene.Start(watchGrant: !wounded); s.Play();
+            var s = Scene.Start(wounded ? RecoveryWatch : GrantWatch); s.Play();
             if (wounded) { s.Use(Driver, "wound", []); s.Play(); }
             var hp = s.V(0).Hp; var max = s.V(0).MaxHp;
             s.Use(Driver, "kill", [2]);
             s.Reach(() => s.P?.SkillPrompt?.SkillId == "ol:songsang");
             s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-            if (!wounded)
+            if (wounded)
+            {
+                s.Reach(() => s.P is { PlayerSeat: 0, SkillPrompt.SkillId: RecoveryWatch });
+                var health = s.E<SongsangHealthIssuedEvent>().Single();
+                var healthParent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == health.FrameId);
+                var healthChild = s.G.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(f => f.Change.ParentFrameId == healthParent.Id);
+                var healthWatcher = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == RecoveryWatch);
+                s.Need(healthParent.SpPangTong is { Stage: "health-children", Wounded: true } &&
+                    healthChild.ResumeFrameId == healthParent.Id && healthChild.Continuation == PostEventContinuation.AwaitedProgramMovement &&
+                    healthChild.Change is { SourceSeat: 0, TargetSeat: 0, Kind: HpChangeKind.Recovery, Amount: 1 } &&
+                    healthChild.Change.HpBefore == hp && healthChild.Change.HpAfter == hp + 1 &&
+                    healthWatcher.WindowContext is { Window: SkillProgramTriggerWindow.AfterHpRecovered } context &&
+                    context.ParentFrameId == healthChild.Id && context.HpChange == healthChild.Change &&
+                    s.V(0).Hp == hp + 1 && s.V(0).MaxHp == max && ZhanjiGrants(s) == 0,
+                    "The real recovery suspends its original Songsang frame before Zhanji is granted.");
+                s.Cold();
+                s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+                s.Play();
+            }
+            else
             {
                 s.Reach(() => s.P is { PlayerSeat: 0, SkillPrompt.SkillId: GrantWatch });
                 var health = s.E<SongsangHealthIssuedEvent>().Single();
@@ -82,9 +102,10 @@ internal static class SpPangTongRuntimeChecks
                     s.E<ProgramBindingResolvedEvent>().Count(fact => fact == resolved) == 1,
                     "The native window returns to the original Songsang frame and completes it once.");
             }
-            else s.Play();
+            var recoveries = s.E<RecoveryAppliedEvent>().Count(e => e == new RecoveryAppliedEvent(0, 0, 1, hp + 1));
+            var growths = s.E<MaximumHpChangedEvent>().Count(e => e is { PlayerSeat: 0, Delta: 1, SkillId: "ol:songsang" } && e.MaximumHp == max + 1);
             s.Need(!s.V(2).IsAlive && s.V(0).Hp == hp + (wounded ? 1 : 0) &&
-                s.V(0).MaxHp == max + (wounded ? 0 : 1) &&
+                s.V(0).MaxHp == max + (wounded ? 0 : 1) && recoveries == (wounded ? 1 : 0) && growths == (wounded ? 0 : 1) &&
                 s.E<SongsangHealthIssuedEvent>() is [{ Wounded: var frozen }] && frozen == wounded &&
                 ZhanjiGrants(s) == 1 && s.V(0).Skills!.Count(skill => skill.ContentId == "ol:zhanji") == 1,
                 "Songsang resolves its actual other death, preserves the original wounded/maximum-HP branch, and really grants Zhanji.");
@@ -115,13 +136,15 @@ internal static class SpPangTongRuntimeChecks
                 {"id":"draw-two","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":2}]}]},
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","isSkillInvocation":false,"window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
               {"id":"{{Watch}}","revision":1,"triggers":[{"id":"exchange-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.guolun.exchange"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]},
-              {"id":"{{GrantWatch}}","revision":1,"triggers":[{"id":"grant-child","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]}]}
+              {"id":"{{GrantWatch}}","revision":1,"triggers":[{"id":"grant-child","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]},
+              {"id":"{{RecoveryWatch}}","revision":1,"triggers":[{"id":"recovery-child","window":"afterHpRecovered","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]}]}
             """;
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Driver] = new { name = Driver, description = "真实原生伤害、失去体力和摸牌" },
                     [Quiet] = new { name = Quiet, description = "固定同桌跳过出牌阶段" },
                     [Watch] = new { name = Watch, description = "已交换后的真实获得牌子窗", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
-                    [GrantWatch] = new { name = GrantWatch, description = "展骥授予后的原生技能变化窗口", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } });
+                    [GrantWatch] = new { name = GrantWatch, description = "展骥授予后的原生技能变化窗口", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
+                    [RecoveryWatch] = new { name = RecoveryWatch, description = "送丧的原生回复窗口", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             foreach (var (id, program) in catalog.Programs)
                 b.AddSkill(new(id, id, catalog.Presentations[id].Description) { Program = program, ProgramPresentation = catalog.Presentations[id] });
@@ -163,10 +186,10 @@ internal static class SpPangTongRuntimeChecks
         public void Cold() { var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(before == State(), "Cold restore preserves every original paid frame, movement invoice and published child choice."); }
         public void Accept(GameCommand command) { var result = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(result.Accepted, result.Error?.Message ?? "Rejected command."); }
         public void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message + JsonSerializer.Serialize(new { G.State.CurrentSeat, G.State.TurnNumber, P })); }
-        public static Scene Start(bool watchGrant = false)
+        public static Scene Start(string? observer = null)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-            var setup = new ShanheBattleSetup(37, 1, "sp-pang-tong-runtime", Hero, 3, 0, 0, 0, 0, watchGrant ? [Driver, GrantWatch] : [Driver], [], [],
+            var setup = new ShanheBattleSetup(37, 1, "sp-pang-tong-runtime", Hero, 3, 0, 0, 0, 0, observer is null ? [Driver] : [Driver, observer], [], [],
                 [new(Peer), new(Peer)], [new(Peer)], new string('a', 64));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,

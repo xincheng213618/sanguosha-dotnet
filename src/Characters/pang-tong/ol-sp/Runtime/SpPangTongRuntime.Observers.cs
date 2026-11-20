@@ -20,7 +20,12 @@ internal sealed partial class SpPangTongRuntime
   if(child is ProgramLifecycleTriggerWindowFrame skills)return ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id,skills);
   var silver=r.Stage=="exchange-children"&&r.OwnFrom==CardLocation.Equipment(f.OwnerSeat)&&r.OwnCard is{}own&&Card(own).Kind==CardKind.SilverLion;
   var health=r.Stage=="health-children"&&r.Wounded;
-  if(child is HpChangedTriggerWindowFrame hp)return (silver||r.Stage=="health-children")&&hp.Change.ParentFrameId==f.Id&&hp.ResumeFrameId==f.Id&&hp.Continuation==PostEventContinuation.AwaitedProgramMovement&&hp.Change.SourceSeat==f.OwnerSeat&&hp.Change.TargetSeat==f.OwnerSeat&&(hp.Change.Kind==HpChangeKind.Recovery&&hp.Change.Amount==1&&(silver||health)||!r.Wounded&&hp.Change.Kind==HpChangeKind.MaximumHp&&hp.Change.Amount==1);
+  if (child is HpChangedTriggerWindowFrame hp)
+      return (silver || r.Stage == "health-children") &&
+          ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.AwaitedProgramMovement) &&
+          hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == f.OwnerSeat &&
+          (hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && (silver || health) ||
+           !r.Wounded && hp.Change.Kind == HpChangeKind.MaximumHp && hp.Change.Amount == 1);
   return (silver||health)&&child is RecoveryReplacementFrame recovery&&facts.RecoveryRidesOn(recovery,f)&&recovery.Return.Continuation==PostEventContinuation.AwaitedProgramMovement&&recovery.Attempt.SourceSeat==f.OwnerSeat&&recovery.Attempt.TargetSeat==f.OwnerSeat&&recovery.Attempt.Amount==1&&(silver?recovery.Attempt.Completion.Producer==RecoveryAttemptProducer.SilverLion&&recovery.Attempt.Completion.MoveReason?.Value==GuolunExchangeReason:recovery.Attempt.Completion.Producer==RecoveryAttemptProducer.Program&&recovery.Attempt.Completion.InstructionIndex==r.Instruction);
  }
  private ProgramSkillFrame? SpPangTongObserverRoot()

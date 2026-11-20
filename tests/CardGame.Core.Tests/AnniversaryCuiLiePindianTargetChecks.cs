@@ -8,6 +8,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
     private const string Hero = "anniversary:cui-lie", Chibi = "anniversary:chibi";
     private const string Mode = "identity:anniversary-chibi-target", Deck = "fixture:anniversary-chibi-target-deck";
     private const string DrawWatch = "fixture:anniversary-zijue-native-draw";
+    private const string RecoveryWatch = "fixture:anniversary-zijue-recovery";
     private static readonly string[] Generals =
         ["fixture:anniversary-chibi-user", Hero, "fixture:anniversary-chibi-far", "fixture:anniversary-chibi-near"];
 
@@ -97,7 +98,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
     {
         const int source = 0, recipient = 1, amount = 2;
         const string skill = "anniversary:zijue", binding = "declare-number";
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(RecoveryWatch));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = source, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
@@ -151,23 +152,59 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             Reach(() => Prompt() is { Kind: DecisionKind.SelectGeneral or DecisionKind.PlayCard });
         }
 
+        var preWound = game.CreateSnapshot(source).Players[source].Hp;
+        Submit(new UseProgramSkillCommand(source, RecoveryWatch, "wound", [], [], game.Revision, Prompt()!.PromptId));
+        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: source });
         var play = Prompt()!;
         var issueTurn = Facts<TurnStartedEvent>().Single(turn => turn.ActorSeat == source);
         var ordinaryDistance = game.GetCombatDistance(recipient, source);
-        var payment = game.CreateSnapshot(source).Players[source].Hand.Take(amount).Select(card => card.Id).ToArray();
-        Need(play.PlayerSeat == source && ordinaryDistance == 1 && payment.Length == amount,
-            "Cui Lie reaches his first actual Play with two physical hand cards and an adjacent recipient.");
+        var sourceBefore = game.CreateSnapshot(source).Players[source];
+        var payment = sourceBefore.Hand.Take(amount).Select(card => card.Id).ToArray();
+        Need(play.PlayerSeat == source && sourceBefore.Hp == preWound - 1 && sourceBefore.Hp < sourceBefore.MaxHp &&
+            Facts<ProgramSkillHpLostEvent>().Count(entry => entry.SkillId == RecoveryWatch && entry.TargetSeat == source && entry.Amount == 1) == 1 &&
+            ordinaryDistance == 1 && payment.Length == amount,
+            "A wounded Cui Lie reaches his first actual Play with two physical hand cards and an adjacent recipient.");
         Submit(new UseProgramSkillCommand(source, skill, binding, [], [recipient], game.Revision, play.PromptId));
         Answer(recipient, choice => choice.Parameters.GetValueOrDefault("value") == "2");
         foreach (var card in payment)
             Answer(source, choice => choice.Cards.SequenceEqual([card]));
-        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: source });
+        Reach(() => Prompt() is { PlayerSeat: source, SkillPrompt.SkillId: RecoveryWatch });
 
         var declaration = Facts<AnniversaryCuiLieNumberEvent>().Single();
         var gift = Facts<AnniversaryCuiLieGiftEvent>().Single();
+        var stack = game.ResolutionStack.ToArray();
+        var parent = stack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == gift.FrameId);
+        var hp = stack.OfType<HpChangedTriggerWindowFrame>().Single();
+        var hpIndex = Array.IndexOf(stack, hp);
+        Need(parent.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.RecoveryChildren } &&
+            hpIndex > 0 && stack[hpIndex - 1].Id == parent.Id && hp.Change.ParentFrameId == parent.Id &&
+            hp.ResumeFrameId == parent.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement &&
+            hp.Change is { SourceSeat: source, TargetSeat: source, Kind: HpChangeKind.Recovery, Amount: 1 } &&
+            hp.Change.HpBefore == sourceBefore.Hp && hp.Change.HpAfter == sourceBefore.Hp + 1 &&
+            payment.All(InRecipientHand) && game.CreateSnapshot(source).Players[source].Hp == hp.Change.HpAfter &&
+            Facts<AnniversaryCuiLieLeaseEvent>().Length == 0,
+            "The real paid gift recovers one HP and pauses under its original program before issuing the distance benefit.");
+        var watchId = Prompt()!.PromptId;
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredParent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredHp = game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.Id == hp.Id);
+        var runtime = game.GetRuntimeModule<CharacterCuiLieAnniversaryRuntime>();
+        Need(Prompt() is { PlayerSeat: source, SkillPrompt.SkillId: RecoveryWatch } watcher && watcher.PromptId == watchId &&
+            runtime.CuiLieFirstChild(restoredParent, restoredHp) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredHp with { ResumeFrameId = hp.Id }) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredHp with { Change = restoredHp.Change with { ParentFrameId = hp.Id } }) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredHp with { Continuation = PostEventContinuation.Program }),
+            "Cold restore retains Zijue's recovery child and rejects a different resume frame, change parent, or continuation.");
+        var resume = Prompt()!;
+        var proceed = resume.Choices.Single(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        Submit(new AnswerPromptCommand(source, resume.PromptId, proceed.Id, game.Revision));
+        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: source });
+
         var lease = Facts<AnniversaryCuiLieLeaseEvent>().Single();
         Need(declaration is { Recipient: recipient, Number: amount } && gift.Count == amount &&
             declaration.FrameId == gift.FrameId && gift.FrameId == lease.FrameId && lease.Turn == issueTurn.TurnNumber &&
+            Facts<RecoveryAppliedEvent>().Single() == new RecoveryAppliedEvent(source, source, 1, sourceBefore.Hp + 1) &&
+            Facts<AnniversaryCuiLieGiftEvent>().Single() == gift &&
             lease.Amount == amount && lease.Source is { OwnerSeat: source, SkillId: skill, BindingId: binding } &&
             payment.All(card => InRecipientHand(card) && game.CardMovements.Count(move =>
                 move.CardId == card && move.From == CardLocation.Hand(source) && move.To == CardLocation.Hand(recipient) &&
@@ -198,7 +235,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
     {
         const int owner = 0, declarer = 1, count = 4;
         const string skill = "anniversary:zijue", reason = "skill-program.anniversary:zijue.draw";
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(watchDraw: true));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(DrawWatch));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = owner, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
@@ -293,29 +330,40 @@ internal static class AnniversaryCuiLiePindianTargetChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture(bool watchDraw = false) : IGameContentPackage
+    private sealed class Fixture(string? watcher = null) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-chibi-target", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
-            if (watchDraw)
+            if (watcher is not null)
             {
+                var isRecovery = watcher == RecoveryWatch;
+                var trigger = isRecovery ? "zijue-recovery" : "zijue-real-draw";
+                var window = isRecovery ? "afterHealthChanged" : "nativeDrawStarting";
+                var condition = isRecovery ? """{"kind":"healthChangeKindIs","hpChangeKind":"recovery"}""" : """{"kind":"phaseIsPlay"}""";
+                var binding = isRecovery ? "recovery" : "draw";
+                var title = isRecovery ? "观察赀爵恢复" : "观察赀爵摸牌";
+                var description = isRecovery ? "暂停于原生体力变化。" : "暂停于原生摸牌请求。";
+                var activations = isRecovery ? """
+                    ,"activations":[{"id":"wound","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving",
+                     "usesPerTurn":1,"effects":[{"op":"loseHp","target":"owner","amount":1}]}]
+                    """ : string.Empty;
                 var catalog = SkillProgramCatalog.Load($$"""
-                    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{DrawWatch}}","revision":1,"triggers":[
-                      {"id":"zijue-real-draw","window":"nativeDrawStarting","subject":"owner","condition":{"kind":"phaseIsPlay"},
-                       "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"draw",
+                    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{watcher}}","revision":1{{activations}},"triggers":[
+                      {"id":"{{trigger}}","window":"{{window}}","subject":"owner","condition":{{condition}},
+                       "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"{{binding}}",
                         "options":[{"id":"continue"}]}]}]}]}
                     """, JsonSerializer.Serialize(new
                     {
                         schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                        skills = new Dictionary<string, object> { [DrawWatch] = new { name = "观察赀爵摸牌", description = "暂停于原生摸牌请求。",
+                        skills = new Dictionary<string, object> { [watcher] = new { name = title, description,
                             optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } }
                     }));
-                builder.AddSkill(new(DrawWatch, catalog.Presentations[DrawWatch].Name, catalog.Presentations[DrawWatch].Description)
-                    { Program = catalog.Programs[DrawWatch], ProgramPresentation = catalog.Presentations[DrawWatch] });
+                builder.AddSkill(new(watcher, catalog.Presentations[watcher].Name, catalog.Presentations[watcher].Description)
+                    { Program = catalog.Programs[watcher], ProgramPresentation = catalog.Presentations[watcher] });
             }
-            CharacterFixtureContent.Register(watchDraw ? new DrawWatchOwner(builder) : builder, Hero);
+            CharacterFixtureContent.Register(watcher is null ? builder : new WatchedOwner(builder, watcher), Hero);
             foreach (var general in Generals.Where(id => id != Hero))
                 builder.AddGeneral(new(general, "固定同桌", "supporter", "standard:none", "wei", 4));
             builder.AddDeck(new(Deck, "斥避固定牌堆", 2, 0, [])
@@ -329,10 +377,11 @@ internal static class AnniversaryCuiLiePindianTargetChecks
         }
     }
 
-    private sealed class DrawWatchOwner(IContentRegistryBuilder builder) : IContentRegistryBuilder
+    private sealed class WatchedOwner(IContentRegistryBuilder builder, string watcher) : IContentRegistryBuilder
     {
         public void AddGeneral(ContentGeneralDefinition general) => builder.AddGeneral(general.Id == Hero
-            ? general with { AdditionalSkillIds = [.. general.AdditionalSkillIds ?? [], DrawWatch] } : general);
+            ? general with { AdditionalSkillIds = [.. general.AdditionalSkillIds ?? [], watcher] }
+            : general);
         public void AddSkill(ContentSkillDefinition skill) => builder.AddSkill(skill);
         public void AddCard(ContentCardDefinition card) => builder.AddCard(card);
         public void AddDeck(ContentDeckRecipe deck) => builder.AddDeck(deck);
