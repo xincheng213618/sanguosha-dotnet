@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
 {
@@ -109,8 +110,21 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         match.EndPlay();
         match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
         var awakened = match.Facts<MouLuMengDujiangAwakenedEvent>().Single();
-        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.FrameId);
-        var watcher = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        var stack = match.Game.ResolutionStack.ToArray();
+        var root = stack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.FrameId);
+        var watcher = stack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        var child = stack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == watcher.WindowContext!.ParentFrameId);
+        var childIndex = Array.IndexOf(stack, child);
+        match.Need(childIndex > 0 && childIndex + 1 < stack.Length && stack[childIndex - 1].Id == root.Id &&
+            stack[childIndex + 1].Id == watcher.Id &&
+            child is { Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram } &&
+            child.ResumeProgramFrameId == root.Id,
+            "Dujiang's original frame directly owns the real skill-change window and its watcher.");
+        var runtime = match.Game.GetRuntimeModule<CharacterLuMengMouMobileRuntime>();
+        match.Need(runtime.MouLuMengFirstChild(root, child) &&
+            !runtime.MouLuMengFirstChild(root, child with { ResumeProgramFrameId = watcher.Id }) &&
+            !runtime.MouLuMengFirstChild(root, child with { Continuation = ProgramLifecycleContinuation.ResumeCharacterStateChange }),
+            "Dujiang accepts its original skill-change return and rejects a different parent or continuation.");
         match.Need(awakened is { OwnerSeat: 0, Armor: 0, Phase: { Kind: ActualDiscardRecoveryPhaseKind.Preparation, ActorSeat: 0, ActualTurnOwnerSeat: 0 } } &&
             match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, awakened.Phase.TurnNumber]) &&
             match.Facts<ActualDiscardRecoveryPhaseStartedEvent>().Any(fact => fact.Phase == awakened.Phase) &&

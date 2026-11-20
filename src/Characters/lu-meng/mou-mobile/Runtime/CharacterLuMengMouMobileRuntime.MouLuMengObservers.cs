@@ -14,8 +14,8 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
             return false;
         if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, f))
             return true;
-        if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
-            return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
+        if (child is ProgramLifecycleTriggerWindowFrame lifecycle)
+            return ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, lifecycle);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (f.MouLuMengKeji is null || hp.Change.Kind == HpChangeKind.Loss && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1 && f.InstructionIndex == 2);
         if (child is DyingFrame dying)
