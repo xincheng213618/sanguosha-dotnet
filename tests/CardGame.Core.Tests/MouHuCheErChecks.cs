@@ -17,11 +17,13 @@ internal static class MouHuCheErChecks
         foreach (var (die, equipmentKind) in new[]
         {
             (false, CardKind.Crossbow), (true, CardKind.Crossbow),
-            (true, CardKind.DefensiveHorse), (true, CardKind.QinggangSword), (true, CardKind.JadeSeal)
+            (true, CardKind.DefensiveHorse), (true, CardKind.QinggangSword), (true, CardKind.JadeSeal),
+            (false, CardKind.SilverLion)
         })
         {
             var checksGrant = equipmentKind == CardKind.Crossbow;
             var checksDraw = equipmentKind == CardKind.JadeSeal;
+            var checksLion = equipmentKind == CardKind.SilverLion;
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(die, equipmentKind));
             var setup = new ShanheBattleSetup(17, 1, "kongwu-shared-state", Hero, 8, 4, 0, 0, 0, [Driver, Quiet],
                 Enumerable.Range(1, 4).Select(rank => new ShanheStartingCard(CardKind.Dodge, Suit.Club, rank)).ToArray(), [],
@@ -47,7 +49,7 @@ internal static class MouHuCheErChecks
                     ? equipped.SingleOrDefault() is { IsBone: false } card && card.Id == id && card.Kind == equipmentKind
                     : equipped.Count == 0;
                 Need(entityMatches, $"{equipmentKind} must have its expected physical state at {boundary}.");
-                if (checksDraw) return;
+                if (checksDraw || checksLion) return;
                 var valueMatches = equipmentKind == CardKind.DefensiveHorse
                     ? game.GetCombatDistance(2, 1) == expected && game.GetCombatDistance(1, 2) == 1
                     : game.GetAttackRange(1) == expected;
@@ -114,7 +116,23 @@ internal static class MouHuCheErChecks
                 "The exact completed phase signs a source-specific restriction through the target's next actual turn end.");
             Cold();
             CheckPrintedEffect(null, 1, "the pre-equipment decision");
+            var holderHpBeforeEquipment = game.CreateSnapshot(0).Players[1].Hp;
             Answer(choice => choice.Targets.SequenceEqual([1]));
+            if (checksLion)
+            {
+                Reach(() => P()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "discard-lion") == true);
+                var holder = game.CreateSnapshot(0).Players[1];
+                Need(game.GetRuntimeModule<CoreNativeDamageHandlesRuntime>().UsesFormalSilverLion &&
+                    holder.Hp > 0 && holder.Hp < holder.MaxHp && holder.Hp == holderHpBeforeEquipment - 1 &&
+                    holder.Equipment.SingleOrDefault() is { Id: 31, Kind: CardKind.SilverLion, IsBone: false } &&
+                    game.CardMovements.Any(move => move.CardId == 31 && move.From == CardLocation.Processing &&
+                        move.To == CardLocation.Equipment(1) && move.Reason == CardMoveReasons.EquipmentEnter) &&
+                    E<ProgramSkillHpLostEvent>().Any(loss => loss.TargetSeat == 1 && loss.Amount == 1) &&
+                    Player(1).SkillGrants.ArePrintedEquipmentEffectsSuppressed,
+                    "Under the accepted debt, the actual Lion installs and its holder is genuinely wounded before the discard command.");
+                Cold();
+                Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "discard-lion");
+            }
             Reach(() => P()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue") == true);
             Need(!Effective(0, Kongwu) && !Effective(1, Unrelated),
                 "The caster lost Kongwu and the independent skill restriction is active.");
@@ -126,13 +144,14 @@ internal static class MouHuCheErChecks
                     change.CardId == 31 && change.CardKind == equipmentKind && change.Slot == slot)
                     ?? throw new InvalidOperationException($"The only {equipmentKind} did not enter seat 1's equipment: " +
                         JsonSerializer.Serialize(game.CardMovements.Where(move => move.CardKind == equipmentKind)));
-                printedEquipmentId = equipment.CardId;
+                if (!checksLion)
+                    printedEquipmentId = equipment.CardId;
                 Need(Player(1).SkillGrants.Grants.All(grant => !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal)) &&
                     game.CardMovements.Any(move => move.CardId == equipment.CardId &&
                     move.From == CardLocation.Processing && move.To == CardLocation.Equipment(1) &&
                     move.Reason == CardMoveReasons.EquipmentEnter),
                     $"The printed {equipmentKind} enters equipment through native resolution without a skill grant.");
-                CheckPrintedEffect(printedEquipmentId, 1, "the late equipment entry under the debt");
+                CheckPrintedEffect(printedEquipmentId, 1, "the late equipment sequence under the debt");
             }
             else
             {
@@ -145,6 +164,21 @@ internal static class MouHuCheErChecks
             }
             Cold();
             CheckPrintedEffect(printedEquipmentId, 1, "cold restore of the accepted debt");
+            if (checksLion)
+            {
+                var departure = game.CardMovements.SingleOrDefault(move => move.CardId == 31 && move.CardKind == CardKind.SilverLion &&
+                    move.From == CardLocation.Equipment(1) && move.To == CardLocation.DiscardPile);
+                Need(departure is not null && game.CreateCardZoneDiagnostics().Single(card => card.CardId == 31).Location == CardLocation.DiscardPile &&
+                    game.CreateSnapshot(0).Players[1].Hp == holderHpBeforeEquipment - 1 &&
+                    Player(1).SkillGrants.ArePrintedEquipmentEffectsSuppressed &&
+                    E<SilverLionRemovedRecoveryEvent>().All(recovery => recovery.PlayerSeat != 1) &&
+                    E<RecoveryAppliedEvent>().All(recovery => recovery.TargetSeat != 1) &&
+                    game.ResolutionStack.All(frame => frame is not RecoveryReplacementFrame
+                        { Attempt: { TargetSeat: 1, Completion.Producer: RecoveryAttemptProducer.SilverLion } } &&
+                        frame.PendingRecoveryAttempts?.Any(attempt => attempt.TargetSeat == 1 &&
+                            attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion) != true),
+                    "Cold recovery preserves the original Lion discard and the holder's wound without a paid or queued Lion recovery.");
+            }
             Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
             Reach(() => E<MouHuCheErDebtTurnEvent>().Any(turn => turn.FrameId == paid.FrameId));
             var due = E<MouHuCheErDebtTurnEvent>().Single(turn => turn.FrameId == paid.FrameId);
@@ -202,6 +236,12 @@ internal static class MouHuCheErChecks
         {
             CharacterFixtureContent.Register(builder, Hero);
             var death = die ? """,{"op":"loseHp","target":"owner","amount":20}""" : "";
+            var lionDeparture = equipmentKind == CardKind.SilverLion ? """
+                ,{"op":"loseHp","target":"selectedTarget","amount":1}
+                ,{"op":"chooseOption","target":"owner","resultBind":"lion-ready","options":[{"id":"discard-lion"}]}
+                ,{"op":"selectOwnedCards","target":"selectedTarget","zones":["equipment"],"amount":1,"resultBind":"lion"}
+                ,{"op":"moveBoundCards","target":"owner","sourceBind":"lion","destination":"discardPile","awaitMovementTriggers":true}
+                """ : "";
             var rules = $$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
               {"id":"{{{Quiet}}}","revision":1,"triggers":[{"id":"no-normal-draw","window":"drawPhaseStarting","subject":"owner","optional":false,
@@ -210,13 +250,16 @@ internal static class MouHuCheErChecks
                 {"op":"selectTarget","target":"owner","targetKind":"otherLiving"},
                 {"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["{{{Kongwu}}}"]}},
                 {"op":"useRandomDeckEquipment","target":"owner","resultBind":"late-equipment"},
-                {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Unrelated}}}"]},"until":[{"event":"roundAdvanced","timing":"after"}]},
+                {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Unrelated}}}"]},"until":[{"event":"roundAdvanced","timing":"after"}]}{{{lionDeparture}}},
                 {"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}{{{death}}}]}]}
             ]}
             """;
+            var optionLabels = new Dictionary<string, string> { ["continue"] = "继续" };
+            if (equipmentKind == CardKind.SilverLion)
+                optionLabels.Add("discard-lion", "弃置已装备的白银狮子");
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Quiet] = new { name = "Quiet", description = "Fixed native draw" },
-                    [Driver] = new { name = "Debt observation", description = "Native equipment after source loss", optionLabels = new { @continue = "继续" } } } });
+                    [Driver] = new { name = "Debt observation", description = "Native equipment after source loss", optionLabels } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             foreach (var (id, program) in catalog.Programs)
                 builder.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
@@ -229,12 +272,15 @@ internal static class MouHuCheErChecks
                 builder.AddEquipmentContent(new("fixture:kongwu-equipment-binding", [EquipmentCatalog.Get(CardKind.Crossbow)],
                     [new(CardKind.Crossbow, EquipmentSkill, "equipment:fixture-kongwu")]));
             }
+            if (equipmentKind == CardKind.SilverLion)
+                builder.AddCard(StandardContentRegistry.CreateWithClassicGenerals().GetCard("classic:silver-lion"));
             ContentDeckPhysicalCard equipment = equipmentKind switch
             {
                 CardKind.Crossbow => new("standard:crossbow", Suit.Club, 7),
                 CardKind.DefensiveHorse => new("standard:defensive_horse", Suit.Spade, 5),
                 CardKind.QinggangSword => new("standard:qinggang_sword", Suit.Spade, 6),
                 CardKind.JadeSeal => new("standard:jade_seal", Suit.Club, 1),
+                CardKind.SilverLion => new("classic:silver-lion", Suit.Club, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(equipmentKind))
             };
             // The derived Shanhe battle seed keeps card 31 below Kongwu's opening refill.
