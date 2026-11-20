@@ -862,6 +862,9 @@ var tests = new (string Name, Action Body)[]
     ("Happy Renjie: actual self discard executor cold", HappySimaYiRenjieDiscardExecutorChecks.RenjieCountsOnlyTheActualSelfDiscardExecutorCold),
     ("Wumiao Zhizhe: paid equipment returns when its slot is abolished cold", WumiaoZhizheEquipmentReturnChecks.ZhizheReturnsPaidEquipmentWhenSlotIsAbolishedBeforePlacementCold),
     ("OL Luochong: paid option and target stay reserved during nested Dying cold", OlTengFangLanLuochongChecks.LuochongReservesItsPaidOptionAndTargetDuringNestedDyingCold),
+    ("Anniversary Saowei: cannot obtain a later discard of delivered Slash cold", AnniversaryQiaoRuiSaoweiDiscardEntryChecks.SaoweiCannotObtainANewerDiscardOfAnAlreadyDeliveredSlashCold),
+    ("Classic Funan: gifts the directly answered counterspell entry cold", ClassicFunanRespondedCounterspellChecks.FunanGiftsOnlyTheDirectlyAnsweredCounterspellEntryCold),
+    ("Mobile Boundary Sidi: first native Shensu Slash consumes private forecast cold", MobileBoundarySidiShensuChecks.SidiConsumesFirstActualShensuSlashCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

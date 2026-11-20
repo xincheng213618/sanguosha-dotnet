@@ -56,9 +56,19 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
                 _zoneEntries.CurrentEntry(location, cost.CardId) is { } sequence && sequence > 0)
                 entries.Add(new(cost.CardId, location, (int)sequence));
         }
+
+        var depth = parent is NullificationWindowFrame { ResponseRuleNode: { } node } counterspell &&
+            node.Action.ActionId == response.ActionId && node.ChainDepth == counterspell.ChainDepth
+            ? counterspell.ChainDepth : (int?)null;
+        var previous = parent.ResponseExchangeAcceptedMaterials;
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with
         {
             ResponseExchangeAcceptedMaterials = new(response.ActionId, entries.AsReadOnly())
+            {
+                CounterspellDepth = depth,
+                AnsweredCounterspell = depth is > 1 && previous is not null && previous.CounterspellDepth == depth - 1
+                    ? new(previous.ActionId, previous.Entries) : null
+            }
         });
     }
 
@@ -97,6 +107,18 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         effect.ResponseExchangeMode != ProgramResponseExchangeMode.ClaimResponseOnly &&
         !ResponseExchangeUpgraded(owner, skill, instance, effect.StateId!);
 
+    private bool IsAnsweredCounterspellCurrent(CardActionContext response, CardActionContext original)
+    {
+        if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not
+                { ChainDepth: > 1, ResponseRuleNode: { } node, ResponseExchangeAcceptedMaterials: { AnsweredCounterspell: { } answered } accepted } window ||
+            node.Action.ActionId != response.ActionId || node.ChainDepth != window.ChainDepth ||
+            accepted.ActionId != response.ActionId || accepted.CounterspellDepth != window.ChainDepth || answered.ActionId != original.ActionId)
+            return false;
+
+        return answered.Entries.Count == original.PhysicalCards.Count && original.PhysicalCards.All(cost =>
+            answered.Entries.Any(entry => entry.CardId == cost.CardId && CurrentResponseEntry(entry, original.ConversionChain.Count != 0) is not null));
+    }
+
     internal CardActionContext? ActualRespondedAction(CardActionContext response)
     {
         if (response.Type != CardActionType.Response)
@@ -117,7 +139,9 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             return false;
         if (!DeliversOriginalResponseExchangeCard(owner, skill, instance, effect))
             return true;
-        return _coreMatchParticipantsPlayersAccess._players[response.ActorSeat].IsAlive && !original.ConversionChain.Any(_coreWushuangJinzhiOperations.IsWushuangJinzhiSource) && original.PhysicalCards.Count > 0 && original.PhysicalCards.All(c => !IsExchangedCardClaim(original.ActionId, c.CardId) && _cardZonesOperations._cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
+        return _coreMatchParticipantsPlayersAccess._players[response.ActorSeat].IsAlive && !original.ConversionChain.Any(_coreWushuangJinzhiOperations.IsWushuangJinzhiSource) && original.PhysicalCards.Count > 0 &&
+            (original.Type == CardActionType.Use || IsAnsweredCounterspellCurrent(response, original)) &&
+            original.PhysicalCards.All(c => !IsExchangedCardClaim(original.ActionId, c.CardId) && _cardZonesOperations._cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 70)]

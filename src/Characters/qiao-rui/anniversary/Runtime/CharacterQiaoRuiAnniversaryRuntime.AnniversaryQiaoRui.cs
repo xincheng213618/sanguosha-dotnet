@@ -167,7 +167,9 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
             }
         }
 
-        if (r.Stage == AnniversaryQiaoRuiStage.NativeTail && r.Damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.Plan is { } p && _cardZonesOperations._cardZones.GetLocation(p.CardId)is var from && from is { Zone: CardZoneKind.DiscardPile or CardZoneKind.Processing })
+        if (r is { Stage: AnniversaryQiaoRuiStage.NativeTail, Damaged: true, NativeMaterialDelivered: false, Plan: { } p } &&
+            _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive &&
+            _cardZonesOperations._cardZones.GetLocation(p.CardId).Zone is CardZoneKind.DiscardPile or CardZoneKind.Processing)
         {
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryQiaoRui = r with { Stage = AnniversaryQiaoRuiStage.ClaimChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

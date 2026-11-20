@@ -23,6 +23,8 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
     {
         if (f.AnniversaryQiaoRui is not { } r || f.InstructionIndex != 1 || !QiaoRuiOriginal(f, r.Operation) || r.Source != QiaoRuiSource(f) || r.Hash != f.GameplayHash || r.ParentId != f.WindowContext!.ParentFrameId || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Requested < 0 || r.Cards.Any(id => id <= 0) || r.Cards.Distinct().Count() != r.Cards.Count || r.NativeBatches.Distinct().Count() != r.NativeBatches.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiStartedEvent>().Count(e => e == new AnniversaryQiaoRuiStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.ParentId, r.Turn)) != 1)
             return false;
+        if (r.NativeMaterialDelivered && (!r.Returned || r.Operation != SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei))
+            return false;
         if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw)
         {
             if (r.Cards.Count != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Damaged || r.Returned || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.Drawing or AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.Completed))

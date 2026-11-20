@@ -15,6 +15,14 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     }
 
     internal int[] BoundarySidiEligibleHolders(int owner, string instance) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner && !BoundarySidiRecords(owner, instance).Any(record => record.HolderSeat == player.Seat)).Select(player => player.Seat).ToArray();
+
+    internal bool HasLiveBoundarySidiPrediction(int actorSeat) =>
+        _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryCaoZhenSidi) &&
+        _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive &&
+            _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == BoundarySidiSkill &&
+                _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) &&
+                BoundarySidiRecords(owner.Seat, instance.SkillInstanceId).Any(record => record.HolderSeat == actorSeat)));
+
     internal IReadOnlyList<int> BoundarySidiActualTargets(ProgramCardTriggerWindowFrame window)
     {
         var action = window.Action;
@@ -179,7 +187,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     }
     internal bool TryBoundarySidiEquipmentCommitted(long id, Card equipment)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != equipment.Kind || !_nativeInvalidations.IsUseIneffective(use) && !_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == BoundarySidiSkill && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) && BoundarySidiRecords(owner.Seat, instance.SkillInstanceId).Any(record => record.HolderSeat == action.ActorSeat))))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != equipment.Kind || !_nativeInvalidations.IsUseIneffective(use) && !HasLiveBoundarySidiPrediction(action.ActorSeat))
             return false;
         var continuation = new ProgramSimpleCardContinuation(equipment.Id, SimpleCardUseEffect.EquipmentPlacement);
         if (_coreCardUseLifecycleOperations.TryBeginCommittedCardUse(id, ProgramCardContinuation.CommittedSimpleCard, simple: continuation))

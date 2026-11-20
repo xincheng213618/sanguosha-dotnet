@@ -19,6 +19,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - A response exchange reads the accepted response's public entries on its native parent. A direct claim checks those entries before offering and acquiring the materials. When the exchange gives the original card first, it freezes the response entries before delivery and rechecks them after the delivery's children return. Loss of a response entry leaves the earlier delivery and its restriction effective.
 
+- When a counterspell replies to another counterspell, its native window retains only the immediately answered payment receipt alongside its own. An exchange giving that earlier play verifies its action, chain position and current physical entries before delivery.
+
 - A completed-response storage offer reads the actual discard entry from the response window's `NativeCosts` after the payment children settle. Its candidate and execution check that same current entry, since the same physical card can leave and reenter the discard pile before the original window resumes.
 
 - Applied response relations use `IAppliedResponseRules` and the shared lifetime store; native use and current counterspell nodes capture issued rules on their original frames. Keep exact displayed names distinct from normalized basic names, frozen source-holder color distinct from unknown color, and declared boundary expiry distinct from turn-number expiry. Query the real current counterspell action/depth; never inherit the root trick after depth zero, use character-origin whitelists, or requalify issued rules after source loss. Real delivery freezes the relation before paid notifications; card-actor, responder and material-provider identities remain separate.

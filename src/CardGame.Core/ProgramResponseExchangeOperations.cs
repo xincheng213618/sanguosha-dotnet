@@ -64,7 +64,15 @@ public sealed class DrawPublicSuitThenEscalatingDiscardHandler : ISkillProgramEf
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect,ProgramSkillFrame frame,int targetSeat,ISkillProgramEffectHost host)=>host.GetCapability<IResponseExchangeProgramHost>().DrawPublicSuitThenEscalatingDiscard(frame,effect);
 }
 internal sealed record ResponseExchangeMaterialEntry(int CardId, CardLocation Location, int EntrySequence);
-internal sealed record ResponseExchangeAcceptedMaterials(long ActionId, IReadOnlyList<ResponseExchangeMaterialEntry> Entries);
+internal sealed record ResponseExchangeAnsweredCounterspell(long ActionId, IReadOnlyList<ResponseExchangeMaterialEntry> Entries);
+internal sealed record ResponseExchangeAcceptedMaterials(long ActionId, IReadOnlyList<ResponseExchangeMaterialEntry> Entries)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CounterspellDepth { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ResponseExchangeAnsweredCounterspell? AnsweredCounterspell { get; init; }
+}
 
 public abstract partial record ResolutionFrame
 {

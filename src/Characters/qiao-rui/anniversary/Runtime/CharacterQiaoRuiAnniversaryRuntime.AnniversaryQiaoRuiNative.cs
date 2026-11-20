@@ -142,7 +142,12 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         var r = f.AnniversaryQiaoRui!;
         if (!IsQiaoRuiNativeUse(use) || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == o.CardId) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == o.CardId && m.Sequence > r.Before && m.From == o.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) != 1)
             throw new InvalidOperationException("Saowei cannot pay another material or return the same use twice.");
-        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { AnniversaryQiaoRui = r with { Returned = true } });
+        var materialDelivered = use.MaterialClaims.Any(claim => claim.CardId == o.CardId &&
+            claim.Kind == NativeMaterialClaimKind.Delivery && claim.MovementSequence > 0);
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with
+        {
+            AnniversaryQiaoRui = r with { Returned = true, NativeMaterialDelivered = materialDelivered }
+        });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryQiaoRuiUseReturnedEvent(f.Id, use.Id, o.ActionId));
         if (use.CardAttack is not { Active: true })
             SettleQiaoRuiUse(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));

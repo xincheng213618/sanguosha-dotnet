@@ -58,6 +58,8 @@ public sealed record AnniversaryQiaoRuiReceipt(CardConversionSource Source, stri
  public long UseId { get; init; }
  public long ActionId { get; init; }
  public bool Returned { get; init; }
+ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+ public bool NativeMaterialDelivered { get; init; }
  public bool Damaged { get; init; }
 }
 public sealed partial record ProgramSkillFrame { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public AnniversaryQiaoRuiReceipt? AnniversaryQiaoRui { get; init; } }
