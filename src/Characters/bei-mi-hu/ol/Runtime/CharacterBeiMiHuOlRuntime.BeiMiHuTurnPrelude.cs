@@ -6,9 +6,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     internal bool TryBeginBeiMiHuActualTurnPrelude(CharacterState owner)
     {
         if (!_coreActualTurnsOperations.HasBeforeTurnPreludeBindingWork(owner) &&
-            !_characterLuSuMobileShiOperations.HasShiLsHandGrantsToExpire(owner.Seat) &&
-            _characterChenZhiMobileShiOperations.ShiCzPendingExtra(owner.Seat) is null &&
-            _characterDongZhaoMobileShiOperations.ShiDzPendingExtra(owner.Seat) is null)
+            !_programPipelineHooksOperations._programPipelineHooks.HasBeforeTurnPreludeWork(owner.Seat))
             return false;
         var id = _coreActualTurnsOperations.OpenBeforeTurnPrelude(owner);
         _characterLuSuMobileShiOperations.ExpireShiLsHandGrants(owner.Seat, id);

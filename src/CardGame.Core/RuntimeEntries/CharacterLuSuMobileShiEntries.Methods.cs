@@ -18,7 +18,6 @@ internal sealed partial class CharacterLuSuMobileShiEntries
     internal void ExpireShiLsHandGrants(int upcomingOwnerSeat, long preludeId) => _resolve().ExpireShiLsHandGrants(upcomingOwnerSeat, preludeId);
     internal Card? FindShiLsPlayableCard(CharacterState actor, int id) => _resolve().FindShiLsPlayableCard(actor, id);
     internal void FinishShiLs(ProgramSkillFrame f) => _resolve().FinishShiLs(f);
-    internal bool HasShiLsHandGrantsToExpire(int owner) => _resolve().HasShiLsHandGrantsToExpire(owner);
     internal bool HasShiLsHandView(int actor, int provider) => _resolve().HasShiLsHandView(actor, provider);
     internal bool HasShiLsUsePaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _resolve().HasShiLsUsePaymentTail(use, continuation);
     internal bool IsShiLsAuthorizedResponseMaterial(CardActionContext action, CardActionCost cost) => _resolve().IsShiLsAuthorizedResponseMaterial(action, cost);

@@ -18,6 +18,5 @@ internal sealed partial class CharacterDongZhaoMobileShiEntries
     internal void SealShiDz(long id) => _resolve().SealShiDz(id);
     internal IReadOnlyList<PromptChoice> ShiDzChoices(ProgramSkillFrame f) => _resolve().ShiDzChoices(f);
     internal IReadOnlyList<PromptChoice> ShiDzPayments(ProgramSkillFrame f) => _resolve().ShiDzPayments(f);
-    internal MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary) => _resolve().ShiDzPendingExtra(beneficiary);
     internal int ShiDzSameNameMaximum(int seat) => _resolve().ShiDzSameNameMaximum(seat);
 }

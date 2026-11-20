@@ -13,6 +13,9 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
         _coreActualTurnsOperations.PendingExtraTurnPreludeGrant<MobileShiDongZhaoExtraGrantedEvent, MobileShiDongZhaoExtraEnteredEvent>(
             beneficiary, ShiDzYingjia);
 
+    [ProgramPipelineHook(ProgramPipelinePhase.BeforeTurnPreludeWork, 30)]
+    internal bool HasShiDzExtraPreludeWork(int owner) => ShiDzPendingExtra(owner) is not null;
+
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 47700)]
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeShiDzExtra(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)
     {

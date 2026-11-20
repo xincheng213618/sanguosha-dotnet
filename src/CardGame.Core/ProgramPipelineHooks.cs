@@ -54,7 +54,8 @@ internal enum ProgramPipelinePhase
     ReturnBaguaResponse,
     RequiresVirtualSlashAction,
     TryBeginProgramInvocation,
-    FieldEquipmentRepresentation
+    FieldEquipmentRepresentation,
+    BeforeTurnPreludeWork
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -148,6 +149,8 @@ internal sealed class ProgramPipelineHookCatalog
             [ProgramPipelinePhase.ContinueDetachedProgramBinding] = (typeof(ProgramDetachedBindingContinuation),
                 [typeof(ProgramSkillFrame)], typeof(bool)),
             [ProgramPipelinePhase.UnissuedTurnStartObligation] = (typeof(ProgramTurnStartObligationProbe),
+                [typeof(int)], typeof(bool)),
+            [ProgramPipelinePhase.BeforeTurnPreludeWork] = (typeof(ProgramTurnStartObligationProbe),
                 [typeof(int)], typeof(bool)),
             [ProgramPipelinePhase.ObservesResponseUseCompletion] = (typeof(ProgramResponseUseCompletionObservation),
                 [typeof(CardActionContext)], typeof(bool)),
@@ -279,6 +282,7 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramPlayPhaseActionFilter[] _filterPlayPhaseActions;
     private readonly ProgramDetachedBindingContinuation[] _continueDetachedProgramBinding;
     private readonly ProgramTurnStartObligationProbe[] _unissuedTurnStartObligation;
+    private readonly ProgramTurnStartObligationProbe[] _beforeTurnPreludeWork;
     private readonly ProgramResponseUseCompletionObservation[] _observesResponseUseCompletion;
     private readonly Func<int, bool>[] _requiresVirtualSlashAction;
     private readonly ProgramCardEntitySkillLabelProvider[] _cardEntitySkillLabel;
@@ -332,6 +336,7 @@ internal sealed class ProgramPipelineHooks
         _filterPlayPhaseActions = Bind<ProgramPlayPhaseActionFilter>(ProgramPipelinePhase.FilterPlayPhaseActions);
         _continueDetachedProgramBinding = Bind<ProgramDetachedBindingContinuation>(ProgramPipelinePhase.ContinueDetachedProgramBinding);
         _unissuedTurnStartObligation = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.UnissuedTurnStartObligation);
+        _beforeTurnPreludeWork = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.BeforeTurnPreludeWork);
         _observesResponseUseCompletion = Bind<ProgramResponseUseCompletionObservation>(ProgramPipelinePhase.ObservesResponseUseCompletion);
         _requiresVirtualSlashAction = Bind<Func<int, bool>>(ProgramPipelinePhase.RequiresVirtualSlashAction);
         _cardEntitySkillLabel = Bind<ProgramCardEntitySkillLabelProvider>(ProgramPipelinePhase.CardEntitySkillLabel);
@@ -476,6 +481,13 @@ internal sealed class ProgramPipelineHooks
     internal bool HasUnissuedTurnStartObligation(int seat)
     {
         foreach (var probe in _unissuedTurnStartObligation)
+            if (probe(seat)) return true;
+        return false;
+    }
+
+    internal bool HasBeforeTurnPreludeWork(int seat)
+    {
+        foreach (var probe in _beforeTurnPreludeWork)
             if (probe(seat)) return true;
         return false;
     }

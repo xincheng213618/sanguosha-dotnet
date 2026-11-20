@@ -35,6 +35,9 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner) =>
         _coreActualTurnsOperations.PendingExtraTurnPreludeGrant<MobileShiChenZhiExtraGrantedEvent, MobileShiChenZhiExtraEnteredEvent>(owner, ShiCzQuanchong);
 
+    [ProgramPipelineHook(ProgramPipelinePhase.BeforeTurnPreludeWork, 20)]
+    internal bool HasShiCzExtraPreludeWork(int owner) => ShiCzPendingExtra(owner) is not null;
+
     // A paid extra-turn obligation survives loss of its original skill. It is
     // still bound to the last native pend and the original content hash.
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 47600)]

@@ -23,6 +23,5 @@ internal sealed partial class CharacterChenZhiMobileShiEntries
     internal IReadOnlyList<PromptChoice> ShiCzChoices(ProgramSkillFrame f) => _resolve().ShiCzChoices(f);
     internal IReadOnlyList<int> ShiCzDiscardTargets(ProgramSkillFrame frame) => _resolve().ShiCzDiscardTargets(frame);
     internal IReadOnlyList<PromptChoice> ShiCzPaymentChoices(ProgramSkillFrame f, int holder) => _resolve().ShiCzPaymentChoices(f, holder);
-    internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner) => _resolve().ShiCzPendingExtra(owner);
     internal bool ShiCzUsedOrPlayedSlash(int seat) => _resolve().ShiCzUsedOrPlayedSlash(seat);
 }
