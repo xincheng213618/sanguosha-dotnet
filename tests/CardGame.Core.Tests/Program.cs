@@ -869,6 +869,7 @@ var tests = new (string Name, Action Body)[]
     ("Classic Jili: original attack range before equipment installation cold", ClassicShaMoKeJiliEquipmentTimingChecks.JiliUsesTheOriginalAttackRangeBeforeInstallingEquipmentCold),
     ("Mobile Boundary Qiaomeng: claims the original discard of the damaged target mount cold", BoundaryMobileQiaomengDiscardEntryChecks.QiaomengClaimsOnlyTheOriginalDiscardOfTheDamagedTargetsMountCold),
     ("Happy Wei Yan Ezhi: uses only the original discarded bone cold", HappyWeiYanEzhiDiscardEntryChecks.EzhiUsesOnlyTheOriginalDiscardedBoneCold),
+    ("Happy Wei Yan Gujing: physical bone occupies its chosen slot without printed effects cold", HappyWeiYanEzhiDiscardEntryChecks.GujingBoneOccupiesChosenSlotWithoutPrintedEffectsCold),
     ("Shi Chen Zhi: first typed Cao Xian discard alone offers Renxing cold", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardConsumesOnlyRenxingOpportunity),
     ("Mobile Boundary Jingce: counts only the paid equipment use that finishes into discard cold", BoundaryMobileJingceEquipmentDiscardChecks.JingceCountsOnlyThePaidEquipmentUseThatFinishesIntoDiscardCold),
     ("Mou Dong Zhuo OL Fengshang: second gift requires its original discard entry cold", MouDongZhuoOlFengshangDiscardEntryChecks.FengshangSecondGiftRequiresItsOriginalDiscardEntryCold),

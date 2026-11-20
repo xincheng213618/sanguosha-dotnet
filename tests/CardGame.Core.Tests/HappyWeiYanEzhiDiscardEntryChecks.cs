@@ -11,6 +11,66 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
     private const string Rediscard = "skill-program.fixture:ezhi-reentry.SelectAndMoveOwnedCard";
     private static readonly string[] Generals = ["fixture:ezhi-owner", "fixture:ezhi-holder", "fixture:ezhi-peer-a", "fixture:ezhi-peer-b"];
 
+    internal static void GujingBoneOccupiesChosenSlotWithoutPrintedEffectsCold()
+    {
+        var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture(withEzhi: false));
+        var game = Start(content);
+        var play = Next(game);
+        var bone = game.CreateSnapshot(0).Players[0].Hand.Single();
+        var weapon = game.CreateSnapshot(1).Players[1].Hand.Single();
+        Require(play is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } && bone.Kind == CardKind.QinggangSword &&
+            weapon.Kind == CardKind.QinggangSword && weapon.Id != bone.Id && game.GetAttackRange(1) == 1,
+            "The two participants hold distinct genuine range-two weapons before Gujing places one as a bone.");
+
+        Accept(game, new UseProgramSkillCommand(0, Gujing, "bone-path", [], [1], game.Revision, play.PromptId));
+        GujingChoice(game, "card:" + bone.Id);
+        GujingChoice(game, "slot:Armor");
+        Require(Next(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Gujing },
+            "The native Gujing choice resumes after the bone's real placement.");
+        var placement = Facts<HappyWeiYanBonePlacedEvent>(game).Single();
+        Require(placement is { Holder: 1, Slot: EquipmentSlot.Armor } && game.CardMovements.Any(move =>
+                move.Sequence == placement.After && move.CardId == bone.Id && move.CardKind == CardKind.QinggangSword &&
+                move.From == CardLocation.Hand(0) && move.To == CardLocation.Equipment(1)),
+            "The original Qinggang Sword physically enters equipment in the chosen armor slot.");
+
+        game = Cold(game, content);
+        Require(Zone(game, bone.Id) == CardLocation.Equipment(1) && game.GetAttackRange(1) == 1 &&
+            game.CreateSnapshot(0).Players[1].Equipment.Single() is
+                { IsBone: true, Kind: CardKind.QinggangSword, OccupiedEquipmentSlot: EquipmentSlot.Armor } sourceView && sourceView.Id == bone.Id &&
+            game.CreateSnapshot(1).Players[1].Equipment.Single() is
+                { IsBone: true, Kind: CardSnapshot.UndisclosedKind, OccupiedEquipmentSlot: EquipmentSlot.Armor } holderView && holderView.Id == bone.Id,
+            "Cold recovery preserves the armor-slot occupation and concealed printed face, and the bone supplies no printed weapon range.");
+
+        GujingChoice(game, "finish");
+        play = Next(game);
+        Require(play is { PlayerSeat: 0, Kind: DecisionKind.PlayCard }, "The original Play resumes with the bone still in place.");
+        Accept(game, new EndPlayPhaseCommand(0, game.Revision, play.PromptId));
+        if (Next(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Watch })
+            Skip(game);
+        play = Next(game);
+        Require(play is { PlayerSeat: 1, Kind: DecisionKind.PlayCard }, "The bone holder reaches an actual Play phase.");
+        var equip = game.GetLegalActions(1).Single(action => action.Kind == LegalActionKind.Equip && action.CardId == weapon.Id);
+        Accept(game, new PlayCardCommand(1, weapon.Id, equip.TargetSeats, game.Revision, play.PromptId, equip.PlayedCardKind));
+        var afterEquip = Next(game);
+        Require(afterEquip is { PlayerSeat: 1, Kind: DecisionKind.PlayCard },
+            "Native equipment returns to the holder's Play phase. Actual prompt " + JsonSerializer.Serialize(afterEquip));
+
+        var changed = Facts<EquipmentChangedEvent>(game).SingleOrDefault(e => e.CardId == weapon.Id);
+        var movements = game.CardMovements.Where(move => move.CardId == weapon.Id || move.CardId == bone.Id).ToArray();
+        Require(changed is { PlayerSeat: 1, Slot: EquipmentSlot.Weapon, ReplacedCardId: null } &&
+            movements.Count(move => move.CardId == weapon.Id && move.From == CardLocation.Hand(1) &&
+                move.To == CardLocation.Processing && move.Reason == CardMoveReasons.EquipmentUse) == 1 &&
+            movements.Count(move => move.CardId == weapon.Id && move.From == CardLocation.Processing &&
+                move.To == CardLocation.Equipment(1) && move.Reason == CardMoveReasons.EquipmentEnter) == 1,
+            "The holder pays and installs the genuine weapon in the free weapon slot. Actual " + JsonSerializer.Serialize(new { changed, movements }));
+        Require(Zone(game, weapon.Id) == CardLocation.Equipment(1) && Zone(game, bone.Id) == CardLocation.Equipment(1) &&
+            !movements.Any(move => move.CardId == bone.Id && move.Sequence > placement.After),
+            "The original armor-slot bone remains equipped alongside the ordinary weapon. Actual moves " + JsonSerializer.Serialize(movements));
+        var range = game.GetAttackRange(1);
+        Require(range == 2, "The ordinary weapon supplies range two. Actual range " + range +
+            " and equipment " + JsonSerializer.Serialize(game.CreateSnapshot(0).Players[1].Equipment));
+    }
+
     internal static void EzhiUsesOnlyTheOriginalDiscardedBoneCold()
     {
         var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
@@ -119,7 +179,7 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
         return restored;
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool withEzhi = true) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-happy-wei-yan-ezhi-entry", new(1, 0));
 
@@ -138,7 +198,9 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
             var catalog = SkillProgramCatalog.LoadCurrent(rules, presentation);
             builder.AddSkill(new(Watch, catalog.Presentations[Watch].Name, catalog.Presentations[Watch].Description)
                 { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
-            builder.AddGeneral(new(Generals[0], "恶峙与骨径", "supporter", Ezhi, "shu", 6, [Gujing, Watch]));
+            // Ezhi's compulsory discard would remove the bone before ordinary equipment placement.
+            builder.AddGeneral(new(Generals[0], withEzhi ? "恶峙与骨径" : "骨径", "supporter", withEzhi ? Ezhi : Gujing,
+                "shu", 6, withEzhi ? [Gujing, Watch] : [Watch]));
             foreach (var general in Generals.Skip(1))
                 builder.AddGeneral(new(general, "同桌", "supporter", "standard:none", "wei", 5));
             builder.AddDeck(new(Deck, "四张真实青釭剑", InitialHandSize: 1, DrawPerTurn: 0, [])

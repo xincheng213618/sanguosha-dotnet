@@ -26,6 +26,11 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
 
     internal EquipmentSlot? HappyBoneSlot(Card card) => CurrentHappyBone(card.Id)is { } bone && bone.PrintedKind == card.Kind ? bone.Slot : null;
     internal bool IsHappyWeiYanBone(int id) => CurrentHappyBone(id)is not null;
+
+    [ProgramPipelineHook(ProgramPipelinePhase.FieldEquipmentRepresentation, 10)]
+    internal FieldEquipmentRepresentation? GetHappyBoneFieldRepresentation(int cardId) =>
+        CurrentHappyBone(cardId) is { } bone ? new(bone.PrintedKind, bone.Slot) : null;
+
     internal int? HappyBoneSourceOwner(int cardId) => IsHappyWeiYanBone(cardId) ? HappyBoneRecord(cardId)!.Source.OwnerSeat : null;
     internal HappyWeiYanBone? HappyBoneAt(int cardId, CardLocation location, int sequence)
     {

@@ -32,6 +32,9 @@ public sealed record EquipmentDefinition(
     bool IgnoresArmor = false,
     bool BlocksBlackSlash = false);
 
+// An alternate field representation occupies its declared slot in place of printed equipment effects.
+internal readonly record struct FieldEquipmentRepresentation(CardKind PrintedKind, EquipmentSlot OccupiedSlot);
+
 public static class EquipmentCatalog
 {
     private static readonly EquipmentContentRegistry Definitions = EquipmentContentRegistry.Create(BuiltInEquipmentContent.All);

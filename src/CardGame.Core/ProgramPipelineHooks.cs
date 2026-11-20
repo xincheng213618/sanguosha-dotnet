@@ -53,7 +53,8 @@ internal enum ProgramPipelinePhase
     AppendNumericRuleContributions,
     ReturnBaguaResponse,
     RequiresVirtualSlashAction,
-    TryBeginProgramInvocation
+    TryBeginProgramInvocation,
+    FieldEquipmentRepresentation
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -191,6 +192,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(long), typeof(CardConversionSource), typeof(string)], typeof(bool)),
             [ProgramPipelinePhase.VirtualEquipment] = (typeof(ProgramVirtualEquipmentProvider),
                 [typeof(int), typeof(EquipmentSlot)], typeof(CardKind?)),
+            [ProgramPipelinePhase.FieldEquipmentRepresentation] = (typeof(Func<int, FieldEquipmentRepresentation?>),
+                [typeof(int)], typeof(FieldEquipmentRepresentation?)),
             [ProgramPipelinePhase.ParticipantPrompt] = (typeof(ProgramParticipantPromptProvider),
                 [typeof(PendingDecision), typeof(int)], typeof(PendingDecision)),
             [ProgramPipelinePhase.ParticipantHostState] = (typeof(ProgramParticipantHostStateProvider),
@@ -300,6 +303,7 @@ internal sealed class ProgramPipelineHooks
     private readonly Action<int, SkillRuleQuery, List<RuleQueryContribution>>[] _appendNumericRuleContributions;
     private readonly Func<bool>[] _resumeScheduledPhase,_cancelScheduledPhase;
     private readonly ProgramVirtualEquipmentProvider[] _virtualEquipment;
+    private readonly Func<int, FieldEquipmentRepresentation?>[] _fieldEquipmentRepresentations;
     private readonly ProgramParticipantPromptProvider[] _participantPrompt;
     private readonly ProgramParticipantHostStateProvider[] _participantHostState;
 
@@ -352,6 +356,7 @@ internal sealed class ProgramPipelineHooks
         _resumeScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.ResumeScheduledPhase);
         _cancelScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.CancelScheduledPhase);
         _virtualEquipment = Bind<ProgramVirtualEquipmentProvider>(ProgramPipelinePhase.VirtualEquipment);
+        _fieldEquipmentRepresentations = Bind<Func<int, FieldEquipmentRepresentation?>>(ProgramPipelinePhase.FieldEquipmentRepresentation);
         _participantPrompt = Bind<ProgramParticipantPromptProvider>(ProgramPipelinePhase.ParticipantPrompt);
         _participantHostState = Bind<ProgramParticipantHostStateProvider>(ProgramPipelinePhase.ParticipantHostState);
 
@@ -636,6 +641,13 @@ internal sealed class ProgramPipelineHooks
     {
         foreach (var provider in _virtualEquipment)
             if (provider(seat, slot) is { } kind) return kind;
+        return null;
+    }
+
+    internal FieldEquipmentRepresentation? GetFieldEquipmentRepresentation(int cardId)
+    {
+        foreach (var provider in _fieldEquipmentRepresentations)
+            if (provider(cardId) is { } representation) return representation;
         return null;
     }
 }
