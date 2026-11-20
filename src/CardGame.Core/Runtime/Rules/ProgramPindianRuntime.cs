@@ -4,6 +4,7 @@ internal interface IProgramPindianPolicyQueries : IProgramSelectionQuery
 {
     bool ProhibitsPindianTarget(int seat);
     bool CanDiscardForPindian(int seat);
+    bool HasPindianInput(int seat);
 }
 
 internal interface IProgramPindianProducer : IProgramRuntimeOperations
@@ -36,8 +37,7 @@ internal sealed class ProgramPindianRuntime(IProgramRuntimeFrames frames, ICardZ
         var opponentSeat = eventOpponent ? frame.WindowContext!.TargetSeat!.Value : frame.SelectedTargetSeats.Single();
         if (!participants.IsAlive(frame.OwnerSeat) || !participants.IsAlive(opponentSeat) || opponentSeat == frame.OwnerSeat ||
             !ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(Participant(frame.OwnerSeat), Participant(opponentSeat)) ||
-            zones.CardsAt(CardLocation.Hand(frame.OwnerSeat)).Count == 0 && !policies.CanDiscardForPindian(frame.OwnerSeat) ||
-            zones.CardsAt(CardLocation.Hand(opponentSeat)).Count == 0 && !policies.CanDiscardForPindian(opponentSeat))
+            !policies.HasPindianInput(frame.OwnerSeat) || !policies.HasPindianInput(opponentSeat))
             throw new InvalidOperationException("Program Pindian participants no longer have a legal native source.");
         var skill = content.Skill(frame.SkillId);
         producer.Begin(frame.Id,

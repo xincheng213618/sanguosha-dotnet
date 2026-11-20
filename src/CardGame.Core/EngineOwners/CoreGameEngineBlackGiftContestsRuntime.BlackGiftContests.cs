@@ -48,7 +48,7 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
     internal int[] BlackGiftSecondSeats(ProgramSkillFrame f)
     {
         var first = f.BlackGiftContest!.RecipientSeat;
-        if (!_coreMatchParticipantsPlayersAccess._players[first].IsAlive || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[first]))
+        if (!_coreMatchParticipantsPlayersAccess._players[first].IsAlive || !_pindianPolicyQueries.HasPindianInput(first))
             return[];
         // “另一名角色” may be the original owner; its hand is checked after the gift.
         return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != first && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(first, p.Seat)).Select(p => p.Seat).ToArray();

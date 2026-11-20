@@ -92,7 +92,7 @@ Required when changing these mechanisms or their consumers. See the
 
 ## Selections and expression bindings
 
-- The shared Pindian policy checks whether a living participant can discard to use a maximum-rank deck card. It reads active policy bindings and physical discardable cards, excluding equipment that grants the qualifying binding. The same read serves participant legality, private selection and validation. The original Pindian window owns payment, deck reservation, reveal and cleanup.
+- The shared Pindian policy checks whether a living participant can discard to use a maximum-rank deck card. It reads active policy bindings and physical discardable cards, excluding equipment that grants the qualifying binding. The same read serves participant legality, private selection and validation. The input query accepts a current hand card or that discard alternative. Call sites separately check living participants and target eligibility. The original Pindian window owns payment, deck reservation, reveal and cleanup.
 
 - Expression card sets carry only known frozen facts and original physical residency. Derived bindings inherit source locations and entry tokens, including unknown tokens, rather than sampling a new origin; use the shared zone-entry query. Accepted after-turn-ended calls retain only their declared original-frame invocation permission, independently of owner-death draining.
 

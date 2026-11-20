@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineCardActionContestsRuntime
         foreach (var effect in trigger.Effects.Where(e => e.Op == SkillProgramEffectOp.StartCardActionPindian))
         {
             var opponent = effect.OpponentReference!.Kind == ProgramParticipantRef.Actor ? context.CardUse?.ActorSeat : context.TargetSeat;
-            if (context.CardUse is not { } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || opponent is not { } seat || seat == owner.Seat || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(owner) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[seat]) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner.Seat, seat))
+            if (context.CardUse is not { } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || opponent is not { } seat || seat == owner.Seat || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || !_pindianPolicyQueries.HasPindianInput(owner.Seat) || !_pindianPolicyQueries.HasPindianInput(seat) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner.Seat, seat))
                 return false;
         }
 
@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineCardActionContestsRuntime
         var context = frame.WindowContext ?? throw new InvalidOperationException("Card contest lost its boundary.");
         var opponent = effect.OpponentReference!.Kind == ProgramParticipantRef.Actor ? context.CardUse!.ActorSeat : context.TargetSeat!.Value;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(f => f.Id == context.CardUse!.ParentCardUseFrameId);
-        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.Action?.ActionId != context.CardUse!.CardActionId || opponent == frame.OwnerSeat || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[opponent]) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.OwnerSeat, opponent) || frame.PindianResultBindings.Any(b => b.Name == effect.ResultBind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.Action?.ActionId != context.CardUse!.CardActionId || opponent == frame.OwnerSeat || !_pindianPolicyQueries.HasPindianInput(frame.OwnerSeat) || !_pindianPolicyQueries.HasPindianInput(opponent) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.OwnerSeat, opponent) || frame.PindianResultBindings.Any(b => b.Name == effect.ResultBind))
             throw new InvalidOperationException("Card contest lost its exact Slash or participants.");
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         _corePindianOperations.BeginSharedPindian(frame.Id, new(frame.SkillId, skill.Name, skill.Name + " · 拼点", skill.Description), frame.OwnerSeat, opponent, programResultBind: effect.ResultBind!, programResultVisibility: effect.Visibility);

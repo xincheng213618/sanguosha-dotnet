@@ -19,7 +19,7 @@ internal static class ProgramPindianRuntimeChecks
         zones.Move(2, CardLocation.DrawPile, CardLocation.Hand(1));
         var participants = new Participants(zones);
         var turn = new Turn();
-        var policies = new Policies();
+        var policies = new Policies(zones);
         var producer = new Producer();
         var phaseFrames = new ProgramPhaseFrameQueries(frames, turn, turn, capabilities.Get<INativeFrameRoutingFacts>());
         var runtime = new ProgramPindianRuntime(frames, zones, content, participants, phaseFrames, policies, producer);
@@ -166,12 +166,13 @@ internal static class ProgramPindianRuntimeChecks
             string resultBind, SkillProgramCardSetVisibility visibility) => Calls.Add((programFrameId, sourceSeat, opponentSeat, resultBind));
     }
 
-    private sealed class Policies : IProgramPindianPolicyQueries
+    private sealed class Policies(ICardZoneQueries zones) : IProgramPindianPolicyQueries
     {
         internal bool[] Alternative { get; } = new bool[2];
         internal bool[] Prohibited { get; } = new bool[2];
         public bool ProhibitsPindianTarget(int seat) => Prohibited[seat];
         public bool CanDiscardForPindian(int seat) => Alternative[seat];
+        public bool HasPindianInput(int seat) => zones.CardsAt(CardLocation.Hand(seat)).Count > 0 || CanDiscardForPindian(seat);
     }
 
     private sealed class Turn : IProgramTurnQueries, IProgramPhaseQueries

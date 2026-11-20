@@ -4,9 +4,18 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPindianPortsRuntime
 {
     bool IProgramPindianPolicyQueries.ProhibitsPindianTarget(int seat) => _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ProhibitPindianTarget);
-    bool IProgramPindianPolicyQueries.CanDiscardForPindian(int seat)
+    bool IProgramPindianPolicyQueries.HasPindianInput(int seat)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[seat];
+        return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 || CanDiscardForPindian(owner);
+    }
+
+    bool IProgramPindianPolicyQueries.CanDiscardForPindian(int seat) =>
+        CanDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[seat]);
+
+    private bool CanDiscardForPindian(CharacterState owner)
+    {
+        var seat = owner.Seat;
         return owner.IsAlive && _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.PindianDiscardForMaximumDeck)
             .Any(binding => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 ||
                 _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(card =>
