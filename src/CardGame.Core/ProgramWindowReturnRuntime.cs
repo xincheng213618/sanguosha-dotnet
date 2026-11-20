@@ -103,7 +103,7 @@ internal sealed class ProgramWindowReturnRuntime(
         if (queries.Phase != TurnPhase.Draw || frames.Top is not ProgramLifecycleTriggerWindowFrame drawEnded ||
             drawEnded.Id != context.ParentFrameId || drawEnded.Continuation != ProgramLifecycleContinuation.CompleteDrawPhaseEnded)
             throw new InvalidOperationException("The draw-phase-ended program lost its parent window.");
-        cursors.AdvanceProgramLifecycleCursor(drawEnded);
+        AdvanceDrawPhaseProgramCursor(drawEnded, context.ResumeCandidateIndex);
         frames.AdvanceTop<ProgramLifecycleTriggerWindowFrame>();
     }
 
@@ -141,12 +141,17 @@ internal sealed class ProgramWindowReturnRuntime(
         }
         else
         {
-            if (context.ResumeCandidateIndex is { } resumeCandidateIndex)
-                frames.ReplaceTop(drawPhase with { CandidateIndex = resumeCandidateIndex });
-            else
-                cursors.AdvanceProgramLifecycleCursor(drawPhase);
+            AdvanceDrawPhaseProgramCursor(drawPhase, context.ResumeCandidateIndex);
         }
         frames.AdvanceTop<ProgramLifecycleTriggerWindowFrame>();
+    }
+
+    private void AdvanceDrawPhaseProgramCursor(ProgramLifecycleTriggerWindowFrame window, int? resumeCandidateIndex)
+    {
+        if (resumeCandidateIndex is { } nextIndex)
+            frames.ReplaceTop(window with { CandidateIndex = nextIndex });
+        else
+            cursors.AdvanceProgramLifecycleCursor(window);
     }
 
     [ProgramWindowReturn(SkillProgramTriggerWindow.PlayEnding)]

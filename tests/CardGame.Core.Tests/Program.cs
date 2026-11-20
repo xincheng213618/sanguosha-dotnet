@@ -893,6 +893,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
     ("OL Cao Xi Gangshu: draw expires on actual Draw or prior Dodge cold", OlCaoXiGangshuDrawChecks.GangshuDrawExpiresOnActualDrawOrPriorDodgeCold),
+    ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

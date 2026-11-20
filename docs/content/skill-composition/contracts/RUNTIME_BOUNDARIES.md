@@ -37,6 +37,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Trigger usage keys and consumption use `ProgramTriggerUsageRuntime` / `ProgramTriggerUsageRules` over the existing skill store and native Event window. Issued opportunities reserve declared limits once and retain that reservation on the original invocation; beginning the binding does not pay it again. Freeze qualification facts privately on the owning frame, keep source loss and owner death independent, and identify native activation sources from actual activations rather than unrelated reward triggers.
 
+- Draw phase start and end windows resume a selected choice group at the original index after all group members. A single candidate advances one position. A completed native draw replacement keeps its phase-specific completion behavior.
+
 - Native multi-stage instructions reuse `ProgramStageRuntime`: declare the next stage before issuing a paid child, reread the original receipt after draining children, and keep dynamic termination rules in the recipe. Ordered random acquisition from other seats uses `ProgramRandomSeatAcquisitionRuntime`; version policies retain selection priority, turnover rules and event projection without repeating the movement loop or scanning history to prove completed payments.
 
 ## Selections and expression bindings
