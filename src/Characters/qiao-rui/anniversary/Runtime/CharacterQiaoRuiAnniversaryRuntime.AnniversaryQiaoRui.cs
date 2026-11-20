@@ -120,9 +120,9 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryQiaoRui!;
-        if (!ValidQiaoRui(f) || r.Stage != AnniversaryQiaoRuiStage.Drawing || d.RecipientSeat != f.OwnerSeat || d.RequestedCount != r.Requested || d.SequenceBefore != r.Before || f.NativeDraw is not null)
+        if (!ValidQiaoRui(f) || r.Stage != AnniversaryQiaoRuiStage.Drawing || f.NativeDraw is not null || QiaoRuiCompletedDraw(f, r) != d)
             throw new InvalidOperationException("Aishou requires its exact once-paid original Draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryQiaoRui = r with { Stage = AnniversaryQiaoRuiStage.DrawChildren, Draw = d, After = d.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryQiaoRui = r with { Stage = AnniversaryQiaoRuiStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryQiaoRuiDrawReturnedEvent(f.Id, d.RequestedCount, d.ActualDrawIds.Count, d.SequenceBefore, d.SequenceAfter));
         foreach (var id in d.ActualDrawIds)
         {

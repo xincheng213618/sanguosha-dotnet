@@ -50,7 +50,6 @@ public sealed record AnniversaryQiaoRuiReceipt(CardConversionSource Source, stri
  private IReadOnlyList<long> _batches = Array.AsReadOnly(Array.Empty<long>());
  public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
  public IReadOnlyList<long> NativeBatches { get => _batches; init => _batches = Array.AsReadOnly(value.ToArray()); }
- public NativeDrawOutcome? Draw { get; init; }
  public int Requested { get; init; }
  public AnniversaryQiaoRuiPlan? Plan { get; init; }
  public long Before { get; init; }

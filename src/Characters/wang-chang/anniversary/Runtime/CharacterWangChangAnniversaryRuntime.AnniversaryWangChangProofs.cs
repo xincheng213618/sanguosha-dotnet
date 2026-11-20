@@ -15,22 +15,47 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
 
     internal bool ValidWangChang(ProgramSkillFrame f)
     {
-        if (f.AnniversaryWangChang is not { } r || f.InstructionIndex != 1 || !WangChangOriginal(f, r.Operation) || r.Source != WangChangSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.Hash || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Phase != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Maximum < 1 || !Enum.IsDefined(r.Stage) || !Enum.IsDefined(r.Polarity) || f.SelectedCardIds.Count != 0 || r.Cards.Count > r.Maximum || r.Cards.Distinct().Count() != r.Cards.Count || r.Targets.Count > r.Maximum || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || t == f.OwnerSeat) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.SlashCursor < 0 || r.SlashCursor > r.Targets.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Moves.Select(m => m.Sequence).Distinct().Count() != r.Moves.Count || r.Moves.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After || m.Reason.Value != WangChangDiscardReason || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || m.To != CardLocation.DiscardPile && !_coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, m.From, new(WangChangDiscardReason))) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangStartedEvent>().Count(e => e == new AnniversaryWangChangStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.ParentId, r.Turn, r.Phase, r.Maximum, r.Polarity)) != 1)
+        var movementSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        if (f.AnniversaryWangChang is not { } r || f.InstructionIndex != 1 || !WangChangOriginal(f, r.Operation) || r.Source != WangChangSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.Hash ||
+            r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber ||
+            r.Phase != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Maximum < 1 || !Enum.IsDefined(r.Stage) || !Enum.IsDefined(r.Polarity) ||
+            f.SelectedCardIds.Count != 0 || r.Cards.Count > r.Maximum || r.Cards.Distinct().Count() != r.Cards.Count ||
+            r.Targets.Count > r.Maximum || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || t == f.OwnerSeat) ||
+            r.Cursor < 0 || r.Cursor > r.Targets.Count || r.SlashCursor < 0 || r.SlashCursor > r.Targets.Count ||
+            r.Before < 0 || r.Before > movementSequence || r.Moves.Select(m => m.Sequence).Distinct().Count() != r.Moves.Count ||
+            r.Moves.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After ||
+                m.Reason.Value != WangChangDiscardReason || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || m.To != CardLocation.DiscardPile && !_coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, m.From, new(WangChangDiscardReason))) ||
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangStartedEvent>()
+                .Count(e => e == new AnniversaryWangChangStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.ParentId, r.Turn, r.Phase, r.Maximum, r.Polarity)) != 1)
             return false;
-        if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji)
+        var isKaiji = r.Operation == SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji;
+        var isYang = isKaiji && r.Polarity == SkillPolarity.Yang;
+        if (!isYang && (r.After < r.Before || r.After > movementSequence))
+            return false;
+        var draw = CompletedKaijiDraw(f);
+        if (isKaiji)
         {
             if (r.Targets.Count != 0 || r.TargetsSealed || r.Cursor != 0 || r.SlashCursor != 0 || f.SelectedTargetSeats.Count != 0 || r.UseId != 0 || r.ActionId != 0 || r.NativeReturned || r.Stage is not (AnniversaryWangChangStage.OwnCards or AnniversaryWangChangStage.Drawing or AnniversaryWangChangStage.MovementChildren or AnniversaryWangChangStage.Completed))
                 return false;
             if (r.Stage == AnniversaryWangChangStage.OwnCards)
-                return r.Polarity == SkillPolarity.Yin && f.ConversionPreviousPolarity is null && r.Draw is null && r.Moves.Count == 0;
+                return r.Polarity == SkillPolarity.Yin && f.ConversionPreviousPolarity is null && draw is null && r.Moves.Count == 0;
             if (f.ConversionPreviousPolarity != r.Polarity)
                 return false;
-            if (r.Polarity == SkillPolarity.Yang)
-                return r.Cards.Count == 0 && r.Moves.Count == 0 && (r.Stage == AnniversaryWangChangStage.Drawing ? r.Draw is null : r.Draw is { } d && d.RecipientSeat == f.OwnerSeat && d.RequestedCount == r.Maximum && d.SequenceBefore == r.Before && d.SequenceAfter == r.After && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangDrawReturnedEvent>().Count(e => e == new AnniversaryWangChangDrawReturnedEvent(f.Id, d.ActualDrawIds.Count, r.Before, r.After)) == 1);
-            return r.Cards.Count >= 1 && r.Draw is null && r.Moves.All(m => m.From.OwnerSeat == f.OwnerSeat && r.Cards.Contains(m.CardId)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangDiscardPaidEvent>().Count(e => e.FrameId == f.Id && e.Cursor == 0 && e.SubjectSeat == f.OwnerSeat && e.Count == r.Moves.Count && e.Before == r.Before && e.After == r.After) == 1;
+            if (isYang)
+            {
+                if (r.Cards.Count != 0 || r.Moves.Count != 0)
+                    return false;
+                // The producer stores its result before delivering the typed return to this stage.
+                if (r.Stage == AnniversaryWangChangStage.Drawing)
+                    return true;
+                return draw is not null && ValidKaijiDrawRange(f, r, draw) &&
+                    _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangDrawReturnedEvent>()
+                        .Count(e => e == new AnniversaryWangChangDrawReturnedEvent(f.Id, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter)) == 1;
+            }
+            return r.Cards.Count >= 1 && draw is null && r.Moves.All(m => m.From.OwnerSeat == f.OwnerSeat && r.Cards.Contains(m.CardId)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangDiscardPaidEvent>().Count(e => e.FrameId == f.Id && e.Cursor == 0 && e.SubjectSeat == f.OwnerSeat && e.Count == r.Moves.Count && e.Before == r.Before && e.After == r.After) == 1;
         }
 
-        if (r.Cards.Count != 0 || r.Draw is not null || f.ConversionPreviousPolarity is not null || r.Stage is AnniversaryWangChangStage.OwnCards or AnniversaryWangChangStage.Drawing)
+        if (r.Cards.Count != 0 || draw is not null || f.ConversionPreviousPolarity is not null || r.Stage is AnniversaryWangChangStage.OwnCards or AnniversaryWangChangStage.Drawing)
             return false;
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangTargetSelectedEvent>().Count(e => e.FrameId == f.Id) != r.Targets.Count || r.Targets.Select((target, index) => new AnniversaryWangChangTargetSelectedEvent(f.Id, index, target)).Any(e => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangTargetSelectedEvent>().Count(x => x == e) != 1))
             return false;
@@ -51,4 +76,12 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
 
         return f.SelectedTargetSeats.Count == 0;
     }
+
+    private static NativeDrawOutcome? CompletedKaijiDraw(ProgramSkillFrame f) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji, new(WangChangDrawReason));
+
+    private bool ValidKaijiDrawRange(ProgramSkillFrame f, AnniversaryWangChangReceipt r, NativeDrawOutcome draw) =>
+        f.NativeDraw is null && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Maximum &&
+        draw.SequenceBefore >= r.Before && draw.SequenceAfter >= draw.SequenceBefore &&
+        draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 }

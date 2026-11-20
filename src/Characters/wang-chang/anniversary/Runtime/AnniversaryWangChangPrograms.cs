@@ -46,7 +46,6 @@ public sealed record AnniversaryWangChangReceipt(CardConversionSource Source, st
     public int SlashCursor { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
     public long UseId { get; init; }
     public long ActionId { get; init; }
     public bool NativeReturned { get; init; }

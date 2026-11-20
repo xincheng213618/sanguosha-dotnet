@@ -181,6 +181,8 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Yan Xiang Yuzheng: foreign native draw after prior movement returns cold", AnniversaryYanXiangChecks.ForeignNativeDrawAfterPriorMovementReturnsCold),
     ("Anniversary Han Song Shuaiyan: foreign Discard draw returns original Zenrun replacement cold", AnniversaryHanSongShuaiyanDrawChecks.ForeignDiscardDrawReturnsOriginalZenrunReplacementCold),
     ("Anniversary Han Song Shuaiyan: equal-hand foreign native Draw offers before returning cold", AnniversaryHanSongForeignDrawEndChecks.EqualHandForeignNativeDrawOffersShuaiyanBeforeReturningCold),
+    ("Anniversary Wang Chang Kaiji: Yang native Draw returns after prior movement cold", AnniversaryWangChangKaijiDrawChecks.YangNativeDrawReturnsAfterPriorMovementCold),
+    ("Anniversary Qiao Rui Aishou: ending Zenrun replacement returns without Ai marks cold", AnniversaryQiaoRuiAishouDrawReplacementChecks.EndingZenrunReplacementReturnsWithoutAiMarksCold),
     ("Mobile Yaozhuo: Jiezi returns through the skipped Shuangshu Draw cold", MobileYaozhuoShuangshuChecks.WonYaozhuoReturnsThroughJieziBeforeNaturalDrawCold),
     ("Anniversary Cui Lie Zijue: two paid Play leases return separate draws from one reveal cold", AnniversaryCuiLiePindianTargetChecks.TwoPaidZijueLeasesReturnSeparateDrawsFromOneRevealCold),
     ("Zhang Yan: converted counterspell returns before independent Suji cold", ZhangYanChecks.ConvertedCounterspellReturnsBeforeIndependentSujiUseCold),

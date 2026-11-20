@@ -29,7 +29,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
         {
             _coreProgramConversionPolarityOperations.CommitProgramConversionPolarity(f);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, maximum, new(WangChangDrawReason));
             return SkillProgramStepOutcome.AwaitChild;
         }
@@ -197,9 +197,10 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryWangChang;
-        if (r is not { Stage: AnniversaryWangChangStage.Drawing, Polarity: SkillPolarity.Yang } || !ValidWangChang(f) || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.Maximum || outcome.SequenceBefore != r.Before)
+        if (r is not { Stage: AnniversaryWangChangStage.Drawing, Polarity: SkillPolarity.Yang } || !ValidWangChang(f) ||
+            CompletedKaijiDraw(f) != outcome || !ValidKaijiDrawRange(f, r, outcome))
             throw new InvalidOperationException("Kaiji lost its one issued native draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Stage = AnniversaryWangChangStage.MovementChildren, Draw = outcome, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Stage = AnniversaryWangChangStage.MovementChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryWangChangDrawReturnedEvent(f.Id, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueWangChang(f.Id);
     }

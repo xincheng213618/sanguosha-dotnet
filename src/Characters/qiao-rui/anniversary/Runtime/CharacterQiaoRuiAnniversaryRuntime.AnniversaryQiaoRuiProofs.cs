@@ -29,12 +29,12 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         {
             if (r.Cards.Count != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Damaged || r.Returned || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.Drawing or AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.Completed))
                 return false;
-            if (r.Draw is { } d && (d.RecipientSeat != f.OwnerSeat || d.RequestedCount != r.Requested || d.SequenceBefore != r.Before || d.SequenceAfter != r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiDrawReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiDrawReturnedEvent(f.Id, r.Requested, d.ActualDrawIds.Count, r.Before, r.After)) != 1))
+            if ((r.Stage == AnniversaryQiaoRuiStage.DrawChildren || r.Stage == AnniversaryQiaoRuiStage.Completed && r.Requested > 0) && QiaoRuiCompletedDraw(f, r) is null)
                 return false;
         }
         else if (r.Operation is SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouPrepare or SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss)
         {
-            if (r.Draw is not null || r.Requested != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Returned || r.Damaged || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren or AnniversaryQiaoRuiStage.Completed))
+            if (r.Requested != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Returned || r.Damaged || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren or AnniversaryQiaoRuiStage.Completed))
                 return false;
             if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss && (r.Cards.Count != 0 || r.Stage == AnniversaryQiaoRuiStage.DiscardChildren))
                 return false;
@@ -47,7 +47,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         }
         else
         {
-            if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei || r.Draw is not null || r.Requested != 0 || r.Cards.Count != 0 || r.Stage is AnniversaryQiaoRuiStage.Drawing or AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren)
+            if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei || r.Requested != 0 || r.Cards.Count != 0 || r.Stage is AnniversaryQiaoRuiStage.Drawing or AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren)
                 return false;
             if (r.Stage == AnniversaryQiaoRuiStage.SlashChoice && (r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Returned || r.Damaged || r.NativeBatches.Count != 0))
                 return false;
@@ -65,6 +65,12 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
 
         return true;
     }
+
+    private NativeDrawOutcome? QiaoRuiCompletedDraw(ProgramSkillFrame f, AnniversaryQiaoRuiReceipt r) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw, new(QiaoRuiDraw)) is { } draw &&
+        draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Requested && draw.SequenceBefore >= r.Before &&
+        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
+
     internal bool QiaoRuiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryQiaoRui is { Stage: AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren or AnniversaryQiaoRuiStage.NativeTail or AnniversaryQiaoRuiStage.ClaimChildren } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidQiaoRui(f);
     internal bool QiaoRuiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -75,7 +81,20 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         if (child is NativeDrawAttemptFrame draw)
             return r.Stage == AnniversaryQiaoRuiStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Requested);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && QiaoRuiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || IsAnniversaryQiaoRuiSettlementBatch(f, moved.Batch)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        {
+            if (f.PendingMovementContinuation is not { } p || !QiaoRuiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) ||
+                !(CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || IsAnniversaryQiaoRuiSettlementBatch(f, moved.Batch)))
+                return false;
+
+            var (before, after) = (r.Before, r.After);
+            if (r.Stage == AnniversaryQiaoRuiStage.DrawChildren)
+            {
+                if (QiaoRuiCompletedDraw(f, r) is not { } outcome)
+                    return false;
+                (before, after) = (outcome.SequenceBefore, outcome.SequenceAfter);
+            }
+            return moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        }
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)
