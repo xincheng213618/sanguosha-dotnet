@@ -9,7 +9,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
     internal int AnniversaryYizanCount(int owner, int? actualTurn = null, long cutoff = long.MaxValue) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Count(e => e.Source.OwnerSeat == owner && e.ActionId <= cutoff && (actualTurn is null || e.ActualTurn == actualTurn) && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 44600, SkillProgramEffectOp.AwakenAnniversaryZhaoTongZhaoGuangLongyuan)]
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 44600, SkillProgramEffectOp.AwakenAnniversaryZhaoTongZhaoGuangLongyuan)]
-    internal bool QualifyAnniversaryLongyuan(ProgramTriggerLegalityContext q) => !AnniversaryYizanModified(q.OwnerSeat) && (AnniversaryYizanCount(q.OwnerSeat) >= 3 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(q.OwnerSeat, q.SkillId, q.Candidate.BindingId));
+    internal bool QualifyAnniversaryLongyuan(ProgramTriggerLegalityContext q) => !AnniversaryYizanModified(q.OwnerSeat) && (AnniversaryYizanCount(q.OwnerSeat) >= 3 || _awakeningOverrides.Granted(q.OwnerSeat, q.SkillId, q.Candidate.BindingId));
     internal SkillProgramStepOutcome BeginAnniversaryZhaoTongZhaoGuang(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

@@ -14,7 +14,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     internal bool CanActivateShenGuoJiaZuoxing(CharacterState owner) => ShenGuoJiaBenefactors(owner, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, ShenGuoJiaZuoxing)).Count > 0 && ShenGuoJiaPlans(owner.Seat).Count > 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 38000, SkillProgramEffectOp.ResolveShenGuoJiaTianyi)]
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38000, SkillProgramEffectOp.ResolveShenGuoJiaTianyi)]
-    internal bool CanAwakenShenGuoJia(ProgramTriggerLegalityContext gate) => HasShenGuoJiaAwakeningCondition(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).All(player => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(damage => damage.TargetSeat == player.Seat && damage.Amount > 0));
+    internal bool CanAwakenShenGuoJia(ProgramTriggerLegalityContext gate) => _awakeningOverrides.Granted(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).All(player => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(damage => damage.TargetSeat == player.Seat && damage.Amount > 0));
     internal SkillProgramStepOutcome BeginShenGuoJia(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -61,7 +61,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         "mou-mobile:zhiji" => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(value => value.OwnerSeat == seat),
         _ => false
     };
-    internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = null) => _awakeningOverrides.Granted(seat, skill, binding);
     internal PromptChoice ShenGuoJiaChoice(ProgramSkillFrame frame, string branch, string label, IReadOnlyList<int>? targets = null, string? value = null) => new(new($"shen-guo-jia.{(frame.Id)}.{(frame.ShenGuoJia!.Stage)}.{(branch)}.{(value)}"), label, [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "shen-guo-jia", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["value"] = value ?? "" });
     internal IReadOnlyList<PromptChoice> ShenGuoJiaChoices(ProgramSkillFrame frame)
     {

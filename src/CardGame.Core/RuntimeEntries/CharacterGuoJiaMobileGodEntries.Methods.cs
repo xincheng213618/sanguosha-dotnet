@@ -17,8 +17,6 @@ internal sealed partial class CharacterGuoJiaMobileGodEntries
     internal bool DrainShenGuoJia(ProgramSkillFrame frame) => _resolve().DrainShenGuoJia(frame);
     internal void FinishShenGuoJia(ProgramSkillFrame frame) => _resolve().FinishShenGuoJia(frame);
     internal void FinishShenGuoJiaIssue(long id) => _resolve().FinishShenGuoJiaIssue(id);
-    internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = default) => _resolve().HasShenGuoJiaAwakeningCondition(seat, skill, binding);
-    internal bool HasShenGuoJiaAwakeningReceipt(ProgramSkillFrame frame) => _resolve().HasShenGuoJiaAwakeningReceipt(frame);
     internal bool IsShenGuoJiaJudgment(JudgmentFrame judgment, ProgramSkillFrame frame) => _resolve().IsShenGuoJiaJudgment(judgment, frame);
     internal bool IsShenGuoJiaVirtualUse(CardUseFrame use) => _resolve().IsShenGuoJiaVirtualUse(use);
     internal void IssueShenGuoJiaVirtualUse(ProgramSkillFrame frame) => _resolve().IssueShenGuoJiaVirtualUse(frame);

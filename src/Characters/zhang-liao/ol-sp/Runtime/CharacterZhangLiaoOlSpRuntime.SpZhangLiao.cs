@@ -10,7 +10,8 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
     internal bool CanOfferSpZhangLiao(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.AwakenMubing))
-            return !HasDiaolingAwakened(c.OwnerSeat) && (MubingMilitaryCount(c.OwnerSeat) >= 6 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(c.OwnerSeat, c.SkillId, c.BindingId));
+            return !HasDiaolingAwakened(c.OwnerSeat) &&
+                (MubingMilitaryCount(c.OwnerSeat) >= 6 || _awakeningOverrides.Granted(c.OwnerSeat, c.SkillId, c.BindingId));
         if (!t.Effects.Any(e => e.Op == SkillProgramEffectOp.PreventDamageForHighestRankGift))
             return true;
         return context is { SourceSeat: { } source, TargetSeat: { } target } && source == c.OwnerSeat && target != source && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZiquDamagePreventedEvent>().Any(e => e.Source.OwnerSeat == source && e.VictimSeat == target);
@@ -21,7 +22,8 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (op == SkillProgramEffectOp.AwakenMubing)
         {
-            if (HasDiaolingAwakened(f.OwnerSeat) || MubingMilitaryCount(f.OwnerSeat) < 6 && !_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(f.OwnerSeat, f.SkillId, f.TriggerId))
+            if (HasDiaolingAwakened(f.OwnerSeat) ||
+                (MubingMilitaryCount(f.OwnerSeat) < 6 && !_awakeningOverrides.Granted(f.OwnerSeat, f.SkillId, f.TriggerId)))
                 throw new InvalidOperationException("Diaoling has no six-card acquisition receipt or its exact Huishi awakening grant.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiaolingAwakenedEvent(f.Id, f.OwnerSeat, MubingMilitaryCount(f.OwnerSeat)));
             return SkillProgramStepOutcome.Continue;

@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangYunOlRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 360)]
-    internal bool CanAwakenWangYun(int owner, SkillProgramTrigger trigger) => !ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.AwakenFromIssuedLianjiSlashDamage) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WangYunLianjiDamageEvent>().Any(e => e.PlanOwner == owner && e.Amount > 0) || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner, "ol:moucheng", trigger.Id);
+    internal bool CanAwakenWangYun(int owner, SkillProgramTrigger trigger) => !ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.AwakenFromIssuedLianjiSlashDamage) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WangYunLianjiDamageEvent>().Any(e => e.PlanOwner == owner && e.Amount > 0) || _awakeningOverrides.Granted(owner, "ol:moucheng", trigger.Id);
     internal SkillProgramStepOutcome AwakenFromIssuedLianjiSlashDamage(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

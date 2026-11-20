@@ -9,6 +9,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Fanxiang = "ol:fanxiang", Liangzhu = "ol:liangzhu", Xiaoji = "classic:xiaoji";
     private const string Moucuan = "ol:moucuan", Binghuo = "ol:binghuo";
     private const string Jianghuo = "anniversary:jianghuo", Lishi = "anniversary:lishi";
+    private const string Diaoling = "ol:diaoling";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string WatchMaximum = """
@@ -266,6 +267,48 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             "The recorded turn starts after exactly one maximum-HP increase and one Lishi grant.");
     }
 
+    internal static void PaidHuishiWaivesDiaolingMilitaryCardsForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:sp-zhang-liao", [Diaoling], WatchMaximum));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(match.Facts<MubingCardsAcquiredEvent>().Length == 0 && match.Facts<DiaolingAwakenedEvent>().Length == 0,
+            "The first actual Preparation has no military acquisitions and offers no natural Diaoling.");
+        match.GrantToSelf(Diaoling);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        match.Need(grant is { Recipient: 0, SkillId: Diaoling } && match.Owner.MaxHp == reducedMaximum &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            match.Facts<DiaolingAwakenedEvent>().Length == 0, "Huishi pays for the original Diaoling instance for a later turn.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Diaoling);
+        var awakened = match.Facts<DiaolingAwakenedEvent>().Single();
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.ProgramFrameId);
+        match.Need(awakened is { OwnerSeat: 0, MilitaryCardCount: 0 } && match.Facts<MubingCardsAcquiredEvent>().Length == 0 &&
+            root.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, OwnerSeat: 0 } &&
+            root.TriggerId == "six-military-cards" && root.SkillInstanceId == grant.InstanceId && root.GameplayHash == grant.GameplayHash &&
+            grant.FrameId < root.Id &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, match.Game.State.TurnNumber]) &&
+            match.Prompt is { PlayerSeat: 0 } prompt && prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "draw-two"),
+            "The original Diaoling awakens at zero military cards during the next actual Preparation and offers its original reward.");
+
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            match.Facts<DiaolingAwakenedEvent>().SequenceEqual([awakened]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+            "Cold replay keeps the same original Diaoling pending reward.");
+        match.ChooseOption("draw-two");
+        match.ReachPlay();
+        var drawn = match.Game.CardMovements.Where(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) &&
+            move.Reason.Value == "skill-program.ol:diaoling.Draw").Select(move => move.CardId).ToArray();
+        match.Need(drawn.Length == 2 && drawn.Distinct().Count() == 2 &&
+            match.Facts<DiaolingAwakenedEvent>().SequenceEqual([awakened]) && match.Owner.MaxHp == reducedMaximum,
+            "Choosing the original reward moves exactly two physical cards to the recorded owner and completes Diaoling once.");
+    }
+
     private sealed class HuishiMatch(ContentRegistry registry)
     {
         internal GameEngine Game { get; private set; } = CreateMatch(registry);
@@ -290,7 +333,8 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
 
         internal void ReachPlay() => Reach(() => Prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && Game.ResolutionStack.Count == 0);
         internal void EndPlay() => Submit(new EndPlayPhaseCommand(0, Game.Revision, Prompt!.PromptId));
-        internal void Continue() => Answer("option-id", "continue");
+        internal void Continue() => ChooseOption("continue");
+        internal void ChooseOption(string option) => Answer("option-id", option);
 
         internal void GrantToSelf(string awakening)
         {
