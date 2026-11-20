@@ -14,6 +14,7 @@ public sealed record NativeLogicalDiscardInvocationRecordedEvent(long Invocation
 
 public sealed record NativeLogicalDiscardMaterial(int CardId, CardLocation From)
 {
+    internal int? ExecutorSeat { get; init; }
     internal Suit? EffectiveSuitAtPayment { get; init; }
 }
 

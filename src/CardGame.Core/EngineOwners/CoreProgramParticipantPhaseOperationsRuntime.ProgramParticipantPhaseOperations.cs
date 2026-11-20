@@ -39,7 +39,12 @@ internal sealed partial class CoreProgramParticipantPhaseOperationsRuntime
 
     internal void CollectFullDiscardPhaseSuit(Card card, CardMovementRecord move)
     {
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Discard || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)is not { OwnerSeat: { } owner } || owner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Discard)
+            return;
+        var native = move.NativeDiscard;
+        var source = native?.From ?? _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move);
+        var currentSeat = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat;
+        if (source?.OwnerSeat != currentSeat || native?.ExecutorSeat is { } executor && executor != currentSeat)
             return;
         if (_coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuitTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)
         {
@@ -47,7 +52,8 @@ internal sealed partial class CoreProgramParticipantPhaseOperationsRuntime
             _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Clear();
         }
 
-        _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Add(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card));
+        _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Add(
+            native?.EffectiveSuitAtPayment ?? _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[currentSeat], card));
     }
 
     internal bool FullDiscardPhaseSuitsAllDistinct => _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuitTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Count >= 2 && _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Distinct().Count() == _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Count;

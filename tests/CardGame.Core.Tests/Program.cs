@@ -831,6 +831,10 @@ var tests = new (string Name, Action Body)[]
     ("Classic Zhongyong: the original Slash cannot be gifted after delivery and rediscard cold", ClassicZhongyongOriginalSlashChecks.ZhongyongCannotGiftTheRediscardedOriginalSlashCold),
     ("Classic Upgraded Funan: original accepted counterspell entry", ClassicUpgradedFunanDiscardEntryChecks.UpgradedFunanCannotClaimARediscardedCounterspell),
     ("Mobile Shi Huang Chong Cujun: both actual discards settle after the first gain child cold", ShiHuangChongCujunClaimChecks.CujunCompletesBothDiscardClaimsAfterFirstGainChildCold),
+    ("Classic Kuizhu: actual Bijing discards count in its own phase cold", ClassicSunLiangKuizhuDiscardBudgetChecks.KuizhuCountsActualBijingDiscardsInItsOwnPhaseCold),
+    ("Anniversary Cangming: Xingshang preserves edition scope for original Ming death discard", AnniversaryCangmingDeathCleanupChecks.XingshangKeepsEditionScopeForOriginalMingDeathDiscardCold),
+    ("OL Xu Rong Shajue: original dying Slash cannot be claimed after prior native delivery cold", OlXuRongShajueMaterialChecks.ShajueReplenishesButCannotClaimAnAlreadyDeliveredSlashCold),
+    ("Classic Guizao: actual phase discards use distinct effective suits cold", ClassicSunZiLiuFangGuizaoDiscardSuitsChecks.GuizaoUsesActualDiscardSuitsAndRejectsEffectiveDuplicatesCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

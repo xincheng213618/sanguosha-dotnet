@@ -60,7 +60,7 @@ dependency direction in the rest of native card-use scheduling.
 
 - True-discard batch claims can use a completed logical discard receipt with the same card, physical destination and movement sequence when the physical reason classifier has no source. Synchronous movement capture uses the facts already available at that point. The claim window can read the completed receipt after the native producer returns.
 
-- An atomic native program discard can carry the original owned source and effective suit sampled before movement onto the actual discard-pile entry. The atomic writer verifies the original producer, reason and selected owned materials. Discard provenance and neighbor first-discard capture can read that entry before the native invoice closes. Redirected movements and the separate staged discard protocols keep their existing settlement rules.
+- An atomic native program discard can carry its executor, original owned source and effective suit sampled before movement onto the actual discard-pile entry. The atomic writer verifies the original producer, reason and selected owned materials. Discard provenance, neighbor first-discard capture and full discard-phase totals can read that entry before the native invoice closes. The phase totals count each qualifying discard occurrence by the current player. Redirected movements and separately staged discards follow their own settlement rules.
 
 - Neighbor discard placement retains the original batch's first-discard fact and previous living seat. Offer and placement eligibility require a surviving original discard-pile entry. A later discard of the same card leaves the earlier batch recorded as the first.
 

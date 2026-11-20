@@ -48,7 +48,11 @@ internal sealed partial class CharacterXuRongOlRuntime
                 ids = [held];
         }
 
-        var entities = ids.Distinct().Where(id => id > 0).Select(id => new XuRongCausalEntity(id, _cardZonesOperations._cardZones.GetLocation(id))).Where(e => e.OriginalLocation.Zone is CardZoneKind.Processing or CardZoneKind.Judgment or CardZoneKind.DiscardPile).ToArray();
+        var entities = attack?.ResolutionId is { } damageOwner
+            ? ids.Distinct().Where(id => id > 0 && !_nativeMaterialClaims.HasRelinquishedMaterial(damageOwner, id))
+                .Select(id => new XuRongCausalEntity(id, _cardZonesOperations._cardZones.GetLocation(id)))
+                .Where(e => e.OriginalLocation.Zone is CardZoneKind.Processing or CardZoneKind.Judgment or CardZoneKind.DiscardPile).ToArray()
+            : [];
         var proof = new XuRongDyingProof(dying.Id, dying.ParentFrameId, dying.VictimSeat, originalHp, checked(1 - originalHp), attack?.ResolutionId, actionId, attack is null || attack.IsSourceLess || attack.IsDelayedJudgmentDamage ? null : attack.SourceSeat, attack is null || attack.IsSourceLess || attack.IsDelayedJudgmentDamage, Array.AsReadOnly(entities));
         _coreNativeDyingFramesOperations.UpdateDyingFrame(dying.Id, current => current with { XuRongProof = proof });
     }

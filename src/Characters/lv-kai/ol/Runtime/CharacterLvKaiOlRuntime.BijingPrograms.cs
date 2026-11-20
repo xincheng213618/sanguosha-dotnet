@@ -106,10 +106,9 @@ internal sealed partial class CharacterLvKaiOlRuntime
             throw new InvalidOperationException("Bijing cannot overpay its original discard group.");
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(active = active with { BijingPunish = state with { SelectedCardIds = chosen, SelectedLocations = chosen.Select(_cardZonesOperations._cardZones.GetLocation).ToArray(), Paid = true, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(state.TurnOwnerSeat, 0, null) });
-        active = _coreNativeLogicalDiscardsOperations.AppendFrameNativeLogicalDiscard(active, state.TurnOwnerSeat, chosen, new($"skill-program.{(active.SkillId)}.bijing-punish"));
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(chosen, CardLocation.DiscardPile, new($"skill-program.{(active.SkillId)}.bijing-punish"), disclosure: CardMovementDisclosure.FaceUp);
+        _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(active, state.TurnOwnerSeat, chosen, new($"skill-program.{(active.SkillId)}.bijing-punish"));
         var discarded = state.DiscardedCardIds.Concat(chosen).ToArray();
-        active = _coreNativeLogicalDiscardsOperations.CompleteFrameNativeLogicalDiscard(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
+        active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(active = active with { BijingPunish = active.BijingPunish!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBijingPunishEvent(active.Id, active.SkillId, state.OwnerSeat, state.TurnOwnerSeat, state.LostCardIds, discarded));
         ContinueBijingPaidGroup(active.Id);

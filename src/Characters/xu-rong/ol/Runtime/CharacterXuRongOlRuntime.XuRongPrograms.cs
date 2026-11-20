@@ -152,7 +152,10 @@ internal sealed partial class CharacterXuRongOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XionghuoPoolChangedEvent(f.Id, source, before, before + gained, "dying"));
         var r = new XuRongPending(source, f.GameplayHash, "claim-native", f.InstructionIndex, w.ParentFrameId, proof.VictimSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, Array.AsReadOnly(Array.Empty<XionghuoGrant>()), 0, 0, -1, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Array.AsReadOnly(Array.Empty<int>()), proof.DyingFrameId, proof.NativeActionId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XuRong = r });
-        var ids = proof.RescueCardsRequired > 1 ? proof.Entities.Where(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.OriginalLocation).Select(e => e.CardId).ToArray() : [];
+        var ids = proof is { RescueCardsRequired: > 1, DamageAttemptResolutionId: { } damageOwner }
+            ? proof.Entities.Where(e => !_nativeMaterialClaims.HasRelinquishedMaterial(damageOwner, e.CardId) &&
+                _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.OriginalLocation).Select(e => e.CardId).ToArray()
+            : [];
         IssueXuRongMove(f, ids, XuRongClaimReason);
         return SkillProgramStepOutcome.AwaitChild;
     }

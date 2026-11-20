@@ -5,7 +5,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     ICardZoneQueries zones, ICardMovementHistoryQueries movements, IProgramEventHistoryQueries history,
-    IProgramContentQueries content, IProgramTurnQueries turn, ISelectionParticipantQueries participants,
+    IProgramContentQueries content, IProgramTurnQueries turn, IProgramPhaseQueries phase, ISelectionParticipantQueries participants,
     IActualDiscardRecoveryPhaseQueries actualPhases, INativeLogicalDiscardFacts facts,
     INativeLogicalDiscardOrigins origins, INativeLogicalDiscardAdmissions admissions,
     INativeLogicalDiscardMovement movement, IProgramBoundCardMovementOperations programMovement) : INativeLogicalDiscardOperations
@@ -87,17 +87,21 @@ internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, 
         CardMoveReason reason, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null)
     {
         var draft = Capture(frame.OwnerSeat, executorSeat, ids, reason, frame.Id);
-        var prepared = PrepareProgramDiscard(frame.Id, ids, reason);
+        var prepared = PrepareProgramDiscard(frame.Id, executorSeat, ids, reason);
         programMovement.MoveMultipleSources(ids, CardLocation.DiscardPile, reason,
             CardMovementDisclosure.FaceUp, afterPhysicalRecords, prepared);
         Complete(draft);
     }
 
-    private NativeProgramDiscardPreparation? PrepareProgramDiscard(long frameId, IReadOnlyList<int> ids, CardMoveReason reason)
+    private NativeProgramDiscardPreparation? PrepareProgramDiscard(long frameId, int executorSeat, IReadOnlyList<int> ids, CardMoveReason reason)
     {
-        var captureSuit = content.HasTriggerOperation(SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance);
+        var recordPhaseSuits = phase.Phase == TurnPhase.Discard &&
+            content.UsesTriggerCondition(SkillProgramTriggerConditionKind.DiscardPhaseSuitsAllDistinct);
+        var recordPhaseBudget = phase.Phase == TurnPhase.Discard &&
+            content.HasTriggerOperation(SkillProgramEffectOp.ResolveDiscardBudgetParticipants);
+        var captureSuit = recordPhaseSuits || content.HasTriggerOperation(SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance);
         if (!facts.SetupComplete || turn.TurnNumber <= 0 || frames.Top?.Id != frameId ||
-            !captureSuit && !content.HasTriggerOperation(SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop))
+            !captureSuit && !recordPhaseBudget && !content.HasTriggerOperation(SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop))
             return null;
 
         var materials = new List<NativeLogicalDiscardMaterial>(ids.Count);
@@ -108,7 +112,7 @@ internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, 
             var suit = captureSuit
                 ? facts.EffectiveSuitAtDiscardSource(zones.CardsAt(from).Single(card => card.Id == id), owner)
                 : (Suit?)null;
-            materials.Add(new(id, from) { EffectiveSuitAtPayment = suit });
+            materials.Add(new(id, from) { ExecutorSeat = executorSeat, EffectiveSuitAtPayment = suit });
         }
 
         return materials.Count > 0 ? new(frameId, facts.MovementSequence, reason, materials.AsReadOnly()) : null;
