@@ -77,9 +77,8 @@ internal sealed partial class CoreNativeRecoveryCardsRuntime
         var recoveryFrameId = _coreNativeRecoveryFramesOperations.BeginRecovery(resolutionId, source.Seat, target.Seat, recoveryAmount);
         try
         {
-            var hpBefore = target.Hp;
-            target.Hp = Math.Min(target.MaxHp, target.Hp + recoveryAmount);
-            _coreNativeRecoveryDamageOperations.RecordNativeCardRecovery(resolutionId, recoveryFrameId, source.Seat, target.Seat, playedCardKind, recoveryAmount, hpBefore, target.Hp);
+            var applied = _coreNativeRecoveryFramesOperations.ApplyRecovery(recoveryFrameId);
+            _coreNativeRecoveryDamageOperations.RecordNativeCardRecovery(resolutionId, recoveryFrameId, source.Seat, target.Seat, playedCardKind, recoveryAmount, applied.Before, applied.After);
             foreach (var policy in recoveryPolicySources ?? [])
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRecoveryPolicyAppliedEvent(resolutionId, target.Seat, source.Seat, card.Id, recoveryAmount, policy.SkillId, policy.PolicyId));

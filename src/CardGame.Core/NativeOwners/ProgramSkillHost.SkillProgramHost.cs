@@ -88,21 +88,23 @@ internal sealed partial class ProgramSkillHost(INativeGivenCardOperations _nativ
             return;
         }
 
-        var recovered = Math.Min(requested, target.MaxHp - target.Hp);
+        var recovered = EngineOwners.CoreNativeRecoveryFramesRuntime.CapRecoveryAmount(requested, target.Hp, target.MaxHp);
         if (recovered <= 0)
             return;
         if (getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId).FixedRecipient is not null)
             getCoreGameEnginePairBenefitObserversRuntime().CaptureFixedRecipientRecovery(frameId, ownerSeat, targetSeat, recovered);
         if (getCoreRecoveryReplacementRuntime().TryQueueRecoveryReplacement(frameId, ownerSeat, targetSeat, getCoreGameEngineRecoveryAmountBonusesRuntime().Value.TracksRecoveryAmountBonuses ? requested : recovered, new(RecoveryAttemptProducer.Program, getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId).InstructionIndex)))
             return;
-        var recovery = getCoreNativeRecoveryFramesRuntime().BeginRecovery(frameId, ownerSeat, targetSeat, recovered);
-        target.Hp += recovered;
-        advanceEventRulesAndQueueFact(new RecoveryAppliedEvent(ownerSeat, targetSeat, recovered, target.Hp));
+        var recoveryFrames = getCoreNativeRecoveryFramesRuntime();
+        var recovery = recoveryFrames.BeginRecovery(frameId, ownerSeat, targetSeat, recovered);
+        var applied = recoveryFrames.ApplyRecovery(recovery);
+        var actual = applied.After - applied.Before;
+        advanceEventRulesAndQueueFact(new RecoveryAppliedEvent(ownerSeat, targetSeat, actual, applied.After));
         getCoreGameEngineRuntimeRuntime().PopResolutionFrame(recovery, ResolutionFrameKind.Recovery);
         if (getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId).WindowContext?.JudgmentReplacement is { } replacement)
         {
             var active = getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId);
-            getCoreGameEngineRuntimeRuntime().ReplaceRuntimeTop(active with { WindowContext = active.WindowContext!with { JudgmentReplacement = replacement with { RecoveredHp = replacement.RecoveredHp + recovered } } });
+            getCoreGameEngineRuntimeRuntime().ReplaceRuntimeTop(active with { WindowContext = active.WindowContext!with { JudgmentReplacement = replacement with { RecoveredHp = replacement.RecoveredHp + actual } } });
         }
     }
 

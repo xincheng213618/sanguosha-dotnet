@@ -62,6 +62,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 ## Recovery applications
 
+- `CoreNativeRecoveryFramesRuntime.ApplyRecovery` applies capped HP recovery from the current original `RecoveryFrame`. Ordinary Peach and the program `Recover` step use the returned before and after HP. Request amounts, replacement admission, dual-health selection, and the typed continuation stay with their native or program producers.
+
 - Program recovery requests freeze `ProgramRecoveryOrigin` on the original queued `RecoveryAttempt`; actual HP applications use the original program's `RecoveryApplications`. `HealthContinuationRuntime` owns their shared receipt reads and typed replacement returns. Preserve issued source, amount, target, dual-health and native return boundaries; use the accepted candidate and original reward movement receipt instead of copying match history to prove output events. Requested, Applied and Chosen events retain their real history consumers; native rescue and dying-entry protocols keep their own facts.
 
 - Native card recovery reads the current `CardUseFrame.RecoveryApplication` through `NativeHealthRecoveryRuntime`. Capture from the real top `RecoveryFrame` before notifications; the same application is idempotent and conflicting writes fail, while a later real recovery on the same use may replace it for another target or effect. Share the HP/material return matcher and keep original Dying, responder, Peach/self-Alcohol and native physical-group boundaries separate. Issued recovery-use links consume their original typed producer relation; do not copy event history to re-prove Applied or Issued output notifications. Zero-delta applications may retain a receipt and notification without authorizing a positive HP child.
