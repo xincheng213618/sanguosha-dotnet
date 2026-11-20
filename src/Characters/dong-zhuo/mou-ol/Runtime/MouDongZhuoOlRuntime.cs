@@ -5,7 +5,7 @@ internal interface IMouDongZhuoOlFacts : IProgramSelectionQuery
 {
     int Turn { get; } int Round { get; } int PlayerCount { get; } int PhaseId { get; } long MovementSequence { get; } bool Finished { get; }
     bool Alive(int seat); bool Human(int seat); string Name(int seat); int Hp(int seat); bool Owns(int seat, string skill);
-    SkillProgram Program(string skill); CardLocation Location(int id); IReadOnlyList<MouDongZhuoOlCard> Discardable(int seat);
+    SkillProgram Program(string skill); IReadOnlyList<MouDongZhuoOlCard> Discardable(int seat);
     IReadOnlyList<MouDongZhuoOlCard> CurrentDiscard(); IEnumerable<T> History<T>() where T : IGameEvent;
     bool ExactStart(ProgramSkillFrame frame, SkillProgramEffectOp operation); bool ParentMatches(ProgramSkillFrame frame);
     int KeepValue(int seat, int cardId); bool Friendly(int owner, int target);
@@ -21,7 +21,7 @@ internal interface IMouDongZhuoOlNative : IProgramRuntimeOperations
 
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZhuoOlNative native,
-    IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouDongZhuoOlRuntime
+    IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, ICardZoneEntryQueries zoneEntries) : IMouDongZhuoOlRuntime
 {
     internal const string Guanbian="mou-ol:guanbian",Xiongni="mou-ol:xiongni",Fengshang="mou-ol:fengshang",Zhibing="mou-ol:zhibing";
     internal const string CostReason="skill-program.mou-ol:xiongni.discard",GiftReason="skill-program.mou-ol:fengshang.give";
@@ -33,6 +33,10 @@ internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZh
         .GroupBy(c=>c.Suit).Where(g=>g.Count()>=2).SelectMany(g=>g).ToArray());
     internal bool CanFengshang(int owner,bool dying)=>Enumerable.Range(0,facts.PlayerCount).Count(facts.Alive)>=2&&Available(owner).Count>=2&&
         !facts.History<MouDongZhuoOlFengshangEvent>().Any(e=>e.Owner==owner&&e.Turn==facts.Turn&&(dying?e.Dying:!e.Dying&&e.Phase==facts.PhaseId));
+
+    private bool IsOriginalFengshangGiftAvailable(MouDongZhuoOlGift gift) => gift.OriginalDiscardSequence is > 0 &&
+        zoneEntries.CurrentEntry(CardLocation.DiscardPile, gift.CardId) == gift.OriginalDiscardSequence;
+
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification,34700)]
     internal bool Trigger(ProgramTriggerCandidate c,SkillProgramTrigger t,ProgramSkillWindowContext w)=>c.SkillId switch {
         Xiongni=>facts.Discardable(c.OwnerSeat).Count>0,
@@ -87,9 +91,29 @@ internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZh
             case "discard":var c=facts.Discardable(payer).Single(c=>c.Id==choice.Cards.Single());frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=r.Stage==MouDongZhuoOlStage.OwnCost?MouDongZhuoOlStage.CostChildren:MouDongZhuoOlStage.PeerChildren,Paid=true,Payer=payer,Suit=r.Stage==MouDongZhuoOlStage.OwnCost?c.Suit:r.Suit,Materials=[c],Before=facts.MovementSequence,After=facts.MovementSequence},PendingMovementContinuation=new(f.OwnerSeat,0,null)});native.Discard(f,payer,c);Continue(f.Id);return;
             case "damage":frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.Damage,Payer=payer}});events.AdvanceFact(new MouDongZhuoOlDamageIssuedEvent(f.Id,payer,r.Cursor));native.Damage(f,payer);Continue(f.Id);return;
             case "card":var card=Available(f.OwnerSeat).Single(c=>c.Id==choice.Cards.Single());frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.GiftRecipient,SelectedCard=card.Id,Suit=card.Suit}});Publish(f);return;
-            case "recipient":var gifts=r.Gifts.Append(new MouDongZhuoOlGift(r.SelectedCard,choice.Targets.Single())).ToArray();frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=gifts.Length==2?MouDongZhuoOlStage.GiftChildren:MouDongZhuoOlStage.GiftCard,Gifts=gifts,SelectedCard=0}});
-                if(gifts.Length==2){if(!CanFengshang(f.OwnerSeat,Dying(f))||gifts.Any(g=>facts.Location(g.CardId)!=CardLocation.DiscardPile))throw new InvalidOperationException("Fengshang lost its two actual discard materials before payment.");
-                    frames.ReplaceTop(f=f with{MouDongZhuoOl=f.MouDongZhuoOl! with{Paid=true}});events.AdvanceFact(new MouDongZhuoOlFengshangEvent(f.Id,f.OwnerSeat,r.Turn,r.Round,facts.PhaseId,Dying(f),r.Suit));RemoveGuanbian(f);Continue(f.Id);}else Publish(f);return;
+            case "recipient":
+                var gift = new MouDongZhuoOlGift(r.SelectedCard, choice.Targets.Single())
+                {
+                    OriginalDiscardSequence = zoneEntries.CurrentEntry(CardLocation.DiscardPile, r.SelectedCard)
+                };
+                var gifts = r.Gifts.Append(gift).ToArray();
+                if (gifts.Length == 2 && (!CanFengshang(f.OwnerSeat, Dying(f)) || gifts.Any(g => !IsOriginalFengshangGiftAvailable(g))))
+                    throw new InvalidOperationException("Fengshang lost its two original discard entries before payment.");
+                frames.ReplaceTop(f = f with { MouDongZhuoOl = r with
+                {
+                    Stage = gifts.Length == 2 ? MouDongZhuoOlStage.GiftChildren : MouDongZhuoOlStage.GiftCard,
+                    Gifts = gifts,
+                    SelectedCard = 0,
+                    Paid = gifts.Length == 2
+                } });
+                if (gifts.Length == 2)
+                {
+                    events.AdvanceFact(new MouDongZhuoOlFengshangEvent(f.Id, f.OwnerSeat, r.Turn, r.Round, facts.PhaseId, Dying(f), r.Suit));
+                    RemoveGuanbian(f);
+                    Continue(f.Id);
+                }
+                else Publish(f);
+                return;
             default:throw new InvalidOperationException("Unknown Mou Dong Zhuo choice.");}
     }
     private void RemoveGuanbian(ProgramSkillFrame f)
@@ -105,8 +129,35 @@ internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZh
             if(facts.Finished){Complete(f);return;}
             if(r.Stage==MouDongZhuoOlStage.CostChildren){RemoveGuanbian(f);f=frames.ActiveProgram(id);r=f.MouDongZhuoOl!;if(native.Drain(f))return;frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.PeerChildren,Cursor=-1}});continue;}
             if(r.Stage is MouDongZhuoOlStage.PeerChildren or MouDongZhuoOlStage.Damage){var next=r.Cursor+1;while(next<r.Participants.Count&&!facts.Alive(r.Participants[next]))next++;if(next>=r.Participants.Count){Complete(f);return;}frames.ReplaceTop(f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.PeerChoice,Cursor=next,Materials=[]}});continue;}
-            if(r.Stage==MouDongZhuoOlStage.GiftChildren){if(r.Cursor<r.Gifts.Count){var g=r.Gifts[r.Cursor];frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Cursor=r.Cursor+1,Before=facts.MovementSequence,After=facts.MovementSequence},PendingMovementContinuation=new(f.OwnerSeat,0,null)});if(facts.Alive(g.Recipient)&&facts.Location(g.CardId)==CardLocation.DiscardPile)native.Give(f,g.CardId,g.Recipient);continue;}
-                if(facts.History<MouDongZhuoOlGiftEvent>().Any(g=>g.FrameId==f.Id&&g.Recipient==f.OwnerSeat)||!facts.Alive(f.OwnerSeat)){Complete(f);return;}frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.Wine}});if(!native.BeginWine(f)){frames.ReplaceTop(f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.Finishing}});continue;}return;}
+            if (r.Stage == MouDongZhuoOlStage.GiftChildren)
+            {
+                if (r.Cursor < r.Gifts.Count)
+                {
+                    var gift = r.Gifts[r.Cursor];
+                    var before = facts.MovementSequence;
+                    frames.ReplaceTop(f = f with
+                    {
+                        MouDongZhuoOl = r with { Cursor = r.Cursor + 1, Before = before, After = before },
+                        PendingMovementContinuation = new(f.OwnerSeat, 0, null)
+                    });
+                    if (facts.Alive(gift.Recipient) && IsOriginalFengshangGiftAvailable(gift))
+                        native.Give(f, gift.CardId, gift.Recipient);
+                    continue;
+                }
+
+                if (facts.History<MouDongZhuoOlGiftEvent>().Any(g => g.FrameId == f.Id && g.Recipient == f.OwnerSeat) || !facts.Alive(f.OwnerSeat))
+                {
+                    Complete(f);
+                    return;
+                }
+                frames.ReplaceTop(f = f with { MouDongZhuoOl = r with { Stage = MouDongZhuoOlStage.Wine } });
+                if (!native.BeginWine(f))
+                {
+                    frames.ReplaceTop(f = f with { MouDongZhuoOl = r with { Stage = MouDongZhuoOlStage.Finishing } });
+                    continue;
+                }
+                return;
+            }
             if(r.Stage==MouDongZhuoOlStage.WineChildren){if(!r.WineReturned)throw new InvalidOperationException("Fengshang Wine has not really returned.");Complete(f);return;}
             if(r.Stage==MouDongZhuoOlStage.ZhibingMaximum){if(r.BlackCount<3||!facts.Alive(f.OwnerSeat)){Complete(f);return;}frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.ZhibingRecovery}});native.MaximumHp(f);continue;}
             if(r.Stage==MouDongZhuoOlStage.ZhibingRecovery){frames.ReplaceTop(f=f with{MouDongZhuoOl=r with{Stage=MouDongZhuoOlStage.ZhibingGrants}});if(facts.Alive(f.OwnerSeat))native.Recover(f);continue;}

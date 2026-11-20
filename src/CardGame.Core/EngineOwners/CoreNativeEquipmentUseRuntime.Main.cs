@@ -29,7 +29,8 @@ internal sealed partial class CoreNativeEquipmentUseRuntime
 
         if (source.EquipmentSlotCapacity(_coreFieldEquipmentOperations.FieldEquipmentSlot(equipment)) == 0)
         {
-            _corePhysicalMovementFacadesOperations.MoveCard(equipment, CardLocation.Processing, CardLocation.DiscardPile, new CardMoveReason("area.abolished.equipment"));
+            _corePhysicalMovementFacadesOperations.MoveCard(equipment, CardLocation.Processing, CardLocation.DiscardPile,
+                CardMoveReasons.EquipmentSlotAbolishedBeforePlacement);
             _coreCardUseLifecycleOperations.BeginSimpleCardUse(resolutionId, new(equipment.Id, SimpleCardUseEffect.Equipment));
             return;
         }

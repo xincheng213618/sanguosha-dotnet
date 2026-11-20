@@ -29,7 +29,12 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
             NativeTrueUseDiscardKind kind;
             int provider;
             long parentAction;
-            if (parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use && (move.Reason == CardMoveReasons.Use || use.CardKind == CardKind.IronChain && move.Reason == CardMoveReasons.IronChainUse) && action.EffectiveKind == use.CardKind && action.PhysicalCards.Any(cost => cost.CardId == move.CardId && cost.CardKind == move.CardKind && cost.From == move.From))
+            if (parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use &&
+                (move.Reason == CardMoveReasons.Use ||
+                    use.CardKind == CardKind.IronChain && move.Reason == CardMoveReasons.IronChainUse ||
+                    use.CardId == move.CardId && move.Reason == CardMoveReasons.EquipmentUse) &&
+                action.EffectiveKind == use.CardKind && action.PhysicalCards.Any(cost => cost.CardId == move.CardId &&
+                    cost.CardKind == move.CardKind && cost.From == move.From))
             {
                 kind = NativeTrueUseDiscardKind.Use;
                 parentAction = action.ActionId;
@@ -66,7 +71,15 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
         if (facts is [var fact])
         {
             if (fact.Kind == NativeTrueUseDiscardKind.Use)
-                return IsNativeUseFinishReason(move.Reason) && parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use && action.ActionId == fact.ParentActionId && action.EffectiveKind == use.CardKind && action.ProviderSeat == fact.ProviderSeat && action.PhysicalCards.Any(cost => cost.CardId == move.CardId && cost.CardKind == move.CardKind && cost.From == entered.From);
+            {
+                var finishesUse = entered.Reason == CardMoveReasons.EquipmentUse
+                    ? move.Reason == CardMoveReasons.EquipmentSlotAbolishedBeforePlacement
+                    : IsNativeUseFinishReason(move.Reason);
+                return finishesUse && parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use &&
+                    action.ActionId == fact.ParentActionId && action.EffectiveKind == use.CardKind &&
+                    action.ProviderSeat == fact.ProviderSeat && action.PhysicalCards.Any(cost => cost.CardId == move.CardId &&
+                        cost.CardKind == move.CardKind && cost.From == entered.From);
+            }
             if (fact.Kind == NativeTrueUseDiscardKind.Dodge)
                 return move.Reason == CardMoveReasons.ResponseFinished && parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && incoming.ActionId == fact.ParentActionId && attack.TargetSeat == fact.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge);
             return fact.Kind == NativeTrueUseDiscardKind.Nullification && (move.Reason == CardMoveReasons.NullificationFinished || entered.Reason == CardMoveReasons.Respond && move.Reason == CardMoveReasons.ResponseFinished) && parent is NullificationWindowFrame counterspell && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(counterspell) && (_coreDelayedNullificationOperations.Value.NullificationParentActionId(counterspell) ?? 0) == fact.ParentActionId;

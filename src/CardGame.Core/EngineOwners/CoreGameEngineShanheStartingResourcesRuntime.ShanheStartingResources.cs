@@ -88,7 +88,10 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
             return true;
         }
 
-        if (used is not null && used.EntrySequence == entry.Sequence && (CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(reason) || reason.Value == "area.abolished.equipment") && _coreCardUseLifecycleOperations.LifecycleCardUse(used.UseFrameId)is { Action: { } action } && action.ActionId == used.ActionId && action.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind))
+        if (used is not null && used.EntrySequence == entry.Sequence &&
+            (CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(reason) || reason == CardMoveReasons.EquipmentSlotAbolishedBeforePlacement) &&
+            _coreCardUseLifecycleOperations.LifecycleCardUse(used.UseFrameId) is { Action: { } action } &&
+            action.ActionId == used.ActionId && action.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind))
         {
             entrySequence = entry.Sequence;
             parentFrame = used.UseFrameId;

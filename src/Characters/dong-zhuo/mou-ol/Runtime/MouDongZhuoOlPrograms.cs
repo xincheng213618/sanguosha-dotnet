@@ -3,7 +3,11 @@ namespace CardGame.Core;
 
 public enum MouDongZhuoOlStage { OwnCost, CostChildren, PeerChoice, PeerChildren, Damage, GiftCard, GiftRecipient, GiftChildren, Wine, WineChildren, ZhibingMaximum, ZhibingRecovery, ZhibingGrants, Finishing }
 public sealed record MouDongZhuoOlCard(int Id, CardLocation From, Suit Suit);
-public sealed record MouDongZhuoOlGift(int CardId, int Recipient);
+public sealed record MouDongZhuoOlGift(int CardId, int Recipient)
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal long? OriginalDiscardSequence { get; init; }
+}
 public sealed record MouDongZhuoOlReceipt(CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Operation, int Turn, int Round, long ParentId)
 {
     public MouDongZhuoOlStage Stage { get; init; }

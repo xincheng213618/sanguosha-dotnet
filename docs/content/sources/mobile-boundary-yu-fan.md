@@ -10,7 +10,7 @@
 
 ## 复用实现
 
-纵玄被动直接使用 `cardsMoved` 的原生 `perOwnerBatch`、`movementDiscardOnly` 和 `putDiscardedCardsOnDrawPileTop`。只处理本人的真实手牌、装备弃置，保留原弃置来源及 Processing 中转证明；使用或打出后的通常清理并不等于弃置。候选必须仍在弃牌堆，按下一张先摸的顺序暂选，确认后移动相应实体。
+纵玄被动直接使用 `cardsMoved` 的原生 `perOwnerBatch`、`movementDiscardOnly` 和 `putDiscardedCardsOnDrawPileTop`。候选和置顶都按同一来源核对本人的手牌、装备弃置。已完成的原生弃置用原移动序号匹配实际来源，既有路径继续识别原弃置来源和处理区中转。候选必须仍在原弃牌堆入堆位置，按下一张先摸的顺序暂选，确认后移动相应实体。
 
 主动纵玄以 `usesPerPhase: 1` 计数。先执行原生 `draw` 并等待移动子窗，再通过 `selectOwnedCards` 从当前手牌和装备中选择一张，以 `moveBoundCards` 原生置顶并等待后续移动时机。可以放回刚摸到的牌，也可以选择原有手牌或装备；启动前不预收这张牌。所有绑定、原区域及付款延续保留在原程序帧。
 

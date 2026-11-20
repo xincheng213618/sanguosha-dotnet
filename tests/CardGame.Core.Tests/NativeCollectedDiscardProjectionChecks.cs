@@ -10,6 +10,7 @@ internal static class NativeCollectedDiscardProjectionChecks
     private const string Owner = "fixture:native-collected-owner";
     private const string Driver = "fixture:native-collected-driver";
     private const string CaoXianDiscardReason = "skill-program.ol:lingxi-or-zhifou.discard";
+    private const string OwnMobileZongxuan = "boundary:zongxuan-mobile";
 
     public static void CaoXianAdjustmentAndTargetDiscardPreserveNativeCollectionCold()
     {
@@ -119,10 +120,49 @@ internal static class NativeCollectedDiscardProjectionChecks
             $"Renxing must finish once on native discard batch {adjustment[0].BatchId}, with none on later batch {laterDiscard[0].BatchId}. First fact: {first?.BatchId}. Completed batches: [{string.Join(", ", completed.Select(entry => entry.FirstDiscardBatch))}].");
     }
 
-    internal static (GameEngine Game, ContentRegistry Registry) CreateCaoXianDiscardScene(bool includeJiang = false, bool includeRenxing = false)
+    public static void CaoXianTypedDiscardOpensOwnMobileZongxuanCold()
+    {
+        var (game, registry) = CreateCaoXianDiscardScene(includeOwnMobileZongxuan: true);
+        var before = game.CardMovements.Count;
+        var required = Prompt(game)!.RequiredCardCount;
+        Require(required == 5, "The genuine Lingxi hand adjustment requires five real owned cards.");
+        for (var index = 0; index < required; index++) Pick(game, choice => HasRole(choice, "pick"));
+        bool AtCaoXianOption() => game.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()?.CaoXian?.Stage == CaoXianStage.OptionTarget;
+        Reach(game, prompt => prompt?.SkillPrompt?.SkillId == OwnMobileZongxuan || AtCaoXianOption());
+
+        var discarded = game.CardMovements.Skip(before).Where(move => move.Reason.Value == CaoXianDiscardReason).ToArray();
+        Require(discarded.Length == required && discarded[0].BatchId is > 0 &&
+            discarded.All(move => move.BatchId == discarded[0].BatchId && move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile),
+            "Lingxi pays one genuine batch of five cards from the owner's original hand to the discard pile.");
+        var materials = game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardMaterialCompletedEvent>().ToArray();
+        Require(discarded.All(move => materials.Any(material => material.CardId == move.CardId &&
+            material.From == move.From && material.To == move.To && material.CompletionSequence == move.Sequence)),
+            "Each entry of the genuine batch has an original typed discard receipt.");
+        Require(Prompt(game)?.SkillPrompt?.SkillId == OwnMobileZongxuan &&
+            game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().LastOrDefault()?.Batch.Id == discarded[0].BatchId,
+            $"The genuine owned discard batch {discarded[0].BatchId} must offer mobile boundary Zongxuan before Zhifou continues.");
+
+        Pick(game, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        Reach(game, prompt => prompt?.SkillPrompt?.SkillId == OwnMobileZongxuan && Has(prompt, "program-action", "discard-top-select"));
+        game = Cold(game, registry);
+        var selected = discarded[0].CardId;
+        Pick(game, choice => choice.Parameters.GetValueOrDefault("program-action") == "discard-top-select" && choice.Cards.SequenceEqual([selected]));
+        Pick(game, choice => choice.Parameters.GetValueOrDefault("program-action") == "discard-top-finish");
+        Reach(game, _ => AtCaoXianOption());
+
+        var zones = game.CreateCardZoneDiagnostics();
+        var placed = game.CardMovements.Last(move => move.CardId == selected);
+        Require(placed.From == CardLocation.DiscardPile && placed.To == CardLocation.DrawPile && placed.Sequence > discarded[0].Sequence &&
+            zones.Where(item => item.Location == CardLocation.DrawPile).MaxBy(item => item.ZoneIndex)?.CardId == selected &&
+            discarded.Skip(1).All(move => zones.Single(item => item.CardId == move.CardId).Location == CardLocation.DiscardPile),
+            "Only the selected original entry reaches the top of the deck after cold continuation; the other four stay discarded.");
+    }
+
+    internal static (GameEngine Game, ContentRegistry Registry) CreateCaoXianDiscardScene(bool includeJiang = false,
+        bool includeRenxing = false, bool includeOwnMobileZongxuan = false)
     {
         var peerGeneral = includeJiang ? "boundary:sun-ce" : includeRenxing ? "mobile:shi-chen-zhi" : CaoXianFixture.Peer;
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new CaoXianFixture(peerGeneral));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new CaoXianFixture(peerGeneral, includeOwnMobileZongxuan));
         Require(registry.Generals.TryGetValue(peerGeneral, out var peer) && registry.IsGeneralPlayable(peerGeneral) &&
             (!includeRenxing || peer.AdditionalSkillIds?.Contains("mobile:shi-renxing") == true),
             $"The Cao Xian fixture requires the registered playable peer {peerGeneral} with its printed skills.");
@@ -132,7 +172,7 @@ internal static class NativeCollectedDiscardProjectionChecks
             new(includeJiang ? CardKind.Duel : CardKind.Dodge, Suit.Club, 8)];
         var firstPeer = new ShanheCombatantDefinition(peerGeneral, Hp: peer!.BaseHp) { StartingHand = [] };
         var setup = new ShanheBattleSetup(373, 1, "cao-xian-native-discard-draft", "ol:cao-xian", 3, 0, 0, 0, 0,
-            [CaoXianFixture.Driver], hand, [], [firstPeer,
+            includeOwnMobileZongxuan ? [CaoXianFixture.Driver, OwnMobileZongxuan] : [CaoXianFixture.Driver], hand, [], [firstPeer,
                 new(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] }, new(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] }], [], new string('c', 64));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0,
             HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
@@ -298,13 +338,15 @@ internal static class NativeCollectedDiscardProjectionChecks
     }
     private static void Require(bool yes, string why) { if (!yes) throw new InvalidOperationException(why); }
 
-    private sealed class CaoXianFixture(string peerGeneral) : IGameContentPackage
+    private sealed class CaoXianFixture(string peerGeneral, bool includeOwnMobileZongxuan) : IGameContentPackage
     {
         internal const string Driver = "fixture:native-cao-xian-driver", Peer = "fixture:native-cao-xian-peer", Deck = "fixture:native-cao-xian-deck";
         public PackageManifest Manifest { get; } = new("fixture-native-cao-xian-discard", new(1, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:cao-xian");
+            if (includeOwnMobileZongxuan)
+                CharacterFixtureContent.Register(b, "boundary:yu-fan-mobile");
             if (peerGeneral == "boundary:sun-ce")
                 CharacterFixtureContent.Register(b, "boundary:sun-ce", "classic:sun-jian", "classic:zhou-yu");
             else if (peerGeneral != Peer)

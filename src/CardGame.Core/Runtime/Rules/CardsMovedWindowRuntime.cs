@@ -582,7 +582,19 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
             return specialized;
         if (trigger.IgnoreOwnSkillMovements && batch.OriginOwnerSeat == candidate.OwnerSeat && batch.OriginSkillId == candidate.SkillId && batch.OriginSkillInstanceId == candidate.SkillInstanceId)
             return[];
-        return batch.Movements.Select((movement, index) => (movement, index)).Where(item => (trigger.Window == SkillProgramTriggerWindow.CardsGained ? item.movement.To : trigger.MovementDiscardOnly ? _discardOrigins.GetProgramDiscardSource(item.movement) : item.movement.From) == location && item.movement.From != item.movement.To && (trigger.MovementReasons.Count == 0 || trigger.MovementReasons.Contains(item.movement.Reason.Value)) && !trigger.ExcludedMovementReasons.Contains(item.movement.Reason.Value)).Where(item => trigger.MovementOccurrence != SkillProgramMovementOccurrence.PerSourceOwner || item.movement.From.OwnerSeat == batch.Movements[candidate.OccurrenceIndex].From.OwnerSeat).Where(item => ordinalIndexes is null || ordinalIndexes.Contains(item.index)).Select(item => item.index).ToArray();
+        var usesCompletedDiscardSource = features.HasOperation(SkillProgramEffectOp.PutDiscardedCardsOnDrawPileTop);
+        CardLocation? MovementLocation(CardMovementRecord movement) => trigger.Window == SkillProgramTriggerWindow.CardsGained
+            ? movement.To
+            : !trigger.MovementDiscardOnly ? movement.From
+            : usesCompletedDiscardSource ? _discardOrigins.GetCompletedProgramDiscardSource(movement)
+            : _discardOrigins.GetProgramDiscardSource(movement);
+        return batch.Movements.Select((movement, index) => (movement, index)).Where(item =>
+            MovementLocation(item.movement) == location && item.movement.From != item.movement.To &&
+            (trigger.MovementReasons.Count == 0 || trigger.MovementReasons.Contains(item.movement.Reason.Value)) &&
+            !trigger.ExcludedMovementReasons.Contains(item.movement.Reason.Value)).Where(item =>
+                trigger.MovementOccurrence != SkillProgramMovementOccurrence.PerSourceOwner ||
+                item.movement.From.OwnerSeat == batch.Movements[candidate.OccurrenceIndex].From.OwnerSeat)
+            .Where(item => ordinalIndexes is null || ordinalIndexes.Contains(item.index)).Select(item => item.index).ToArray();
     }
 
     internal int[] MatchingOwnerBatchMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _facts.ProgramMovementSourceCounts(batch, SkillProgramTriggerWindow.CardsMoved).Where(item => (!item.DiscardOriginOnly || trigger.MovementDiscardOnly) && item.Count.Location.OwnerSeat == candidate.OwnerSeat && trigger.SourceZones.Contains(item.Count.Location.Zone)).SelectMany(item => MatchingMovementIndexes(batch, candidate, trigger, item.Count.Location)).Distinct().Order().ToArray();

@@ -158,6 +158,7 @@ public static class CardMoveReasons
     public static CardMoveReason EquipmentUse { get; } = new("equipment.use");
     public static CardMoveReason EquipmentEnter { get; } = new("equipment.enter");
     public static CardMoveReason EquipmentReplace { get; } = new("equipment.replace");
+    public static CardMoveReason EquipmentSlotAbolishedBeforePlacement { get; } = new("area.abolished.equipment");
     public static CardMoveReason WoodenOxStore { get; } = new("equipment.wooden-ox.store");
     public static CardMoveReason WoodenOxTransfer { get; } = new("equipment.wooden-ox.transfer");
     public static CardMoveReason WoodenOxGrainDiscard { get; } = new("equipment.wooden-ox.grain-discard");

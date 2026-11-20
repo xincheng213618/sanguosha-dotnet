@@ -86,7 +86,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
 
     private IEnumerable<CardMovementRecord> CurrentOwnDiscardMovements(CardMovementBatchContext batch, int owner,
         IReadOnlyList<CardZoneKind> zones) => batch.Movements.Where(movement =>
-            _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement) is { } discarded &&
+            _coreProgramDiscardOriginsOperations.GetCompletedProgramDiscardSource(movement) is { } discarded &&
             discarded.OwnerSeat == owner && (zones.Count == 0 || zones.Contains(discarded.Zone)) && IsCurrentDiscardEntry(movement));
 
     internal IEnumerable<CardMovementRecord> EligibleProgramDiscardTopMovements(ProgramSkillFrame frame)

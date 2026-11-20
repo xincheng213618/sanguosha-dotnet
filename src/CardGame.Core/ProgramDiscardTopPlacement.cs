@@ -16,6 +16,7 @@ internal sealed class PutDiscardedCardsOnDrawPileTopProgramOperationDescriptor :
     public override ISkillProgramEffectHandler Handler { get; } = new PutDiscardedCardsOnDrawPileTopSkillProgramEffectHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Move, static (_, _) => { });
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
 }

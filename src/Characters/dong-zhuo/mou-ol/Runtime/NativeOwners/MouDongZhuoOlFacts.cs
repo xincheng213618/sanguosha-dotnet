@@ -15,7 +15,6 @@ internal sealed class MouDongZhuoOlFacts(EngineStates.CoreActualTurnProgressStat
     public int Hp(int seat) => matchParticipantsState.ReferenceToPlayers[seat].Hp;
     public bool Owns(int seat, string skill) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkill(matchParticipantsState.ReferenceToPlayers[seat], skill);
     public SkillProgram Program(string id) => getContentRegistry().GetSkill(id).Program!;
-    public CardLocation Location(int id) => getCardZoneStore().GetLocation(id);
     public IEnumerable<T> History<T>()
         where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public int KeepValue(int seat, int id) => EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id), matchParticipantsState.ReferenceToPlayers[seat]);
