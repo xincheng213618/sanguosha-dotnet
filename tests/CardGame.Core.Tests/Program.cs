@@ -909,6 +909,7 @@ var tests = new (string Name, Action Body)[]
     ("Shi Zhong Hui Sizi: both paid activations stop at the next owner turn cold", ShiZhongHuiSiziExpiryChecks.BothPaidSiziActivationsStopAtTheOwnersNextActualTurnCold),
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
+    ("OL Tang Zi Xingzhao: real wound lends Xunxun and orders next actual Draw cold", OlTangZiXingzhaoWoundedOwnerChecks.RealWoundLendsXunxunAndOrdersNextActualDrawCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
     ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
     ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),

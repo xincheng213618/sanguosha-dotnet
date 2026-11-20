@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.EngineOwners;
-[Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CharacterTangZiOlRuntime(RuntimeEntries.CoreGameEngineTreatedWoundedEntries _coreTreatedWoundedOperations, ICharacterTangZiOlCoreProgramSelectionModulesOperations _coreProgramSelectionModulesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess) : ISelectionWoundedQueries
-{
-}

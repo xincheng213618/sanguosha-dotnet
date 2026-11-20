@@ -35,6 +35,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineNativeUsedDiscardOriginsRuntime` captures the actor and exact discard entry of finished uses and responses during the original movement batch. Xunxian and Tongxie request this fact through their trigger operations. Tongxie observes each queued fact synchronously and validates the original movement and live Slash parent before opening its own later follow-up window.
 
+- `CoreGameEngineTreatedWoundedRuntime` supplies current wounded status and identity concealment to conditional skill bindings and rule expressions. This uses the same match health rules as native checks, including undefined HP, the active Happy Qiao health pool and qualifying Guiming. Xingzhao reads that current status through its declared condition.
+
 - Use a skill's `modifiers` declaration for ordinary additive values and conditions that its existing queries can express. For example, OL Huo Jun's Qiongshou declares `handLimit` with `operation: add` and `value: 4`. The native Discard phase uses the resulting limit when it requests real card payments.
 
 - OL Du Fu Ren's Shunshi contributes to the shared Draw count, Slash limit and hand limit through the same registration. Each paid gift is consumed separately at the participant's next actual phase of the corresponding kind. Skipped phases leave that grant pending. A Draw-start instruction may read the pending Draw term before confirmation; confirmed queries read the terms issued for the original phase key.
