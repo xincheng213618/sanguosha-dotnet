@@ -64,6 +64,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 - Huxin Mirror uses effective field equipment and its exact skill instance for the offer and the unpaid admission. Once the mirror actually leaves equipment as payment, the original damage owner reads that movement receipt to finish prevention through any movement children.
 
+- Kunlun Mirror uses effective field equipment and its exact treasure skill instance for both learning and prevention. The holder learns the effective trick name after actual applied damage. Later prevention reads that holder's remembered name and current equipment on the actual damage attempt.
+
 - Fixed effects already issued for a card use use `CardUseFrame.CardDamageAdjustments` and `CoreGameEngineCardUseLifecycleRuntime`; current-occurrence damage changes stay on the actual damage attempt. Preserve whole-use versus target scope and card-damage versus additional-damage layers. Do not rebuild character boost ledgers or requalify paid effects when their source disappears.
 
 - Barbarian Assault keeps its original card user and assigned damage source on the group continuation. A living assigned source remains responsible after skill loss. If that replacement source dies, a later failed response starts a source-less damage attempt while the original use continues with its assigned seats.

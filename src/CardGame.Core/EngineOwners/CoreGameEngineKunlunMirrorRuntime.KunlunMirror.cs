@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineKunlunMirrorRuntime
 {
     internal const string KunlunMirrorSkill = "shanhe:kunlun-mirror-14080";
-    internal bool HasEffectiveKunlunMirror(int owner, string instance) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _characterHuCheErMouOperations.KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Kind == CardKind.KunlunMirror && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, KunlunMirrorSkill, instance, card));
+    internal bool HasEffectiveKunlunMirror(int owner, string instance) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Kind == CardKind.KunlunMirror && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, KunlunMirrorSkill, instance, card));
     internal bool KnowsKunlunMirrorName(int owner, string name) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KunlunMirrorTrickLearnedEvent>().Any(fact => fact.Receipt.Source.OwnerSeat == owner && string.Equals(fact.Receipt.Origin.CardName, name, StringComparison.Ordinal));
     internal bool TryKunlunMirrorOrigin(GameEngine.IDamageAttempt? attack, out KunlunMirrorDamageOrigin origin)
     {
