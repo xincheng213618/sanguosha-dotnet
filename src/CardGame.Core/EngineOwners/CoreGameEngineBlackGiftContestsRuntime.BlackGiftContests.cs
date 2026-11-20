@@ -51,7 +51,10 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[first].IsAlive || !_pindianPolicyQueries.HasPindianInput(first))
             return[];
         // “另一名角色” may be the original owner; its hand is checked after the gift.
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != first && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(first, p.Seat)).Select(p => p.Seat).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players
+            .Where(player => player.IsAlive && player.Seat != first && _pindianPolicyQueries.CanBePindianTarget(first, player.Seat))
+            .Select(player => player.Seat)
+            .ToArray();
     }
 
     internal IReadOnlyList<PromptChoice> BlackGiftDiscardOptions(ProgramSkillFrame f)

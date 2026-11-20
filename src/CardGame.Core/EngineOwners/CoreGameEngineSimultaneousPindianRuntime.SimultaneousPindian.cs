@@ -10,7 +10,14 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
     internal SkillProgramStepOutcome StartSimultaneousPindian(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.TriggerId is not null || f.InstructionIndex != 1 || f.SimultaneousPindian is not null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || f.SelectedCardIds.Count > 1 || f.SelectedCardIds.Count == 0 && !_pindianPolicyQueries.CanDiscardForPindian(f.OwnerSeat) || f.SelectedTargetSeats.Count is < 1 or > 3 || f.SelectedTargetSeats.Distinct().Count() != f.SelectedTargetSeats.Count || f.SelectedTargetSeats.Any(s => !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, s)) || f.SelectedCardIds.Count == 1 && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(c => c.Id == f.SelectedCardIds[0]))
+        if (f.TriggerId is not null || f.InstructionIndex != 1 || f.SimultaneousPindian is not null ||
+            f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat ||
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play ||
+            f.SelectedCardIds.Count > 1 || f.SelectedCardIds.Count == 0 && !_pindianPolicyQueries.CanDiscardForPindian(f.OwnerSeat) ||
+            f.SelectedTargetSeats.Count is < 1 or > 3 || f.SelectedTargetSeats.Distinct().Count() != f.SelectedTargetSeats.Count ||
+            f.SelectedTargetSeats.Any(seat => !_pindianPolicyQueries.CanBePindianTarget(f.OwnerSeat, seat)) ||
+            f.SelectedCardIds.Count == 1 && !_corePhysicalOwnedCardQueriesOperations
+                .GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(card => card.Id == f.SelectedCardIds[0]))
             throw new InvalidOperationException("A simultaneous contest lost its exact own card, other hand participants or phase activation.");
         var id = f.SelectedCardIds.SingleOrDefault();
         var card = id == 0 ? null : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Single(c => c.Id == id);
