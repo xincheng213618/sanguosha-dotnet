@@ -403,7 +403,16 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
 
     internal SkillProgramStepOutcome BeginProgramSkillPindian(ProgramSkillFrame frame, int targetSeat)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id || frame.PindianResultBindings.Any(item => item.Name == SimpleProgramPindianResultBind) || frame.SelectedCardIds.Count != 1 && !_characterLuKangWumiaoOperations.HasWuLuKangPindianSelection(frame, ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Activation!) || frame.SelectedTargetSeats.Count != 1 || frame.SelectedTargetSeats[0] != targetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.OwnerSeat, targetSeat) || !_pindianPolicyQueries.HasPindianInput(targetSeat) || frame.SelectedCardIds.Count == 1 && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(card => card.Id == frame.SelectedCardIds[0]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not ProgramSkillFrame current ||
+            current.Id != frame.Id || frame.PindianResultBindings.Any(item => item.Name == SimpleProgramPindianResultBind) ||
+            frame.SelectedCardIds.Count != 1 && !_characterLuKangWumiaoOperations.HasWuLuKangPindianSelection(frame,
+                ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Activation!) ||
+            frame.SelectedTargetSeats.Count != 1 || frame.SelectedTargetSeats[0] != targetSeat ||
+            !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat ||
+            !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive ||
+            !_pindianPolicyQueries.CanBePindianTarget(frame.OwnerSeat, targetSeat) ||
+            frame.SelectedCardIds.Count == 1 && !_corePhysicalOwnedCardQueriesOperations
+                .GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(card => card.Id == frame.SelectedCardIds[0]))
         {
             throw new InvalidOperationException("A program Pindian requires one current owner hand card and one living other target with hand cards.");
         }

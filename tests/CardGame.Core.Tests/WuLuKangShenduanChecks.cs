@@ -116,33 +116,85 @@ internal static class WuLuKangShenduanChecks
             game.CardMovements.Count(move => move.CardId == equipment && move.From == CardLocation.Equipment(0)) == 1,
             "Returning the original prompt pays the actual equipment once and uses the original contest's maximum deck entity.");
 
-        GameEngine Start(ShanheStartingCard? equipmentCard)
-        {
-            var setup = new ShanheBattleSetup(7, 1, "shenduan-equipment", EquipmentFixture.Owner, 4, 0, 0, 0, 0, [], [],
+        VerifyOpponentEquipment(content);
+
+        GameEngine Start(ShanheStartingCard? equipmentCard) =>
+            StartEquipmentEncounter(content, new(7, 1, "shenduan-equipment", EquipmentFixture.Owner, 4, 0, 0, 0, 0, [], [],
                 equipmentCard is { } card ? [card] : [],
                 [new(Generals[1]) { StartingHand = [new(CardKind.Dodge, Suit.Spade, 7)] }, new(Generals[2]) { StartingHand = [] }],
-                [new(Generals[3]) { StartingHand = [] }], new string('d', 64));
-            var match = GameEngine.CreateStandard(new GameOptions
-            {
-                Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
-                HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
-                UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4
-            }, content);
-            Accept(match, new StartGameCommand());
-            Settle(match);
-            return match;
-        }
+                [new(Generals[3]) { StartingHand = [] }], new string('d', 64)));
+    }
+
+    private static void VerifyOpponentEquipment(ContentRegistry content)
+    {
+        var crossbow = new ShanheStartingCard(CardKind.Crossbow, Suit.Club, 8);
+        var game = StartEquipmentEncounter(content, new(7, 1, "shenduan-opponent-equipment", EquipmentFixture.TaishiCi, 4, 0, 0, 0, 0,
+            [], [new(CardKind.Dodge, Suit.Spade, 7)], [],
+            [new(Generals[1], ExtraSkillIds: [Shenduan]) { StartingHand = [], StartingEquipment = [crossbow] },
+             new(Generals[2]) { StartingHand = [], StartingEquipment = [crossbow] }],
+            [new(Generals[3]) { StartingHand = [] }], new string('d', 64)));
+        var players = game.CreateSnapshot(0).Players;
+        var sourceCard = players[0].Hand.Single();
+        var opponent = players.Single(player => player.GeneralId == Generals[1]);
+        var ineligible = players.Single(player => player.GeneralId == Generals[2]);
+        var equipment = opponent.Equipment.Single().Id;
+        var ineligibleEquipment = ineligible.Equipment.Single().Id;
+        var action = game.GetHumanLegalActions().Single(item => item.SkillId == EquipmentFixture.Tianyi);
+        Require(sourceCard is { Kind: CardKind.Dodge, Rank: 7 } && opponent.HandCount == 0 && ineligible.HandCount == 0 &&
+            action.MinCardCount == 1 && action.SelectableCardIds.SequenceEqual([sourceCard.Id]) &&
+            action.SelectableTargetSeats.SequenceEqual([opponent.Seat]),
+            "Tianyi requires Taishi Ci's physical Dodge and offers the empty-hand opponent whose Shenduan can pay equipment.");
+
+        var revision = game.Revision;
+        Require(!game.Submit(new UseProgramSkillCommand(0, EquipmentFixture.Tianyi, "contest", [sourceCard.Id], [ineligible.Seat], revision, P(game)!.PromptId)).Accepted &&
+            game.Revision == revision, "An empty-hand opponent with equipment and no Shenduan cannot be submitted as a target.");
+        Accept(game, new UseProgramSkillCommand(0, EquipmentFixture.Tianyi, "contest", [sourceCard.Id], [opponent.Seat], revision, P(game)!.PromptId));
+        var native = game.ResolutionStack.OfType<PindianFrame>().Single();
+        var offer = game.CreateSnapshot(opponent.Seat).PendingDecision;
+        Require(native is { SourceSeat: 0, PindianStep: PindianStep.ChooseOpponentCard } && native.SourceCardId == sourceCard.Id &&
+            native.OpponentSeat == opponent.Seat && offer is { IsPrivate: true, ValidCardIds.Count: 0, Choices.Count: 1 } &&
+            offer.Choices.Single().Parameters.GetValueOrDefault("action") == "pindian-maximum" && game.CreateSnapshot(0).PendingDecision is null &&
+            game.CreateCardZoneDiagnostics().Single(card => card.CardId == equipment).Location == CardLocation.Equipment(opponent.Seat),
+            "The original native contest gives the opponent only the private unpaid maximum choice.");
+
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        Settle(game);
+        var paid = game.Events.Select(item => item.Payload).OfType<WuLuKangShenduanDiscardPaidEvent>().Single();
+        var discard = game.CardMovements.Single(move => move.CardId == equipment && move.From == CardLocation.Equipment(opponent.Seat));
+        var result = game.Events.Select(item => item.Payload).OfType<PindianResultDeterminedEvent>().Single();
+        var maximum = game.CardMovements.Single(move => move.Reason.Value == "skill-program.wu-lu-kang.shenduan.reserve");
+        Require(paid.ContestId == native.Id && paid.ParticipantSeat == opponent.Seat && paid.CardId == equipment &&
+            paid.From == CardLocation.Equipment(opponent.Seat) && paid.To == CardLocation.DiscardPile && paid.Sequence < maximum.Sequence &&
+            discard.Sequence == paid.Sequence && discard.To == paid.To &&
+            maximum.From == CardLocation.DrawPile && maximum.To == CardLocation.Processing && result.FrameId == native.Id &&
+            result.Result is { SourceRank: 7, OpponentRank: 13, SourceWon: false } && result.Result.SourceCardId == sourceCard.Id &&
+            result.Result.OpponentCardId == maximum.CardId &&
+            game.CreateCardZoneDiagnostics().Single(card => card.CardId == ineligibleEquipment).Location == CardLocation.Equipment(ineligible.Seat),
+            "Cold return pays the opponent's actual equipment once and uses the reserved deck entity against Taishi Ci's original card.");
+    }
+
+    private static GameEngine StartEquipmentEncounter(ContentRegistry content, ShanheBattleSetup setup)
+    {
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
+            HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
+            UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4
+        }, content);
+        Accept(game, new StartGameCommand());
+        Settle(game);
+        return game;
     }
 
     private sealed class EquipmentFixture : IGameContentPackage
     {
-        internal const string Owner = "fixture:shenduan-equipment-owner", Tianyi = "classic:tianyi";
+        internal const string Owner = "fixture:shenduan-equipment-owner", Tianyi = "classic:tianyi", TaishiCi = "classic:taishi-ci";
         private const string EquipmentDeck = "fixture:shenduan-equipment-deck";
         public PackageManifest Manifest { get; } = new("fixture-shenduan-equipment", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "wumiao:lu-kang", "classic:taishi-ci");
+            CharacterFixtureContent.Register(builder, "wumiao:lu-kang", TaishiCi);
             builder.AddGeneral(new(Owner, "审断只付装备", "supporter", Tianyi, "wu", 4, [Shenduan]));
             foreach (var id in Generals.Skip(1))
                 builder.AddGeneral(new(id, "固定同桌", "supporter", "standard:none", "wei", 10));
@@ -152,7 +204,7 @@ internal static class WuLuKangShenduanChecks
                     .Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 13)).ToArray()
             });
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "实际空手审断", 4, 4, new Dictionary<string, int>(), EquipmentDeck,
-                GeneralPoolIds: [Owner, .. Generals.Skip(1)], ModeKind: ContentModeKind.Team,
+                GeneralPoolIds: [Owner, TaishiCi, .. Generals.Skip(1)], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }

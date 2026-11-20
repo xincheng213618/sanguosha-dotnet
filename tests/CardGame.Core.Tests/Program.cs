@@ -921,6 +921,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Shen Guo Jia: paid Huishi preserves accepted Choujue before general completion cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiLetsActualChoujueAcceptBeforeGeneralCompletionCold),
     ("Mobile Shen Guo Jia: paid Huishi lets Dili spend one game use across both windows cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiLetsDiliConsumeOneGameUseAcrossBothWindowsCold),
     ("Mou Dian Wei Kuangzhan: real draw and native Pindian share opponents cold", MouDianWeiPindianOpponentChecks.ActualKuangzhanDrawAndNativePindianUseSameOpponentsCold),
+    ("OL Pang Ji Biguo: native opponent and card menu cold", PangJiBiguoOpponentChecks.ActualBiguoSelectsNativeOpponentAndCardCold),
     ("OL Guan Hai Youque: actual bait requires input and preserves its original entity cold", OlGuanHaiPindianInputChecks.RealBaitNeedsPindianInputAndKeepsItsOriginalEntityCold),
     ("OL Sun Ru Weimian: original recovery request and application return cold", SunRuWeimianRecoveryChecks.ActualWeimianReturnsFromReplacementAndOriginalApplicationCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),

@@ -27,8 +27,14 @@ internal sealed partial class CoreGameEnginePindianRuntime
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(chooser);
         if (frame.PindianStep == PindianStep.ChooseSourceCard && frame.SourceCardId is { } originallySelected)
             hand = hand.Where(card => card.Id == originallySelected).ToArray();
-        var targets = frame.PindianStep == PindianStep.ChooseParticipants ? _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != chooser.Seat && _pindianPolicyQueries.HasPindianInput(player.Seat) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.SourceSeat, player.Seat)).Select(player => player.Seat).ToArray() : [];
-        if (!chooser.IsAlive || !_pindianPolicyQueries.HasPindianInput(chooser.Seat) || frame.PindianStep == PindianStep.ChooseParticipants && targets.Length == 0 || !selectingSource && (chooser.Seat == frame.SourceSeat || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.SourceSeat, chooser.Seat) || !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame)))
+        var targets = frame.PindianStep == PindianStep.ChooseParticipants
+            ? _coreEquipmentSlotGroupProgramsOperations.PindianOpponents(frame.SourceSeat)
+            : [];
+        if (!chooser.IsAlive || !_pindianPolicyQueries.HasPindianInput(chooser.Seat) ||
+            frame.PindianStep == PindianStep.ChooseParticipants && targets.Count == 0 ||
+            !selectingSource && (chooser.Seat == frame.SourceSeat ||
+                !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.SourceSeat, chooser.Seat) ||
+                !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame)))
             throw new InvalidOperationException("Pindian participants no longer have legal hand cards.");
         var choices = new List<PromptChoice>();
         foreach (var card in hand)
