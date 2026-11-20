@@ -110,7 +110,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
 
     internal static NativeDrawOutcome? CompletedOperationDraw(ProgramSkillFrame frame, int instructionIndex,
         SkillProgramEffectOp operation, CardMoveReason reason) => frame.NativeOperationDrawReturns
-        .SingleOrDefault(receipt => receipt.InstructionIndex == instructionIndex && receipt.Operation == operation && receipt.Reason == reason)
+        .LastOrDefault(receipt => receipt.InstructionIndex == instructionIndex && receipt.Operation == operation && receipt.Reason == reason)
         ?.Outcome;
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 0)]

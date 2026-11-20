@@ -36,7 +36,7 @@ internal static class AnniversaryHanSongComposition
 }
 public enum AnniversaryHanSongStage { BenefitChoice,CardChoice,Drawing,DrawChildren,DiscardChildren,Complete }
 public sealed record AnniversaryHanSongReceipt(CardConversionSource Source,string GameplayHash,long ParentId,int ActualTurn,int SubjectSeat,int DrawCount,
- AnniversaryHanSongStage Stage,NativeDrawOutcome? Draw=null,int DiscardId=0,CardLocation? DiscardFrom=null,long Before=0,long After=0,long DiscardSequence=0);
+ AnniversaryHanSongStage Stage,int DiscardId=0,CardLocation? DiscardFrom=null,long Before=0,long After=0,long DiscardSequence=0);
 public sealed partial record ProgramSkillFrame
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public AnniversaryHanSongReceipt? AnniversaryHanSong {get;init;}}
 public sealed record AnniversaryHanSongStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,long ParentId,int ActualTurn,int SubjectSeat,int DrawCount):IGameEvent;

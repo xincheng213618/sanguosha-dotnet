@@ -28,12 +28,12 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
             if (f.SelectedTargetSeats is not [var actor] || actor != r.Actor || r.Option is < 0 or > 2 || r.Plan is not null || r.Name is not null || r.RewardLeases.Count != 0 || r.UseId != 0 || r.ActionId != 0)
                 return false;
             if (r.Stage == AnniversaryYanXiangStage.Option)
-                return r.Option == 0 && r.Cards.Count == 0 && r.Draw is null && YanXiangAvailableOptions(f.OwnerSeat, f.SkillInstanceId).Length > 0;
+                return r.Option == 0 && r.Cards.Count == 0 && f.NativeOperationDrawReturns.Count == 0 && YanXiangAvailableOptions(f.OwnerSeat, f.SkillInstanceId).Length > 0;
             if (r.Option == 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangOptionChosenEvent>().Count(e => e == new AnniversaryYanXiangOptionChosenEvent(f.Id, r.Source, r.Hash, r.Turn, r.Phase, r.Actor, r.Option)) != 1)
                 return false;
             if (r.Stage is not (AnniversaryYanXiangStage.HandCards or AnniversaryYanXiangStage.Drawing or AnniversaryYanXiangStage.MovementChildren or AnniversaryYanXiangStage.Completed))
                 return false;
-            if (r.Option == 1 && (r.Draw is not null || r.Requested != 0 || r.Stage == AnniversaryYanXiangStage.Drawing))
+            if (r.Option == 1 && (f.NativeOperationDrawReturns.Count != 0 || r.Requested != 0 || r.Stage == AnniversaryYanXiangStage.Drawing))
                 return false;
             if (r.Option == 2 && (r.Cards.Count != 0 || r.Required != 0 || r.Moves.Count != 0 || r.Requested > 5))
                 return false;
@@ -46,7 +46,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         }
         else
         {
-            if (f.SelectedTargetSeats.Count != 0 || r.Actor != f.WindowContext?.SourceSeat || r.Option != 0 || r.Cards.Count != 0 || r.Draw is not null || r.Requested != 0 || r.RewardLeases.Count != 0 || r.Stage is AnniversaryYanXiangStage.Option or AnniversaryYanXiangStage.HandCards or AnniversaryYanXiangStage.Drawing or AnniversaryYanXiangStage.MovementChildren)
+            if (f.SelectedTargetSeats.Count != 0 || r.Actor != f.WindowContext?.SourceSeat || r.Option != 0 || r.Cards.Count != 0 || f.NativeOperationDrawReturns.Count != 0 || r.Requested != 0 || r.RewardLeases.Count != 0 || r.Stage is AnniversaryYanXiangStage.Option or AnniversaryYanXiangStage.HandCards or AnniversaryYanXiangStage.Drawing or AnniversaryYanXiangStage.MovementChildren)
                 return false;
             if (r.Stage != AnniversaryYanXiangStage.DamageName && (r.Name is not { } name || !YanXiangDamageNames().Contains(name) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangNameDeclaredEvent>().Count(e => e == new AnniversaryYanXiangNameDeclaredEvent(f.Id, r.Actor, name)) != 1))
                 return false;
@@ -62,10 +62,20 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
 
         if (r.Moves.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.From != CardLocation.Hand(r.Actor) || !r.Cards.Contains(m.CardId) || m.Reason.Value != YanXiangDiscardReason || m.Sequence <= r.Before || m.Sequence > r.After || m.To != CardLocation.DiscardPile && !_coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, m.From, new(YanXiangDiscardReason))))
             return false;
-        if (r.Draw is { } d && (d.RecipientSeat != r.Actor || d.RequestedCount != r.Requested || d.SequenceBefore != r.Before || d.SequenceAfter != r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangDrawReturnedEvent>().Count(e => e == new AnniversaryYanXiangDrawReturnedEvent(f.Id, r.Cursor, r.Actor, r.Requested, d.ActualDrawIds.Count, r.Before, r.After)) != 1))
-            return false;
-        return true;
+        // During the next reward's Drawing stage, the previous cursor can have a completed receipt.
+        if (r.Requested == 0 || r.Stage is not (AnniversaryYanXiangStage.MovementChildren or AnniversaryYanXiangStage.Completed))
+            return true;
+
+        return YanXiangCompletedDraw(f, r) is { } draw &&
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangDrawReturnedEvent>().Count(e => e ==
+                new AnniversaryYanXiangDrawReturnedEvent(f.Id, r.Cursor, draw.RecipientSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter)) == 1;
     }
+
+    private NativeDrawOutcome? YanXiangCompletedDraw(ProgramSkillFrame f, AnniversaryYanXiangReceipt r) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, r.Operation, new(YanXiangDrawReason)) is { } draw &&
+        draw.RecipientSeat == r.Actor && draw.RequestedCount == r.Requested && draw.SequenceBefore >= r.Before &&
+        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
+
     internal bool YanXiangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryYanXiang is { Stage: AnniversaryYanXiangStage.MovementChildren or AnniversaryYanXiangStage.NativeTail } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidYanXiang(f);
     internal bool YanXiangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -76,7 +86,22 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         if (child is NativeDrawAttemptFrame draw)
             return r.Stage == AnniversaryYanXiangStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Actor, r.Requested);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        {
+            if (f.PendingMovementContinuation is not { } p || !YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) ||
+                !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
+                return false;
+
+            var (before, after) = (r.Before, r.After);
+            if (r.Requested > 0)
+            {
+                if (YanXiangCompletedDraw(f, r) is not { } outcome)
+                    return false;
+                (before, after) = (outcome.SequenceBefore, outcome.SequenceAfter);
+            }
+
+            return moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after &&
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        }
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)

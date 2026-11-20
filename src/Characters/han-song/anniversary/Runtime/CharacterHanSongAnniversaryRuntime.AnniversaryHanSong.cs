@@ -147,7 +147,7 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     internal void IssueHanSongDraw(ProgramSkillFrame f)
     {
         var r = f.AnniversaryHanSong!;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHanSong = r with { Stage = AnniversaryHanSongStage.Drawing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHanSong = r with { Stage = AnniversaryHanSongStage.Drawing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHanSongBenefitIssuedEvent(f.Id, true, r.DrawCount));
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, r.DrawCount, new(HanSongDrawReason));
     }
@@ -157,9 +157,10 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryHanSong;
-        if (r is null || r.Stage != AnniversaryHanSongStage.Drawing || !ValidHanSong(f) || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.DrawCount || outcome.SequenceBefore != r.Before || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        if (r is null || r.Stage != AnniversaryHanSongStage.Drawing || !ValidHanSong(f) ||
+            CompletedHanSongDraw(f) != outcome || !ValidHanSongDrawRange(f, r, outcome))
             throw new InvalidOperationException("Shuaiyan lost its original once-paid native draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHanSong = r with { Stage = AnniversaryHanSongStage.DrawChildren, Draw = outcome, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHanSong = r with { Stage = AnniversaryHanSongStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHanSongDrawReturnedEvent(f.Id, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueHanSong(f.Id);
     }

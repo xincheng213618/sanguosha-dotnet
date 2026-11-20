@@ -198,7 +198,8 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
             return;
         }
 
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryYanXiang = r with { Stage = AnniversaryYanXiangStage.Drawing, Draw = null, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryYanXiang = r with { Stage = AnniversaryYanXiangStage.Drawing, Before = before, After = before } });
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.Actor, r.Requested, new(YanXiangDrawReason));
     }
 
@@ -207,10 +208,10 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryYanXiang;
-        if (r is not { Stage: AnniversaryYanXiangStage.Drawing } || !ValidYanXiang(f) || f.NativeDraw is not null || draw.RecipientSeat != r.Actor || draw.RequestedCount != r.Requested || draw.SequenceBefore != r.Before)
+        if (r is not { Stage: AnniversaryYanXiangStage.Drawing } || !ValidYanXiang(f) || f.NativeDraw is not null || YanXiangCompletedDraw(f, r) != draw)
             throw new InvalidOperationException("Yuzheng lost its original once-issued native draw.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryYanXiang = r with { Stage = AnniversaryYanXiangStage.MovementChildren, Draw = draw, After = draw.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangDrawReturnedEvent(f.Id, r.Cursor, r.Actor, r.Requested, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryYanXiang = r with { Stage = AnniversaryYanXiangStage.MovementChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangDrawReturnedEvent(f.Id, r.Cursor, draw.RecipientSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
         ContinueYanXiang(f.Id);
     }
 

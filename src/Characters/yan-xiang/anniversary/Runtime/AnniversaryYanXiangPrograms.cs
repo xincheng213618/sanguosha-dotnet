@@ -53,7 +53,6 @@ public sealed record AnniversaryYanXiangReceipt(CardConversionSource Source,stri
  public int Requested {get;init;}
  public int Cursor {get;init;}
  public long RewardAction {get;init;}
- public NativeDrawOutcome? Draw {get;init;}
  public CardKind? Name {get;init;}
  public AnniversaryYanXiangPlan? Plan {get;init;}
  public long Before {get;init;}

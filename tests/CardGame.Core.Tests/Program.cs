@@ -178,6 +178,9 @@ var tests = new (string Name, Action Body)[]
     ("Ordinary Xun Chen: Fenglve current pindian gift pending and cold", OrdinaryXunChenChecks.FenglveGiftsItsExactCurrentPindianCardPendingAndCold),
     ("Wushuang skills B: Dingan exact second Slash nested damage cold", WushuangSkillsBChecks.DinganDamagesDuringExactSecondSlashAndReturnsCold),
     ("Anniversary Yan Xiang: exhausted true use quota filters ending plans cold", AnniversaryYanXiangChecks.EndingNativePlansRespectExhaustedTrueUseQuotaCold),
+    ("Anniversary Yan Xiang Yuzheng: foreign native draw after prior movement returns cold", AnniversaryYanXiangChecks.ForeignNativeDrawAfterPriorMovementReturnsCold),
+    ("Anniversary Han Song Shuaiyan: foreign Discard draw returns original Zenrun replacement cold", AnniversaryHanSongShuaiyanDrawChecks.ForeignDiscardDrawReturnsOriginalZenrunReplacementCold),
+    ("Anniversary Cui Lie Zijue: two paid Play leases return separate draws from one reveal cold", AnniversaryCuiLiePindianTargetChecks.TwoPaidZijueLeasesReturnSeparateDrawsFromOneRevealCold),
     ("Zhang Yan: converted counterspell returns before independent Suji cold", ZhangYanChecks.ConvertedCounterspellReturnsBeforeIndependentSujiUseCold),
     ("Happy Shen Da Xiao Qiao: undefined Wushuang HP and scalar limit cold", CardGame.Core.Tests.HappyShenDaXiaoQiaoChecks.WushuangFactsPreserveUndefinedSisterHpAndRejectScalarLimitCold),
 

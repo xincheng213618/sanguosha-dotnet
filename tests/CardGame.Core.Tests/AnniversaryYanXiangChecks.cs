@@ -7,6 +7,7 @@ using CardGame.Core.Campaigns;
 internal static class AnniversaryYanXiangChecks
 {
  private const string Hero="anniversary:yan-xiang",Yuzheng="anniversary:yuzheng",Suishi="anniversary:suishi",Peer="fixture:yan-xiang-peer-",NoDraw="fixture:yan-xiang-no-draw",Watch="fixture:yan-xiang-native-watch",Deck="fixture:yan-xiang-deck",Mode="identity:classic-yan-xiang";
+ private const string DrawObserver="fixture:yan-xiang-before-draw-movement",DrawReason="skill-program.anniversary:yuzheng.draw";
  public static void EndingNativePlansRespectExhaustedTrueUseQuotaCold()
  {
   var s=Scene.Start(false);s.UseYuzheng(0);s.Menu(AnniversaryYanXiangStage.Option);s.Answer(c=>Value(c)=="2");s.Play(0);
@@ -23,6 +24,65 @@ internal static class AnniversaryYanXiangChecks
   s.Reach(()=>s.E<AnniversaryYanXiangCompletedEvent>().Any(e=>e.FrameId==frame));
   s.Need(s.E<AnniversaryYanXiangUseIssuedEvent>().Length==issued,"Cold unpaid decline never invents another accepted action or material payment.");
  }
+
+ public static void ForeignNativeDrawAfterPriorMovementReturnsCold()
+ {
+  const int owner = 0, target = 1, amount = 5;
+  var s = Scene.Start(false, beforeDrawMovement: true);
+  var originalHand = s.V(target).Hand.Select(card => card.Id).ToArray();
+  var ownerHand = s.V(owner).Hand.Select(card => card.Id).ToArray();
+  var paidId = originalHand[0];
+  var turn = s.G.State.TurnNumber;
+  s.UseYuzheng(target);
+  s.Menu(AnniversaryYanXiangStage.Option);
+  s.Need(s.P!.PlayerSeat == target, "The original foreign recipient chooses the second Yuzheng option.");
+  s.Answer(c => Value(c) == "2");
+  s.Reach(() => s.P is { PlayerSeat: target, SkillPrompt.SkillId: DrawObserver } prompt &&
+   prompt.Choices.Any(choice => choice.Cards.SequenceEqual([paidId])));
+
+  var parent = s.Root!;
+  var attempt = s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single();
+  var issueSequence = attempt.Context.SequenceBefore;
+  s.Need(parent.OwnerSeat == owner && parent.AnniversaryYanXiang is
+    { Stage: AnniversaryYanXiangStage.Drawing, Actor: target, Option: 2, Requested: amount } &&
+   parent.AnniversaryYanXiang.Before == issueSequence && attempt.Context.ParentFrameId == parent.Id &&
+   attempt.Context is { RecipientSeat: target, RequestedCount: amount } && attempt.Context.Reason.Value == DrawReason &&
+   attempt.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation,
+   "The observer is already inside the foreign Draw5 issued by the original Yuzheng parent.");
+
+  s.Answer(choice => choice.Cards.SequenceEqual([paidId]));
+  s.Reach(() => s.P is { PlayerSeat: target, SkillPrompt.SkillId: DrawObserver } prompt &&
+   prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue"));
+  var paid = s.G.CardMovements.Single(move => move.CardId == paidId && move.Sequence > issueSequence);
+  var stopPromptId = s.P!.PromptId;
+  s.Need(paid.From == CardLocation.Hand(target) && paid.To == CardLocation.DiscardPile &&
+   s.Root?.Id == parent.Id && s.G.CardMovements.All(move => move.Reason.Value != DrawReason) &&
+   s.E<AnniversaryYanXiangDrawReturnedEvent>().Length == 0,
+   "The real preceding observer has paid a card after issue while the original Draw5 is still pending.");
+  s.Cold();
+  var restoredAttempt = s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single();
+  s.Need(s.P?.PromptId == stopPromptId && restoredAttempt.Id == attempt.Id && restoredAttempt.Context == attempt.Context &&
+   s.Root?.Id == parent.Id && s.Zone(paidId) == CardLocation.DiscardPile,
+   "Cold replay retains the same attempt, the paid entity and the observer continuation.");
+
+  s.Continue();
+  s.Play(owner);
+  var returned = s.E<AnniversaryYanXiangDrawReturnedEvent>().Single();
+  var lease = s.E<AnniversaryYanXiangLeaseEvent>().Single();
+  var drawn = s.G.CardMovements.Where(move => move.Reason.Value == DrawReason).ToArray();
+  var drawnIds = drawn.Select(move => move.CardId).ToArray();
+  s.Need(returned is { Actor: target, Requested: amount, Actual: amount } && returned.FrameId == parent.Id &&
+   returned.Before == paid.Sequence && drawn.Length == amount && drawnIds.Distinct().Count() == amount &&
+   drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(target) &&
+    move.Sequence > returned.Before && move.Sequence <= returned.After) && returned.After == drawn[^1].Sequence &&
+   s.G.CardMovements.Count(move => move.CardId == paidId && move.Sequence > issueSequence) == 1 &&
+   s.V(target).Hand.Select(card => card.Id).Order().SequenceEqual(originalHand.Where(id => id != paidId).Concat(drawnIds).Order()) &&
+   s.V(owner).Hand.Select(card => card.Id).SequenceEqual(ownerHand) &&
+   lease is { Actor: target, Option: 2, Amount: amount } && lease.Id == parent.Id &&
+   s.E<AnniversaryYanXiangCompletedEvent>().Single().FrameId == parent.Id && s.G.State.TurnNumber == turn,
+   "The five original native Draw entities return once to the foreign hand after the prior discard, with one quota and same Play phase.");
+ }
+
  private static string? Value(PromptChoice c)=>c.Parameters.GetValueOrDefault("value");
  private sealed class Scene(GameEngine game,ContentRegistry registry)
  {
@@ -73,18 +133,18 @@ internal static class AnniversaryYanXiangChecks
   public void Replay(){var before=State();G=GameReplay.Replay(G.CreateCheckpoint().Options,G.AcceptedCommands,registry);Need(before==State(),"The accepted journal replays actual branch payments, issued effects and native damage returns exactly.");}
   public void Need(bool okay,string message){if(!okay)throw new InvalidOperationException(message+" "+JsonSerializer.Serialize(new{G.State.TurnNumber,G.State.CurrentSeat,P,Receipt=Root?.AnniversaryYanXiang,Last=G.Events.TakeLast(7).Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType())).ToArray()}));}
   private void Accept(GameCommand command){var result=G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single());Need(result.Accepted,result.Error?.Message??"Rejected original Yan Xiang command.");}
-  public static Scene Start(bool damage)
+  public static Scene Start(bool damage, bool beforeDrawMovement = false)
   {
    var hands=Hands(damage);var stock=Enumerable.Range(0,80).Select(_=>new ContentDeckPhysicalCard("standard:slash",Suit.Club,7)).ToArray();
    // One fixed-seed native deal determines entity positions. Replacing the recipe
    // at those IDs preserves the same native shuffle, setup, deal and replay.
-   var probe=Boot(ContentRegistry.Build(new StandardContentPackage(),new Fixture(damage,stock)));
+   var probe=Boot(ContentRegistry.Build(new StandardContentPackage(),new Fixture(damage,stock,beforeDrawMovement)));
    foreach(var seat in Enumerable.Range(0,4))
    {
     var ids=probe.V(seat).Hand.Select(c=>c.Id).ToArray();probe.Need(ids.Length==hands[seat].Length,"The fixed identity table deals its exact sparse initial hand counts.");
     for(var i=0;i<ids.Length;i++)stock[ids[i]-1]=new(probe.registryCard(hands[seat][i].Kind),hands[seat][i].Suit,hands[seat][i].Rank);
    }
-   return Boot(ContentRegistry.Build(new StandardContentPackage(),new Fixture(damage,stock)));
+   return Boot(ContentRegistry.Build(new StandardContentPackage(),new Fixture(damage,stock,beforeDrawMovement)));
   }
   private string registryCard(CardKind kind)=>registry.Cards.Values.First(c=>c.LegacyKind==kind).Id;
   private static Scene Boot(ContentRegistry registry)
@@ -115,7 +175,7 @@ internal static class AnniversaryYanXiangChecks
   [new(CardKind.Crossbow,Suit.Spade,1),new(CardKind.ArrowBarrage,Suit.Spade,7),new(CardKind.Dodge,Suit.Heart,2)]
  ];
  private static string HandSkill(int seat)=>"fixture:yan-xiang-hand-"+seat;
- private sealed class Fixture(bool damage,IReadOnlyList<ContentDeckPhysicalCard> stock):IGameContentPackage
+ private sealed class Fixture(bool damage,IReadOnlyList<ContentDeckPhysicalCard> stock,bool beforeDrawMovement):IGameContentPackage
  {
   public PackageManifest Manifest{get;}=new("fixture-anniversary-yan-xiang",new(1,0,0));
   public void Register(IContentRegistryBuilder b)
@@ -131,6 +191,18 @@ internal static class AnniversaryYanXiangChecks
    ]}
    """)!;
    var names=new Dictionary<string,object>{[NoDraw]=new{name="固定真实手牌",description="保留原生阶段，正常摸牌调整为零。"},[Watch]=new{name="原生付款与使用暂停",description="在原帧真实子窗暂停。",optionLabels=new Dictionary<string,string>{["continue"]="继续"}}};
+   if (beforeDrawMovement)
+   {
+    rules["skills"]!.AsArray().Add(JsonNode.Parse($$"""
+    {"id":"{{DrawObserver}}","revision":1,"triggers":[
+     {"id":"discard-before-native-draw","window":"nativeDrawStarting","subject":"owner","condition":{"kind":"phaseIsPlay"},
+      "usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,"effects":[
+       {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true},
+       {"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}
+    ]}
+    """));
+    names[DrawObserver] = new { name = "摸牌前弃置", description = "在原生摸牌请求中弃置一张手牌后暂停。", optionLabels = new Dictionary<string,string> { ["continue"] = "继续" } };
+   }
    for(var seat=0;seat<4;seat++)
    {
     rules["skills"]!.AsArray().Add(JsonNode.Parse($$"""{"id":"{{HandSkill(seat)}}","revision":1,"modifiers":[{"id":"sparse-opening","query":"initialHandSize","operation":"add","value":{{Hands(damage)[seat].Length}},"priority":0}]}"""));
@@ -138,7 +210,12 @@ internal static class AnniversaryYanXiangChecks
    }
    var catalog=SkillProgramCatalog.Load(rules.ToJsonString(),JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=names}));
    foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,catalog.Presentations[id].Name,catalog.Presentations[id].Description){Program=p,ProgramPresentation=catalog.Presentations[id]});
-   for(var seat=1;seat<4;seat++)b.AddGeneral(new(Peer+seat,"固定真实同桌","",NoDraw,"wei",12,[Watch,HandSkill(seat)]){InitialHp=damage?3:12});
+   for(var seat=1;seat<4;seat++)
+   {
+    var skills = new List<string> { Watch, HandSkill(seat) };
+    if (beforeDrawMovement && seat == 1) skills.Add(DrawObserver);
+    b.AddGeneral(new(Peer+seat,"固定真实同桌","",NoDraw,"wei",12,skills){InitialHp=damage?3:12});
+   }
    b.AddDeck(new(Deck,"固定实际实体库存",0,2,[]){PhysicalCards=stock});
    b.AddMode(new(Mode,"阎象真实分支和原生伤害",4,4,new Dictionary<string,int>{[nameof(Role.Lord)]=1,[nameof(Role.Rebel)]=3},Deck,GeneralCandidateCount:4,GeneralPoolIds:[Hero,Peer+1,Peer+2,Peer+3]));
   }
