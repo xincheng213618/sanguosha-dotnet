@@ -11,6 +11,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Jianghuo = "anniversary:jianghuo", Lishi = "anniversary:lishi";
     private const string Diaoling = "ol:diaoling";
     private const string Choujue = "ol:choujue", Beishui = "ol:beishui";
+    private const string Dili = "ol:dili", Shengzhi = "ol:shengzhi";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string WatchMaximum = """
@@ -359,6 +360,70 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             "Returning the original child awards Beishui and emits general completion exactly once.");
     }
 
+    internal static void PaidHuishiLetsDiliConsumeOneGameUseAcrossBothWindowsCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:shen-sun-quan", [Dili], WatchSkillGrant));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        bool DiliUsed() => match.Owner.SkillRuntimeStates?.SingleOrDefault(skill => skill.SkillId == Dili)?.Usages
+            .Count(usage => usage == new SkillUsageStateSnapshot("awakening", SkillUsageScope.Game, 1)) == 1;
+        match.Need(match.Facts<ProgramBindingStartedEvent>().All(fact => fact.SkillId != Dili) && !DiliUsed(),
+            "Dili crosses the first real Preparation with its game use intact.");
+
+        match.GrantToSelf(Dili);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        match.Need(grant is { Recipient: 0, SkillId: Dili } && match.Owner.MaxHp == reducedMaximum &&
+            match.Owner.Skills is { } skills && skills.Select(skill => skill.ContentId).Distinct().Count() <= reducedMaximum &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId && !DiliUsed(),
+            "Paid Huishi grants the existing Dili instance below its own natural skill-count threshold.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Dili);
+        var binding = match.Facts<ProgramBindingStartedEvent>().Single(fact => fact.SkillId == Dili);
+        var original = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == binding.FrameId);
+        var paid = match.Facts<MaximumHpChangedEvent>().Single(fact => fact.SkillId == Dili);
+        match.Need(binding is { OwnerSeat: 0, BindingId: "awaken-at-turn-start", Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } &&
+            grant.FrameId < original.Id && original.SkillInstanceId == grant.InstanceId && original.GameplayHash == grant.GameplayHash &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, match.Game.State.TurnNumber]) &&
+            original.AdvancedSelection is { Operation: SkillProgramEffectOp.ReplaceSkillsOnAwakening } choice &&
+            choice.Candidates.Contains(Huishi) && choice.Selected.Count == 0 && paid.PlayerSeat == 0 && paid.Delta == -1 &&
+            paid.MaximumHp == reducedMaximum - 1 && DiliUsed(),
+            "The real Preparation uses the shared per-skill game key before any replacement selection is submitted.");
+
+        match.Answer("advanced-value", Huishi);
+        var selected = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == original.Id);
+        match.Need(selected.AdvancedSelection?.Selected.SequenceEqual([Huishi]) == true, "The real private choice holds the source skill on the original frame.");
+        match.Restore();
+        match.Need(DiliUsed() && match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == original.Id)) == JsonSerializer.Serialize(selected),
+            "Cold replay retains the shared game use and exact pending replacement choice.");
+
+        match.Answer("advanced-value", "finish");
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var watcher = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        var skillsChanged = match.Game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
+            .Single(frame => frame.Id == watcher.WindowContext!.ParentFrameId);
+        match.Need(watcher.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged, OwnerSeat: 0 } &&
+            skillsChanged.ResumeProgramFrameId == original.Id &&
+            skillsChanged.Candidates.Take(skillsChanged.CandidateIndex).Any(candidate =>
+                candidate.SkillId == Dili && candidate.BindingId == "awaken-on-acquisition" &&
+                candidate.OwnerSeat == 0 && candidate.SkillInstanceId == grant.InstanceId) &&
+            match.Owner.Skills?.All(skill => skill.ContentId != Huishi) == true &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Shengzhi) == 1 &&
+            match.Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Dili && fact.SkillIds.SequenceEqual([Shengzhi])) == 1 &&
+            match.Facts<ProgramBindingStartedEvent>().Where(fact => fact.SkillId == Dili).SequenceEqual([binding]),
+            "The real skill-acquisition window sees the original replacement and the second Dili binding shares its spent game use.");
+        match.Continue();
+        match.ReachPlay();
+        match.Need(DiliUsed() && match.Owner.MaxHp == reducedMaximum - 1 &&
+            match.Facts<MaximumHpChangedEvent>().Where(fact => fact.SkillId == Dili).SequenceEqual([paid]) &&
+            match.Facts<SkillAwakenedEvent>().All(fact => fact.SkillId != Dili),
+            "Dili completes the original payment once using its durable game key.");
+    }
+
     private sealed class HuishiMatch(ContentRegistry registry)
     {
         internal GameEngine Game { get; private set; } = CreateMatch(registry);
@@ -426,7 +491,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             Need(result.Accepted, result.Error?.Message ?? "The actual awakening command was rejected.");
         }
 
-        private void Answer(string parameter, string value)
+        internal void Answer(string parameter, string value)
         {
             var prompt = Prompt!;
             var choice = prompt.Choices.Single(candidate => candidate.Parameters.GetValueOrDefault(parameter) == value);

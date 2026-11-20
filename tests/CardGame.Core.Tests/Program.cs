@@ -918,6 +918,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Shen Guo Jia: paid Huishi waives Jianghuo damage before next actual turn cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesJianghuoDamageBeforeNextActualTurnCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Diaoling military cards for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesDiaolingMilitaryCardsForNextPreparationCold),
     ("Mobile Shen Guo Jia: paid Huishi preserves accepted Choujue before general completion cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiLetsActualChoujueAcceptBeforeGeneralCompletionCold),
+    ("Mobile Shen Guo Jia: paid Huishi lets Dili spend one game use across both windows cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiLetsDiliConsumeOneGameUseAcrossBothWindowsCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
     ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
     ("Boundary Mobile Han Dang Jiefan: native weapon and typed draw return to original responders cold", BoundaryMobileHanDangAttackRangeAidOwnerChecks.NativeWeaponAndTypedDrawReturnToOriginalResponderRosterCold),

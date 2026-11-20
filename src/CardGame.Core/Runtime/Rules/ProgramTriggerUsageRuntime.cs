@@ -8,14 +8,28 @@ internal interface IProgramTriggerUsageReservations : IProgramRuntimeOperations
         out SkillUsageConsumedEvent? fact);
 }
 
+internal interface IProgramReplacementAwakeningUsage : IProgramRuntimeOperations
+{
+    bool WasConsumed(int ownerSeat, string skillId);
+    bool TryConsume(int ownerSeat, string skillId);
+}
+
 // Trigger admission and deferred issuance share one usage store and key policy.
 // Event-scoped usage remains on its original native card-action window.
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ProgramTriggerUsageRuntime(IKernelSkillRuntimeStateAccess state,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IMatchParticipantStateAccess participants, IProgramBindingFacts definitions)
-    : IProgramTriggerUsageQuery, IProgramTriggerUsageReservations
+    : IProgramTriggerUsageQuery, IProgramTriggerUsageReservations, IProgramReplacementAwakeningUsage
 {
+    private const string ReplacementAwakeningKey = "awakening";
+
+    bool IProgramReplacementAwakeningUsage.WasConsumed(int ownerSeat, string skillId) =>
+        GetUsage(ownerSeat, skillId, ReplacementAwakeningKey, SkillUsageScope.Game) > 0;
+
+    bool IProgramReplacementAwakeningUsage.TryConsume(int ownerSeat, string skillId) =>
+        TryConsumeUsage(ownerSeat, skillId, ReplacementAwakeningKey, SkillUsageScope.Game, 1);
+
     public int AlivePlayerCount => participants.Players.Count(player => player.IsAlive);
 
     public int GetUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope,
