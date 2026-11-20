@@ -22,7 +22,6 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 {
     int DefaultDrawCount { get; }
     IReadOnlyList<Card> EffectiveEquipment { get; }
-    int DuliangNextDrawBonus { get; }
     int LuanxinNextDrawBonus { get; }
     int AlternatingNextDrawBonus { get; }
     int KuangxiangDrawPenalty { get; }
@@ -68,7 +67,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         var contributions = query.Contributions.ToList();
         AddFiniteContribution(contributions, $"campaign:{query.Seat}:market:draw", query.MarketBonus);
         AddFiniteContribution(contributions, $"campaign:{query.Seat}:shared-rank:draw", query.SharedRankBonus);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile-duliang:draw", query.DuliangNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shanhe-luanxin:draw", query.LuanxinNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:alternating-next-draw", query.AlternatingNextDrawBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.DrawCount, contributions);

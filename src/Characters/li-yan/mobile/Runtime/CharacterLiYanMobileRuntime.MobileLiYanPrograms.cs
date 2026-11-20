@@ -24,11 +24,21 @@ internal sealed partial class CharacterLiYanMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLiYanNextDrawBonusAssignedEvent(grant.ProgramFrameId, grant.InstructionIndex, e.Phase));
     }
 
-    internal int MobileLiYanNextDrawBonus(CharacterState player)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 90)]
+    internal void AddDuliangDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.IssueMobileLiYanNextDrawBonus) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase || phase.ActorSeat != player.Seat)
-            return 0;
-        var assigned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLiYanNextDrawBonusAssignedEvent>().Where(x => x.Phase == phase).Select(x => (x.ProgramFrameId, x.InstructionIndex)).ToHashSet();
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLiYanNextDrawBonusIssuedEvent>().Where(x => x.TargetSeat == player.Seat && assigned.Contains((x.ProgramFrameId, x.InstructionIndex))).Sum(x => x.Amount);
+        if (query != SkillRuleQuery.DrawCount ||
+            !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.IssueMobileLiYanNextDrawBonus) ||
+            _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase ||
+            phase.ActorSeat != seat)
+            return;
+
+        var assigned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLiYanNextDrawBonusAssignedEvent>()
+            .Where(assignment => assignment.Phase == phase)
+            .Select(assignment => (assignment.ProgramFrameId, assignment.InstructionIndex)).ToHashSet();
+        var amount = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLiYanNextDrawBonusIssuedEvent>()
+            .Where(grant => grant.TargetSeat == seat && assigned.Contains((grant.ProgramFrameId, grant.InstructionIndex)))
+            .Sum(grant => grant.Amount);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:mobile-duliang:draw", amount);
     }
 }
