@@ -3,6 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQingheGongzhuOlRuntime
 {
+    private IReadOnlyList<Card> ChangjiDiscardableHand(int seat) =>
+        _coreTurnHandCategoryRestrictionsOperations.GetSelfDiscardableOwnedHand(_coreMatchParticipantsPlayersAccess._players[seat]);
+
     internal SkillProgramStepOutcome ChangjiProgramEndingDamageChoice(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -58,10 +61,10 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
 
         if (branch == "discard")
         {
-            var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[endingSeat]);
+            var hand = ChangjiDiscardableHand(endingSeat);
             if (hand.Count == 0)
             {
-                _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[endingSeat].Name)} 没有手牌，长姬弃牌落空。", active.OwnerSeat, endingSeat);
+                _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[endingSeat].Name)} 没有可弃置的手牌，长姬弃牌落空。", active.OwnerSeat, endingSeat);
                 _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
                 return;
             }
@@ -78,7 +81,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
     {
         var state = frame.ChangjiDiscard ?? throw new InvalidOperationException("The Changji discard lost its state.");
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[state.EndingSeat]).OrderBy(card => card.Id).ToArray();
+        var hand = ChangjiDiscardableHand(state.EndingSeat).OrderBy(card => card.Id).ToArray();
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
         var choices = hand.Select(card => new PromptChoice(new ChoiceId($"changji-discard.frame-{(frame.Id)}.card-{(card.Id)}"), $"弃置【{(card.DisplayName)}】。", [card.Id], [], new Dictionary<string, string> { ["program-action"] = "changji-discard", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["card-id"] = card.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, state.EndingSeat, $"【{(presentation.Name)}】请弃置 {(state.Remaining)} 张手牌。", hand.Select(card => card.Id).ToArray(), [], active.OwnerSeat)
@@ -96,12 +99,13 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The Changji discard choice lost its program frame.");
         var state = frame.ChangjiDiscard ?? throw new InvalidOperationException("The Changji discard lost its state.");
-        if (!int.TryParse(selected.Parameters.GetValueOrDefault("card-id"), System.Globalization.CultureInfo.InvariantCulture, out var cardId) || _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(state.EndingSeat))
-            throw new InvalidOperationException("The Changji discard card is no longer in hand.");
+        if (!int.TryParse(selected.Parameters.GetValueOrDefault("card-id"), System.Globalization.CultureInfo.InvariantCulture, out var cardId) ||
+            ChangjiDiscardableHand(state.EndingSeat).SingleOrDefault(candidate => candidate.Id == cardId) is not { } card)
+            throw new InvalidOperationException("Changji requires a hand card the turn owner can discard.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         active = _coreNativeLogicalDiscardsOperations.AppendFrameNativeLogicalDiscard(active, state.EndingSeat, [cardId], new($"skill-program.{(active.SkillId)}.changji-discard"));
-        _corePhysicalMovementFacadesOperations.MoveCards([_cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(state.EndingSeat)).Single(card => card.Id == cardId)], CardLocation.Hand(state.EndingSeat), CardLocation.DiscardPile, new($"skill-program.{(active.SkillId)}.changji-discard"));
+        _corePhysicalMovementFacadesOperations.MoveCards([card], CardLocation.Hand(state.EndingSeat), CardLocation.DiscardPile, new($"skill-program.{(active.SkillId)}.changji-discard"));
         var discarded = state.DiscardedCardIds.Append(cardId).ToArray();
         if (state.Remaining > 1)
         {

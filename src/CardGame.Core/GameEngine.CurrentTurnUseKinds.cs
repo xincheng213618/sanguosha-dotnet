@@ -21,4 +21,6 @@ public sealed record CurrentTurnCardUseKindsRecordedEvent(
     public int? ProgramInstructionIndex { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public CardKind? EffectiveCardKind { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Suit? EffectiveSuit { get; init; }
 }

@@ -89,7 +89,12 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
     internal static bool ValidNativeEquipmentReceipt(NativeEquipmentInvocationReceipt r) => Enum.IsDefined(r.Kind) && r.PhysicalCardIds is System.Collections.IList { IsReadOnly: true } && r.PhysicalFrom is System.Collections.IList { IsReadOnly: true } && r.PhysicalFrom.Count == r.PhysicalCardIds.Count && r.PhysicalCardIds.Distinct().Count() == r.PhysicalCardIds.Count && r.CommitmentNonce.Length == 16 && r.CommitmentNonce.All(Uri.IsHexDigit) && r.SkillKey == CardCatalog.Get(NativeInvocationEquipment(r.Kind)).DisplayName && !string.IsNullOrWhiteSpace(r.OccurrenceKey);
     internal bool NativeEquipmentHostMatches(ResolutionFrame parent, CardUseFrame root, NativeEquipmentInvocationReceipt r)
     {
-        if (root.CardAttack is not { } attack || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || attack.TargetSeat != r.TargetSeat || attack.EffectiveCardKind != root.CardKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || (r.Kind is NativeEquipmentInvocationKind.Bagua or NativeEquipmentInvocationKind.FactionBagua ? !CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind) && root.CardKind != CardKind.ArrowBarrage : !CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind)))
+        var qizhengBagua = r.Kind == NativeEquipmentInvocationKind.Bagua && CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(root) == CardKind.QizhengXiangsheng &&
+            root.Qizheng is { Stage: QizhengStage.BaguaJudgment, BaguaAttempted: true } qizheng && qizheng.Target == r.TargetSeat;
+        var attackKind = qizhengBagua ? CardKind.QizhengXiangsheng : root.CardKind;
+        var allowedCard = qizhengBagua || CoreNativeCardClassificationsRuntime.IsSlashCard(attackKind) ||
+            ((r.Kind is NativeEquipmentInvocationKind.Bagua or NativeEquipmentInvocationKind.FactionBagua) && attackKind == CardKind.ArrowBarrage);
+        if (root.CardAttack is not { } attack || !allowedCard || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || attack.TargetSeat != r.TargetSeat || attack.EffectiveCardKind != attackKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat))
             return false;
         var c = root.Continuations;
         if (r.Kind == NativeEquipmentInvocationKind.FactionBagua)
@@ -196,6 +201,12 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
 
     internal void CancelNativeEquipmentContinuation(NativeEquipmentInvocationReceipt r, NativeOwners.CardAttackHandle attack)
     {
+        if (r.Kind == NativeEquipmentInvocationKind.Bagua && attack.EffectiveCardKind == CardKind.QizhengXiangsheng)
+        {
+            _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded: false);
+            return;
+        }
+
         if (r.Kind == NativeEquipmentInvocationKind.FactionBagua && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } defense)
         {
             defense.CandidateIndex++;

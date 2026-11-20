@@ -882,6 +882,9 @@ var tests = new (string Name, Action Body)[]
     ("OL SP Ma Chao Zhuiji: loaded Wooden Ox recast returns the original Slash cold", OlSpMaChaoZhuijiWoodenOxRecastChecks.ZhuijiRecastsTheLoadedTreasureAndReturnsItsOriginalSlashCold),
     ("Shanhe Source Dingxi: stores only its original second use finish cold", ShanheSourceDingxiDiscardEntryChecks.DingxiStoresOnlyItsOriginalSecondUseFinishCold),
     ("Anniversary He Yan Yachai: omits discard when Jilei blocks the only hand card cold", AnniversaryHeYanYachaiDiscardChoicesChecks.YachaiOmitsDiscardWhenJileiBlocksTheOnlyHandCardCold),
+    ("Mobile Qizheng: regular accepts a real Bagua played Dodge cold", MobileQizhengBaguaResponseChecks.QizhengRegularAllowsActualBaguaPlayedDodgeCold),
+    ("OL Pan Jun Guanwei: counts effective suit of an equipment conversion cold", OlPanJunGuanweiSuitChecks.GuanweiCountsTheEffectiveSuitOfAnEquipmentConversionCold),
+    ("OL Qinghe Changji respects Jilei on the ending player's physical discard cold", OlQingheChangjiDiscardRestrictionChecks.ChangjiDoesNotDiscardTheTurnOwnersJileiHandCardCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

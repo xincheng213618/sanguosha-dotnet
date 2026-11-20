@@ -60,7 +60,12 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
         // Freeze declaration order, not completion order: nested uses may complete
         // before this one, and Action-null legacy virtual uses still occupy a slot.
         var ordinal = TracksActualTurnUseOrdinal && HasOngoingActualUseTurn ? checked(_corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent or TurnEndedEvent).OfType<CurrentTurnCardUseKindsRecordedEvent>().Count(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actorSeat) + 1) : (int? )null;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnCardUseKindsRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, actorSeat, frameId, action?.ActionId, handSuit, 1 << (int)category, nullificationUse, ordinal, _coreCurrentRoundActualUsesOperations.TracksCurrentRoundActualUses || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal ? action?.Type ?? CardActionType.Use : null, _coreCurrentRoundActualUsesOperations.TracksCurrentRoundActualUses || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal ? action?.ProviderSeat ?? actorSeat : null, _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal && _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn ? checked(_coreWholeActualTurnUsesOperations.WholeActualTurnUseHistory().Length + 1) : null) { ProgramInstructionIndex = programInstructionIndex, EffectiveCardKind = _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal || _contentRegistryOperations._contentRegistry.ProgramDependencies.TracksSlashDamageUseOrdinals ? effectiveKind : null });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnCardUseKindsRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, actorSeat, frameId, action?.ActionId, handSuit, 1 << (int)category, nullificationUse, ordinal, _coreCurrentRoundActualUsesOperations.TracksCurrentRoundActualUses || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal ? action?.Type ?? CardActionType.Use : null, _coreCurrentRoundActualUsesOperations.TracksCurrentRoundActualUses || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal ? action?.ProviderSeat ?? actorSeat : null, _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal && _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn ? checked(_coreWholeActualTurnUsesOperations.WholeActualTurnUseHistory().Length + 1) : null)
+        {
+            ProgramInstructionIndex = programInstructionIndex,
+            EffectiveCardKind = _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal || _contentRegistryOperations._contentRegistry.ProgramDependencies.TracksSlashDamageUseOrdinals ? effectiveKind : null,
+            EffectiveSuit = _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.TurnOwnerUsedSameSuitCards) ? action?.EffectiveSuit : null
+        });
     }
 
     internal int? CapturedActualTurnActorUseOrdinal(CardActionContext action)
@@ -101,9 +106,10 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
         var uses = 0;
         foreach (var fact in _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent or TurnEndedEvent).OfType<CurrentTurnCardUseKindsRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat))
         {
-            if (fact.HandSuitMask == 0)
+            var suit = ActualTurnSuitBit(fact.EffectiveSuit);
+            if (suit == 0)
                 return false;
-            mask |= fact.HandSuitMask;
+            mask |= suit;
             uses++;
         }
 

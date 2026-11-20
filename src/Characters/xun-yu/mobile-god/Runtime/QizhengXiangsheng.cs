@@ -4,12 +4,13 @@ using System.Text;
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-public enum QizhengStage { Designation, Response, PaidResponse, Gain, Damage, Finishing }
+public enum QizhengStage { Designation, Response, PaidResponse, Gain, Damage, Finishing, BaguaJudgment }
 public sealed record QizhengReceipt(long NullificationId, long ActionId, int Target, int TargetIndex, int EffectOrdinal, QizhengStage Stage)
 {
     public bool Ambush { get; init; }
     public string Nonce { get; init; } = "";
     public string Commitment { get; init; } = "";
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] internal bool BaguaAttempted { get; init; }
     public CardKind? ResponseKind { get; init; }
     public long ResponseActionId { get; init; }
 }

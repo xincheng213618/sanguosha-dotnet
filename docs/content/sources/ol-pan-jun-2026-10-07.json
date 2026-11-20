@@ -31,7 +31,7 @@
       "programId": "ol:guanwei",
       "notes": [
         "Launch: playEnding optional trigger with turnOwnerScope anyLiving (own and other living play ends) gated by the turn-owner used-suit history condition; usageScope turn with usageLimit 1 so both branches share one launch per turn.",
-        "Condition: the engine's per-turn card-use ledger (CurrentTurnCardUseKindsRecordedEvent) proves at least two uses by the current turn owner whose recorded hand-suit masks resolve to a single suit; a use whose physical cards do not all come from the owner's own hand records an empty suit mask and never satisfies the condition.",
+        "Condition: the per-turn card-use ledger (CurrentTurnCardUseKindsRecordedEvent) records each original action's effective suit. The current turn owner must have used at least two cards, and every recorded use must have the same effective suit. The separate hand-suit mask continues to serve rules that specifically count uses from hand.",
         "Cost: selectAndMoveOwnedCard (owner chooser, hand+equipment, 1 card, discard pile, skipIfNoCards) reusing the established discard-cost pattern; the movement carries the skill reason.",
         "Grant: draw(selectedTarget, 2) plus insertPhase(selectedTarget, play, beforeNormalPreparation) — the same scheduled-phase mechanism as 廖化当先, extended so a playEnding grant can name the current turn player as beneficiary; the inserted phase runs inside the beneficiary's own turn and the scheduling fact is public."
       ]
@@ -50,8 +50,8 @@
   "observations": [
     "OL lists 潘濬 as wu 3HP male with title 方严疾恶 (星火燎原-天机); the biligame texts for 观微/公清 are the current OL wording and match the implemented presentation verbatim.",
     "No new bespoke ops were needed (the pre-allocated 7188-7195 range stays unused); no new player markers. Shared capability extensions: playEnding turnOwnerScope anyLiving; ScheduleProgramPhase play-ending beneficiary grant; insertPhase selectedTarget; TurnOwnerUsedSameSuitCards trigger condition + fact; damageModifiers capsToAmount plus the two attack-range conditions and ProgramDamageCappedEvent.",
-    "观微's same-suit condition reads only proactively-used cards whose physical cards all come from the owner's own hand; converted or sourceless uses never satisfy it.",
+    "The official OL wording requires identical suits across the uses and does not restrict their material zones (https://www.sanguosha.com/news/20210412_9416_4819). An equipment card used through Wusheng qualifies if the resulting action retains the common suit. A use with no effective suit prevents qualification.",
     "公清 only rewrites damage that has a damage source (attacker attack range); sourceless damage is untouched, and an exact range of three is neither capped nor boosted.",
-    "An unpayable 观微 launch cannot arise in practice (arming two same-suit uses always leaves payable cards in hand), so the cost keeps the established skipIfNoCards fallback (ol-deng-zhong precedent) instead of a new offer gate."
+    "The cost uses the established skipIfNoCards fallback (ol-deng-zhong precedent)."
   ]
 }
