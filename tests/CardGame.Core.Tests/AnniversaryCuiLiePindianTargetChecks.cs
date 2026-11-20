@@ -91,6 +91,107 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             "Cold replay retains the original pair, chosen source input, and private opponent prompt.");
     }
 
+    internal static void PaidZijueSurvivesRecipientStartAndExpiresAtSourceStartCold()
+    {
+        const int source = 0, recipient = 1, amount = 2;
+        const string skill = "anniversary:zijue", binding = "declare-number";
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = source, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
+            UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false
+        }, registry);
+        PendingDecision? Prompt() => Enumerable.Range(0, 4).Select(seat => game.CreateSnapshot(seat).PendingDecision)
+            .FirstOrDefault(prompt => prompt is not null);
+        T[] Facts<T>() where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
+        void Submit(GameCommand command)
+        {
+            var result = game.Submit(command);
+            Need(result.Accepted, result.Error?.Message ?? "The Zijue fixture command was rejected.");
+        }
+        void Reach(Func<bool> ready, bool passPlay = false)
+        {
+            for (var step = 0; step < 100; step++)
+            {
+                if (ready()) return;
+                switch (Prompt())
+                {
+                    case null when game.State.Winner == Winner.None:
+                        Submit(new AdvanceOneStepCommand(game.Revision));
+                        break;
+                    case { Kind: DecisionKind.PlayCard } play when passPlay:
+                        Submit(new EndPlayPhaseCommand(play.PlayerSeat, game.Revision, play.PromptId));
+                        break;
+                    default:
+                        throw new InvalidOperationException("The Zijue fixture encountered an unexpected decision or game end.");
+                }
+            }
+            throw new InvalidOperationException("The Zijue fixture missed its expected boundary.");
+        }
+        void Answer(int seat, Func<PromptChoice, bool> select)
+        {
+            Reach(() => Prompt() is { } prompt && prompt.PlayerSeat == seat && prompt.SkillPrompt?.SkillId == skill);
+            var menu = Prompt()!;
+            var choice = menu.Choices.Single(select);
+            Submit(new AnswerPromptCommand(seat, menu.PromptId, choice.Id, game.Revision));
+        }
+        bool InRecipientHand(int card) => game.CreateSnapshot(recipient).Players[recipient].Hand.Any(item => item.Id == card);
+
+        Submit(new StartGameCommand());
+        Reach(() => Prompt() is { Kind: DecisionKind.SelectGeneral or DecisionKind.PlayCard });
+        while (Prompt() is { Kind: DecisionKind.SelectGeneral } selection)
+        {
+            var general = selection.PlayerSeat switch
+            {
+                source => Hero, recipient => Generals[source], _ => Generals[selection.PlayerSeat]
+            };
+            Submit(new SelectGeneralCommand(selection.PlayerSeat, general, game.Revision, selection.PromptId));
+            Reach(() => Prompt() is { Kind: DecisionKind.SelectGeneral or DecisionKind.PlayCard });
+        }
+
+        var play = Prompt()!;
+        var issueTurn = Facts<TurnStartedEvent>().Single(turn => turn.ActorSeat == source);
+        var ordinaryDistance = game.GetCombatDistance(recipient, source);
+        var payment = game.CreateSnapshot(source).Players[source].Hand.Take(amount).Select(card => card.Id).ToArray();
+        Need(play.PlayerSeat == source && ordinaryDistance == 1 && payment.Length == amount,
+            "Cui Lie reaches his first actual Play with two physical hand cards and an adjacent recipient.");
+        Submit(new UseProgramSkillCommand(source, skill, binding, [], [recipient], game.Revision, play.PromptId));
+        Answer(recipient, choice => choice.Parameters.GetValueOrDefault("value") == "2");
+        foreach (var card in payment)
+            Answer(source, choice => choice.Cards.SequenceEqual([card]));
+        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: source });
+
+        var declaration = Facts<AnniversaryCuiLieNumberEvent>().Single();
+        var gift = Facts<AnniversaryCuiLieGiftEvent>().Single();
+        var lease = Facts<AnniversaryCuiLieLeaseEvent>().Single();
+        Need(declaration is { Recipient: recipient, Number: amount } && gift.Count == amount &&
+            declaration.FrameId == gift.FrameId && gift.FrameId == lease.FrameId && lease.Turn == issueTurn.TurnNumber &&
+            lease.Amount == amount && lease.Source is { OwnerSeat: source, SkillId: skill, BindingId: binding } &&
+            payment.All(card => InRecipientHand(card) && game.CardMovements.Count(move =>
+                move.CardId == card && move.From == CardLocation.Hand(source) && move.To == CardLocation.Hand(recipient) &&
+                move.Reason.Value == "skill-program.anniversary:zijue.give") == 1) &&
+            game.GetCombatDistance(recipient, source) == ordinaryDistance + amount,
+            "The foreign declaration and two real transfers issue one distance benefit on Cui Lie's actual turn.");
+
+        Reach(() => Facts<TurnStartedEvent>().Last().ActorSeat == recipient, passPlay: true);
+        var foreignStart = Facts<TurnStartedEvent>().Last();
+        Need(foreignStart.TurnNumber > lease.Turn && Facts<TurnStartedEvent>().Count(turn => turn.ActorSeat == source) == 1 &&
+            payment.All(InRecipientHand) && game.GetCombatDistance(recipient, source) == ordinaryDistance + amount,
+            "The recipient's later actual start leaves both paid cards and the issued distance benefit in place.");
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        Need(Facts<TurnStartedEvent>().Last() == foreignStart && Facts<AnniversaryCuiLieLeaseEvent>().Single() == lease &&
+            Facts<AnniversaryCuiLieGiftEvent>().Single() == gift && payment.All(InRecipientHand) &&
+            game.GetCombatDistance(recipient, source) == ordinaryDistance + amount,
+            "Cold restore on the recipient's turn retains the physical payment and the original active benefit.");
+
+        Reach(() => Facts<TurnStartedEvent>().Last().ActorSeat == source, passPlay: true);
+        Need(Facts<TurnStartedEvent>().Count(turn => turn.ActorSeat == source) == 2 &&
+            Facts<TurnStartedEvent>().Last().TurnNumber > foreignStart.TurnNumber &&
+            game.GetCombatDistance(recipient, source) == ordinaryDistance &&
+            Facts<AnniversaryCuiLieLeaseEvent>().Single() == lease && Facts<AnniversaryCuiLieGiftEvent>().Single() == gift,
+            "Cui Lie's next actual turn start expires the original distance benefit.");
+    }
+
     private static void Need(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);

@@ -13,7 +13,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         if (!HasWuLuXunRuxianCapability)
             return null;
         var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuLuXunRuxianActivatedEvent>().LastOrDefault(e => e.Source.OwnerSeat == ownerSeat);
-        return issued is not null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(e => e.ActorSeat == ownerSeat && e.TurnNumber > issued.ActualTurn) ? issued : null;
+        return issued is not null && !_coreProgramEventHistoryOperations.Value.ProgramHistory.HasActualTurnStartAfter(ownerSeat, issued.ActualTurn) ? issued : null;
     }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 29003, SkillProgramEffectOp.ResolveWuLuXunRuxian)]

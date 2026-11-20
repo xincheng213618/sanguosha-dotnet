@@ -935,6 +935,8 @@ var tests = new (string Name, Action Body)[]
     ("Wu Lu Kang Kegou: actual Play-start retargets original Pindian cold", WuLuKangKegouOpponentChecks.OriginalPlayStartRetargetsNativePindianCold),
     ("Anniversary Mu Shun Jinjian: actual damage source opens original Pindian cold", AnniversaryMuShunPindianTargetChecks.ActualDamageSourceOpensOriginalPindianCold),
     ("Anniversary Cui Lie Chibi: far native use opens original Pindian cold", AnniversaryCuiLiePindianTargetChecks.FarNativeUseOpensOriginalPindianCold),
+    ("Anniversary Cui Lie Zijue: paid distance survives recipient start and expires at source start cold", AnniversaryCuiLiePindianTargetChecks.PaidZijueSurvivesRecipientStartAndExpiresAtSourceStartCold),
+    ("Wu Lu Xun Ruxian: issued permission expires at next own actual start", WuLuXunRuxianTurnStartChecks.IssuedPermissionExpiresAtNextOwnActualStart),
     ("Anniversary Liu You Kannan: actual Play offers only eligible Pindian opponents cold", AnniversaryLiuYouPindianTargetChecks.ActualPlayPublishesAndRestoresOriginalPindian),
     ("Happy Diao Chan Huoxin: paid ordered private Pindian pair cold", HappyDiaoChanPindianTargetChecks.PaidHuoxinKeepsOrderedPrivatePairCold),
     ("OL Guan Hai Youque: actual bait requires input and preserves its original entity cold", OlGuanHaiPindianInputChecks.RealBaitNeedsPindianInputAndKeepsItsOriginalEntityCold),

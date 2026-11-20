@@ -13,6 +13,9 @@ internal static class ProgramEventHistoryQueries
 
     internal static int CountActualTurnStarts(this IProgramEventHistoryQueries history, int actorSeat) =>
         history.Read<TurnStartedEvent>().Count(entry => entry.ActorSeat == actorSeat);
+
+    internal static bool HasActualTurnStartAfter(this IProgramEventHistoryQueries history, int actorSeat, int turnNumber) =>
+        history.Read<TurnStartedEvent>().Any(entry => entry.ActorSeat == actorSeat && entry.TurnNumber > turnNumber);
 }
 
 internal interface IProgramEventBoundaryQueries : IProgramSelectionQuery

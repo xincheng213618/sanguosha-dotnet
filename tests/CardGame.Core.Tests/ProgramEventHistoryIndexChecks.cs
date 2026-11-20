@@ -107,6 +107,9 @@ internal static class ProgramEventHistoryIndexChecks
                 history.FindOpenActualTurn(1, 0) is null && history.FindOpenActualTurn(2, 0) is null &&
                 history.CountActualTurnStarts() == 2 && history.CountActualTurnStarts(1) == 1,
             "The latest pending start uses the whole-table ordinal and requires the original turn and actor.");
+        Require(!history.HasActualTurnStartAfter(0, 1) && !history.HasActualTurnStartAfter(1, 2) &&
+                history.HasActualTurnStartAfter(1, 1),
+            "A subsequent actual start must belong to the requested seat and occur strictly after the issued turn.");
     }
 
     private static void ActualUsesKeepAcceptedAndFinalizedOrdersSeparate()
