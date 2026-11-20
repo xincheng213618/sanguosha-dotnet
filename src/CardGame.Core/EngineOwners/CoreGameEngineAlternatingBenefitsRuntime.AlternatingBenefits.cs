@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
     internal IEnumerable<IGameEvent> CompleteProgramEventHistory() => _coreProgramEventHistoryOperations.ProgramHistory.Complete();
     void IAlternatingBenefitsProgramHost.ApplyAlternatingChoiceBenefit(ProgramSkillFrame f, SkillProgramEffect e) => ApplyAlternatingChoiceBenefit(f, e);
     SkillProgramStepOutcome IAlternatingBenefitsProgramHost.ObtainDeckCardWithConsecutiveTarget(ProgramSkillFrame f, int seat, SkillProgramEffect e) => ObtainDeckCardWithConsecutiveTarget(f, seat, e);
-    internal int AlternatingOwnerTurnOrdinal(int owner) => _coreProgramEventHistoryOperations.ProgramHistory.CountActualTurnStarts(owner);
+    private int AlternatingOwnerTurnOrdinal(int owner) => _coreProgramEventHistoryOperations.ProgramHistory.CountActualTurnStarts(owner);
     internal AlternatingChoiceBenefitResolvedEvent? GetAlternatingChoicePredecessor(int owner, string skill, string instance, SkillProgramEffect effect)
     {
         var last = _coreProgramEventHistoryOperations.ProgramEventHistory<AlternatingChoiceBenefitResolvedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == skill && e.SkillInstanceId == instance && e.StateId == effect.StateId);

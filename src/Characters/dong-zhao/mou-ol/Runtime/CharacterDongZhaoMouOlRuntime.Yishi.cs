@@ -128,7 +128,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     {
         var r = f.MouDongZhao!;
         if (!r.LostHand && r.FieldMoved && r.MovedSuit is { } suit && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoYishiGrantedEvent(f.Id, r.Source, r.GameplayHash, suit, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoYishiGrantedEvent(f.Id, r.Source, r.GameplayHash, suit, _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts(f.OwnerSeat), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
 
     [PublicHandRevealReturn("yishi-kept-hand")]

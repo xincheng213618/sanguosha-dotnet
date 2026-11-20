@@ -6,7 +6,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal bool HasShenCaoPiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ApplyShenCaoPiYinzhi);
 
     internal static CardConversionSource ShenCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == seat);
+    private int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts(seat);
     internal bool YinzhiAwaitingOwnTurn(YinzhiIssuedEvent e) => YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns && !(_resolutionStackOperations._resolutionStack.FirstOrDefault()is BeiMiHuTurnPreludeFrame prelude && prelude.Proof.UpcomingOwnerSeat == e.TargetSeat && prelude.Proof.UpcomingTurnNumber > e.ActualTurn);
     internal bool IsYinzhiTurnRestricted(int actor) => HasShenCaoPiCapability && actor == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == actor && YinzhiOwnTurns(actor) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId));
     internal bool YinzhiNewCardsForbidden(int actor, IEnumerable<int> ids)

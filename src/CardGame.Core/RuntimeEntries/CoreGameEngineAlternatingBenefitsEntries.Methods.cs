@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineAlternatingBenefitsEntries
 {
     internal int AlternatingNextDrawPhaseBonus(CharacterState player) => _resolve().AlternatingNextDrawPhaseBonus(player);
-    internal int AlternatingOwnerTurnOrdinal(int owner) => _resolve().AlternatingOwnerTurnOrdinal(owner);
     internal void ApplyAlternatingChoiceBenefit(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().ApplyAlternatingChoiceBenefit(frame, effect);
     internal void AssignAlternatingNextDrawPhase(ActualDiscardRecoveryPhaseStartedEvent e) => _resolve().AssignAlternatingNextDrawPhase(e);
     internal IEnumerable<IGameEvent> CompleteProgramEventHistory() => _resolve().CompleteProgramEventHistory();

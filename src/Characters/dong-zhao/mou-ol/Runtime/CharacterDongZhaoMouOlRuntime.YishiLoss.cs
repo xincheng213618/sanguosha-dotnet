@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMouOlRuntime
 {
-    internal IEnumerable<MouDongZhaoYishiGrantedEvent> ActiveMouYishiGrants(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiGrantedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Suit != Suit.None && e.OwnTurnStarts == _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(t => t.ActorSeat == owner)).GroupBy(e => e.Suit).Select(g => g.Last());
+    internal IEnumerable<MouDongZhaoYishiGrantedEvent> ActiveMouYishiGrants(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiGrantedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Suit != Suit.None && e.OwnTurnStarts == _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts(owner)).GroupBy(e => e.Suit).Select(g => g.Last());
     internal IReadOnlyList<MouDongZhaoLossSource> CaptureMouYishiSources(IEnumerable<CardLocation> locations)
     {
         if (!HasMouDongZhao || !_coreMatchSetupSetupCompleteAccess._setupComplete)

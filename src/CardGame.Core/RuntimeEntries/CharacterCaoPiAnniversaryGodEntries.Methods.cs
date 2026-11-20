@@ -46,7 +46,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodEntries
     internal bool YinzhiAwaitingOwnTurn(YinzhiIssuedEvent e) => _resolve().YinzhiAwaitingOwnTurn(e);
     internal bool YinzhiMaterialBan(ProgramCardMaterialQuery q) => _resolve().YinzhiMaterialBan(q);
     internal bool YinzhiNewCardsForbidden(int actor, IEnumerable<int> ids) => _resolve().YinzhiNewCardsForbidden(actor, ids);
-    internal int YinzhiOwnTurns(int seat) => _resolve().YinzhiOwnTurns(seat);
     internal bool YinzhiResponseBan(ProgramNativeResponseQuery q) => _resolve().YinzhiResponseBan(q);
     internal YinzhiIssuedEvent? YinzhiRewardIssue(int owner, CardActionContext? a) => _resolve().YinzhiRewardIssue(owner, a);
     internal bool HasKemingInvocationObservers { get => _resolve().HasKemingInvocationObservers; }
