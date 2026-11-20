@@ -99,6 +99,14 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
     }
 
     public void SetIgnoresArmor(bool value) => IgnoresArmor = value;
+
+    public void MarkNoDamageSource()
+    {
+        if (DamageAmountFinalized || DamageWasApplied || IsChainPropagation)
+            throw new InvalidOperationException("The damage source cannot change after damage begins.");
+        IsSourceLess = true;
+    }
+
     public void ReplaceCardUser(int actorSeat)
     {
         if (DamageAmountFinalized || DamageWasApplied || IsChainPropagation)

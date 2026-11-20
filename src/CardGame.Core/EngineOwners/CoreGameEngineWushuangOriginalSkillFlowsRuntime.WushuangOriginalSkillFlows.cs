@@ -5,6 +5,12 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
 {
     internal void ContinueWushuangYiji(ProgramSkillFrame f)
     {
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        {
+            _coreWushuangOriginalSkillsOperations.FinishWushuangOriginal(f, completed: false);
+            return;
+        }
+
         var r = f.WushuangOriginalSkill!;
         if (r.Stage == "begin")
         {

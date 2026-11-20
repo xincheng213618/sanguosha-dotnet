@@ -22,6 +22,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             return;
         }
 
+        List<(Card Card, long EntrySequence)>? finished = null;
         foreach (var physicalCard in group.PhysicalCards)
         {
             if (_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, physicalCard.Id))
@@ -29,7 +30,11 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             var cardLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (cardLocation == CardLocation.Processing)
             {
-                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
+                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished, beforeFact: movement =>
+                {
+                    if (movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.UseFinished)
+                        (finished ??= []).Add((physicalCard, movement.Sequence));
+                });
             }
             else if (!RuntimeSkills.RuntimeRules_Core_CommonRules.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
             {
@@ -37,14 +42,20 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             }
         }
 
-        if (_coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ClaimResolvedGlobalCard, group.Card.Kind))is { } claimant && group.SourceSeat != claimant.Seat)
+        if (finished is not null && _coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ClaimResolvedGlobalCard, group.Card.Kind))is { } claimant && group.SourceSeat != claimant.Seat)
         {
-            var claimable = group.PhysicalCards.Where(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.DiscardPile).ToArray();
-            foreach (var card in claimable)
-                _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(claimant.Seat), CardMoveReasons.JuxiangGain);
-            if (claimable.Length > 0)
+            var claimed = new List<int>();
+            foreach (var (card, entrySequence) in finished)
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JuxiangCardClaimedEvent(group.ResolutionId, claimant.Seat, claimable.Select(card => card.Id).ToArray()));
+                if (_zoneEntries.CurrentEntry(CardLocation.DiscardPile, card.Id) != entrySequence)
+                    continue;
+                _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(claimant.Seat), CardMoveReasons.JuxiangGain);
+                claimed.Add(card.Id);
+            }
+
+            if (claimed.Count > 0)
+            {
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JuxiangCardClaimedEvent(group.ResolutionId, claimant.Seat, claimed.ToArray()));
                 _coreMatchLogOperations.AddLog("SkillTriggered", $"{(claimant.Name)} 获得了结算完毕的【{(group.Card.DisplayName)}】。", claimant.Seat);
             }
         }

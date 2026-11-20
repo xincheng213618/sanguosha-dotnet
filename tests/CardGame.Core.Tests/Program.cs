@@ -840,6 +840,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Shi Huang Chong Sili: only the first actual health change offers after refusal cold", ShiHuangChongSiliFirstHealthChecks.SiliOnlyOffersTheFirstActualHealthChangeEvenAfterRefusalCold),
     ("Classic Luoshen: Tiandu keeps the original claim and Luoshen continues cold", ClassicZhenJiLuoshenJudgmentEntryChecks.LuoshenContinuesAfterTianduAndUsesTheNextJudgmentEntryCold),
     ("Classic Kangkai: Jilei forbids use of the gifted equipment cold", ClassicCaoAngKangkaiEquipmentChecks.KangkaiCannotUseEquipmentForbiddenByJileiCold),
+    ("Classic Juxiang: claims only the original native Barbarian cleanup cold", ClassicJuxiangOriginalBarbarianChecks.JuxiangCannotClaimTheRediscardedOriginalBarbarianCold),
+    ("Classic Huoshou: later native Barbarian damage is sourceless after Meng Huo dies cold", ClassicHuoshouDamageSourceChecks.HuoshouDeathLeavesLaterBarbarianDamageWithoutSourceCold),
+    ("Mobile Yiji: first recipient death returns or finishes the match cold", MobileGuoJiaYijiGainReturnChecks.FirstYijiRecipientDeathReturnsToLiveChoicesOrFinishesTheMatchCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

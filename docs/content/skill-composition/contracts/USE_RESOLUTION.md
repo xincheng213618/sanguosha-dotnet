@@ -58,6 +58,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 - Fixed effects already issued for a card use use `CardUseFrame.CardDamageAdjustments` and `CoreGameEngineCardUseLifecycleRuntime`; current-occurrence damage changes stay on the actual damage attempt. Preserve whole-use versus target scope and card-damage versus additional-damage layers. Do not rebuild character boost ledgers or requalify paid effects when their source disappears.
 
+- Barbarian Assault keeps its original card user and assigned damage source on the group continuation. A living assigned source remains responsible after skill loss. If that replacement source dies, a later failed response starts a source-less damage attempt while the original use continues with its assigned seats.
+
 ## Recovery applications
 
 - Program recovery requests freeze `ProgramRecoveryOrigin` on the original queued `RecoveryAttempt`; actual HP applications use the original program's `RecoveryApplications`. `HealthContinuationRuntime` owns their shared receipt reads and typed replacement returns. Preserve issued source, amount, target, dual-health and native return boundaries; use the accepted candidate and original reward movement receipt instead of copying match history to prove output events. Requested, Applied and Chosen events retain their real history consumers; native rescue and dying-entry protocols keep their own facts.

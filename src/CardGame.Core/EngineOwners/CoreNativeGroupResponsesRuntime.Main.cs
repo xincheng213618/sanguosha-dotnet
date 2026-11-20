@@ -46,6 +46,9 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(group.ResolutionId, group.Card.Kind, requiredCardKind, responder.Seat, UsedResponse: false, ResponseCardId: null));
+        if (group.Card.Kind == CardKind.BarbarianAssault && group.DamageSourceSeat != group.SourceSeat &&
+            attack.SourceSeat == group.DamageSourceSeat && !_participants.IsAlive(attack.SourceSeat))
+            attack.MarkNoDamageSource();
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
         {
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
