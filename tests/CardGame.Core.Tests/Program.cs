@@ -876,6 +876,9 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Cai Yang Xunji: uses original black color of a composite Slash cold", AnniversaryCaiYangXunjiColorChecks.XunjiUsesTheOriginalBlackColorOfACompositeSlashCold),
     ("OL Sima Hui Chenghao: continues after first gift is redirected cold", OlSimaHuiChenghaoGainReplacementChecks.ChenghaoContinuesAfterItsFirstGiftIsRedirectedCold),
     ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),
+    ("Mobile Boundary Yan Yan Chengshi: takes only the original third Slash discard cold", BoundaryMobileYanYanChengshiDiscardEntryChecks.ChengshiObtainsOnlyTheOriginalThirdSlashDiscardCold),
+    ("OL SP Pang Tong Guolun: direct exchange excludes Wooden Ox grain cold", OlSpPangTongGuolunWoodenOxChecks.GuolunCanExchangeHeldCardsButNotWoodenOxGrainCold),
+    ("OL Dong Zhao Xianlue: continues after first gift stays in its original hand cold", OlDongZhaoXianlueRetainedGainChecks.XianlueContinuesAfterFirstGiftStaysInItsOriginalHandCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

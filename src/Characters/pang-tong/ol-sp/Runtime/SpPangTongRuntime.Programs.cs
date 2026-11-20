@@ -62,8 +62,7 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
   }
   else if(r.Stage=="exchange"&&r.RevealedCard is{}id&&zones.GetLocation(id)==CardLocation.Hand(r.Target))
   {
-   var grain=facts.UsesFormalWoodenOx&&zones.CardsAt(CardLocation.Equipment(f.OwnerSeat)).Any(c=>c.Kind==CardKind.WoodenOx)?zones.CardsAt(CardLocation.WoodenOxGrain(f.OwnerSeat)):[];
-   foreach(var card in zones.CardsAt(CardLocation.Hand(f.OwnerSeat)).Concat(zones.CardsAt(CardLocation.Equipment(f.OwnerSeat))).Concat(grain))
+   foreach(var card in zones.CardsAt(CardLocation.Hand(f.OwnerSeat)).Concat(zones.CardsAt(CardLocation.Equipment(f.OwnerSeat))))
    {
     var at=zones.GetLocation(card.Id);if(card.IsGeneralWeapon||boundCards.ForeignDiscardPrevented(f.OwnerSeat,card,at,OwnedCardMoveIntent.Transfer)||at.Zone==CardZoneKind.Equipment&&facts.IsSourceEquipment(f.OwnerSeat,f.SkillId,f.SkillInstanceId,card))continue;
     var args=Args("exchange");args["card-id"]=card.Id.ToString(CultureInfo.InvariantCulture);choices.Add(new(new($"guolun.{f.Id}.material.{card.Id}"),$"以{card.DisplayName}交换",[card.Id],[],args));

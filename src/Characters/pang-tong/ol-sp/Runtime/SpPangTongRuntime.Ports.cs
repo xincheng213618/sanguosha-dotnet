@@ -5,7 +5,6 @@ namespace CardGame.Core;
 internal interface ISpPangTongNativeFacts : IProgramSelectionQuery
 {
     Winner Winner { get; }
-    bool UsesFormalWoodenOx { get; }
     bool UsesTreatedWounded { get; }
     bool IsRuleWounded(CharacterState player);
     int EffectiveOwnedCardRank(CharacterState owner, Card card);

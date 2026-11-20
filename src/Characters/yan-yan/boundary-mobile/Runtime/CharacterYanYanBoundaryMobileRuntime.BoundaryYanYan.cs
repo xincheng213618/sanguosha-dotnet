@@ -133,13 +133,23 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 54300)]
     internal bool IssuedBoundaryYanYanClaim(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => BoundaryYanYanClaimUse(c, w)is not null;
+
+    private bool BoundaryYanYanCanObtainMaterial(CardUseFrame use, int cardId)
+    {
+        if (_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, cardId))
+            return false;
+        if (use.NativeUseDiscardEntries?.FirstOrDefault(entry => entry.CardId == cardId) is { CardId: > 0 } discard)
+            return _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cardId) == discard.Sequence;
+        return _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Processing;
+    }
+
     internal SkillProgramStepOutcome ClaimBoundaryYanYan(ProgramSkillFrame f)
     {
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0);
         if (f.BoundaryYanYanClaim is not null || f.WindowContext is not { } w || BoundaryYanYanClaimUse(candidate, w)is not { Action: { } a, BoundaryYanYanClaims: { } claims } use)
             throw new InvalidOperationException("Chengshi obtains only its original fully resolved Slash materials once.");
         var pending = claims.Where(c => c.Source.OwnerSeat == f.OwnerSeat && c.Source.SkillInstanceId == f.SkillInstanceId && !c.Settled).ToArray();
-        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray();
+        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => BoundaryYanYanCanObtainMaterial(use, id)).ToArray();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var draft = new BoundaryYanYanClaimDraft(use.Id, pending[0].ProducerFrameId, before)
         {

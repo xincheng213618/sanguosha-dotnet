@@ -108,6 +108,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
 
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } materialUse)
             _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(materialUse);
+        List<NativeUseDiscardEntry>? finished = null;
         foreach (var physicalCard in attack.PhysicalCards)
         {
             if (_nativeMaterialClaims.PreservesMaterialAtCompletion(attack.ResolutionId, physicalCard.Id))
@@ -115,13 +116,22 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             var physicalLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (physicalLocation == CardLocation.Processing)
             {
-                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
+                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile,
+                    CardMoveReasons.UseFinished, beforeFact: movement =>
+                    {
+                        if (movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.UseFinished)
+                            (finished ??= []).Add(new(movement.CardId, movement.Sequence));
+                    });
             }
             else if (physicalLocation.Zone is not (CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile))
             {
                 throw new InvalidOperationException($"A resolved {(attack.EffectiveCardKind)} physical card left Processing through an unsupported destination: {(physicalLocation)}.");
             }
         }
+
+        if (finished is not null)
+            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId,
+                use => use with { NativeUseDiscardEntries = finished.AsReadOnly() });
 
         var completedAction = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).Action;
         _coreNativeCardUseCompletionOperations.QueueCardUseFinishedWithoutPop(attack.ResolutionId, attackCard, CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack));

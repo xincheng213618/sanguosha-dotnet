@@ -6,6 +6,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoOlRuntime
 {
     internal const string XianlueDrawBind = "xianlue-exact-drawn";
+    private const string XianlueGiftReason = "program.xianlue.gift";
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30)]
     internal bool CanOfferDongZhao(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
@@ -92,11 +93,31 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         var target = int.Parse(choice.Parameters["value"], CultureInfo.InvariantCulture);
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || choice.Cards is not [var chosen] || chosen != id || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat))
             throw new InvalidOperationException("Xianlue gift lost its actual drawn entity.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XianluePending = r with { Stage = XianlueStage.GiftChildren, CardIndex = r.CardIndex + 1, GiftBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, GiftAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, GiftCardId = id, GiftTargetSeat = target }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            XianluePending = r with
+            {
+                Stage = XianlueStage.GiftChildren, CardIndex = r.CardIndex + 1, GiftBefore = before,
+                GiftAfter = before, GiftCardId = id, GiftTargetSeat = target
+            },
+            PendingMovementContinuation = target == f.OwnerSeat ? null : new(f.OwnerSeat, 0, null)
+        });
         if (target != f.OwnerSeat)
-            _corePhysicalMovementFacadesOperations.MoveCards([_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Single(c => c.Id == id)], CardLocation.Hand(f.OwnerSeat), CardLocation.Hand(target), new("program.xianlue.gift"), _nativeGivenCards.Completion(f.Id, f.OwnerSeat, target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { XianluePending = f.XianluePending!with { GiftAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianlueMovementIssuedEvent(f.Id, XianlueStage.GiftChildren, f.XianluePending!.GiftBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, id, target));
+            _coreHappyWeiYanGainDestinationsOperations.MoveNativeGivenCards(f.Id, f.OwnerSeat, target, [id], new(XianlueGiftReason), settlement =>
+            {
+                var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+                var paid = current.XianluePending!;
+                var from = CardLocation.Hand(f.OwnerSeat);
+                if (settlement.Movements is [var move] && move.From == from && move.To.Zone == CardZoneKind.Hand)
+                    _coreRuntimeOperations.ReplaceRuntimeTop(current with { XianluePending = paid with { GiftAfter = move.Sequence, GiftMovement = move } });
+                else if (settlement.RetainedGains is [var retained] && retained.Plan.From == from)
+                    _coreRuntimeOperations.ReplaceRuntimeTop(current with { XianluePending = paid with { RetainedGiftOrdinal = retained.Ordinal }, PendingMovementContinuation = null });
+                else
+                    throw new InvalidOperationException("Xianlue requires its actual original hand gift or retained gain.");
+            });
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianlueMovementIssuedEvent(f.Id, XianlueStage.GiftChildren, before, f.XianluePending!.GiftAfter, id, target));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
@@ -127,7 +148,11 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         var index = r.CardIndex;
         while (index < cards.Count && _cardZonesOperations._cardZones.GetLocation(cards[index]) != CardLocation.Hand(f.OwnerSeat))
             index++;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, XianluePending = r with { Stage = index < cards.Count ? XianlueStage.Distribute : XianlueStage.Record, CardIndex = index } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            PendingMovementContinuation = null,
+            XianluePending = r with { Stage = index < cards.Count ? XianlueStage.Distribute : XianlueStage.Record, CardIndex = index, GiftMovement = null, RetainedGiftOrdinal = null }
+        });
         PublishXianluePrompt(f);
         return true;
     }
@@ -148,7 +173,30 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         var b = f.CardSetBindings.SingleOrDefault(b => b.Name == XianlueDrawBind);
         if (b is null || r.CardIndex > b.CardIds.Count || b.CardIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.CardId == id && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "program.xianlue.draw") != 1))
             return false;
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianlueMovementIssuedEvent>().Any(e => e.FrameId == f.Id && e.Stage == XianlueStage.DrawChildren && e.Before == r.DrawBefore && e.After == r.DrawAfter) && (r.Stage != XianlueStage.GiftChildren || r.GiftCardId is { } gift && r.GiftTargetSeat is { } target && b.CardIds.Contains(gift) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianlueMovementIssuedEvent>().Any(e => e.FrameId == f.Id && e.Stage == r.Stage && e.Before == r.GiftBefore && e.After == r.GiftAfter && e.GiftCardId == gift && e.GiftTargetSeat == target) && (target == f.OwnerSeat ? r.GiftBefore == r.GiftAfter : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == gift && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target) && m.Reason.Value == "program.xianlue.gift") == 1));
+        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianlueMovementIssuedEvent>().Any(e => e.FrameId == f.Id && e.Stage == XianlueStage.DrawChildren && e.Before == r.DrawBefore && e.After == r.DrawAfter) &&
+            (r.Stage != XianlueStage.GiftChildren || IsSettledXianlueGift(f, r, b.CardIds));
+    }
+
+    private bool IsSettledXianlueGift(ProgramSkillFrame f, XianluePendingState r, IReadOnlyList<int> originalCards)
+    {
+        if (r.CardIndex <= 0 || r.CardIndex > originalCards.Count || r.GiftCardId != originalCards[r.CardIndex - 1] ||
+            r.GiftTargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || r.GiftBefore < 0)
+            return false;
+        if (target == f.OwnerSeat)
+            return r.GiftBefore == r.GiftAfter && r.GiftMovement is null && r.RetainedGiftOrdinal is null;
+
+        var from = CardLocation.Hand(f.OwnerSeat);
+        var journal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements;
+        if (r.GiftMovement is { } move)
+            return r.RetainedGiftOrdinal is null && move.Sequence > r.GiftBefore && move.Sequence == r.GiftAfter && move.Sequence <= journal.Count &&
+                move.CardId == r.GiftCardId && move.From == from && move.To.Zone == CardZoneKind.Hand && move.Reason.Value == XianlueGiftReason &&
+                journal[move.Sequence - 1] == move;
+
+        return r.GiftBefore == r.GiftAfter && r.RetainedGiftOrdinal is { } ordinal && ordinal >= 0 &&
+            f.HappyWeiYanRetainedGains is { } retained && ordinal < retained.Count && retained[ordinal] is { Plan: var plan } gain &&
+            gain.Ordinal == ordinal && gain.ProducerFrameId == f.Id && gain.InstructionIndex == f.InstructionIndex &&
+            plan.CardId == r.GiftCardId && plan.From == from && plan.ActualTo == from && plan.RequestedTo == CardLocation.Hand(target) &&
+            plan.Reason.Value == XianlueGiftReason && plan.SequenceBefore == r.GiftBefore;
     }
     internal bool DongZhaoFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
@@ -156,7 +204,14 @@ internal sealed partial class CharacterDongZhaoOlRuntime
             return ZaowangFirstChild(root, child);
         if (!ValidIssuedXianlue(root) || root.XianluePending is not { } r || child is not CardsMovedTriggerWindowFrame moved)
             return false;
-        return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Stage == XianlueStage.DrawChildren ? m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.Reason.Value == "program.xianlue.draw" : r.Stage == XianlueStage.GiftChildren && m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == r.GiftCardId && m.Reason.Value == "program.xianlue.gift"));
+        if (moved.Batch.ParentFrameId != root.Id || moved.Batch.AwaitingProgramFrameId != root.Id || moved.ResumeProgramFrameId is not null ||
+            moved.Batch.OriginOwnerSeat != root.OwnerSeat || moved.Batch.OriginSkillId != root.SkillId || moved.Batch.OriginSkillInstanceId != root.SkillInstanceId)
+            return false;
+        return r.Stage == XianlueStage.GiftChildren
+            ? r.GiftMovement is { } gift && moved.Batch.Movements is [var movement] && movement == gift
+            : r.Stage == XianlueStage.DrawChildren && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m =>
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.DrawBefore &&
+                m.Sequence <= r.DrawAfter && m.Reason.Value == "program.xianlue.draw");
     }
 
     SkillProgramStepOutcome IDongZhaoProgramHost.XianlueRecord(ProgramSkillFrame f) => BeginXianlueRecord(f);

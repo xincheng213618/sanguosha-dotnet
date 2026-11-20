@@ -11,7 +11,13 @@ public sealed record IdentityExchangedEvent(long DeathFrameId, int FormerLordSea
 internal sealed record ZaowangIdentityGrant(long FrameId, int OwnerSeat, int TargetSeat, Role OriginalRole, string SkillInstanceId, string GameplayHash);
 public enum XianlueStage { Record, DrawChildren, Distribute, GiftChildren }
 public sealed record XianluePendingState(XianlueStage Stage, int CardIndex, string SkillId = "", string SkillInstanceId = "", string GameplayHash = "", long WindowId = 0, long UseId = 0, long ActionId = 0,
-    long DrawBefore = 0, long DrawAfter = 0, long GiftBefore = 0, long GiftAfter = 0, int? GiftCardId = null, int? GiftTargetSeat = null);
+    long DrawBefore = 0, long DrawAfter = 0, long GiftBefore = 0, long GiftAfter = 0, int? GiftCardId = null, int? GiftTargetSeat = null)
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal CardMovementRecord? GiftMovement { get; init; }
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal int? RetainedGiftOrdinal { get; init; }
+}
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
