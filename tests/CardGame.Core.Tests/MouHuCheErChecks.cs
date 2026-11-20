@@ -14,9 +14,14 @@ internal static class MouHuCheErChecks
 
     public static void AcceptedDebtSuppressesLaterEquipmentUntilItsExactTurnEndCold()
     {
-        foreach (var (die, useHorse) in new[] { (false, false), (true, false), (true, true) })
+        foreach (var (die, equipmentKind) in new[]
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(die, useHorse));
+            (false, CardKind.Crossbow), (true, CardKind.Crossbow),
+            (true, CardKind.DefensiveHorse), (true, CardKind.QinggangSword)
+        })
+        {
+            var checksGrant = equipmentKind == CardKind.Crossbow;
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(die, equipmentKind));
             var setup = new ShanheBattleSetup(17, 1, "kongwu-shared-state", Hero, 8, 4, 0, 0, 0, [Driver, Quiet],
                 Enumerable.Range(1, 4).Select(rank => new ShanheStartingCard(CardKind.Dodge, Suit.Club, rank)).ToArray(), [],
                 [new(Peer) { StartingHand = [] }, new(Peer) { StartingHand = [] }],
@@ -33,8 +38,17 @@ internal static class MouHuCheErChecks
             CharacterState Player(int seat) => ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
                 BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!)[seat];
             bool Effective(int seat, string skill) => game.GetRuntimeModule<CoreGameEngineNationalSkillsRuntime>().HasRuntimeSkill(Player(seat), skill);
-            bool DirectedDistance(int toHolder) => game.GetCombatDistance(2, 1) == toHolder && game.GetCombatDistance(1, 2) == 1;
-            bool HorseEquipped(int id) => game.CreateSnapshot(0).Players[1].Equipment.SingleOrDefault()?.Id == id;
+            void CheckPrintedEffect(int? cardId, int expected, string boundary)
+            {
+                if (checksGrant) return;
+                var equipped = game.CreateSnapshot(0).Players[1].Equipment;
+                var entityMatches = cardId is { } id ? equipped.SingleOrDefault()?.Id == id : equipped.Count == 0;
+                var valueMatches = equipmentKind == CardKind.DefensiveHorse
+                    ? game.GetCombatDistance(2, 1) == expected && game.GetCombatDistance(1, 2) == 1
+                    : game.GetAttackRange(1) == expected;
+                Need(entityMatches && valueMatches,
+                    $"{equipmentKind} must have its expected physical state and yield {expected} at {boundary}.");
+            }
             void Submit(GameCommand command)
             { var result = game.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Kongwu command rejected."); }
             void Answer(Func<PromptChoice, bool> predicate)
@@ -85,26 +99,26 @@ internal static class MouHuCheErChecks
                 Player(1).SkillGrants.Grants.All(grant => grant.SkillId != EquipmentSkill),
                 "The exact completed phase signs a source-specific restriction through the target's next actual turn end.");
             Cold();
-            if (useHorse)
-                Need(game.CreateSnapshot(0).Players[1].Equipment.Count == 0 && DirectedDistance(1),
-                    "The adjacent seats have unit distance in both directions before the defensive horse enters.");
+            CheckPrintedEffect(null, 1, "the pre-equipment decision");
             Answer(choice => choice.Targets.SequenceEqual([1]));
             Reach(() => P()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue") == true);
             Need(!Effective(0, Kongwu) && !Effective(1, Unrelated),
                 "The caster lost Kongwu and the independent skill restriction is active.");
-            EquipmentChangedEvent? horse = null;
-            if (useHorse)
+            int? printedEquipmentId = null;
+            if (!checksGrant)
             {
-                horse = E<EquipmentChangedEvent>().SingleOrDefault(change => change is
-                    { PlayerSeat: 1, CardKind: CardKind.DefensiveHorse, Slot: EquipmentSlot.DefensiveHorse })
-                    ?? throw new InvalidOperationException("The only defensive horse did not enter seat 1's equipment: " +
-                        JsonSerializer.Serialize(game.CardMovements.Where(move => move.CardKind == CardKind.DefensiveHorse)));
-                Need(HorseEquipped(horse.CardId) && Player(1).SkillGrants.Grants.All(grant =>
-                    !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal)) &&
-                    game.CardMovements.Any(move => move.CardId == horse.CardId &&
+                var slot = equipmentKind == CardKind.DefensiveHorse ? EquipmentSlot.DefensiveHorse : EquipmentSlot.Weapon;
+                var equipment = E<EquipmentChangedEvent>().SingleOrDefault(change => change.PlayerSeat == 1 &&
+                    change.CardId == 31 && change.CardKind == equipmentKind && change.Slot == slot)
+                    ?? throw new InvalidOperationException($"The only {equipmentKind} did not enter seat 1's equipment: " +
+                        JsonSerializer.Serialize(game.CardMovements.Where(move => move.CardKind == equipmentKind)));
+                printedEquipmentId = equipment.CardId;
+                Need(Player(1).SkillGrants.Grants.All(grant => !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal)) &&
+                    game.CardMovements.Any(move => move.CardId == equipment.CardId &&
                     move.From == CardLocation.Processing && move.To == CardLocation.Equipment(1) &&
-                    move.Reason == CardMoveReasons.EquipmentEnter) && DirectedDistance(1),
-                    "The printed defensive horse has no skill grant and contributes no incoming distance under the accepted debt.");
+                    move.Reason == CardMoveReasons.EquipmentEnter),
+                    $"The printed {equipmentKind} enters equipment through native resolution without a skill grant.");
+                CheckPrintedEffect(printedEquipmentId, 1, "the late equipment entry under the debt");
             }
             else
             {
@@ -116,48 +130,44 @@ internal static class MouHuCheErChecks
                     "Real native equipment entry creates its own owned grant while the accepted restriction still makes it ineffective.");
             }
             Cold();
-            if (horse is not null)
-                Need(HorseEquipped(horse.CardId) && DirectedDistance(1),
-                    "Cold restore preserves both the mounted horse and its suppressed incoming distance.");
+            CheckPrintedEffect(printedEquipmentId, 1, "cold restore of the accepted debt");
             Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
             Reach(() => E<MouHuCheErDebtTurnEvent>().Any(turn => turn.FrameId == paid.FrameId));
             var due = E<MouHuCheErDebtTurnEvent>().Single(turn => turn.FrameId == paid.FrameId);
-            Need((useHorse || !Effective(1, EquipmentSkill)) && Player(0).IsAlive == !die && due.Target == 1 && due.Turn > origin.IssuedTurn &&
+            Need((!checksGrant || !Effective(1, EquipmentSkill)) && Player(0).IsAlive == !die && due.Target == 1 && due.Turn > origin.IssuedTurn &&
                 E<SkillStateExpiredEvent>().All(expired => expired.Origin != origin),
                 "Loss of the issuing skill, and optionally its caster's real death, cannot revoke the debt accepted before the target's actual next turn.");
-            if (horse is not null)
-                Need(HorseEquipped(horse.CardId) && DirectedDistance(1),
-                    "The same defensive horse remains ineffective when its holder's next actual turn begins.");
+            CheckPrintedEffect(printedEquipmentId, 1, "the holder's next actual turn start");
+            bool IsHolderDraw(ActualDiscardRecoveryPhaseStartedEvent entry) =>
+                entry.Phase is { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase &&
+                phase.ActorSeat == due.Target && phase.TurnNumber == due.Turn;
+            Reach(() => E<ActualDiscardRecoveryPhaseStartedEvent>().Any(IsHolderDraw));
+            CheckPrintedEffect(printedEquipmentId, 1, "the holder's actual draw phase");
             Reach(() => E<TurnEndedEvent>().Any(ended => ended.ActorSeat == due.Target && ended.TurnNumber == due.Turn));
             var started = game.Events.Single(entry => entry.Payload is TurnStartedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
             var ended = game.Events.Single(entry => entry.Payload is TurnEndedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
             var expiry = game.Events.Single(entry => entry.Payload is SkillStateExpiredEvent expired && expired.Origin == origin);
-            var draw = E<ActualDiscardRecoveryPhaseStartedEvent>().Single(entry => entry.Phase is { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase &&
-                phase.ActorSeat == due.Target && phase.TurnNumber == due.Turn);
+            var draw = E<ActualDiscardRecoveryPhaseStartedEvent>().Single(IsHolderDraw);
             Need(game.CardMovements.Count(move => move.TurnNumber == due.Turn && move.Sequence > draw.MovementSequenceBefore &&
                 move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(due.Target) && move.Reason == CardMoveReasons.Draw) == 1,
                 "The accepted debt still reduces this exact normal Draw from two physical cards to one.");
-            Need((useHorse || Effective(1, EquipmentSkill)) && !Effective(1, Unrelated) &&
+            Need((!checksGrant || Effective(1, EquipmentSkill)) && !Effective(1, Unrelated) &&
                 Player(1).SkillGrants.Restrictions.Single().Lifetime.Origin?.Source.SkillId == Driver &&
                 expiry.Payload is SkillStateExpiredEvent { Seat: 1 } && started.Sequence < expiry.Sequence && expiry.Sequence < ended.Sequence,
                 "The original target turn end revokes only that debt origin, restoring later equipment and retaining an independent restriction.");
-            if (horse is not null)
-                Need(HorseEquipped(horse.CardId) && DirectedDistance(2),
-                    "At the holder's actual turn end the same horse restores only the incoming distance bonus.");
+            CheckPrintedEffect(printedEquipmentId, 2, "the holder's actual turn end");
             Cold();
             Need(E<MouHuCheErDebtEvent>().Length == 1 && E<SkillStateExpiredEvent>().Count(expired => expired.Origin == origin) == 1 &&
-                (useHorse || Effective(1, EquipmentSkill)),
+                (!checksGrant || Effective(1, EquipmentSkill)),
                 "Cold replay keeps the one original payment and one original expiry without reissuing a debt or suppressing an unrelated source.");
-            if (horse is not null)
-                Need(HorseEquipped(horse.CardId) && DirectedDistance(2),
-                    "Cold replay preserves the mounted horse and the restored incoming distance bonus.");
+            CheckPrintedEffect(printedEquipmentId, 2, "cold restore after expiry");
         }
     }
 
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture(bool die, bool useHorse) : IGameContentPackage
+    private sealed class Fixture(bool die, CardKind equipmentKind) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-kongwu-state", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
@@ -185,19 +195,23 @@ internal static class MouHuCheErChecks
                     { Program = program, ProgramPresentation = catalog.Presentations[id] });
             builder.AddSkill(new(Unrelated, "Independent", "Independent source"));
             builder.AddGeneral(new(Peer, "Peer", "", Unrelated, "wei", 8));
-            if (!useHorse)
+            if (equipmentKind == CardKind.Crossbow)
             {
                 builder.AddSkill(new(EquipmentSkill, "Equipment source", "Native physical equipment grant"));
                 builder.AddEquipmentContent(new("fixture:kongwu-equipment-binding", [EquipmentCatalog.Get(CardKind.Crossbow)],
                     [new(CardKind.Crossbow, EquipmentSkill, "equipment:fixture-kongwu")]));
             }
+            ContentDeckPhysicalCard equipment = equipmentKind switch
+            {
+                CardKind.Crossbow => new("standard:crossbow", Suit.Club, 7),
+                CardKind.DefensiveHorse => new("standard:defensive_horse", Suit.Spade, 5),
+                CardKind.QinggangSword => new("standard:qinggang_sword", Suit.Spade, 6),
+                _ => throw new ArgumentOutOfRangeException(nameof(equipmentKind))
+            };
             // The derived Shanhe battle seed keeps card 31 below Kongwu's opening refill.
-            var physicalCards = useHorse
-                ? Enumerable.Range(1, 60).Select(id => id == 31
-                    ? new ContentDeckPhysicalCard("standard:defensive_horse", Suit.Spade, 5)
-                    : new ContentDeckPhysicalCard("standard:dodge", Suit.Club, 7)).ToArray()
-                : Enumerable.Range(0, 60)
-                    .Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Club, 7)).ToArray();
+            var physicalCards = equipmentKind == CardKind.Crossbow
+                ? Enumerable.Repeat(equipment, 60).ToArray()
+                : Enumerable.Range(1, 60).Select(id => id == 31 ? equipment : new("standard:dodge", Suit.Club, 7)).ToArray();
             builder.AddDeck(new(Deck, "Fixed native equipment", 0, 2, []) { PhysicalCards = physicalCards });
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "Kongwu shared state", 4, 4, new Dictionary<string, int>(), Deck,
                 GeneralPoolIds: [Hero, Peer], ModeKind: ContentModeKind.Team,

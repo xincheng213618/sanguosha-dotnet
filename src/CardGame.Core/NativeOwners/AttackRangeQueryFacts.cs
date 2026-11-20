@@ -1,11 +1,11 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct AttackRangeQueryFacts(EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, Func<EquipmentContentRegistry> getEquipmentContentRegistry, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<ProgramDistanceRules> getProgramDistanceRules, Func<RuntimeEntries.CoreGameEngineTurnDefaultStatsEntries> getCoreGameEngineTurnDefaultStatsRuntime, Func<RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangRenMobileShiRuntime>> getCharacterZhangRenMobileShiRuntime, Func<TurnCardUseEffectStore> getTurnCardUseEffectStore, CharacterState player) : IMatchAttackRangeQuery
+internal readonly struct AttackRangeQueryFacts(EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CoreGameEngineFieldEquipmentEntries> getFieldEquipment, Func<EquipmentContentRegistry> getEquipmentContentRegistry, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<ProgramDistanceRules> getProgramDistanceRules, Func<RuntimeEntries.CoreGameEngineTurnDefaultStatsEntries> getCoreGameEngineTurnDefaultStatsRuntime, Func<RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangRenMobileShiRuntime>> getCharacterZhangRenMobileShiRuntime, Func<TurnCardUseEffectStore> getTurnCardUseEffectStore, CharacterState player) : IMatchAttackRangeQuery
 {
     public string ModeId => matchDefinitionState.ReferenceToModeDefinition.Id;
     public int Seat => player.Seat;
     public int TurnNumber => actualTurnProgressState.ReferenceToTurnNumber;
-    public IReadOnlyList<Card> EffectiveEquipment => getCharacterHuCheErMouRuntime().KongwuEffectiveEquipment(player);
+    public IReadOnlyList<Card> EffectiveEquipment => getFieldEquipment().GetEquipmentWithPrintedEffects(player);
 
     public EquipmentDefinition EquipmentDefinition(CardKind kind) => getEquipmentContentRegistry().Get(kind);
     public int WeaponAttackRange(Card weapon) => getCoreGameEngineAdvancedLifecycleRuntime().GetWeaponAttackRange(player, weapon);

@@ -25,7 +25,7 @@ Required when changing these mechanisms or their consumers. See the
 
 - An HP-ordered distance projection checks for an active policy before reading scalar health. An ordinary distance query with independent health pools can use the usual distance contributions without selecting a pool.
 
-- Seat distance reads each participant's effective printed equipment through `CoreGameEngineFieldEquipmentRuntime`. A suppressed horse stays in its equipment slot and contributes no printed distance term until the existing restriction expires. Keep physical slot occupancy separate from the active printed effects.
+- Seat distance and attack range read effective printed equipment through `CoreGameEngineFieldEquipmentRuntime`. Suppressed horses and weapons stay in their slots, with their printed terms restored at the original restriction's expiry. The attack-range query still applies card and slot exclusions to the eligible weapons before selecting the range base. Keep physical slot occupancy separate from the active printed effects.
 
 - Mobile Shi Xiahou Ba's Libing contributes its existing finite increase through `ProgramDistanceStage.AttackRangeContributions`. The shared range query retains the equipped weapon base and exclusions. Libing owns its accepted count and the original damage-card completion resets it. Poxi retains its separately issued distance permission.
 
