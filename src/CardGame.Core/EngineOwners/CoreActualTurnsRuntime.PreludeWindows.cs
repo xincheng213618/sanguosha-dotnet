@@ -21,22 +21,25 @@ internal sealed partial class CoreActualTurnsRuntime
         const SkillProgramTriggerWindow ownWindow = SkillProgramTriggerWindow.TurnBeforeStart;
         const SkillProgramTriggerWindow roundWindow = SkillProgramTriggerWindow.RoundStarting;
 
-        if (owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(ownWindow)
-            .Any(binding => HasOrdinaryBeforeTurnPreludeOperation(ProgramInstructionResolver.Default.Features(binding.Trigger))))
+        if (HasBeforeTurnPreludeBinding(owner, ownWindow, HasOrdinaryBeforeTurnPreludeOperation))
             return true;
 
         return _coreMatchParticipantsPlayersAccess._players.Any(player =>
-                HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart)) ||
-            _coreMatchParticipantsPlayersAccess._players.Any(player =>
-                HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua)) ||
+                HasBeforeTurnPreludeBinding(player, roundWindow, HasRoundPreludeOpeningOperation)) ||
             (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
-                HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
+                HasBeforeTurnPreludeBinding(owner, ownWindow, static features =>
+                    features.HasOperation(SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn)) &&
                 _eventHistory.CountActualTurnStarts(owner.Seat) == 0);
     }
 
-    private bool HasBeforeTurnPreludeBinding(CharacterState player, SkillProgramTriggerWindow window, SkillProgramEffectOp operation) =>
+    private bool HasBeforeTurnPreludeBinding(CharacterState player, SkillProgramTriggerWindow window,
+        Func<ProgramInstructionFeatures, bool> matchesOperation) =>
         player.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(player).GetInstanceTriggers(window)
-            .Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(operation));
+            .Any(binding => matchesOperation(ProgramInstructionResolver.Default.Features(binding.Trigger)));
+
+    private static bool HasRoundPreludeOpeningOperation(ProgramInstructionFeatures features) =>
+        features.HasOperation(SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart) ||
+        features.HasOperation(SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua);
 
     private static bool HasOrdinaryBeforeTurnPreludeOperation(ProgramInstructionFeatures features) =>
         features.HasOperation(SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
@@ -119,8 +122,7 @@ internal sealed partial class CoreActualTurnsRuntime
         var features = ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate));
         if (isRound)
         {
-            return features.HasOperation(SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart) ||
-                features.HasOperation(SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua) ||
+            return HasRoundPreludeOpeningOperation(features) ||
                 features.HasOperation(SkillProgramEffectOp.ResolveLinjieRound) ||
                 features.HasOperation(SkillProgramEffectOp.IssueHappyPangTongPlan) ||
                 (candidate.SkillId == "happy:huanshu" && candidate.BindingId == "round-phantoms" &&

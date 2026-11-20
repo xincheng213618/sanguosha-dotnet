@@ -906,6 +906,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Sima Hui Jianjie: ordered seals grant before only the first actual turn cold", OlSimaHuiJianjieFirstTurnChecks.OrderedSealsGrantBeforeOnlyFirstActualTurnCold),
     ("Shi Dong Zhao Yingjia: issued foreign extra draws before actual start cold", ShiDongZhaoYingjiaPreludeChecks.IssuedForeignExtraDrawPrecedesActualTurnCold),
     ("Anniversary Liu Li Fuli: paid range survives recipient turn and expires at source turn cold", AnniversaryLiuLiFuliTurnChecks.PaidRangeSurvivesRecipientTurnAndExpiresAtSourceTurnCold),
+    ("Anniversary Liu Li Dehua: native first-round damage name completes before actual turn cold", AnniversaryLiuLiDehuaRoundChecks.FirstRoundUsesNativeDamageNameBeforeActualTurnCold),
     ("Mobile Wu Xian Fumian: skipped own turn leaves one draw bonus", MobileFumianTurnGapChecks.SkippedOwnTurnLeavesOneDrawBonus),
     ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),
     ("Shi Zhong Hui Xiezhi: one overflow pays two native Slashes and keeps five cards cold", ShiZhongHuiXiezhiNumericChecks.OneOverflowFundsTwoSlashesAndARealHandLimitCold),
