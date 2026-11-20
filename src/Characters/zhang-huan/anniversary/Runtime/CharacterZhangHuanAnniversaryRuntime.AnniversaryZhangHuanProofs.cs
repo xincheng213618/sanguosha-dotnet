@@ -28,7 +28,7 @@ internal sealed partial class CharacterZhangHuanAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryZhangHuanStage.NativeUse && IsZhangHuanNative(use);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryZhangHuanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.RequestedDraw && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryZhangHuanStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.RequestedDraw);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && ZhangHuanMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)

@@ -73,7 +73,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryQiaoRuiStage.NativeSlash && IsQiaoRuiNativeUse(use);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryQiaoRuiStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Requested && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryQiaoRuiStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Requested);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && QiaoRuiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || IsAnniversaryQiaoRuiSettlementBatch(f, moved.Batch)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)

@@ -17,7 +17,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
         if (f.ShiGuoYuan is not { } r || !ValidShiGy(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiGyStage.Drawing && draw.Context.RecipientSeat == r.Victim && draw.Context.RequestedCount == 2 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiGyStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Victim, 2);
         if (child is CardUseFrame use)
             return r.Stage == ShiGyStage.NativeUse && IsShiGyNative(use);
         if (child is CardDeclarationFrame d)
