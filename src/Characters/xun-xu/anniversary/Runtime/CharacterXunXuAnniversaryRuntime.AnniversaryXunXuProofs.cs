@@ -44,7 +44,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         if (child is HappyQiaoHealthChoiceFrame qiao)
             return r.Stage == "hp" && _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoHealthChoiceRidesOn(qiao, f);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == "drawing" && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Target && draw.Context.RequestedCount == r.Count && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == "drawing" && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, r.Count);
         if (child is CardsMovedTriggerWindowFrame settled && r.Stage == "native-children")
             return settled.Id == settled.Batch.Id && settled.ResumeProgramFrameId == f.Id && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(settled) && IsAnniversaryXunXuSettlementBatch(f, settled.Batch);
         if (child is CardsMovedTriggerWindowFrame moved)

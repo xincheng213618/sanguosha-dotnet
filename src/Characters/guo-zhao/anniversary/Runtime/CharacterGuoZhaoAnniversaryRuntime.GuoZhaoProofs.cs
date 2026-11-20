@@ -89,7 +89,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         if (f.AnniversaryGuoZhao is not { } r || !ValidGuoZhao(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryGuoZhaoStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Amount && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryGuoZhaoStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Amount);
         if (child is CardUseFrame use)
             return IsAnniversaryGuoZhaoNativeEquipment(use, f);
         if (child is HappyQiaoHealthChoiceFrame)

@@ -944,6 +944,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Cui Lie Zijue: paid distance survives recipient start and expires at source start cold", AnniversaryCuiLiePindianTargetChecks.PaidZijueSurvivesRecipientStartAndExpiresAtSourceStartCold),
     ("Anniversary Cui Lie Zijue: declined gift returns original four-card native draw cold", AnniversaryCuiLiePindianTargetChecks.DeclinedGiftReturnsOriginalNativeDrawCold),
     ("Anniversary Feng Xi Boyan: capped foreign native draw returns cold", AnniversaryFengXiBoyanDrawChecks.CappedForeignNativeDrawReturnsCold),
+    ("Anniversary Guo Zhao Zunwei: capped owner native draw returns cold", AnniversaryGuoZhaoZunweiDrawChecks.CappedOwnerNativeDrawReturnsCold),
     ("Wu Lu Xun Ruxian: issued permission expires at next own actual start", WuLuXunRuxianTurnStartChecks.IssuedPermissionExpiresAtNextOwnActualStart),
     ("Anniversary Liu You Kannan: actual Play offers only eligible Pindian opponents cold", AnniversaryLiuYouPindianTargetChecks.ActualPlayPublishesAndRestoresOriginalPindian),
     ("Happy Diao Chan Huoxin: paid ordered private Pindian pair cold", HappyDiaoChanPindianTargetChecks.PaidHuoxinKeepsOrderedPrivatePairCold),
