@@ -60,7 +60,7 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool CanMuShunContest(ProgramSkillFrame f) => f.MuShunJinjian?.DamageSourceSeat is { } source && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && source != f.OwnerSeat && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[source]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, source);
+    internal bool CanMuShunContest(ProgramSkillFrame f) => f.MuShunJinjian?.DamageSourceSeat is { } source && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && source != f.OwnerSeat && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _pindianPolicyQueries.HasPindianInput(f.OwnerSeat) && _pindianPolicyQueries.HasPindianInput(source) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, source);
     internal IReadOnlyList<PromptChoice> MuShunChoices(ProgramSkillFrame f)
     {
         var list = new List<PromptChoice>();

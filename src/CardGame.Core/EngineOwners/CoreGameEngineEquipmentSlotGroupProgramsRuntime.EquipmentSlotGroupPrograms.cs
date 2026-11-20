@@ -6,6 +6,15 @@ internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
     internal bool ResolveEnteringChain(CharacterState player, bool requested) => requested && !player.IsChained && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.PreventEnteringChain) ? false : requested;
     internal ProgramLegalityParticipant CreateProgramLegalityParticipant(int seat) => new(seat, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count, _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ProhibitPindianTarget), _pindianPolicyQueries.CanDiscardForPindian(seat));
     internal bool CanBePindianTarget(int sourceSeat, int targetSeat) => ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(CreateProgramLegalityParticipant(sourceSeat), CreateProgramLegalityParticipant(targetSeat));
+
+    internal IReadOnlyList<int> PindianOpponents(int sourceSeat) =>
+        !_pindianPolicyQueries.HasPindianInput(sourceSeat) ? [] :
+        _coreMatchParticipantsPlayersAccess._players
+            .Where(player => player.IsAlive && player.Seat != sourceSeat && CanBePindianTarget(sourceSeat, player.Seat))
+            .Select(player => player.Seat)
+            .Order()
+            .ToArray();
+
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 140)]
     internal bool CanPayEquipmentSlotGroup(CharacterState owner, SkillProgramActivation activation) => ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.AbolishEquipmentSlotGroup).All(e => e.EquipmentSlots.Any(slot => owner.EquipmentSlotCapacity(slot) > 0));
     internal bool CanSelectProgramPindianOpponent(ProgramSkillFrame frame, int targetSeat) => _programTargetSelectionOperations.Get().CanSelectPindianOpponent(frame, targetSeat);
