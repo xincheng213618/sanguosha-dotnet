@@ -1,10 +1,10 @@
 #nullable enable
 
 namespace CardGame.Core.EngineOwners;
-internal sealed partial class CharacterHanDangBoundaryMobileRuntime
+internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
 {
     internal CardMoveReason ProgramAttackRangeAidReason(ProgramSkillFrame frame) => new($"skill-program.{(frame.SkillId)}.{(SkillProgramEffectOp.RequestAttackRangeAid)}");
-    internal Card[] ProgramAttackRangeAidWeapons(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(card => !card.IsGeneralWeapon && _coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind) && _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).OrderBy(card => card.Id).ToArray();
+    internal Card[] ProgramAttackRangeAidWeapons(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(card => !card.IsGeneralWeapon && _coreEquipmentContentOperations.Value.EquipmentRules.IsEquipment(card.Kind) && _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).OrderBy(card => card.Id).ToArray();
     internal bool ValidProgramAttackRangeAid(ProgramSkillFrame frame)
     {
         if (frame.AttackRangeAid is not { } aid || frame.InstructionIndex < 1 || aid.InstructionIndex != frame.InstructionIndex || frame.SelectedTargetSeats is not [var target] || target != aid.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.RequestAttackRangeAid || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash != frame.GameplayHash || aid.ResponderSeats is not System.Collections.IList { IsReadOnly: true } || aid.ResponderSeats.Count == 0 || aid.ResponderSeats.Distinct().Count() != aid.ResponderSeats.Count || aid.ResponderSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == target) || aid.ResponderIndex < 0 || aid.ResponderIndex >= aid.ResponderSeats.Count)
@@ -23,7 +23,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
             return false;
         if (payment.CardId is { } cardId)
         {
-            if (payment.Stage != ProgramAttackRangeAidPaymentStage.MovementChildren || payment.Draw is not null || payment.PrintedKind is not { } kind || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) || _coreEquipmentContentOperations.EquipmentRules.Get(kind).Slot != EquipmentSlot.Weapon || payment.From is not { Zone: CardZoneKind.Hand or CardZoneKind.Equipment } from || from.OwnerSeat != payment.ResponderSeat || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == cardId && move.CardKind == kind && move.Sequence > payment.Before && move.Sequence <= payment.After && move.From == from && move.To == CardLocation.Processing && move.Reason == ProgramAttackRangeAidReason(frame)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == cardId && move.CardKind == kind && move.Sequence > payment.Before && move.Sequence <= payment.After && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == ProgramAttackRangeAidReason(frame)) != 1 || prior.Last().DiscardedWeaponCardId != cardId || prior.Last().DrawnCardIds.Count != 0)
+            if (payment.Stage != ProgramAttackRangeAidPaymentStage.MovementChildren || payment.Draw is not null || payment.PrintedKind is not { } kind || !_coreEquipmentContentOperations.Value.EquipmentRules.IsEquipment(kind) || _coreEquipmentContentOperations.Value.EquipmentRules.Get(kind).Slot != EquipmentSlot.Weapon || payment.From is not { Zone: CardZoneKind.Hand or CardZoneKind.Equipment } from || from.OwnerSeat != payment.ResponderSeat || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == cardId && move.CardKind == kind && move.Sequence > payment.Before && move.Sequence <= payment.After && move.From == from && move.To == CardLocation.Processing && move.Reason == ProgramAttackRangeAidReason(frame)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == cardId && move.CardKind == kind && move.Sequence > payment.Before && move.Sequence <= payment.After && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == ProgramAttackRangeAidReason(frame)) != 1 || prior.Last().DiscardedWeaponCardId != cardId || prior.Last().DrawnCardIds.Count != 0)
                 return false;
         }
         else
@@ -74,7 +74,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
             return;
         }
 
-        _coreProgramAttackRangeAidOperations.PublishProgramAttackRangeAid(frame, ProgramAttackRangeAidReason(frame));
+        PublishProgramAttackRangeAid(frame, ProgramAttackRangeAidReason(frame));
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 56900)]
     internal bool ResumeProgramAttackRangeAidPayment(long id)

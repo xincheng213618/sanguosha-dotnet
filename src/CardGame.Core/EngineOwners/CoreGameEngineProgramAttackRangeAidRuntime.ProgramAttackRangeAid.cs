@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
 
         var responder = _coreMatchParticipantsPlayersAccess._players[aid.ResponderSeats[aid.ResponderIndex]];
         var target = _coreMatchParticipantsPlayersAccess._players[aid.TargetSeat];
-        var choices = _characterHanDangBoundaryMobileOperations.ProgramAttackRangeAidWeapons(responder.Seat).OrderBy(card => card.Id).Select(card => new PromptChoice(new ChoiceId($"program-attack-range-aid.frame-{(frame.Id)}.index-{(aid.ResponderIndex)}.weapon-{(card.Id)}"), $"弃置武器【{(card.DisplayName)}】。", [card.Id], [], AttackRangeAidParameters(frame, aid, reason, "attack-range-aid-discard-weapon"))).Append(new PromptChoice(new ChoiceId($"program-attack-range-aid.frame-{(frame.Id)}.index-{(aid.ResponderIndex)}.draw-{(target.Seat)}"), $"令 {(target.Name)} 摸一张牌。", [], [target.Seat], AttackRangeAidParameters(frame, aid, reason, "attack-range-aid-draw"))).ToArray();
+        var choices = ProgramAttackRangeAidWeapons(responder.Seat).OrderBy(card => card.Id).Select(card => new PromptChoice(new ChoiceId($"program-attack-range-aid.frame-{(frame.Id)}.index-{(aid.ResponderIndex)}.weapon-{(card.Id)}"), $"弃置武器【{(card.DisplayName)}】。", [card.Id], [], AttackRangeAidParameters(frame, aid, reason, "attack-range-aid-discard-weapon"))).Append(new PromptChoice(new ChoiceId($"program-attack-range-aid.frame-{(frame.Id)}.index-{(aid.ResponderIndex)}.draw-{(target.Seat)}"), $"令 {(target.Name)} 摸一张牌。", [], [target.Seat], AttackRangeAidParameters(frame, aid, reason, "attack-range-aid-draw"))).ToArray();
         var skill = _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.AwaitingResponse });
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, responder.Seat, $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 发动【{(skill.Name)}】：弃置一张武器牌，或令 {(target.Name)} 摸一张牌。", choices.SelectMany(choice => choice.Cards).ToArray(), [target.Seat], SourceSeat: frame.OwnerSeat)
@@ -87,13 +87,13 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[aid.TargetSeat];
         if (aid.Payment is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != responderSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Attack-range aid must pay the current original responder exactly once.");
-        var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (selected.Parameters.GetValueOrDefault("program-action"))
         {
             case "attack-range-aid-discard-weapon" when selected.Cards.Count == 1 && selected.Targets.Count == 0:
             {
-                var weapon = _characterHanDangBoundaryMobileOperations.ProgramAttackRangeAidWeapons(responderSeat).SingleOrDefault(card => card.Id == selected.Cards.Single()) ?? throw new InvalidOperationException("The selected aid-response weapon is no longer in its owner's actual hand or equipment.");
+                var weapon = ProgramAttackRangeAidWeapons(responderSeat).SingleOrDefault(card => card.Id == selected.Cards.Single()) ?? throw new InvalidOperationException("The selected aid-response weapon is no longer in its owner's actual hand or equipment.");
                 var from = _cardZonesOperations._cardZones.GetLocation(weapon.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect, AttackRangeAid = aid with { Payment = new(aid.ResponderIndex, responderSeat, ProgramAttackRangeAidPaymentStage.MovementChildren, before, before, weapon.Id, weapon.Kind, from) }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
                 var discardInvocation = _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat, responderSeat, [weapon.Id], expectedReason, frame.Id);
@@ -101,15 +101,15 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
                 _corePhysicalMovementFacadesOperations.MoveCard(weapon, CardLocation.Processing, CardLocation.DiscardPile, expectedReason);
                 _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(discardInvocation);
                 frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-                _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { AttackRangeAid = frame.AttackRangeAid!with { Payment = frame.AttackRangeAid!.Payment!with { After = _coreCardMovementJournalMovementSequenceAccess._movementSequence } } });
+                _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { AttackRangeAid = frame.AttackRangeAid!with { Payment = frame.AttackRangeAid!.Payment!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, responderSeat, aid.TargetSeat, weapon.Id, Array.AsReadOnly(Array.Empty<int>())));
-                _characterHanDangBoundaryMobileOperations.ContinueProgramAttackRangeAidPayment(frame.Id);
+                ContinueProgramAttackRangeAidPayment(frame.Id);
                 return;
             }
 
             case "attack-range-aid-draw" when selected.Cards.Count == 0 && selected.Targets.SequenceEqual([aid.TargetSeat]):
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect, AttackRangeAid = aid with { Payment = new(aid.ResponderIndex, responderSeat, ProgramAttackRangeAidPaymentStage.Drawing, before, before) } });
-                _characterHanDangBoundaryMobileOperations.ContinueProgramAttackRangeAidPayment(frame.Id);
+                ContinueProgramAttackRangeAidPayment(frame.Id);
                 return;
             default:
                 throw new InvalidOperationException("The attack-range aid choice is malformed.");

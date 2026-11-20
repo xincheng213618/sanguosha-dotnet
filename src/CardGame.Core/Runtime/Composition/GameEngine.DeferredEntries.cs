@@ -648,7 +648,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineHalfHandTargetSupportEntries HalfHandTargetSupportEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHalfHandTargetSupportEntries, EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime>(Core.RuntimeEntries.CoreGameEngineHalfHandTargetSupportEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHanDangBoundaryMobileEntries HanDangBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHanDangBoundaryMobileEntries, EngineOwners.CharacterHanDangBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterHanDangBoundaryMobileEntries.Create);
 
     internal Core.RuntimeEntries.CharacterHanDangMouMobileEntries HanDangMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHanDangMouMobileEntries, EngineOwners.CharacterHanDangMouMobileRuntime>(Core.RuntimeEntries.CharacterHanDangMouMobileEntries.Create);
 

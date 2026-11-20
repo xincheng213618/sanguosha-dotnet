@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.EngineOwners;
-internal sealed partial class CharacterHanDangBoundaryMobileRuntime
+internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
 {
     internal bool ProgramAttackRangeAidChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
@@ -18,8 +18,22 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == frame.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(entry => entry.Change.Id == state.Id && entry.Change.ParentFrameId == frame.Id));
     }
 
-    internal bool ProgramAttackRangeAidSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame frame && this.ProgramAttackRangeAidChild(frame, _resolutionStackOperations2._resolutionStack()[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? ProgramAttackRangeAidRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.ProgramAttackRangeAidChild(frame, child), (index) => this.ProgramAttackRangeAidSuffix(index));
+    private bool ProgramAttackRangeAidSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, childIndex =>
+    {
+        if (_coreObserverSubtreesOperations.IsMovementObserverEdge(childIndex) ||
+            _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(childIndex))
+            return true;
+
+        var parent = _resolutionStackOperations._resolutionStack[childIndex - 1];
+        var child = _resolutionStackOperations._resolutionStack[childIndex];
+        return _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) ||
+            parent is ProgramSkillFrame frame && ProgramAttackRangeAidChild(frame, child) ||
+            CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) ||
+            _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
+    }, _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix);
+
+    private ProgramSkillFrame? ProgramAttackRangeAidRoot() =>
+        _coreObserverSubtreesOperations.FindProgramObserverRoot(ProgramAttackRangeAidChild, ProgramAttackRangeAidSuffix);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56900)]
     internal bool ProgramAttackRangeAidDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && ProgramAttackRangeAidRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 56900)]

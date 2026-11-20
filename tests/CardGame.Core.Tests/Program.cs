@@ -912,6 +912,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Tang Zi Xingzhao: real wound lends Xunxun and orders next actual Draw cold", OlTangZiXingzhaoWoundedOwnerChecks.RealWoundLendsXunxunAndOrdersNextActualDrawCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
     ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
+    ("Boundary Mobile Han Dang Jiefan: native weapon and typed draw return to original responders cold", BoundaryMobileHanDangAttackRangeAidOwnerChecks.NativeWeaponAndTypedDrawReturnToOriginalResponderRosterCold),
     ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),
     ("Anniversary Hu Che Er Fuzhong: three foreign batches retain seven after actual discard cold", AnniversaryHuCheErFuzhongDrawChecks.ThreeForeignBatchesRetainSevenAfterActualDiscardCold),
     ("OL Huo Jun Qiongshou: declared additions set actual Discard quota cold", OlHuoJunQiongshouDeclaredHandLimitChecks.DeclaredAdditionsSetActualDiscardQuotaCold),
