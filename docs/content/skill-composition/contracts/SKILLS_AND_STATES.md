@@ -21,6 +21,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Applied states outlive their caster and original skill. After application, evaluate the recipient's declared conditions, lifetime and removal rules; do not revoke a state merely because its caster died or lost the skill. Source qualification controls new applications and future windows; it does not requalify an already applied state. Read HP through the existing match health query, including its mode conversions and selected health receipts.
 
+- Mou Hu Che Er's Kongwu uses its original paid origin to issue one equipment restriction through the target's next actual `TurnEnded` Before boundary. This lifetime skips the turn of issuance. Equipment and Wooden Ox read the same active origin. The hand-size and HP qualification still belongs to the original Play-phase settlement, and the draw penalty uses the original next-turn binding.
+
 ## Physical marks and hand limits
 
 - Permanent physical card marks use `CardEntityMarkRuntime`, `markInitialHand` / `markCards`, and the shared `cardMarkCount` read; keep mark identity independent of holder, zone, source skill and presentation label. Holder-dependent benefits remain separate rules. Printed Lord qualification belongs to the actual grant as typed setup/program source data and uses the single `PrintedLordSkillQualifications` matcher.

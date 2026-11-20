@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHuCheErMouEntries
 {
-    internal IEnumerable<MouHuCheErDebtEvent> ActiveMouHuCheErDebts(int target) => _resolve().ActiveMouHuCheErDebts(target);
     internal void BindMouHuCheErSlashUse(CardUseFrame supplied) => _resolve().BindMouHuCheErSlashUse(supplied);
     internal bool CanMouHuCheErSlash(ProgramSkillFrame f) => _resolve().CanMouHuCheErSlash(f);
     internal bool CanStartMouHuCheEr(CharacterState owner) => _resolve().CanStartMouHuCheEr(owner);

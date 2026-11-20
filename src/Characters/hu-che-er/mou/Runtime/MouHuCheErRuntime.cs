@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries skillChanges) : IMouHuCheErHost
+internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IMatchParticipantStateAccess participants, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries skillChanges) : IMouHuCheErHost
 {
     internal const string MouHuCheErAction = "mou-hu-che-er-kongwu",MouHuCheErDiscardReason = "skill-program.mou:kongwu.discard",MouHuCheErDrawReason = "skill-program.mou:kongwu.draw";
     private static CardConversionSource MouHuCheErSource(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
@@ -102,7 +102,10 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
     [ProgramContinuation(ProgramContinuationKind.Movement, 35800)] private bool ReturnMouHuCheErMovement(ProgramSkillFrame f) => f.MouHuCheEr is not null && ResumeMouHuCheEr(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35800)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35800)] private bool PaidMouHuCheEr(ProgramSkillFrame f) => f.MouHuCheEr is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuCheErKongwu)] private PromptChoice AiMouHuCheEr(PendingDecision p, ProgramSkillFrame f) => f.MouHuCheEr!.Stage == MouHuCheErStage.Target ? p.Choices.OrderBy(c => facts.Friendly(f.OwnerSeat, c.Targets.Single()) ? 1 : 0).First() : p.Choices.First();
-    private IEnumerable<MouHuCheErDebtEvent> ActiveDebts(int target) => facts.History<MouHuCheErDebtEvent>().Where(d => d.Target == target && !facts.History<MouHuCheErDebtExpiredEvent>().Any(e => e.FrameId == d.FrameId));
+    internal static IEnumerable<SkillStateOrigin> ActiveDebtOrigins(CharacterState target) =>
+        target.SkillGrants.Restrictions.Where(restriction => restriction.Action == SkillStateAction.Suppress &&
+            restriction.Lifetime.Origin is { EffectIndex: 0, Source: { SkillId: MouHuCheErComposition.Kongwu, BindingId: "show-hand" } })
+            .Select(restriction => restriction.Lifetime.Origin!);
     private static SkillStateOrigin EquipmentDebtOrigin(MouHuCheErCompletedEvent paid) =>
         new(paid.FrameId, 0, new(paid.Source.SkillId, paid.Source.BindingId, paid.Source.OwnerSeat, paid.Source.SkillInstanceId));
     // The original journal predicate changed only after QueueFact. Apply the
@@ -111,9 +114,8 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
     {
         if (payload is MouHuCheErDebtEvent debt)
             skillChanges.IssueSkillState(EquipmentDebtOrigin(facts.History<MouHuCheErCompletedEvent>().Single(paid => paid.FrameId == debt.FrameId)),
-                debt.Target, new(SkillStateAction.Suppress, new(filter: new("not", ProgramExpressionType.Bool, [SkillStateFilters.Character]))));
-        else if (payload is MouHuCheErDebtExpiredEvent expired)
-            skillChanges.RevokeSkillStateOrigin(EquipmentDebtOrigin(facts.History<MouHuCheErCompletedEvent>().Single(paid => paid.FrameId == expired.FrameId)));
+                debt.Target, new(SkillStateAction.Suppress, new(filter: new("not", ProgramExpressionType.Bool, [SkillStateFilters.Character])),
+                    [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, SkipIssued: true)]));
     }
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 35800)] private void ObserveDamage(IGameEvent payload)
     {
@@ -133,10 +135,8 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
             }
         }
         if (payload is TurnStartedEvent start)
-            foreach (var debt in ActiveDebts(start.ActorSeat).Where(d => !facts.History<MouHuCheErDebtTurnEvent>().Any(t => t.FrameId == d.FrameId)).ToArray())
-                events.AdvanceFact(new MouHuCheErDebtTurnEvent(debt.FrameId, debt.Target, start.TurnNumber));
-        if (payload is TurnEndedEvent end)
-            foreach (var debt in ActiveDebts(end.ActorSeat).Where(d => facts.History<MouHuCheErDebtTurnEvent>().Any(t => t.FrameId == d.FrameId && t.Turn == end.TurnNumber && t.Target == end.ActorSeat)).ToArray())
-                events.AdvanceFact(new MouHuCheErDebtExpiredEvent(debt.FrameId, debt.Target, end.TurnNumber));
+            foreach (var origin in ActiveDebtOrigins(participants.At(start.ActorSeat)).Where(origin => origin.IssuedTurn < start.TurnNumber &&
+                !facts.History<MouHuCheErDebtTurnEvent>().Any(turn => turn.FrameId == origin.FrameId)).ToArray())
+                events.AdvanceFact(new MouHuCheErDebtTurnEvent(origin.FrameId, start.ActorSeat, start.TurnNumber));
     }
 }

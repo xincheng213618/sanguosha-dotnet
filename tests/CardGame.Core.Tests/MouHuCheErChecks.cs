@@ -74,9 +74,14 @@ internal static class MouHuCheErChecks
                 "The genuine Kongwu reveals and discards the target's only basic card, completes its native refill, and freezes its paid actual Play identity.");
             Submit(new EndPlayPhaseCommand(0, game.Revision, P()!.PromptId));
             Reach(() => E<MouHuCheErDebtEvent>().Length == 1 && P()?.SkillPrompt?.SkillId == Driver);
-            Need(Player(1).SkillGrants.Restrictions.Single().Lifetime.Origin?.FrameId == paid.FrameId &&
+            var lifetime = Player(1).SkillGrants.Restrictions.Single().Lifetime;
+            var origin = lifetime.Origin!;
+            Need(origin.FrameId == paid.FrameId && origin.Source is { OwnerSeat: 0, SkillId: Kongwu, BindingId: "show-hand" } &&
+                origin.Source.SkillInstanceId == paid.Source.SkillInstanceId &&
+                lifetime.Until.SequenceEqual([new(SkillStateBoundaryEvent.TurnEnded, 1, SkillStateBoundaryTiming.Before,
+                    paid.Phase.TurnNumber, SkipIssued: true)]) &&
                 Player(1).SkillGrants.Grants.All(grant => grant.SkillId != EquipmentSkill),
-                "The exact completed phase signs a source-specific equipment restriction before any equipment source exists.");
+                "The exact completed phase signs a source-specific restriction through the target's next actual turn end.");
             Cold();
             Answer(choice => choice.Targets.SequenceEqual([1]));
             Reach(() => P()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue") == true);
@@ -89,15 +94,26 @@ internal static class MouHuCheErChecks
             Cold();
             Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
             Reach(() => E<MouHuCheErDebtTurnEvent>().Any(turn => turn.FrameId == paid.FrameId));
-            Need(!Effective(1, EquipmentSkill) && Player(0).IsAlive == !die && E<MouHuCheErDebtExpiredEvent>().Length == 0,
+            var due = E<MouHuCheErDebtTurnEvent>().Single(turn => turn.FrameId == paid.FrameId);
+            Need(!Effective(1, EquipmentSkill) && Player(0).IsAlive == !die && due.Target == 1 && due.Turn > origin.IssuedTurn &&
+                E<SkillStateExpiredEvent>().All(expired => expired.Origin != origin),
                 "Loss of the issuing skill, and optionally its caster's real death, cannot revoke the debt accepted before the target's actual next turn.");
-            Reach(() => E<MouHuCheErDebtExpiredEvent>().Any(expired => expired.FrameId == paid.FrameId));
+            Reach(() => E<TurnEndedEvent>().Any(ended => ended.ActorSeat == due.Target && ended.TurnNumber == due.Turn));
+            var started = game.Events.Single(entry => entry.Payload is TurnStartedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
+            var ended = game.Events.Single(entry => entry.Payload is TurnEndedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
+            var expiry = game.Events.Single(entry => entry.Payload is SkillStateExpiredEvent expired && expired.Origin == origin);
+            var draw = E<ActualDiscardRecoveryPhaseStartedEvent>().Single(entry => entry.Phase is { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase &&
+                phase.ActorSeat == due.Target && phase.TurnNumber == due.Turn);
+            Need(game.CardMovements.Count(move => move.TurnNumber == due.Turn && move.Sequence > draw.MovementSequenceBefore &&
+                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(due.Target) && move.Reason == CardMoveReasons.Draw) == 1,
+                "The accepted debt still reduces this exact normal Draw from two physical cards to one.");
             Need(Effective(1, EquipmentSkill) && !Effective(1, Unrelated) &&
                 Player(1).SkillGrants.Restrictions.Single().Lifetime.Origin?.Source.SkillId == Driver &&
-                E<SkillStateExpiredEvent>().Count(expired => expired.Origin?.FrameId == paid.FrameId) == 1,
+                expiry.Payload is SkillStateExpiredEvent { Seat: 1 } && started.Sequence < expiry.Sequence && expiry.Sequence < ended.Sequence,
                 "The original target turn end revokes only that debt origin, restoring later equipment and retaining an independent restriction.");
             Cold();
-            Need(E<MouHuCheErDebtEvent>().Length == 1 && E<MouHuCheErDebtExpiredEvent>().Length == 1 && Effective(1, EquipmentSkill),
+            Need(E<MouHuCheErDebtEvent>().Length == 1 && E<SkillStateExpiredEvent>().Count(expired => expired.Origin == origin) == 1 &&
+                Effective(1, EquipmentSkill),
                 "Cold replay keeps the one original payment and one original expiry without reissuing a debt or suppressing an unrelated source.");
         }
     }
