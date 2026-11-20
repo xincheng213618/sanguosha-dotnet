@@ -4,6 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBeiSpOl664Runtime
 {
     internal const string OlSpZhujiu = "ol:zhujiu-3577", OlSpJinglei = "ol:jinglei-3578", OlSpBrewDisabled = "zhujiu-disabled";
+    private const string JingleiDiscardReason = "skill.ol-sp-liu-bei.jinglei.discard";
     SkillProgramStepOutcome IOlSpLiuBei664Host.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op switch
     {
         SkillProgramEffectOp.UseOlSpLiuBeiZhujiu => BeginOlSpZhujiu(frame),
@@ -274,7 +275,15 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
             throw new InvalidOperationException("Jinglei lost its selected actual hand discards.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { OlSpLiuBei664 = draft with { Stage = "discarding", SequenceBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Choices = [] } });
         foreach (var card in draft.Cards.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray())
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(target), CardLocation.DiscardPile, new("skill.ol-sp-liu-bei.jinglei.discard"));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(target), CardLocation.DiscardPile, new(JingleiDiscardReason), beforeFact: movement =>
+            {
+                var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+                var paid = active.OlSpLiuBei664!;
+                _coreRuntimeOperations.ReplaceRuntimeFrame(active.Id, active with
+                {
+                    OlSpLiuBei664 = paid with { PaidAdjustmentDiscards = [.. (paid.PaidAdjustmentDiscards ?? []), movement] }
+                });
+            });
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { OlSpLiuBei664 = frame.OlSpLiuBei664!with { SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
@@ -287,10 +296,14 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
         var draft = frame.OlSpLiuBei664!;
         if (draft.Stage == "discarding" && draft.TargetSeat != frame.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
         {
-            if (draft.Cards.Any(card => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence > draft.SequenceBefore && move.Sequence <= draft.SequenceAfter && move.CardId == card && move.From == CardLocation.Hand(draft.TargetSeat!.Value) && move.To == CardLocation.DiscardPile && move.Reason.Value == "skill.ol-sp-liu-bei.jinglei.discard") != 1))
+            var source = CardLocation.Hand(draft.TargetSeat!.Value);
+            if (draft.PaidAdjustmentDiscards is not { } discards || !discards.Select(move => move.CardId).SequenceEqual(draft.Cards) ||
+                discards.Any(move => move.From != source || move.To != CardLocation.DiscardPile || move.Reason.Value != JingleiDiscardReason))
                 throw new InvalidOperationException("Jinglei can transfer only the exact entities actually discarded by this paid adjustment.");
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { OlSpLiuBei664 = draft with { Stage = "giving" }, PendingMovementContinuation = null });
-            foreach (var card in draft.Cards.Where(card => _cardZonesOperations._cardZones.GetLocation(card) == CardLocation.DiscardPile).Select(_coreCardAttackStateOperations.GetAttackCard).ToArray())
+            var available = discards.Where(move => _zoneEntries.CurrentEntry(CardLocation.DiscardPile, move.CardId) == move.Sequence)
+                .Select(move => _coreCardAttackStateOperations.GetAttackCard(move.CardId)).ToArray();
+            foreach (var card in available)
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(frame.OwnerSeat), new("skill.ol-sp-liu-bei.jinglei.give"));
             if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.AwaitChild)
                 return;

@@ -810,6 +810,8 @@ var tests = new (string Name, Action Body)[]
     ("Mou Xun Yu Bizuo: excludes an earlier use entry after rediscard", MouXunYuBizuoDiscardEntryChecks.BizuoExcludesAnEarlierUseThatReenteredByDiscard),
     ("Mobile Boundary Shuangxiong preserves the original Duel response discard entry cold", BoundaryMobileShuangxiongDiscardEntryChecks.ShuangxiongCannotClaimANewerEntryOfAnOpponentDuelResponseCold),
     ("Mobile Boundary Shuangxiong collects both native Zhangba response entries without completion observer cold", BoundaryMobileShuangxiongDiscardEntryChecks.ShuangxiongCollectsBothNativeZhangbaDiscardEntriesWithoutCompletionObserverCold),
+    ("OL SP Liu Bei Jinglei: give only the original adjustment entry cold", OlSpLiuBei664Checks.JingleiCannotGiveTheSameCardAtANewerDiscardEntryCold),
+    ("Mou Ju Shou Muwang: later entry after missed return", MouJuShouMuwangDiscardEntryChecks.MuwangRecoversOnLaterDiscardAfterAnEarlierClaimSettles),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

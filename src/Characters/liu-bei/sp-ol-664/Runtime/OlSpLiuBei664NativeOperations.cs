@@ -6,6 +6,7 @@ public sealed record OlSpLiuBei664Draft
 {
     private readonly IReadOnlyList<int> _cards = Array.Empty<int>();
     private readonly IReadOnlyList<PromptChoice> _choices = Array.Empty<PromptChoice>();
+    private readonly IReadOnlyList<CardMovementRecord>? _paidAdjustmentDiscards;
     public string Stage { get; init; } = "materials";
     public int Minimum { get; init; }
     public int? TargetSeat { get; init; }
@@ -17,6 +18,12 @@ public sealed record OlSpLiuBei664Draft
     public long SequenceAfter { get; init; }
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<PromptChoice> Choices { get => _choices; init => _choices = Array.AsReadOnly(value.ToArray()); }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<CardMovementRecord>? PaidAdjustmentDiscards
+    {
+        get => _paidAdjustmentDiscards;
+        init => _paidAdjustmentDiscards = value is null ? null : Array.AsReadOnly(value.ToArray());
+    }
 }
 public sealed partial record ProgramSkillFrame
 {

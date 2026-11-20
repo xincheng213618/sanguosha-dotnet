@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed partial class MouJuShouRuntime(IHandLimitExemptions handExemptions,IMouJuShouFacts facts,IMouJuShouNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws):IMouJuShouRuntime
+internal sealed partial class MouJuShouRuntime(IHandLimitExemptions handExemptions,IMouJuShouFacts facts,IMouJuShouNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws,ICardZoneEntryQueries zoneEntries):IMouJuShouRuntime
 {
  internal const string ZuoJun="mou:zuojun",Muwang="mou:muwang",Action="mou-ju-shou-anniversary";
  internal static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);

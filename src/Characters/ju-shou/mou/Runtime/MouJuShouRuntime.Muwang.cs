@@ -17,7 +17,9 @@ internal sealed partial class MouJuShouRuntime
    if(loss is null)continue;
    if(loss is{Returned:true,LostAgain:false}&&departures.Any(m=>m.CardId==loss.CardId&&m.Sequence>loss.FirstSequence))
    {native.SetLosses(owner,losses.Select(l=>l==loss?l with{LostAgain=true}:l).ToArray());Queue(source.Source,source.Hash,batch,MouJsMuwangKind.Penalty,loss.CardId,loss.FirstSequence);continue;}
-   if(!loss.Returned&&batch.Moves.Any(m=>m.CardId==loss.CardId&&facts.Reclaimable(loss,m))&&!facts.History<MouJsMuwangQueuedEvent>().Any(e=>e.Source==loss.Source&&e.Turn==loss.Turn&&e.Kind==MouJsMuwangKind.Recover))Queue(source.Source,source.Hash,batch,MouJsMuwangKind.Recover,loss.CardId,loss.FirstSequence);
+   if (!loss.Returned && batch.Moves.Any(m => facts.Reclaimable(loss, m)) &&
+       !facts.History<MouJsMuwangQueuedEvent>().Any(e => e.Source == loss.Source && e.Turn == loss.Turn && e.BatchId == batch.Id && e.Kind == MouJsMuwangKind.Recover))
+    Queue(source.Source, source.Hash, batch, MouJsMuwangKind.Recover, loss.CardId, loss.FirstSequence);
   }
  }
  private MouJsMuwangQueuedEvent Queue(CardConversionSource source,string hash,MouJsObservedBatch batch,MouJsMuwangKind kind,int card,long sequence)
@@ -29,7 +31,19 @@ internal sealed partial class MouJuShouRuntime
   var r=new MouJuShouReceipt(Source(f),f.GameplayHash,SkillProgramEffectOp.ResolveMouJuShouMuwang,facts.Turn,f.OwnerSeat){Stage=q.Kind==MouJsMuwangKind.ChooseFirst?MouJuShouStage.FirstLossChoice:q.Kind==MouJsMuwangKind.Recover?MouJuShouStage.RecoverChildren:MouJuShouStage.Penalty,Before=facts.Sequence,After=facts.Sequence,MuwangOrdinal=q.Ordinal,CardId=q.CardId,LossSequence=q.FirstSequence,Recover=q.Kind==MouJsMuwangKind.Recover,Penalty=q.Kind==MouJsMuwangKind.Penalty,Bound=cards};
   frames.ReplaceTop(f=f with{MouJuShou=r});events.AdvanceFact(new MouJsStartedEvent(f.Id,r.Source,r.GameplayHash,r.Operation,r.Turn,r.Actor));
   if(q.Kind==MouJsMuwangKind.ChooseFirst&&cards is[var only])ChooseFirst(f,only);
-  else if(q.Kind==MouJsMuwangKind.Recover){frames.ReplaceTop(f=f with{PendingMovementContinuation=new(f.OwnerSeat,0,null)});if(facts.InDiscard(r.CardId))native.Recover(f);else Complete(f);}
+  else if (q.Kind == MouJsMuwangKind.Recover)
+  {
+   var entry = zoneEntries.CurrentEntry(CardLocation.DiscardPile, q.CardId);
+   var tracked = facts.Losses(f.OwnerSeat).Any(loss => loss.Source == q.Source && loss.Turn == q.Turn &&
+       loss.CardId == q.CardId && loss.FirstSequence == q.FirstSequence && !loss.Returned);
+   if (tracked && entry is { } sequence && f.WindowContext?.MovementBatch is { } batch &&
+       batch.Movements.Any(move => move.CardId == q.CardId && move.To == CardLocation.DiscardPile && move.Sequence == sequence))
+   {
+    frames.ReplaceTop(f = f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+    native.Recover(f);
+   }
+   else Complete(f);
+  }
   Continue(f.Id);return SkillProgramStepOutcome.AwaitChild;
  }
  private void ChooseFirst(ProgramSkillFrame f,int card)
