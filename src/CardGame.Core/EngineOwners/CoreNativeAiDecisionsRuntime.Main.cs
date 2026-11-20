@@ -569,11 +569,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
             }
             else if (useBagua)
             {
-                var judgmentResult = _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder);
-                if (judgmentResult is { } succeeded)
-                {
-                    _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded);
-                }
+                _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder);
             }
             else
             {
@@ -665,11 +661,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
             }
             else if (useBagua)
             {
-                var judgmentResult = _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, target);
-                if (judgmentResult is { } succeeded)
-                {
-                    _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded);
-                }
+                _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, target);
             }
             else
             {

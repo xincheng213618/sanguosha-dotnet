@@ -181,8 +181,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
                 Step = ResolutionFrameStep.ResolvingEffect
             });
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
-            if (_coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder) is { } succeeded)
-                _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded);
+            _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder);
             return;
         }
 

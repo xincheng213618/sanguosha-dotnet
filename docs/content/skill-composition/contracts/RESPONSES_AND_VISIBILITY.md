@@ -17,6 +17,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - A native Slash keeps the actual discard-pile entries of its accepted physical Dodge responses when a completed-use offer needs them. The original Slash owns the response and its cleanup entries, including a Dodge supplied by another player. A gift of that response requires all its materials to remain in their original entries. The response still returns to the native Slash cursor when its materials are unavailable.
 
+- Native Bagua starts at `CoreNativeJudgmentRuntime.ResolveBaguaJudgment` for Slash, Arrow Barrage and Qizheng. This owner applies an immediate outcome once. A suspended judgment returns through its original `JudgmentFrame`. An already-issued equipment invocation and a faction-defense provider keep their own return paths. A failed judgment opens the live physical response choices on the original attack.
+
 - A response exchange reads the accepted response's public entries on its native parent. A direct claim checks those entries before offering and acquiring the materials. When the exchange gives the original card first, it freezes the response entries before delivery and rechecks them after the delivery's children return. Loss of a response entry leaves the earlier delivery and its restriction effective.
 
 - When a counterspell replies to another counterspell, its native window retains only the immediately answered payment receipt alongside its own. An exchange giving that earlier play verifies its action, chain position and current physical entries before delivery.

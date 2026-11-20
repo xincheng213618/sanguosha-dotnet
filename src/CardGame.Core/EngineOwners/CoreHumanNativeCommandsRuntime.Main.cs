@@ -209,11 +209,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
         }
         else if (useBagua)
         {
-            var judgmentResult = _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, defender);
-            if (judgmentResult is { } succeeded)
-            {
-                _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded);
-            }
+            _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, defender);
         }
         else
         {
@@ -660,11 +656,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (useBagua)
         {
-            var judgmentResult = _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder);
-            if (judgmentResult is { } succeeded)
-            {
-                _coreNativeJudgmentOperations.CompleteBaguaResponse(attack, succeeded);
-            }
+            _coreNativeJudgmentOperations.ResolveBaguaJudgment(attack, responder);
         }
         else
         {

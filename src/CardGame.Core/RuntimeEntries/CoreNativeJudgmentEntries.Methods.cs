@@ -18,7 +18,7 @@ internal sealed partial class CoreNativeJudgmentEntries
     internal JudgmentFrame GetJudgmentFrame(long frameId) => _resolve().GetJudgmentFrame(frameId);
     internal bool IsProtectedJudgmentSourceEquipment(CharacterState owner, Card card, int judgmentSubjectSeat, string judgmentReason) => _resolve().IsProtectedJudgmentSourceEquipment(owner, card, judgmentSubjectSeat, judgmentReason);
     internal void ReplaceJudgmentFrame(JudgmentFrame frame) => _resolve().ReplaceJudgmentFrame(frame);
-    internal bool? ResolveBaguaJudgment(NativeOwners.CardAttackHandle attack, CharacterState defender) => _resolve().ResolveBaguaJudgment(attack, defender);
+    internal void ResolveBaguaJudgment(NativeOwners.CardAttackHandle attack, CharacterState defender) => _resolve().ResolveBaguaJudgment(attack, defender);
     internal void ResumeAfterLightningDamage(int delayedSeat, int? excludedCardId = default) => _resolve().ResumeAfterLightningDamage(delayedSeat, excludedCardId);
     internal void ResumeCompletedJudgment(GameEngine.JudgmentCompletionReceipt receipt) => _resolve().ResumeCompletedJudgment(receipt);
     internal void SetJudgmentFrameStep(long frameId, ResolutionFrameStep step) => _resolve().SetJudgmentFrameStep(frameId, step);

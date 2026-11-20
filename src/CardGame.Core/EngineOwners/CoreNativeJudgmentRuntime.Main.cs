@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeJudgmentRuntime
 {
-    internal bool? ResolveBaguaJudgment(NativeOwners.CardAttackHandle attack, CharacterState defender)
+    internal void ResolveBaguaJudgment(NativeOwners.CardAttackHandle attack, CharacterState defender)
     {
         if (attack.IgnoresArmor)
         {
@@ -16,8 +16,9 @@ internal sealed partial class CoreNativeJudgmentRuntime
         }
 
         if (_coreNativeEquipmentInvocationsOperations.TryBeginBaguaEquipmentInvocation(attack, defender))
-            return null;
-        return BeginJudgment(attack, defender.Seat, JudgmentReasons.BaguaDefense, attack.ResolutionId, attack.EffectiveCardKind, JudgmentContinuationKind.Bagua);
+            return;
+        if (BeginJudgment(attack, defender.Seat, JudgmentReasons.BaguaDefense, attack.ResolutionId, attack.EffectiveCardKind, JudgmentContinuationKind.Bagua) is { } succeeded)
+            CompleteBaguaResponse(attack, succeeded);
     }
 
     internal void CompleteBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
