@@ -9,14 +9,19 @@ internal sealed partial class CharacterHuCheErMouRuntime
         _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
     internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(player);
-    internal int MouHuCheErDrawPenalty(CharacterState player)
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 40)]
+    internal void AddKongwuDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != player.Seat ||
-            _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat != player.Seat)
-            return 0;
-        var turn = _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber;
-        return MouHuCheErRuntime.ActiveDebtOrigins(player).Count(origin =>
+        var turn = _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        if (query != SkillRuleQuery.DrawCount || turn._currentSeat != seat || turn._turnProgression.OwnerSeat != seat)
+            return;
+
+        var player = _coreMatchParticipantsPlayersAccess._players[seat];
+        var turnNumber = turn._turnNumber;
+        var debtCount = MouHuCheErRuntime.ActiveDebtOrigins(player).Count(origin =>
             _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtTurnEvent>()
-                .Any(due => due.FrameId == origin.FrameId && due.Target == player.Seat && due.Turn == turn));
+                .Any(due => due.FrameId == origin.FrameId && due.Target == seat && due.Turn == turnNumber));
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:mou-kongwu:draw", -debtCount);
     }
 }

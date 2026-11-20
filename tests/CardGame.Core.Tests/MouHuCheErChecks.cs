@@ -17,10 +17,11 @@ internal static class MouHuCheErChecks
         foreach (var (die, equipmentKind) in new[]
         {
             (false, CardKind.Crossbow), (true, CardKind.Crossbow),
-            (true, CardKind.DefensiveHorse), (true, CardKind.QinggangSword)
+            (true, CardKind.DefensiveHorse), (true, CardKind.QinggangSword), (true, CardKind.JadeSeal)
         })
         {
             var checksGrant = equipmentKind == CardKind.Crossbow;
+            var checksDraw = equipmentKind == CardKind.JadeSeal;
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(die, equipmentKind));
             var setup = new ShanheBattleSetup(17, 1, "kongwu-shared-state", Hero, 8, 4, 0, 0, 0, [Driver, Quiet],
                 Enumerable.Range(1, 4).Select(rank => new ShanheStartingCard(CardKind.Dodge, Suit.Club, rank)).ToArray(), [],
@@ -31,7 +32,7 @@ internal static class MouHuCheErChecks
                 Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
                 ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false,
-                AdvanceAfterHumanCommands = false, MaxTurns = 4
+                AdvanceAfterHumanCommands = false, MaxTurns = checksDraw ? 8 : 4
             }, registry);
             PendingDecision? P() => game.CreateSnapshot(0).PendingDecision;
             T[] E<T>() where T : IGameEvent => game.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -42,12 +43,25 @@ internal static class MouHuCheErChecks
             {
                 if (checksGrant) return;
                 var equipped = game.CreateSnapshot(0).Players[1].Equipment;
-                var entityMatches = cardId is { } id ? equipped.SingleOrDefault()?.Id == id : equipped.Count == 0;
+                var entityMatches = cardId is { } id
+                    ? equipped.SingleOrDefault() is { IsBone: false } card && card.Id == id && card.Kind == equipmentKind
+                    : equipped.Count == 0;
+                Need(entityMatches, $"{equipmentKind} must have its expected physical state at {boundary}.");
+                if (checksDraw) return;
                 var valueMatches = equipmentKind == CardKind.DefensiveHorse
                     ? game.GetCombatDistance(2, 1) == expected && game.GetCombatDistance(1, 2) == 1
                     : game.GetAttackRange(1) == expected;
-                Need(entityMatches && valueMatches,
-                    $"{equipmentKind} must have its expected physical state and yield {expected} at {boundary}.");
+                Need(valueMatches, $"{equipmentKind} must yield {expected} at {boundary}.");
+            }
+            int NormalDrawCount(int seat, int turn)
+            {
+                ActualDiscardRecoveryPhaseStartedEvent StartOf(ActualDiscardRecoveryPhaseKind kind) =>
+                    E<ActualDiscardRecoveryPhaseStartedEvent>().Single(entry => entry.Phase.Kind == kind &&
+                        entry.Phase.ActualTurnOwnerSeat == seat && entry.Phase.ActorSeat == seat && entry.Phase.TurnNumber == turn);
+                var before = StartOf(ActualDiscardRecoveryPhaseKind.Draw).MovementSequenceBefore;
+                var after = StartOf(ActualDiscardRecoveryPhaseKind.Play).MovementSequenceBefore;
+                return game.CardMovements.Count(move => move.Sequence > before && move.Sequence <= after &&
+                    move.TurnNumber == turn && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(seat) && move.Reason == CardMoveReasons.Draw);
             }
             void Submit(GameCommand command)
             { var result = game.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Kongwu command rejected."); }
@@ -107,7 +121,7 @@ internal static class MouHuCheErChecks
             int? printedEquipmentId = null;
             if (!checksGrant)
             {
-                var slot = equipmentKind == CardKind.DefensiveHorse ? EquipmentSlot.DefensiveHorse : EquipmentSlot.Weapon;
+                var slot = EquipmentCatalog.Get(equipmentKind).Slot;
                 var equipment = E<EquipmentChangedEvent>().SingleOrDefault(change => change.PlayerSeat == 1 &&
                     change.CardId == 31 && change.CardKind == equipmentKind && change.Slot == slot)
                     ?? throw new InvalidOperationException($"The only {equipmentKind} did not enter seat 1's equipment: " +
@@ -147,9 +161,7 @@ internal static class MouHuCheErChecks
             var started = game.Events.Single(entry => entry.Payload is TurnStartedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
             var ended = game.Events.Single(entry => entry.Payload is TurnEndedEvent turn && turn.ActorSeat == due.Target && turn.TurnNumber == due.Turn);
             var expiry = game.Events.Single(entry => entry.Payload is SkillStateExpiredEvent expired && expired.Origin == origin);
-            var draw = E<ActualDiscardRecoveryPhaseStartedEvent>().Single(IsHolderDraw);
-            Need(game.CardMovements.Count(move => move.TurnNumber == due.Turn && move.Sequence > draw.MovementSequenceBefore &&
-                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(due.Target) && move.Reason == CardMoveReasons.Draw) == 1,
+            Need(NormalDrawCount(due.Target, due.Turn) == 1,
                 "The accepted debt still reduces this exact normal Draw from two physical cards to one.");
             Need((!checksGrant || Effective(1, EquipmentSkill)) && !Effective(1, Unrelated) &&
                 Player(1).SkillGrants.Restrictions.Single().Lifetime.Origin?.Source.SkillId == Driver &&
@@ -161,6 +173,22 @@ internal static class MouHuCheErChecks
                 (!checksGrant || Effective(1, EquipmentSkill)),
                 "Cold replay keeps the one original payment and one original expiry without reissuing a debt or suppressing an unrelated source.");
             CheckPrintedEffect(printedEquipmentId, 2, "cold restore after expiry");
+
+            if (checksDraw)
+            {
+                Reach(() => E<ActualDiscardRecoveryPhaseStartedEvent>().Any(entry => entry.Phase is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase &&
+                    phase.ActorSeat == due.Target && phase.ActualTurnOwnerSeat == due.Target && phase.TurnNumber > due.Turn));
+                var nextTurn = E<TurnStartedEvent>().First(turn => turn.ActorSeat == due.Target && turn.TurnNumber > due.Turn).TurnNumber;
+                Need(NormalDrawCount(due.Target, nextTurn) == 3,
+                    "The same Jade Seal adds a third physical card to the holder's next normal Draw after the debt expires.");
+                Cold();
+                Need(NormalDrawCount(due.Target, due.Turn) == 1 && NormalDrawCount(due.Target, nextTurn) == 3 &&
+                    game.CreateSnapshot(0).Players[due.Target].Equipment.SingleOrDefault() is { Id: 31, Kind: CardKind.JadeSeal, IsBone: false } &&
+                    E<EquipmentChangedEvent>().Count(change => change.CardId == 31 && change.PlayerSeat == due.Target && change.Slot == EquipmentSlot.Treasure) == 1 &&
+                    E<MouHuCheErDebtEvent>().Length == 1 && E<MouHuCheErDebtTurnEvent>().SequenceEqual([due]) &&
+                    E<SkillStateExpiredEvent>().Count(expired => expired.Origin == origin) == 1,
+                    "The same Jade Seal stays equipped through cold replay, and the target draws one under the debt then three on the next actual turn.");
+            }
         }
     }
 
@@ -206,6 +234,7 @@ internal static class MouHuCheErChecks
                 CardKind.Crossbow => new("standard:crossbow", Suit.Club, 7),
                 CardKind.DefensiveHorse => new("standard:defensive_horse", Suit.Spade, 5),
                 CardKind.QinggangSword => new("standard:qinggang_sword", Suit.Spade, 6),
+                CardKind.JadeSeal => new("standard:jade_seal", Suit.Club, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(equipmentKind))
             };
             // The derived Shanhe battle seed keeps card 31 below Kongwu's opening refill.

@@ -13,7 +13,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal IReadOnlyList<Card> KongwuEffectiveEquipment2(int seat) => _resolve().KongwuEffectiveEquipment(seat);
     internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => _resolve().KongwuUsableWoodenOxGrain(player);
     internal bool MouHuCheErAdvanceChildren() => _resolve().MouHuCheErAdvanceChildren();
-    internal int MouHuCheErDrawPenalty(CharacterState player) => _resolve().MouHuCheErDrawPenalty(player);
     internal bool MouHuCheErDying() => _resolve().MouHuCheErDying();
     internal bool MouHuCheErEdge(int i) => _resolve().MouHuCheErEdge(i);
     internal bool MouHuCheErEquipmentDisabled(int target) => _resolve().MouHuCheErEquipmentDisabled(target);
