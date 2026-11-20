@@ -34,6 +34,8 @@ internal static class MouMengHuoMobileChecks
         s.Need(s.V().Hp == 2 && s.Charge() == 2 && s.E<MouMengHuoChargeGainedEvent>().Length == 3 &&
             s.E<MouMengHuoBarbarianUsedEvent>().Select(e => e.Phase).Distinct().Count() == 3,
             "A fresh own actual Play resets only its native use quota; genuine caused damage adds one charge, while real HP Loss never creates charge.");
+        s.Need(s.E<MouMengHuoChargeGainedEvent>().Select(e => e.Turn).SequenceEqual([new(1, 0, 1), new(2, 1, 2), new(5, 0, 5)]),
+            "All three charges retain the actual turn owner and the global turn-start ordinal across own and foreign turns.");
         s.End(); s.Reach(s.Selecting); s.Choose("toggle", target: 0); s.Choose("toggle", target: 1); s.Choose("confirm");
         s.Reach(() => s.Recipient(0)); s.Choose("discard", card: s.V().Equipment.Single(c => c.Kind == CardKind.SilverLion).Id);
         s.Reach(() => s.P?.SkillPrompt?.SkillId == Scene.Watch);

@@ -10,8 +10,10 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
     internal static CardConversionSource MouZyMobileSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_yu_mou_mobile_MouZhouYuMobile.MouZyMobileSource(f);
     internal MouZhouYuMobileTurn? MouZyMobileTurn()
     {
-        var h = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return h.LastOrDefault(e => e is TurnStartedEvent or ActualTurnCursorReturnedEvent)is TurnStartedEvent t && t.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && t.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat ? new(t.TurnNumber, t.ActorSeat, h.OfType<TurnStartedEvent>().Count()) : null;
+        var turn = _coreProgramEventHistoryOperations.Value.ProgramHistory.FindOpenActualTurn(
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber,
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+        return turn is { } open ? new(open.Start.TurnNumber, open.Start.ActorSeat, open.Ordinal) : null;
     }
 
     internal bool MouZyMobileDisabled(int owner, MouZhouYuMobileTurn turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Turn == turn);

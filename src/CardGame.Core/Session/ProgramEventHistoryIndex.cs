@@ -21,6 +21,15 @@ internal sealed partial class ProgramEventHistoryIndex(IReadOnlyList<EventEnvelo
         return null;
     }
 
+    internal (TurnStartedEvent Start, int Ordinal)? FindOpenActualTurn(int turnNumber, int ownerSeat)
+    {
+        if (LastMatching(static item => item is TurnStartedEvent or ActualTurnCursorReturnedEvent) is not TurnStartedEvent start ||
+            start.TurnNumber != turnNumber || start.ActorSeat != ownerSeat)
+            return null;
+
+        return (start, Read<TurnStartedEvent>().Count);
+    }
+
     public IEnumerable<IGameEvent> SinceLastBoundary(Func<IGameEvent, bool> boundary)
     {
         var pendingBoundary = pendingEvents.FindLastIndex(item => boundary(item));

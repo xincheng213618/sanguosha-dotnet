@@ -5,10 +5,12 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
 {
     internal MouXiahouShiTurnKey? CurrentMouXiahouShiTurn()
     {
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (history.LastOrDefault(e => e is TurnStartedEvent or ActualTurnCursorReturnedEvent)is not TurnStartedEvent turn || turn.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || turn.ActorSeat != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber)
+        var turnNumber = _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
+        var progression = _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression;
+        if (progression.TurnNumber != turnNumber ||
+            _coreProgramEventHistoryOperations.Value.ProgramHistory.FindOpenActualTurn(turnNumber, progression.OwnerSeat) is not { } turn)
             return null;
-        return new(turn.TurnNumber, turn.ActorSeat, history.OfType<TurnStartedEvent>().Count());
+        return new(turn.Start.TurnNumber, turn.Start.ActorSeat, turn.Ordinal);
     }
 
     internal bool MouXiahouShiTurnBefore(IGameEvent fact, MouXiahouShiTurnKey turn)

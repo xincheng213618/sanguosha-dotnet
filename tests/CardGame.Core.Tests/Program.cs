@@ -400,6 +400,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Mo Zhang Fei forward: cumulative Slash Duel armor both directions and once", CardGame.Core.Tests.OlMoZhangFeiChecks.CumulativeSlashAndDuelDamageCountsArmorBothDirectionsAndEntersOnceForward),
     ("Mou Pang Tong Mobile: ordered native Niepan upgrade all target discard cold", CardGame.Core.Tests.MouPangTongMobileChecks.OrderedNativeNiepanUpgradeAndAllTargetDiscardCold),
     ("Mou Meng Huo Mobile: native attribution charge phase and paid recipient cold", CardGame.Core.Tests.MouMengHuoMobileChecks.NativeAttributionChargePhaseAndPaidRecipientCold),
+    ("Mou Zhou Yu Mobile: actual covered payment returns to target cold", MouZhouYuMobileChecks.ActualCoveredPaymentReturnsToTargetCold),
     ("Mou Gongsun Zan OL: equal range native Slash and next actual Play expiry Cold", CardGame.Core.Tests.MouGongsunZanOlChecks.EqualRangeNativeSlashAndNextActualPlayExpiryCold),
     ("Mou Jiang Wei Mobile: real requested Slash gift charge awakening and Beifa Cold", CardGame.Core.Tests.MouJiangWeiMobileChecks.RealRequestedSlashGiftChargeAwakeningAndBeifaCold),
     ("Mou Hua Xiong OL: native committed pair and persistent directional tickets Cold", CardGame.Core.Tests.MouHuaXiongOlChecks.NativeCommittedPairMutualUseAndPersistentDirectionalTicketsCold),

@@ -31,6 +31,7 @@ internal static class ProgramEventHistoryIndexChecks
         Require(separate.Read<Fact>().Count == 0,
             "A separate match must not share typed history or cached pending state.");
         BoundaryQueriesKeepJournalOrderAndLiveTails();
+        OpenActualTurnFollowsTheOriginalCursorReturn();
         ActualUsesKeepAcceptedAndFinalizedOrdersSeparate();
         LatestFactsKeepAcceptedDesignationsAcrossStages();
         ObservationsKeepNativeScopeAndFrozenSnapshots();
@@ -86,6 +87,25 @@ internal static class ProgramEventHistoryIndexChecks
         Require(ReferenceEquals(arrayJournal.LastMatching(fact => fact is BoundaryFact), committedBoundary) &&
                 arrayJournal.Complete().SequenceEqual(new IGameEvent[] { before, committedBoundary, after }),
             "The read-only committed-journal fallback retains the same order and exact payload identities.");
+    }
+
+    private static void OpenActualTurnFollowsTheOriginalCursorReturn()
+    {
+        var first = new TurnStartedEvent(1, 0);
+        var history = new ProgramEventHistoryIndex([new(new EventId(1), null, 1, 1, "r1", first)], []);
+        history.Append(new TurnEndedEvent(1, 0));
+        Require(history.FindOpenActualTurn(1, 0) is { Ordinal: 1 } active && ReferenceEquals(active.Start, first),
+            "A turn that emitted TurnEnded still owns its original cursor during a late phase.");
+
+        history.Append(new ActualTurnCursorReturnedEvent(1, 0));
+        Require(history.FindOpenActualTurn(1, 0) is null,
+            "A pending native cursor return closes the previous turn immediately.");
+
+        var next = new TurnStartedEvent(2, 1);
+        history.Append(next);
+        Require(history.FindOpenActualTurn(2, 1) is { Ordinal: 2 } started && ReferenceEquals(started.Start, next) &&
+                history.FindOpenActualTurn(1, 0) is null && history.FindOpenActualTurn(2, 0) is null,
+            "The latest pending start uses the whole-table ordinal and requires the original turn and actor.");
     }
 
     private static void ActualUsesKeepAcceptedAndFinalizedOrdersSeparate()

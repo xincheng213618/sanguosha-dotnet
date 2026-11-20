@@ -9,8 +9,10 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     internal int MouMhCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.MouMengHuoCharge);
     internal MouMengHuoTurnKey? MouMhTurn()
     {
-        var h = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return h.LastOrDefault(e => e is TurnStartedEvent or ActualTurnCursorReturnedEvent)is TurnStartedEvent t && t.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && t.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat ? new(t.TurnNumber, t.ActorSeat, h.OfType<TurnStartedEvent>().Count()) : null;
+        var actualTurn = _coreProgramEventHistoryOperations.Value.ProgramHistory.FindOpenActualTurn(
+            _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber,
+            _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+        return actualTurn is { } turn ? new(turn.Start.TurnNumber, turn.Start.ActorSeat, turn.Ordinal) : null;
     }
 
     internal void ChangeMouMhCharge(ProgramSkillFrame f, int delta)
