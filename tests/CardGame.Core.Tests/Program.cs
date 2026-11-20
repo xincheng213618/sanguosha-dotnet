@@ -822,6 +822,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Zongxuan: own discard requires its original pile entry cold", OwnDiscardZongxuanChecks.MobileBoundaryZongxuanOnlyPlacesItsOriginalDiscardEntryCold),
     ("Friend Xiaxing: original Xuanjian discard entry", FriendXiaxingDiscardEntryChecks.XiaxingCannotSpendMarksOnAnOldDiscardEntry),
     ("Shanhe Source Chunlao 3161: original distance-one discard entry cold", ShanheSourceChunlao3161DiscardEntryChecks.SourceChunlao3161OffersOnlyTheDiscardersOriginalDistanceOneEntryCold),
+    ("Classic Shenduan: only the original black basic discard can become Supply Shortage cold", ClassicShenduanDiscardEntryChecks.ShenduanOnlyUsesItsOriginalBlackBasicDiscardCold),
+    ("Classic Zhongyong: original response Dodge discard entry cold", ClassicZhouCangZhongyongDiscardEntryChecks.ZhongyongCannotGiftANewerEntryOfTheOriginalDodgeCold),
+    ("Classic Funan: original counterspell discard entry", ClassicFunanDiscardEntryChecks.FunanCannotClaimARediscardedCounterspellFromItsOldResponse),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

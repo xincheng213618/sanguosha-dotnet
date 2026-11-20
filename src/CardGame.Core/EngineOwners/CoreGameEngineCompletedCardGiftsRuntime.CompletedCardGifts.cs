@@ -4,29 +4,42 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
 {
     internal const string CompletedGiftFactionResultBind = "completed-card-gift-slash";
-    internal CardActionContext CompletedGiftAction(ProgramSkillFrame frame)
+    private CardUseFrame CompletedGiftUse(ProgramSkillFrame frame)
     {
         var context = frame.WindowContext;
         if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } || use.ActorSeat != frame.OwnerSeat)
             throw new InvalidOperationException("A completed-card gift requires the owner's completed use.");
-        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == use.ParentCardUseFrameId && frame.Action?.ActionId == use.CardActionId).Action!;
+        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(native => native.Id == use.ParentCardUseFrameId &&
+            native.Step == ResolutionFrameStep.Completed && native.Action?.ActionId == use.CardActionId);
     }
 
     internal IReadOnlyList<CardActionContext> CompletedGiftSources(ProgramSkillFrame frame)
     {
-        var use = CompletedGiftAction(frame);
-        var sources = new List<CardActionContext>
+        var use = CompletedGiftUse(frame);
+        var action = use.Action!;
+        var sources = new List<CardActionContext>();
+        if (action.PhysicalCards.Count > 0 && action.PhysicalCards.All(cost =>
+                _cardZonesOperations._cardZones.GetLocation(cost.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile))
+            sources.Add(action);
+
+        foreach (var response in use.NativeDodgeResponses ?? [])
         {
-            use
-        };
-        sources.AddRange(_coreCommandJournalStorageEventsPendingEventsAccess._events.Select(envelope => envelope.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<CardActionAcceptedEvent>().Select(item => item.Action).Where(response => response.Type == CardActionType.Response && response.ParentActionId == use.ActionId && response.EffectiveKind == CardKind.Dodge && response.ResponderSeat is { } responder && use.EffectiveDesignatedTargetSeats.Contains(responder)));
-        return sources.Where(action => action.PhysicalCards.Count > 0 && action.PhysicalCards.All(cost => _cardZonesOperations._cardZones.GetLocation(cost.CardId)is { Zone: CardZoneKind.Processing or CardZoneKind.DiscardPile })).ToArray();
+            if (response.Action.ResponderSeat is not { } responder || !action.EffectiveDesignatedTargetSeats.Contains(responder))
+                continue;
+            if (response.Action.PhysicalCards.All(cost =>
+                {
+                    var currentEntry = _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cost.CardId);
+                    return response.Entries.Any(entry => entry.CardId == cost.CardId && entry.Sequence == currentEntry);
+                }))
+                sources.Add(response.Action);
+        }
+        return sources;
     }
 
     internal int[] CompletedGiftSlashTargets(ProgramSkillFrame frame, int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && target.Seat != frame.OwnerSeat && _attackRanges.IsWithinAttackRange(frame.OwnerSeat, target.Seat)).Select(target => target.Seat).ToArray();
     internal SkillProgramStepOutcome OfferProgramCompletedCardGift(ProgramSkillFrame frame)
     {
-        var action = CompletedGiftAction(frame);
+        var action = CompletedGiftUse(frame).Action!;
         if (frame.CompletedCardGiftDraft is not null)
             throw new InvalidOperationException("A completed gift was offered twice.");
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || CompletedGiftSources(frame).Count == 0 || !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Seat != frame.OwnerSeat))

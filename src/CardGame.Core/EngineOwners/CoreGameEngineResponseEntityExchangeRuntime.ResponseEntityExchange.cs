@@ -33,6 +33,73 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
     }
 
     internal Card EntityAtCurrentLocation(int id) => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id);
+
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 3)]
+    internal void CaptureAcceptedResponseExchangeMaterials(CardActionAcceptedEvent accepted)
+    {
+        var response = accepted.Action;
+        if (response.Type != CardActionType.Response || response.PhysicalCards.Count == 0)
+            return;
+        var content = _contentRegistryOperations._contentRegistry;
+        if (!content.ProgramDependencies.GetTriggerOperationSkillIds(SkillProgramEffectOp.ExchangeRespondedCardEntities).Any(skill =>
+                content.GetSkill(skill).Program!.Triggers.Any(trigger => trigger.Effects.Any(effect =>
+                    effect.Op == SkillProgramEffectOp.ExchangeRespondedCardEntities && effect.ResponseExchangeMode is null))))
+            return;
+
+        var parent = response.EffectiveKind == CardKind.Nullification
+            ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow
+            : _resolutionStackOperations._resolutionStack.LastOrDefault();
+        if (parent is null || parent.ResponseExchangeAcceptedMaterials?.ActionId == response.ActionId)
+            return;
+        var entries = new List<ResponseExchangeMaterialEntry>(response.PhysicalCards.Count);
+        foreach (var cost in response.PhysicalCards)
+        {
+            var location = _cardZonesOperations._cardZones.GetLocation(cost.CardId);
+            if (location.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile &&
+                _zoneEntries.CurrentEntry(location, cost.CardId) is { } sequence && sequence > 0)
+                entries.Add(new(cost.CardId, location, (int)sequence));
+        }
+        _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with
+        {
+            ResponseExchangeAcceptedMaterials = new(response.ActionId, entries.AsReadOnly())
+        });
+    }
+
+    private bool IsCurrentResponseEntry(ResponseExchangeMaterialEntry entry) =>
+        _zoneEntries.CurrentEntry(entry.Location, entry.CardId) == entry.EntrySequence;
+
+    private IReadOnlyList<ResponseExchangeMaterialEntry> CurrentAcceptedResponseEntries(ProgramCardTriggerWindowFrame window)
+    {
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(parent => parent.Id == window.ParentFrameId)
+                ?.ResponseExchangeAcceptedMaterials is not { } accepted || accepted.ActionId != window.Action.ActionId)
+            return [];
+        var canFinishBeforeWindow = window.Continuation == ProgramCardContinuation.NullificationResponse &&
+            window.Action.ConversionChain.Count != 0;
+        return Array.AsReadOnly(accepted.Entries.Select(entry => CurrentResponseEntry(entry, canFinishBeforeWindow))
+            .OfType<ResponseExchangeMaterialEntry>().ToArray());
+    }
+
+    private ResponseExchangeMaterialEntry? CurrentResponseEntry(ResponseExchangeMaterialEntry entry, bool canFinishBeforeWindow)
+    {
+        if (IsCurrentResponseEntry(entry))
+            return entry;
+        // Extended counterspells accept their materials before synchronously finishing them.
+        if (!canFinishBeforeWindow || entry.Location != CardLocation.Processing ||
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, entry.CardId) is not { } discardSequence ||
+            discardSequence <= entry.EntrySequence)
+            return null;
+        var finish = _movementHistory.Last(move => move.CardId == entry.CardId && move.Sequence == discardSequence);
+        if (finish is null || finish.From != CardLocation.Processing || finish.To != CardLocation.DiscardPile ||
+            finish.Reason != CardMoveReasons.ResponseFinished)
+            return null;
+        var previous = _movementHistory.Last(move => move.CardId == entry.CardId && move.From != move.To && move.Sequence < discardSequence);
+        return previous?.Sequence == entry.EntrySequence ? new(entry.CardId, CardLocation.DiscardPile, finish.Sequence) : null;
+    }
+
+    private bool DeliversOriginalResponseExchangeCard(int owner, string skill, string instance, SkillProgramEffect effect) =>
+        effect.ResponseExchangeMode != ProgramResponseExchangeMode.ClaimResponseOnly &&
+        !ResponseExchangeUpgraded(owner, skill, instance, effect.StateId!);
+
     internal CardActionContext? ActualRespondedAction(CardActionContext response)
     {
         if (response.Type != CardActionType.Response)
@@ -51,7 +118,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var original = ActualRespondedAction(response);
         if (original is null || original.ActorSeat != owner || response.ActorSeat == owner || original.Type != CardActionType.Use && original.EffectiveKind != CardKind.Nullification || response.PhysicalCards.Count == 0 || response.ConversionChain.Any(_coreWushuangJinzhiOperations.IsWushuangJinzhiSource) || response.PhysicalCards.Any(c => IsExchangedCardClaim(response.ActionId, c.CardId) || _cardZonesOperations._cardZones.GetLocation(c.CardId).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile)))
             return false;
-        if (effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || ResponseExchangeUpgraded(owner, skill, instance, effect.StateId!))
+        if (!DeliversOriginalResponseExchangeCard(owner, skill, instance, effect))
             return true;
         return _coreMatchParticipantsPlayersAccess._players[response.ActorSeat].IsAlive && !original.ConversionChain.Any(_coreWushuangJinzhiOperations.IsWushuangJinzhiSource) && original.PhysicalCards.Count > 0 && original.PhysicalCards.All(c => !IsExchangedCardClaim(original.ActionId, c.CardId) && _cardZonesOperations._cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
     }
@@ -63,7 +130,11 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         if (effect is null)
             return true;
         var response = ResponseExchangeHistory().OfType<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.ActionId == context.CardUse?.CardActionId);
-        return response is not null && CanExchangeResponseEntities(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect, response);
+        if (response is null || !CanExchangeResponseEntities(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect, response))
+            return false;
+        return !DeliversOriginalResponseExchangeCard(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect) ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(frame => frame.Id == context.ParentFrameId) is { } window &&
+                CurrentAcceptedResponseEntries(window).Count == response.PhysicalCards.Count;
     }
 
     internal SkillProgramStepOutcome BeginResponseEntityExchange(ProgramSkillFrame frame, SkillProgramEffect effect)
@@ -73,8 +144,18 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var original = ActualRespondedAction(response);
         if (original is null || !CanExchangeResponseEntities(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect, response))
             return SkillProgramStepOutcome.Continue;
-        var originals = effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || ResponseExchangeUpgraded(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect.StateId!) || original.ConversionChain.Any(_coreWushuangJinzhiOperations.IsWushuangJinzhiSource) ? [] : original.PhysicalCards.Select(c => c.CardId).ToArray();
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ResponseEntityExchange = new(original.ActionId, response.ActionId, response.ActorSeat, originals, response.PhysicalCards.Select(c => c.CardId).ToArray(), effect.StateId!, 1) });
+        var originals = DeliversOriginalResponseExchangeCard(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect)
+            ? original.PhysicalCards.Select(c => c.CardId).ToArray() : [];
+        var entries = originals.Length == 0 ? null : CurrentAcceptedResponseEntries(window);
+        if (entries is not null && entries.Count != response.PhysicalCards.Count)
+            return SkillProgramStepOutcome.Continue;
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with
+        {
+            ResponseEntityExchange = new(original.ActionId, response.ActionId, response.ActorSeat, originals, response.PhysicalCards.Select(c => c.CardId).ToArray(), effect.StateId!, 1)
+            {
+                ResponseEntries = entries
+            }
+        });
         ClaimResponseEntities(frame, original.ActionId, response.ActorSeat, originals, true);
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
@@ -175,7 +256,13 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ResponseEntityExchange = exchange with { Stage = 2 } });
                 if (_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
-                    ClaimResponseEntities(frame, exchange.ResponseActionId, frame.OwnerSeat, exchange.ResponseCardIds.Where(cardId => !IsExchangedCardClaim(exchange.ResponseActionId, cardId) && _cardZonesOperations._cardZones.GetLocation(cardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile).ToArray(), false);
+                {
+                    var current = exchange.OriginalCardIds.Count == 0
+                        ? exchange.ResponseCardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile)
+                        : (exchange.ResponseEntries ?? []).Where(IsCurrentResponseEntry).Select(entry => entry.CardId);
+                    ClaimResponseEntities(frame, exchange.ResponseActionId, frame.OwnerSeat,
+                        current.Where(id => !IsExchangedCardClaim(exchange.ResponseActionId, id)).ToArray(), false);
+                }
                 if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
                     _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
             }

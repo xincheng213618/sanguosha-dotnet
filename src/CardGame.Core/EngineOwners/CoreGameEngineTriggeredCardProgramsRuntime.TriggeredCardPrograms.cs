@@ -3,12 +3,21 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
 {
+    private bool IsCurrentDiscardEntry(CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile &&
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence;
+
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 916, SkillProgramEffectOp.UseDiscardedCardAsDelayedTrick)]
+    private bool CanOfferDiscardedCardAsDelayedTrick(ProgramTriggerLegalityContext context) =>
+        context.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } &&
+        (uint)index < (uint)batch.Movements.Count && IsCurrentDiscardEntry(batch.Movements[index]);
+
     internal bool IsProgramDiscardedDelayedTrickTarget(int ownerSeat, CharacterState target, ProgramSkillWindowContext? context)
     {
         if (context is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !target.IsAlive || target.Seat == ownerSeat || target.JudgmentAreaAbolished || _coreActualTurnsOperations.HasJudgmentEffectiveCard(target, CardKind.SupplyShortage) || _coreCardUseModulesOperations.IsCardUseForbidden(ownerSeat, CardKind.SupplyShortage, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(ownerSeat, target.Seat, CardKind.SupplyShortage))
             return false;
         var movement = batch.Movements[index];
-        if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat != ownerSeat || _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
+        if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat != ownerSeat || !IsCurrentDiscardEntry(movement))
             return false;
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
         return card.Suit is Suit.Spade or Suit.Club && ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.SupplyShortage, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], card)));
@@ -62,7 +71,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         var movement = batch.Movements[index];
         if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat != active.OwnerSeat || movement.To != CardLocation.DiscardPile || movement.From == movement.To)
             throw new InvalidOperationException("A discarded-card conversion requires the owner's actual discarded card.");
-        if (_cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
+        if (!IsCurrentDiscardEntry(movement) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
         if (CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit) || card.Suit == Suit.None || !ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []))

@@ -140,10 +140,30 @@ internal sealed partial class CoreNativeDodgeRuntime
         CompleteSuccessfulDodgeResponse(attack);
     }
 
+    internal static bool RecordsNativeDodgeSettlement(ContentRegistry registry, CardUseFrame? use, CardActionContext action, ProgramCardContinuation continuation) =>
+        continuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge &&
+        action is { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge, PhysicalCards.Count: > 0 } &&
+        use?.Action is { Type: CardActionType.Use } original && CoreNativeCardClassificationsRuntime.IsSlashCard(original.EffectiveKind) &&
+        action.ParentActionId == original.ActionId && registry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferCompletedCardGift);
+
     internal void ContinueAcceptedCardResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         var processing = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing);
-        var responseCosts = _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuAcceptedResponse(action) ? [] : action.PhysicalCards;
+        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
+        var entries = RecordsNativeDodgeSettlement(_contentRegistryOperations._contentRegistry, use, action, continuation)
+            ? new List<NativeDodgeDiscardEntry>() : null;
+        void RecordDiscard(CardMovementRecord move)
+        {
+            if (move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile)
+                entries!.Add(new(move.CardId, move.Sequence));
+        }
+
+        var finishedBatch = _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuAcceptedResponse(action);
+        if (finishedBatch && entries is not null &&
+            action.PhysicalCards.All(cost => _cardZonesOperations._cardZones.GetLocation(cost.CardId) == CardLocation.DiscardPile))
+            foreach (var movement in _coreResponseCompletionOperations.CaptureResponseCompletionCosts(action, continuation, attack.ResolutionId))
+                RecordDiscard(movement);
+        var responseCosts = finishedBatch ? [] : action.PhysicalCards;
         foreach (var cost in responseCosts)
         {
             if (_characterGuanHaiOlOperations.TryGetXieweiResponseCostMovement(action, cost.CardId, out _))
@@ -157,6 +177,9 @@ internal sealed partial class CoreNativeDodgeRuntime
             {
                 if (processing.Any(card => card.Id == cost.CardId))
                     throw new InvalidOperationException("An alternative response cost must not remain in Processing.");
+                if (entries is not null && _coreWushuangJinzhiOperations.TryGetWushuangJinzhiResponseMovements(action, cost.CardId, out var paid))
+                    foreach (var movement in paid)
+                        RecordDiscard(movement);
                 continue;
             }
 
@@ -165,7 +188,17 @@ internal sealed partial class CoreNativeDodgeRuntime
             if (_coreGuanduChariotResponsesOperations.GuanduChariotResponsePayment(action, attack.ResolutionId, cost, continuation)is not null)
                 continue;
             var card = processing.Single(item => item.Id == cost.CardId);
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.ResponseFinished);
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.ResponseFinished,
+                beforeFact: entries is null ? null : RecordDiscard);
+        }
+
+        if (entries is { Count: > 0 })
+        {
+            var settlement = new NativeDodgeResponseSettlement(action, Array.AsReadOnly(entries.ToArray()));
+            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId, original => original with
+            {
+                NativeDodgeResponses = Array.AsReadOnly((original.NativeDodgeResponses ?? []).Append(settlement).ToArray())
+            });
         }
 
         if (_coreResponseCompletionOperations.TryBeginCardResponseCompleted(attack, action, continuation))

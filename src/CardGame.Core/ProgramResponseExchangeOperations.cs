@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CardGame.Core;
 public enum ProgramResponseExchangeMode { ClaimResponseOnly = 0 }
 public enum ProgramPublicSuitDiscardMode { ChooseSuitCappedCurrentCountRetain = 0 }
@@ -61,7 +63,20 @@ public sealed class DrawPublicSuitThenEscalatingDiscardHandler : ISkillProgramEf
     public SkillProgramEffectOp Op => SkillProgramEffectOp.DrawPublicSuitThenEscalatingDiscard;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect,ProgramSkillFrame frame,int targetSeat,ISkillProgramEffectHost host)=>host.GetCapability<IResponseExchangeProgramHost>().DrawPublicSuitThenEscalatingDiscard(frame,effect);
 }
-public sealed record ProgramResponseEntityExchangeDraft(long RespondedActionId,long ResponseActionId,int RecipientSeat,IReadOnlyList<int> OriginalCardIds,IReadOnlyList<int> ResponseCardIds,string StateId,int Stage=0);
+internal sealed record ResponseExchangeMaterialEntry(int CardId, CardLocation Location, int EntrySequence);
+internal sealed record ResponseExchangeAcceptedMaterials(long ActionId, IReadOnlyList<ResponseExchangeMaterialEntry> Entries);
+
+public abstract partial record ResolutionFrame
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal ResponseExchangeAcceptedMaterials? ResponseExchangeAcceptedMaterials { get; init; }
+}
+
+public sealed record ProgramResponseEntityExchangeDraft(long RespondedActionId,long ResponseActionId,int RecipientSeat,IReadOnlyList<int> OriginalCardIds,IReadOnlyList<int> ResponseCardIds,string StateId,int Stage=0)
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal IReadOnlyList<ResponseExchangeMaterialEntry>? ResponseEntries { get; init; }
+}
 public sealed record ProgramPublicSuitDiscardDraft(int TargetSeat,int Required,string StateId,string UpgradeSkillId,int Stage=0,IReadOnlyList<int>? SelectedIds=null,bool Exhausted=false)
 {
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] public Suit? ChosenSuit { get; init; }

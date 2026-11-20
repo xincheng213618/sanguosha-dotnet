@@ -50,6 +50,8 @@ dependency direction in the rest of native card-use scheduling.
 
 - Discard and judgment provenance claims use the original movement entry at collection, candidate admission and execution. Reentering the discard pile gives the physical card a new entry and ends the previous opportunity.
 
+- A delayed-trick conversion from discarded material checks the original discard entry at admission, target selection and native issuance. Once issued, the resulting use owns the material and resolves placement through the ordinary delayed-trick continuation.
+
 - `claimMovedCards` with `discardPileReceived`, `movementDiscardOnly` and `perBatch` claims the matching entries of the original discard batch in one physical movement. Selection retains the original batch window, and execution rechecks each original entry at the discard pile after earlier effects such as HP payment.
 
 - True-discard batch claims can use a completed logical discard receipt with the same card, physical destination and movement sequence when the physical reason classifier has no source. Synchronous movement capture uses the facts already available at that point. The claim window can read the completed receipt after the native producer returns.
