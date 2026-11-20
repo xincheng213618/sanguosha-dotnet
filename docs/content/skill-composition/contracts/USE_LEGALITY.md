@@ -43,6 +43,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreNativePromptBoundaryRuntime.CreateResponseChoices` publishes the original required card kind after checking each eligible response material. Retain the chosen identity or view-as source and its private parameters on the choice. Command admission and payment recheck the current material and its exact selected source.
 
+- Native armor qualification reads effective physical cards from the field equipment owner. An individual armor query still applies its original response and virtual armor conditions. A requirement for an empty armor slot reads actual equipment occupancy. The departure effect for Silver Lion qualifies the original departing entity and its owner on the movement path.
+
 - The native physical Peach rescue uses the same live response legality for its published options and submitted payment. A category restriction reads the actual responder and the effective Peach identity. An issued directed restriction checks that responder against the original dying recipient before the rescue offers materials.
 
 - Faction-supplied Slash target eligibility uses `IProvidedSlashPaymentTargets`; do not gate actual-material validation on a character or distance/color privilege. Candidate conversion and final-kind issuance query the same actual materials separately.
