@@ -50,7 +50,8 @@ internal enum ProgramPipelinePhase
     CaptureMovementBatchFacts,
     CompleteMovementBatch,
     HandCardProjection,
-    AppendNumericRuleContributions
+    AppendNumericRuleContributions,
+    ReturnBaguaResponse
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -172,6 +173,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(ProgramLifecycleTriggerWindowFrame)], typeof(bool)),
             [ProgramPipelinePhase.BeforeNullificationFinished] = (typeof(Func<NullificationWindowFrame, bool>),
                 [typeof(NullificationWindowFrame)], typeof(bool)),
+            [ProgramPipelinePhase.ReturnBaguaResponse] = (typeof(Func<NativeOwners.CardAttackHandle, bool, bool>),
+                [typeof(NativeOwners.CardAttackHandle), typeof(bool)], typeof(bool)),
             [ProgramPipelinePhase.AppendTurnEndingItems] = (typeof(Action<List<TurnEndingBoundaryItem>>),
                 [typeof(List<TurnEndingBoundaryItem>)], typeof(void)),
             [ProgramPipelinePhase.AppendNumericRuleContributions] = (typeof(Action<int, SkillRuleQuery, List<RuleQueryContribution>>),
@@ -286,6 +289,7 @@ internal sealed class ProgramPipelineHooks
     private readonly Func<ProgramActualPhaseSkipContext, bool>[] _actualPhaseSkipped;
     private readonly Func<ProgramLifecycleTriggerWindowFrame, bool>[] _lifecycleWindowCompleted;
     private readonly Func<NullificationWindowFrame, bool>[] _beforeNullificationFinished;
+    private readonly Func<NativeOwners.CardAttackHandle, bool, bool>[] _returnBaguaResponse;
     private readonly Action<List<TurnEndingBoundaryItem>>[] _appendTurnEndingItems;
     private readonly Action<int, SkillRuleQuery, List<RuleQueryContribution>>[] _appendNumericRuleContributions;
     private readonly Func<bool>[] _resumeScheduledPhase,_cancelScheduledPhase;
@@ -334,6 +338,7 @@ internal sealed class ProgramPipelineHooks
         _actualPhaseSkipped = Bind<Func<ProgramActualPhaseSkipContext, bool>>(ProgramPipelinePhase.ActualPhaseSkipped);
         _lifecycleWindowCompleted = Bind<Func<ProgramLifecycleTriggerWindowFrame, bool>>(ProgramPipelinePhase.LifecycleWindowCompleted);
         _beforeNullificationFinished = Bind<Func<NullificationWindowFrame, bool>>(ProgramPipelinePhase.BeforeNullificationFinished);
+        _returnBaguaResponse = Bind<Func<NativeOwners.CardAttackHandle, bool, bool>>(ProgramPipelinePhase.ReturnBaguaResponse);
         _appendTurnEndingItems = Bind<Action<List<TurnEndingBoundaryItem>>>(ProgramPipelinePhase.AppendTurnEndingItems);
         _appendNumericRuleContributions = Bind<Action<int, SkillRuleQuery, List<RuleQueryContribution>>>(ProgramPipelinePhase.AppendNumericRuleContributions);
         _resumeScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.ResumeScheduledPhase);
@@ -567,6 +572,13 @@ internal sealed class ProgramPipelineHooks
     internal bool BeforeNullificationFinished(NullificationWindowFrame frame)
     {
         foreach (var hook in _beforeNullificationFinished) if (hook(frame)) return true;
+        return false;
+    }
+
+    internal bool TryReturnBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
+    {
+        foreach (var hook in _returnBaguaResponse)
+            if (hook(attack, succeeded)) return true;
         return false;
     }
 

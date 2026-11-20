@@ -226,8 +226,11 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         PayQizhengSingleResponse(use.Id, responder, physical, kind);
     }
 
-    internal void CompleteQizhengBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
+    [ProgramPipelineHook(ProgramPipelinePhase.ReturnBaguaResponse, 10)]
+    internal bool TryReturnQizhengBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
     {
+        if (attack.EffectiveCardKind != CardKind.QizhengXiangsheng)
+            return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not CardUseFrame
             { Qizheng: { Stage: QizhengStage.BaguaJudgment, BaguaAttempted: true, ResponseKind: null } r } use ||
             use.Id != attack.ResolutionId || r.Target != attack.TargetSeat || use.SourceSeat != attack.SourceSeat)
@@ -238,13 +241,13 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         if (!responder.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
             FinishQizhengWithoutDamage(use);
-            return;
+            return true;
         }
 
         if (!succeeded)
         {
             PublishQizheng(use with { Qizheng = r with { Stage = QizhengStage.Response } });
-            return;
+            return true;
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(use with
@@ -254,6 +257,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengResponsePaidEvent(use.Id, r.NullificationId, CardKind.Dodge));
         if (!_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, responder, responder, null, use.SourceSeat, CardKind.Dodge, [], ProgramCardContinuation.QizhengResponse))
             ResolveQizhengAfterResponse(use.Id);
+        return true;
     }
 
     internal void PayQizhengSingleResponse(long id, CharacterState responder, Card card, CardKind kind)

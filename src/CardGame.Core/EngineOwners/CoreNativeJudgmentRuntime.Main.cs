@@ -24,11 +24,8 @@ internal sealed partial class CoreNativeJudgmentRuntime
     internal void CompleteBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
     {
         succeeded &= _characterHuangZuMobileShiOperations.ShiHzResponseColorAllowed(attack.TargetSeat, effectiveIsRed: null);
-        if (attack.EffectiveCardKind == CardKind.QizhengXiangsheng)
-        {
-            _characterXunYuMobileGodOperations.Value.CompleteQizhengBaguaResponse(attack, succeeded);
+        if (_programPipelineHooksOperations._programPipelineHooks.TryReturnBaguaResponse(attack, succeeded))
             return;
-        }
 
         if (!succeeded)
         {
