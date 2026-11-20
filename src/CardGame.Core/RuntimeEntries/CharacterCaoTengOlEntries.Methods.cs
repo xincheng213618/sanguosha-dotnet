@@ -12,7 +12,6 @@ internal sealed partial class CharacterCaoTengOlEntries
     internal bool CaoTengFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().CaoTengFirstChild(f, child);
     internal ProgramSkillFrame? CaoTengObserverRoot() => _resolve().CaoTengObserverRoot();
     internal bool CaoTengParentMatches(ProgramSkillFrame f) => _resolve().CaoTengParentMatches(f);
-    internal int CaoTengYongzuHandLimitBonus(int seat) => _resolve().CaoTengYongzuHandLimitBonus(seat);
     internal PromptChoice ChooseCaoTengAi(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseCaoTengAi(p, f);
     internal void ContinueCaoTeng(long id) => _resolve().ContinueCaoTeng(id);
     internal bool ContinuePaidCaoTeng(ProgramSkillFrame f) => _resolve().ContinuePaidCaoTeng(f);

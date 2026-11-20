@@ -37,5 +37,14 @@ internal sealed partial class CharacterCaoTengOlRuntime
         }
     }
 
-    internal int CaoTengYongzuHandLimitBonus(int seat) => HasCaoTengCapability ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengHandLimitGrantedEvent>().Count(e => e.RecipientSeat == seat) : 0;
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 130)]
+    internal void AddYongzuHandLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.HandLimit || !HasCaoTengCapability)
+            return;
+
+        var grantedCount = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengHandLimitGrantedEvent>()
+            .Count(grant => grant.RecipientSeat == seat);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:cao-teng:yongzu:hand-limit", grantedCount);
+    }
 }
