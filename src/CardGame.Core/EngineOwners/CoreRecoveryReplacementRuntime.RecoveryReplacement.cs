@@ -301,7 +301,16 @@ internal sealed partial class CoreRecoveryReplacementRuntime
         var bonus = _coreRecoveryAmountBonusesOperations.Value.PrepareOwnRecoveryAmountBonus(application);
         var requested = bonus?.ModifiedRequestedAmount ?? application.RequestedAmount;
         var amount = recipient.IsAlive && recipient.HasHpValue && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? Math.Min(requested, Math.Max(0, recipient.MaxHp - recipient.Hp)) : 0;
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { CandidateIndex = candidateIndex, Stage = RecoveryReplacementStage.RecoveryApplied, OriginalRecovered = candidate is null ? amount : 0, PendingApplication = null, AmountBonus = bonus, Step = ResolutionFrameStep.ResolvingEffect });
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with
+        {
+            CandidateIndex = candidateIndex,
+            Stage = RecoveryReplacementStage.RecoveryApplied,
+            OriginalRecovered = candidate is null ? amount : 0,
+            RedirectedRecovered = candidate is null ? 0 : amount,
+            PendingApplication = null,
+            AmountBonus = bonus,
+            Step = ResolutionFrameStep.ResolvingEffect
+        });
         if (candidate is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RecoveryReplacementChosenEvent(frame.Id, attempt.TargetSeat, candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, candidate.PolicyId, attempt.Amount, candidate.RecoveryAmount));
         if (amount > 0)
@@ -375,6 +384,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
 
     internal void ResumeRecoveryReplacementProducer(RecoveryReplacementFrame completed)
     {
+        _coreProgramRecoveryReceiptsOperations.ReturnOperationRecovery(completed);
         if (_coreResponseCompletionHealthOperations.Value.ReturnCardResponseCompletionRecovery(completed))
             return;
         if (_coreCardSupplyCompletionOperations.ReturnCardSupplyCompletionRecovery(completed))

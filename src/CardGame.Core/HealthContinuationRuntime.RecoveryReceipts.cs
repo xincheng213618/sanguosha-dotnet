@@ -26,6 +26,7 @@ internal sealed partial class HealthContinuationRuntime
         }
         frames.Replace(current.Id, current with
         {
+            OperationRecovery = BindOperationRecovery(current, attempt.Id, attempt.SourceSeat, attempt.TargetSeat, attempt.Amount),
             PendingRecoveryAttempts = Array.AsReadOnly(requests.Select(request => request.Id == issued.Id
                 ? request with { ProgramOrigin = origin } : request).ToArray())
         });
@@ -76,9 +77,52 @@ internal sealed partial class HealthContinuationRuntime
                 throw new InvalidOperationException("A program recovery cannot replace its actual health application.");
             return;
         }
+        var operation = BindOperationRecovery(owner, recovery.Id, recovery.SourceSeat, recovery.TargetSeat, recovery.Amount);
         frames.Replace(owner.Id, owner with
-        { RecoveryApplications = Array.AsReadOnly((owner.RecoveryApplications ?? []).Append(receipt).ToArray()) });
+        {
+            RecoveryApplications = Array.AsReadOnly((owner.RecoveryApplications ?? []).Append(receipt).ToArray()),
+            OperationRecovery = operation is null ? null : operation with { Result = new(change.Amount) }
+        });
         events.AdvanceFact(new ProgramRecoveryAppliedEvent(owner.Id, receipt));
+    }
+
+    private static ProgramOperationRecovery? BindOperationRecovery(ProgramSkillFrame owner, long nativeFrameId,
+        int sourceSeat, int targetSeat, int nativeAmount)
+    {
+        if (owner.OperationRecovery is not { } operation) return null;
+        if (!operation.BelongsTo(owner) || operation.Result is not null ||
+            operation.SourceSeat != sourceSeat || operation.TargetSeat != targetSeat ||
+            nativeAmount <= 0 || nativeAmount > operation.RequestedAmount ||
+            operation.NativeFrameId is { } existing && existing != nativeFrameId)
+            throw new InvalidOperationException("An operation recovery cannot bind an unrelated native request.");
+        return operation with { NativeFrameId = nativeFrameId };
+    }
+
+    internal void FinishSynchronousOperationRecovery(long ownerId)
+    {
+        if (frames.Top is not ProgramSkillFrame { OperationRecovery: { } operation } owner || owner.Id != ownerId ||
+            !operation.BelongsTo(owner))
+            throw new InvalidOperationException("The operation recovery lost its original program.");
+        if (operation.NativeFrameId is not null) return;
+        if (operation.Result is not null)
+            throw new InvalidOperationException("The operation recovery has already returned without a native child.");
+        frames.ReplaceTop(owner with { OperationRecovery = operation with { Result = new(0) } });
+    }
+
+    internal void ReturnOperationRecovery(RecoveryReplacementFrame completed)
+    {
+        if (completed.Attempt.Completion.Producer != RecoveryAttemptProducer.Program ||
+            frames.Find(completed.ParentFrameId) is not ProgramSkillFrame { OperationRecovery: { } operation } owner)
+            return;
+        if (frames.Top != owner || completed.Stage != RecoveryReplacementStage.RewardApplied ||
+            operation.NativeFrameId != completed.Id || operation.Result is not null || !operation.BelongsTo(owner) ||
+            !ProgramRecoveryReplacementReceiptMatches(owner, completed))
+            throw new InvalidOperationException("The operation recovery lost its exact native return.");
+        var redirectedSeat = completed.CandidateIndex is { } index ? completed.Attempt.Candidates[index].OwnerSeat : (int?)null;
+        frames.ReplaceTop(owner with
+        {
+            OperationRecovery = operation with { Result = new(completed.OriginalRecovered, redirectedSeat, completed.RedirectedRecovered) }
+        });
     }
 
     internal bool ProgramRecoveryReceiptMatches(ProgramSkillFrame owner, HpChangedTriggerWindowFrame hp)

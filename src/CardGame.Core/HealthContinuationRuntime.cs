@@ -411,10 +411,13 @@ internal sealed partial class HealthContinuationRuntime
     internal bool TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery) =>
         recovery.Id == recovery.Attempt.Id && Enum.IsDefined(recovery.Stage) &&
         recovery.OriginalRecovered >= 0 && recovery.OriginalRecovered <= protocols.SupportedRecoveryAmount(recovery, recovery.Attempt.Amount) &&
+        recovery.RedirectedRecovered >= 0 &&
         (recovery.CandidateIndex is not { } index
-            ? recovery.Stage != RecoveryReplacementStage.Choosing || recovery.OriginalRecovered == 0
+            ? recovery.RedirectedRecovered == 0 && (recovery.Stage != RecoveryReplacementStage.Choosing || recovery.OriginalRecovered == 0)
             : recovery.Stage != RecoveryReplacementStage.Choosing && index >= 0 && index < recovery.Attempt.Candidates.Count &&
-              recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery));
+              recovery.OriginalRecovered == 0 &&
+              recovery.RedirectedRecovered <= protocols.SupportedRecoveryAmount(recovery, recovery.Attempt.Candidates[index].RecoveryAmount) &&
+              TypedRecoveryChosenCandidateMatches(recovery));
 
     internal static bool IsRecoveryCursorPrimitive(ProgramSkillInstruction? instruction) =>
         RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsRecoveryCursorPrimitive(instruction);

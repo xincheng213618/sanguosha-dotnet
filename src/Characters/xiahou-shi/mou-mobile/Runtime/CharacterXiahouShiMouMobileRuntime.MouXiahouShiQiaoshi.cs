@@ -46,8 +46,14 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        var baseRecovery = branch == "recover-and-draw" && owner.IsAlive && owner.HasHpValue ? Math.Max(0, Math.Min(r.DamageAmount, owner.MaxHp - owner.Hp)) : 0;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXiahouShiQiaoshi = r with { Branch = branch, Stage = MouXiahouShiQiaoshiStage.RecoveryChildren, RequestedRecovery = branch == "recover-and-draw" ? r.DamageAmount : 0, BaseRecovery = baseRecovery, RecoveryHpBefore = owner.HasHpValue ? owner.Hp : 0 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            MouXiahouShiQiaoshi = r with { Branch = branch, Stage = MouXiahouShiQiaoshiStage.RecoveryChildren },
+            OperationRecovery = branch == "recover-and-draw"
+                ? new(new(f.Id, f.InstructionIndex, f.GameplayHash), r.DamageSourceSeat, f.OwnerSeat, r.DamageAmount)
+                : null,
+            PendingMovementContinuation = new(f.OwnerSeat, 0, null)
+        });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouShiQiaoshiBranchAcceptedEvent(f.Id, r.Source, r.Turn, r.DamageSourceSeat, branch));
         if (branch == "decline")
         {
@@ -55,11 +61,11 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
             return;
         }
 
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouShiQiaoshiRecoveryIssuedEvent(f.Id, r.DamageSourceSeat, f.OwnerSeat, r.DamageAmount, r.DamageAmount, owner.HasHpValue ? owner.Hp : 0, baseRecovery));
         // The native host preserves recovery replacement and real HP invoices. Its
         // source is the original damage source, independently of the skill owner.
         if (owner.IsAlive)
             _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, r.DamageSourceSeat, f.OwnerSeat, r.DamageAmount, null, null);
+        _coreProgramRecoveryReceiptsOperations.FinishSynchronousOperationRecovery(f.Id);
         SealMouXiahouShiMovements(f.Id, r.Before);
         ContinueMouXiahouShi(f.Id);
     }

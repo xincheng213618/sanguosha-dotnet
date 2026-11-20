@@ -3,6 +3,8 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramRecoveryReceiptsEntries
 {
     internal void ClearProgramRecoveryApplication(HpChangeContext change) => _resolve().ClearProgramRecoveryApplication(change);
+    internal void FinishSynchronousOperationRecovery(long ownerId) => _resolve().FinishSynchronousOperationRecovery(ownerId);
+    internal void ReturnOperationRecovery(RecoveryReplacementFrame completed) => _resolve().ReturnOperationRecovery(completed);
     internal bool ProgramRecoveryReceiptMatches(ProgramSkillFrame owner, HpChangedTriggerWindowFrame hp) => _resolve().ProgramRecoveryReceiptMatches(owner, hp);
     internal bool ProgramRecoveryReplacementReceiptMatches(ProgramSkillFrame owner, RecoveryReplacementFrame recovery) => _resolve().ProgramRecoveryReplacementReceiptMatches(owner, recovery);
     internal void RecordProgramRecoveryApplication(RecoveryFrame recovery, HpChangeContext change) => _resolve().RecordProgramRecoveryApplication(recovery, change);

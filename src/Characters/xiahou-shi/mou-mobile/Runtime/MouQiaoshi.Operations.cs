@@ -7,10 +7,6 @@ public sealed record MouXiahouShiQiaoshiReceipt(CardConversionSource Source, str
 {
     public MouXiahouShiQiaoshiStage Stage { get; init; }
     public string? Branch { get; init; }
-    public int RequestedRecovery { get; init; }
-    public int BaseRecovery { get; init; }
-    public int RecoveryHpBefore { get; init; }
-    public bool RecoveryReturned { get; init; }
     public NativeDrawOutcome? Draw { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
@@ -20,10 +16,13 @@ public sealed record MouXiahouShiQiaoshiStartedEvent(long FrameId, CardConversio
     int DamageSourceSeat, int DamageAmount) : IGameEvent;
 public sealed record MouXiahouShiQiaoshiBranchAcceptedEvent(long FrameId, CardConversionSource Source,
     MouXiahouShiTurnKey Turn, int DamageSourceSeat, string Branch) : IGameEvent;
-public sealed record MouXiahouShiQiaoshiRecoveryIssuedEvent(long FrameId, int SourceSeat, int TargetSeat,
-    int DamageAmount, int RequestedRecovery, int HpBefore, int BaseRecovery) : IGameEvent;
 public sealed record MouXiahouShiQiaoshiRecoveryReturnedEvent(long FrameId, int SourceSeat, int TargetSeat,
-    int RequestedRecovery) : IGameEvent;
+    int RequestedRecovery) : IGameEvent
+{
+    public int OriginalRecovered { get; init; }
+    public int? RedirectedSeat { get; init; }
+    public int RedirectedRecovered { get; init; }
+}
 internal sealed class ResolveMouXiahouShiQiaoshiDescriptor : MouXiahouShiDescriptor
 {
     public override ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.Trigger;
