@@ -29,7 +29,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
         if (f.HuZhaoMidu is not { } r || !ValidHuZhaoMidu(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == HuZhaoMiduStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Recipient && draw.Context.RequestedCount == HuZhaoCount(r.SelectedMask);
+            return r.Stage == HuZhaoMiduStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Recipient, HuZhaoCount(r.SelectedMask));
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is not null && moved.ResumeProgramFrameId == f.Id && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason == CardMoveReasons.Reshuffle || r.Stage == HuZhaoMiduStage.DrawChildren && m.Reason.Value == HuZhaoDrawReason && m.From == CardLocation.DrawPile || r.Stage == HuZhaoMiduStage.CostChildren && (m.Reason.Value == "equipment.slot-abolished" && m.From == CardLocation.Equipment(f.OwnerSeat) || m.Reason.Value == HuZhaoJudgmentReason && m.From == CardLocation.Judgment(f.OwnerSeat))));
         if (child is RecoveryReplacementFrame recovery)

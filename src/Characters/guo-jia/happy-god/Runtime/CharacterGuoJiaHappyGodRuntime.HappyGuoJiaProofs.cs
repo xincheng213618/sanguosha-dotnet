@@ -43,7 +43,8 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
         if (child is CardUseFrame use)
             return use.VirtualOrdinaryTrickOrigin?.ParentProgramFrameId == f.Id && IsHappyGuoJiaVirtualUse(use);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == HappyGuoJiaStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Target && draw.Context.RequestedCount == 4;
+            return r.Stage == HappyGuoJiaStage.Drawing &&
+                CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, 4);
         if (child is HpChangedTriggerWindowFrame hp)
             return f.PendingMovementContinuation is not null && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.MaximumHp && hp.Change.TargetSeat == (r.Operation == SkillProgramEffectOp.ResolveHappyGuoJiaZuoxing ? r.Benefactor : f.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Any(e => e.FrameId == f.Id && e.Seat == hp.Change.TargetSeat && Math.Abs(e.After - e.Before) == hp.Change.Amount);
         if (child is DeathFrame death)
