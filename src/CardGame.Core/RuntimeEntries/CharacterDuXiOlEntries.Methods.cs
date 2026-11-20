@@ -15,7 +15,6 @@ internal sealed partial class CharacterDuXiOlEntries
     internal IEnumerable<CardMovementRecord> DuXiBixiongMovements(CardMovementBatchContext batch, int owner) => _resolve().DuXiBixiongMovements(batch, owner);
     internal IReadOnlyList<PromptChoice> DuXiChoices(ProgramSkillFrame f) => _resolve().DuXiChoices(f);
     internal DuXiQuxiMarkerMovedEvent[] DuXiCurrentMarkers() => _resolve().DuXiCurrentMarkers();
-    internal int DuXiDrawAdjustment(CharacterState player) => _resolve().DuXiDrawAdjustment(player);
     internal bool DuXiFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().DuXiFirstChild(f, child);
     internal bool DuXiHasPair(int owner) => _resolve().DuXiHasPair(owner);
     internal int? DuXiHolder(CardConversionSource source, PlayerMarkerKind marker) => _resolve().DuXiHolder(source, marker);

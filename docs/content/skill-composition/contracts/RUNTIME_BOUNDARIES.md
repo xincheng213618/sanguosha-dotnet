@@ -39,6 +39,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Anniversary Hu Che Er's Fuzhong reads the effective skill holder's current Zhong count. At least one Zhong adds one card to the actual Draw count, and at least three Zhong add three to the hand limit checked in Discard. A fixed amount from a separate native draw producer uses its own amount.
 
+- OL Du Xi's Quxi contributes to the actual Draw count of each living marker holder. Each current Feng adds one and each current Qian subtracts one. Drawing leaves the issued marks in place for subsequent Draw phases and for their original transfer windows.
+
 - Accepted card-action and movement trigger continuations use `ProgramInvocations` on the original native window and candidate cursor. Acceptance-scoped rights begin only after the actual binding starts; preserve earlier source-frozen permissions as distinct declarations. Keep source-loss invocation rights separate from owner-death rights; never refresh accepted qualification from later use history or recreate character payment-proof ledgers.
 
 - Accepted materials are commitments on their original frame, separately from chosen inputs and physical payment results. Acceptance freezes eligibility; execution drops materials that left their frozen source without requalifying the promise. Declare source-loss continuation separately from owner-death draining, and never use draining to issue future effects.

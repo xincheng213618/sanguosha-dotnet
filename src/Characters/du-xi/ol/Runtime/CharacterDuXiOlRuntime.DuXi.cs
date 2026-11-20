@@ -242,7 +242,18 @@ internal sealed partial class CharacterDuXiOlRuntime
     internal bool ContinueIssuedDuXi(ProgramSkillFrame f) => f.DuXiQuxi is not null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveQuxiAtPlayEnding, SkillProgramEffectOp.TransferQuxiAtRoundOrDeath)]
     internal PromptChoice AiDuXi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "skip") ?? p.Choices.First();
-    internal int DuXiDrawAdjustment(CharacterState player) => !player.IsAlive ? 0 : DuXiCurrentMarkers().Where(e => e.Holder == player.Seat).Sum(e => e.Marker == PlayerMarkerKind.QuxiFeng ? 1 : -1);
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 110)]
+    internal void AddQuxiDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.DrawCount || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
+            return;
+
+        var adjustment = DuXiCurrentMarkers().Where(mark => mark.Holder == seat)
+            .Sum(mark => mark.Marker == PlayerMarkerKind.QuxiFeng ? 1 : -1);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{seat}:quxi:draw", adjustment);
+    }
+
     internal bool TrySkipDuXiDiscardPhase(CharacterState player)
     {
         var receipt = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiAcceptedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == player.Seat && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
