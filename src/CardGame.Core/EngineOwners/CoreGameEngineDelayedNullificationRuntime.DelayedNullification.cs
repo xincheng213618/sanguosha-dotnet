@@ -31,13 +31,24 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
             return _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not null;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
         var parent = index > 0 ? _resolutionStackOperations._resolutionStack[index - 1] : null;
-        return index >= 0 && (parent?.Id ?? 0) == delayed.ParentFrameId && parent?.Kind == delayed.ParentKind && parent?.Step == delayed.ParentStep && window.ParentFrameId == delayed.ParentFrameId && window.EffectCardId == delayed.CardId && window.EffectCardKind == delayed.EffectiveKind && CoreNativeCardClassificationsRuntime.IsDelayedCard(delayed.EffectiveKind) && window.SourceSeat == delayed.OwnerSeat && window.TargetSeats.SequenceEqual([delayed.OwnerSeat]) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber == delayed.TurnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == delayed.Phase && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == delayed.OwnerSeat && (delayed.OriginalUseLightning is not null ? _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed) : _coreShanheDelayedNullifiedTrickClaimsOperations.Value.HasShanheClaimedDelayedOwner(window, delayed) || _cardZonesOperations._cardZones.GetLocation(delayed.CardId) == CardLocation.Judgment(delayed.OwnerSeat) && _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(_coreNativeNullificationFramesOperations.GetNullificationEffectCard(window)) == delayed.EffectiveKind);
+        if (index < 0 || (parent?.Id ?? 0) != delayed.ParentFrameId || parent?.Kind != delayed.ParentKind ||
+            parent?.Step != delayed.ParentStep || window.ParentFrameId != delayed.ParentFrameId ||
+            window.EffectCardId != delayed.CardId || window.EffectCardKind != delayed.EffectiveKind ||
+            !CoreNativeCardClassificationsRuntime.IsDelayedCard(delayed.EffectiveKind) ||
+            window.SourceSeat != delayed.OwnerSeat || !window.TargetSeats.SequenceEqual([delayed.OwnerSeat]) ||
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber != delayed.TurnNumber ||
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != delayed.Phase ||
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != delayed.OwnerSeat)
+            return false;
+        if (delayed.OriginalUseLightning is not null)
+            return _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed);
+        return _coreShanheDelayedNullifiedTrickClaimsOperations.Value.HasShanheClaimedDelayedOwner(window, delayed) ||
+            FindHeldDelayedEffectCard(_coreMatchParticipantsPlayersAccess._players[delayed.OwnerSeat], delayed) is not null;
     }
 
     internal long? NullificationParentActionId(NullificationWindowFrame window) => window.DelayedReturn is null ? _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.Action?.ActionId : null;
     internal void CompleteDelayedNullification(NullificationWindowFrame window, DelayedEffectContinuation delayed)
     {
-        var parent = _resolutionStackOperations._resolutionStack.LastOrDefault();
         if (delayed.OriginalUseLightning is not null)
         {
             _coreOriginalUseLightningOperations.CompleteOriginalUseLightningNullification(delayed, window.EffectNullified, window.Id);
@@ -49,8 +60,7 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[delayed.OwnerSeat];
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive)
             return;
-        var card = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).SingleOrDefault(card => card.Id == delayed.CardId);
-        if (card is null || _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card) != delayed.EffectiveKind)
+        if (FindHeldDelayedEffectCard(owner, delayed) is not { } card)
             throw new InvalidOperationException("Delayed counterspell lost its held card identity.");
         if (window.EffectNullified)
         {
@@ -69,5 +79,11 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
         if (_coreCardEffectProgramsOperations.TryBeginDelayedCardEffectPrograms(owner, card, delayed.EffectiveKind))
             return;
         _coreCardEffectProgramsOperations.BeginActualDelayedJudgment(owner, card, delayed.EffectiveKind);
+    }
+
+    private Card? FindHeldDelayedEffectCard(CharacterState owner, DelayedEffectContinuation delayed)
+    {
+        var card = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).SingleOrDefault(card => card.Id == delayed.CardId);
+        return card is not null && _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card) == delayed.EffectiveKind ? card : null;
     }
 }

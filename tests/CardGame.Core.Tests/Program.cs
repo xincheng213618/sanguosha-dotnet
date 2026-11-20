@@ -897,6 +897,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Cao Xi Gangshu: finite Slash limit admits one additional payment cold", OlCaoXiGangshuDrawChecks.GangshuSlashLimitAdmitsOneMoreNativeSlashCold),
     ("Classic Wusheng: red equipment Play and Duel preserve original conversion cold", ClassicWushengResponseChecks.RedEquipmentKeepsItsClassicSourceInPlayAndDuelCold),
     ("OL Xingbu: two red skips the next actual discard cold", XingbuRevealChecks.TwoRedForecastSkipsTheNextDiscardWithoutAnActualPhaseEndCold),
+    ("Delayed Nullification: held Indulgence owns original counterspell payment cold", DelayedNullificationOwnerChecks.HeldIndulgenceOwnsItsNativeCounterspellPaymentCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
