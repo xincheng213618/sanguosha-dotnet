@@ -116,12 +116,8 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             var physicalLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (physicalLocation == CardLocation.Processing)
             {
-                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile,
-                    CardMoveReasons.UseFinished, beforeFact: movement =>
-                    {
-                        if (movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.UseFinished)
-                            (finished ??= []).Add(new(movement.CardId, movement.Sequence));
-                    });
+                if (_coreNativeCardUseCompletionOperations.DiscardFinishedUseMaterial(physicalCard) is { } entry)
+                    (finished ??= []).Add(entry);
             }
             else if (physicalLocation.Zone is not (CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile))
             {
@@ -129,9 +125,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             }
         }
 
-        if (finished is not null)
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId,
-                use => use with { NativeUseDiscardEntries = finished.AsReadOnly() });
+        _coreNativeCardUseCompletionOperations.StoreFinishedUseDiscards(attack.ResolutionId, finished);
 
         var completedAction = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).Action;
         _coreNativeCardUseCompletionOperations.QueueCardUseFinishedWithoutPop(attack.ResolutionId, attackCard, CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack));

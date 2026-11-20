@@ -63,8 +63,13 @@ internal sealed partial class CoreGameEngineSourceDingxiNativeRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         if (!SourceDingxiUseRidesOn(f, use) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceDingxiReturnedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Dingxi requires its once-completed exact original native card return.");
+        var discard = use.NativeUseDiscardEntries?.Where(entry => entry.CardId == o.CardId)
+            .Select(entry => (int?)entry.Sequence).SingleOrDefault();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SourceDingxiReturnedEvent(f.Id, use.Id, o.CardId));
-        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { SourceDingxi = f.SourceDingxi!with { Stage = SourceDingxiStage.Returned } });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with
+        {
+            SourceDingxi = f.SourceDingxi! with { Stage = SourceDingxiStage.Returned, NativeDiscardSequence = discard }
+        });
         if (use.CardAttack is not { Active: true })
             _coreSourceBeigongOperations.ContinueSourceBeigong(f.Id);
         return true;

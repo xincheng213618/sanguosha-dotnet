@@ -92,29 +92,49 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyPaymentsRuntime
         if (recast)
             f = _coreNativeRecastInvocationsOperations.BeginFrameNativeRecastInvocation(f, d.Identity.TargetSeat, cards.Select(c => c.Id).ToArray());
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SlashTargetPenaltyDraft = d with { Stage = SlashTargetPenaltyStage.CostChildren, Recast = recast, SequenceBefore = before, PaidCardIds = cards.Select(c => c.Id).ToArray(), PaidFrom = from }, PendingMovementContinuation = new(d.Identity.TargetSeat, 0, null) });
+        var paidSequences = new List<int>(cards.Count);
+        void RecordPayment(CardMovementRecord move) => paidSequences.Add(move.Sequence);
         if (recast)
-            _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Equipment(d.Identity.TargetSeat), CardLocation.DiscardPile, CardMoveReasons.RecastDiscard);
+            _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Equipment(d.Identity.TargetSeat), CardLocation.DiscardPile, CardMoveReasons.RecastDiscard, RecordPayment);
         else
-            _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, d.Identity.TargetSeat, cards[0], from[0], new(SlashTargetPenaltyCostReason(f, false)));
+            _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, d.Identity.TargetSeat, cards[0], from[0], new(SlashTargetPenaltyCostReason(f, false)), RecordPayment);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var after = SlashTargetPenaltySequence;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SlashTargetPenaltyDraft = f.SlashTargetPenaltyDraft!with { SequenceAfter = after } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SlashTargetPenaltyPaidEvent(f.Id, d.Identity.CardUseFrameId, d.Identity.ActorSeat, d.Identity.TargetSeat, recast, Array.AsReadOnly(cards.Select(c => c.Id).ToArray()), before, after));
+        var paid = f.SlashTargetPenaltyDraft! with { SequenceAfter = after, PaidMovementSequences = paidSequences };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SlashTargetPenaltyDraft = paid });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SlashTargetPenaltyPaidEvent(f.Id, d.Identity.CardUseFrameId, d.Identity.ActorSeat, d.Identity.TargetSeat, recast, paid.PaidCardIds, before, after));
         ContinueTargetPenaltyChildren(f);
     }
 
     internal bool ValidTargetPenaltyPayment(ProgramSkillFrame f)
     {
-        if (!_coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyProgramMatches(f) || f.InstructionIndex != 1 || f.SlashTargetPenaltyDraft is not { } d || d.Identity != f.WindowContext!.SlashTargetPenalty || d.Stage == SlashTargetPenaltyStage.Offered || d.PaidCardIds.Count == 0 || d.PaidCardIds.Count != d.PaidFrom.Count || d.PaidCardIds.Distinct().Count() != d.PaidCardIds.Count || !d.Recast && d.PaidCardIds.Count != 1 || d.SequenceAfter <= d.SequenceBefore)
+        if (!_coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyProgramMatches(f) || f.InstructionIndex != 1 ||
+            f.SlashTargetPenaltyDraft is not { } d || d.Identity != f.WindowContext!.SlashTargetPenalty || d.Stage == SlashTargetPenaltyStage.Offered ||
+            d.PaidCardIds.Count == 0 || d.PaidCardIds.Count != d.PaidFrom.Count || d.PaidCardIds.Count != d.PaidMovementSequences.Count ||
+            d.PaidCardIds.Distinct().Count() != d.PaidCardIds.Count || !d.Recast && d.PaidCardIds.Count != 1 || d.SequenceAfter <= d.SequenceBefore)
             return false;
-        var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter).ToArray();
+        var journal = _coreCardMovementJournalCardMovementsAccess._cardMovements;
+        if (d.SequenceBefore < 0 || d.SequenceAfter > journal.Count)
+            return false;
         var reason = SlashTargetPenaltyCostReason(f, d.Recast);
-        if (moves.Length != d.PaidCardIds.Count)
-            return false;
-        for (var i = 0; i < moves.Length; i++)
-            if (moves[i].CardId != d.PaidCardIds[i] || moves[i].From != d.PaidFrom[i] || moves[i].From.OwnerSeat != d.Identity.TargetSeat || moves[i].From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || moves[i].To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreCardAttackStateOperations.GetAttackCard(moves[i].CardId), moves[i].From, (moves[i].From.Zone == CardZoneKind.Equipment && _coreCardAttackStateOperations.GetAttackCard(moves[i].CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) || moves[i].Reason.Value != reason || d.Recast && (!_coreEquipmentContentOperations.EquipmentRules.IsEquipment(moves[i].CardKind) || moves[i].From.Zone != CardZoneKind.Equipment))
+        var previousSequence = d.SequenceBefore;
+        for (var i = 0; i < d.PaidMovementSequences.Count; i++)
+        {
+            var sequence = d.PaidMovementSequences[i];
+            if (sequence <= previousSequence || sequence > d.SequenceAfter)
                 return false;
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SlashTargetPenaltyPaidEvent>().Count(e => e.ProgramFrameId == f.Id && e.CardUseFrameId == d.Identity.CardUseFrameId && e.ActorSeat == d.Identity.ActorSeat && e.TargetSeat == d.Identity.TargetSeat && e.Recast == d.Recast && e.CardIds.SequenceEqual(d.PaidCardIds) && e.SequenceBefore == d.SequenceBefore && e.SequenceAfter == d.SequenceAfter) == 1;
+            var move = journal[sequence - 1];
+            if (move.Sequence != sequence || move.CardId != d.PaidCardIds[i] || move.From != d.PaidFrom[i] ||
+                move.From.OwnerSeat != d.Identity.TargetSeat || move.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+                move.Reason.Value != reason || d.Recast && (!_coreEquipmentContentOperations.EquipmentRules.IsEquipment(move.CardKind) || move.From.Zone != CardZoneKind.Equipment))
+                return false;
+            var card = _coreCardAttackStateOperations.GetAttackCard(move.CardId);
+            var destination = move.From.Zone == CardZoneKind.Equipment && card.IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile;
+            if (move.To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, move.From, destination))
+                return false;
+            previousSequence = sequence;
+        }
+        return true;
     }
 
     internal void ContinueTargetPenaltyChildren(ProgramSkillFrame supplied)

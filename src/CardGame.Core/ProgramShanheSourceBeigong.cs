@@ -5,7 +5,11 @@ namespace CardGame.Core;
 public enum SourceDingxiStage { Choose, EntryChildren, Issuing, NativeUse, Returned, StoreChildren, DrawChildren }
 public sealed record SourceDingxiReceipt(long BatchId, long OriginalUseId, long OriginalActionId, int LeftSeat,
     IReadOnlyList<int> OriginalCardIds, SourceDingxiStage Stage, int CardId = 0, int DiscardSequence = 0,
-    int EntrySequence = 0, long UseId = 0, long ActionId = 0, long Before = 0, long After = 0);
+    int EntrySequence = 0, long UseId = 0, long ActionId = 0, long Before = 0, long After = 0)
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal int? NativeDiscardSequence { get; init; }
+}
 public sealed record SourceDingxiNativeOrigin(long ProgramFrameId, long OriginalUseId, long OriginalActionId,
     int OwnerSeat, int LeftSeat, int CardId, CardKind Kind, int DiscardSequence, int EntrySequence,
     string SkillInstanceId, string GameplayHash, long UseId, long ActionId);

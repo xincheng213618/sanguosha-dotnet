@@ -142,8 +142,10 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
 
         if (r.Stage != SourceDingxiStage.Returned)
             return;
+        var originalProcessing = r.NativeDiscardSequence is null && _zoneEntries.CurrentEntry(CardLocation.Processing, r.CardId) == r.EntrySequence;
+        var originalDiscard = r.NativeDiscardSequence is { } discard && _zoneEntries.CurrentEntry(CardLocation.DiscardPile, r.CardId) == discard;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceDingxi = r with { Stage = SourceDingxiStage.StoreChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        if ((_cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.Processing || _cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.DiscardPile) && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
+        if ((originalProcessing || originalDiscard) && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             var pile = _corePublicPileSourcesOperations.EnsurePublicPileSource(f, int.MaxValue);
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.CardId], pile.Location, new("skill-program.source-dingxi.store"), (_, moves) =>
@@ -153,7 +155,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SourceDingxiStoredEvent(f.Id, f.OwnerSeat, r.CardId, moves.Single().Sequence));
             });
         }
-        else if (_cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.Processing)
+        else if (originalProcessing)
             _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId), CardLocation.Processing, CardLocation.DiscardPile, new("skill-program.source-dingxi.source-lost"));
         _coreSourceBeigongOperations.ContinueSourceBeigong(f.Id);
     }

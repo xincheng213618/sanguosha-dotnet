@@ -74,13 +74,102 @@ internal static class ShanheSourceDingxiDiscardEntryChecks
         }
     }
 
-    private static (GameEngine Game, ContentRegistry Content) Start(bool rediscard)
+    internal static void DingxiStoresOnlyItsOriginalSecondUseFinishCold()
+    {
+        foreach (var rediscard in new[] { false, true })
+        {
+            var (game, content) = Start(rediscard: true, optionalDriver: true);
+            var play = Next(game);
+            Need(play is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.CreateSnapshot(0).DrawPileCount == 0,
+                "The normal Play phase starts with an empty deck and the original physical Duel still in hand.");
+            var duel = game.CreateSnapshot(0).Players[0].Hand.Single(card => card.Kind == CardKind.Duel).Id;
+            var action = game.GetHumanLegalActions().Single(option => option.CardId == duel && option.ConversionSource is null && option.TargetSeats.SequenceEqual([1]));
+            Submit(game, new PlayCardCommand(0, duel, action.TargetSeats, game.Revision, play.PromptId, action.PlayedCardKind, action.TargetCardId));
+
+            var firstChild = Next(game);
+            var first = game.CardMovements.Single(move => move.CardId == duel && move.Reason == CardMoveReasons.UseFinished);
+            var qualified = Facts<SourceDingxiDiscardQualifiedEvent>(game).Single(fact => fact.CardId == duel);
+            Need(firstChild.SkillPrompt?.SkillId == Driver && first.From == CardLocation.Processing && first.To == CardLocation.DiscardPile &&
+                 first.BatchId == qualified.BatchId && first.Sequence == qualified.DiscardSequence &&
+                 Facts<CardUseDeclaredEvent>(game).Count(fact => fact.ResolutionId == qualified.OriginalUseId && fact.CardId == duel && fact.SourceSeat == 0) == 1 &&
+                 Facts<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == qualified.OriginalUseId && fact.CardId == duel) == 1,
+                "The initial native Duel reaches its real first discard and alone qualifies for Dingxi.");
+            AnswerProgramChoice(game, firstChild, "skip");
+
+            var use = Next(game);
+            Need(use.SkillPrompt?.SkillId == Dingxi, "The original unchanged first entry offers actual Dingxi.");
+            if (use.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"))
+            {
+                AnswerProgramChoice(game, use, "activate");
+                use = Next(game);
+            }
+            Answer(game, use, use.Choices.Single(choice => choice.Cards.SequenceEqual([duel]) && choice.Targets.SequenceEqual([2])));
+
+            var secondChild = Next(game);
+            var issued = Facts<SourceDingxiIssuedEvent>(game).Single().Origin;
+            var second = game.CardMovements.Single(move => move.CardId == duel && move.Reason == CardMoveReasons.UseFinished && move.Sequence != first.Sequence);
+            Need(secondChild.SkillPrompt?.SkillId == Driver && issued.OriginalUseId == qualified.OriginalUseId && issued.OriginalActionId == qualified.OriginalActionId &&
+                 issued.UseId != issued.OriginalUseId && issued.ActionId != issued.OriginalActionId && issued.CardId == duel && issued.LeftSeat == 2 &&
+                 Facts<SourceDingxiEnteredEvent>(game).Single() is { } entered && entered.EntrySequence == issued.EntrySequence && entered.OriginalDiscardSequence == first.Sequence &&
+                 game.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == issued.UseId) is { Step: ResolutionFrameStep.Completed, Action: { } secondAction } &&
+                 secondAction.ActionId == issued.ActionId && secondAction.PhysicalCards.Select(cost => cost.CardId).SequenceEqual([duel]) && secondAction.TargetSeats.SequenceEqual([2]) &&
+                 second.From == CardLocation.Processing && second.To == CardLocation.DiscardPile && second.Sequence > entered.EntrySequence && second.BatchId != first.BatchId &&
+                 Facts<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == issued.UseId && fact.CardId == duel) == 1 && !Facts<SourceDingxiReturnedEvent>(game).Any(),
+                "The second actual Duel uses the original physical material on its fixed left target, and its completed child runs after real cleanup and before returning.");
+
+            if (!rediscard)
+            {
+                AnswerProgramChoice(game, secondChild, "skip");
+                Need(Next(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
+                     Facts<SourceDingxiReturnedEvent>(game).Single().UseId == issued.UseId &&
+                     Facts<SourceDingxiStoredEvent>(game).Single() is { } stored && stored.ProgramFrameId == issued.ProgramFrameId &&
+                     game.CardMovements.Where(move => move.CardId == duel && move.Sequence > second.Sequence).ToArray() is [var placement] &&
+                     placement.Sequence == stored.MovementSequence && placement.From == CardLocation.DiscardPile && placement.To.Zone == CardZoneKind.PublicPersistentPile,
+                    "Dingxi stores its second native use's unchanged original finish exactly once.");
+                continue;
+            }
+
+            AnswerProgramChoice(game, secondChild, "activate");
+            var discard = Next(game);
+            var draw = game.CardMovements.Where(move => move.CardId == duel && move.Sequence > second.Sequence).ToArray();
+            Need(discard.Choices.Count(choice => choice.Cards.SequenceEqual([duel])) == 1 &&
+                 draw is [var shuffled, var gained] && shuffled.From == CardLocation.DiscardPile && shuffled.To == CardLocation.DrawPile &&
+                 shuffled.Reason == CardMoveReasons.Reshuffle && gained.From == CardLocation.DrawPile && gained.To == CardLocation.Hand(0) &&
+                 game.ResolutionStack.OfType<CardUseFrame>().Any(frame => frame.Id == issued.UseId && frame.Step == ResolutionFrameStep.Completed),
+                "The genuine second completed-use child reshuffles and draws this exact Duel before the public discard choice.");
+            var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+            Need(restored.CardMovements.SequenceEqual(game.CardMovements) &&
+                 SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
+                "Cold replay retains the paid second native action, current physical hand card and discard choice.");
+
+            foreach (var run in new[] { game, restored })
+            {
+                var payment = Next(run);
+                Answer(run, payment, payment.Choices.Single(choice => choice.Cards.SequenceEqual([duel])));
+                var next = Next(run);
+                var later = run.CardMovements.Single(move => move.CardId == duel && move.Reason.Value == LaterDiscard && move.To == CardLocation.DiscardPile);
+                Need(later.Sequence > draw[^1].Sequence && later.BatchId != second.BatchId &&
+                     Facts<NativeLogicalDiscardMaterialCompletedEvent>(run).Any(fact => fact.CardId == duel && fact.CompletionSequence == later.Sequence) &&
+                     Facts<SourceDingxiDiscardQualifiedEvent>(run).Single().DiscardSequence == first.Sequence &&
+                     Facts<SourceDingxiReturnedEvent>(run).Single().UseId == issued.UseId,
+                    "The native reuse returns once after a genuine new discard that supplies no original-use entitlement.");
+                Need(next is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && !Facts<SourceDingxiStoredEvent>(run).Any() &&
+                     run.CreateCardZoneDiagnostics().Single(card => card.CardId == duel).Location == CardLocation.DiscardPile,
+                    $"Dingxi's second native finish {second.Sequence} cannot store the unrelated later discard {later.Sequence}.");
+            }
+            Need(game.CardMovements.SequenceEqual(restored.CardMovements) &&
+                 SnapshotJson.Serialize(game.CreateSnapshot(0)) == SnapshotJson.Serialize(restored.CreateSnapshot(0)),
+                "The same public answer after cold replay produces identical physical movements and player state.");
+        }
+    }
+
+    private static (GameEngine Game, ContentRegistry Content) Start(bool rediscard, bool optionalDriver = false)
     {
         const string enemy = "classic:guan-yu";
         var setup = new ShanheBattleSetup(211, 1, "source-dingxi-discard-entry", StandardShanheSourceBeigongDuoPackage.BeigongBaseId,
             4, 0, 0, 0, 0, rediscard ? [Driver] : [], [new(CardKind.Duel, Suit.Club, 7)], [],
             [new(enemy) { StartingHand = [] }, new(enemy) { StartingHand = [] }], [], new string('d', 64));
-        var content = StandardShanheCampaignCatalog.CreateBattleRegistry(setup).WithExtension(new Fixture(), mode =>
+        var content = StandardShanheCampaignCatalog.CreateBattleRegistry(setup).WithExtension(new Fixture(optionalDriver), mode =>
             mode.Id == ShanheBattleSetup.BattleModeId ? mode with { DeckId = Deck } : mode);
         var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 3, HumanSeat = 0,
             HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
@@ -110,6 +199,9 @@ internal static class ShanheSourceDingxiDiscardEntryChecks
     private static void Answer(GameEngine game, PendingDecision prompt, PromptChoice choice) =>
         Submit(game, new AnswerPromptCommand(0, prompt.PromptId, choice.Id, game.Revision));
 
+    private static void AnswerProgramChoice(GameEngine game, PendingDecision prompt, string verb) =>
+        Answer(game, prompt, prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == verb));
+
     private static void Submit(GameEngine game, GameCommand command)
     {
         var result = game.Submit(command);
@@ -118,7 +210,7 @@ internal static class ShanheSourceDingxiDiscardEntryChecks
 
     private static void Need(bool valid, string message) { if (!valid) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool optionalDriver) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-source-dingxi-discard-entry", new(1, 0));
 
@@ -127,7 +219,7 @@ internal static class ShanheSourceDingxiDiscardEntryChecks
             var rules = $$$"""
                 {"skills":[{"id":"{{{Driver}}}","revision":1,"triggers":[
                   {"id":"draw-and-discard-completed-duel","window":"cardUseCompleted","ownerRelation":"actor","cardKinds":["duel"],
-                   "optional":false,"usageScope":"game","usageLimit":1,"effects":[
+                   "optional":{{{(optionalDriver ? "true" : "false")}}},"usageScope":"game","usageLimit":1,"effects":[
                      {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true},
                      {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
                       "zones":["hand"],"cardKinds":["duel"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]}]}]}

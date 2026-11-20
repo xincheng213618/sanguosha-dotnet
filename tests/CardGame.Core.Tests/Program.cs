@@ -879,6 +879,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Yan Yan Chengshi: takes only the original third Slash discard cold", BoundaryMobileYanYanChengshiDiscardEntryChecks.ChengshiObtainsOnlyTheOriginalThirdSlashDiscardCold),
     ("OL SP Pang Tong Guolun: direct exchange excludes Wooden Ox grain cold", OlSpPangTongGuolunWoodenOxChecks.GuolunCanExchangeHeldCardsButNotWoodenOxGrainCold),
     ("OL Dong Zhao Xianlue: continues after first gift stays in its original hand cold", OlDongZhaoXianlueRetainedGainChecks.XianlueContinuesAfterFirstGiftStaysInItsOriginalHandCold),
+    ("OL SP Ma Chao Zhuiji: loaded Wooden Ox recast returns the original Slash cold", OlSpMaChaoZhuijiWoodenOxRecastChecks.ZhuijiRecastsTheLoadedTreasureAndReturnsItsOriginalSlashCold),
+    ("Shanhe Source Dingxi: stores only its original second use finish cold", ShanheSourceDingxiDiscardEntryChecks.DingxiStoresOnlyItsOriginalSecondUseFinishCold),
+    ("Anniversary He Yan Yachai: omits discard when Jilei blocks the only hand card cold", AnniversaryHeYanYachaiDiscardChoicesChecks.YachaiOmitsDiscardWhenJileiBlocksTheOnlyHandCardCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

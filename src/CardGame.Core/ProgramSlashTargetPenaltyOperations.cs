@@ -15,6 +15,9 @@ public sealed record SlashTargetPenaltyDraft(SlashTargetPenaltyIdentity Identity
     public IReadOnlyList<int> PaidCardIds { get => _ids; init => _ids = Array.AsReadOnly((value ?? []).ToArray()); }
     private readonly IReadOnlyList<CardLocation> _from = Array.AsReadOnly((PaidFrom ?? []).ToArray());
     public IReadOnlyList<CardLocation> PaidFrom { get => _from; init => _from = Array.AsReadOnly((value ?? []).ToArray()); }
+    private readonly IReadOnlyList<int> _paidMovementSequences = [];
+    [System.Text.Json.Serialization.JsonInclude]
+    internal IReadOnlyList<int> PaidMovementSequences { get => _paidMovementSequences; init => _paidMovementSequences = Array.AsReadOnly((value ?? []).ToArray()); }
 }
 public sealed record SlashTargetPenaltyEntry(ProgramTriggerCandidate Candidate, SlashTargetPenaltyIdentity Identity);
 public sealed record SlashTargetPenaltyWindowFrame(long Id, long ParentFrameId, SlashTargetPenaltyReturn ReturnKind,

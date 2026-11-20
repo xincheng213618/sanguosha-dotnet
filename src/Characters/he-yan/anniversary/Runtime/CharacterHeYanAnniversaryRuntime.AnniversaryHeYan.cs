@@ -60,7 +60,8 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
             };
             if (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.SourceSeat]).Count > 0)
             {
-                choices.Add(HeYanChoice(f, "discard", "弃置一半手牌（向上取整）"));
+                if (HeYanDiscardChoices(f).Count > 0)
+                    choices.Add(HeYanChoice(f, "discard", "弃置一半手牌（向上取整）"));
                 choices.Add(HeYanChoice(f, "reveal", "展示所有手牌并交给何晏其中一种花色的所有牌"));
             }
 

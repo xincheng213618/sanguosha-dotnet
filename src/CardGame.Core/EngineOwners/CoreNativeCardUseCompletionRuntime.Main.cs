@@ -52,6 +52,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
             return;
         if (_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } pendingUse && !_characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(pendingUse))
         {
+            List<NativeUseDiscardEntry>? finished = null;
             foreach (var physicalCardId in pendingUse.PhysicalCardIds ?? [pendingUse.CardId])
             {
                 if (_nativeMaterialClaims.PreservesMaterialAtCompletion(frameId, physicalCardId))
@@ -59,9 +60,12 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
                 if (_cardZonesOperations._cardZones.GetLocation(physicalCardId) == CardLocation.Processing)
                 {
                     var physicalCard = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(candidate => candidate.Id == physicalCardId);
-                    _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
+                    if (DiscardFinishedUseMaterial(physicalCard) is { } entry)
+                        (finished ??= []).Add(entry);
                 }
             }
+
+            StoreFinishedUseDiscards(frameId, finished);
         }
 
         QueueCardUseFinishedWithoutPop(frameId, card, playedCardKind);
@@ -69,6 +73,25 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && completedUse.Action is { } action && _coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardUseCompleted, action.TargetSeats, ProgramCardContinuation.CompletedCard, cardUseCausedDamage: completedUse.CausedDamage))
             return;
         PopFinishedCardUse(frameId);
+    }
+
+    internal NativeUseDiscardEntry? DiscardFinishedUseMaterial(Card card)
+    {
+        NativeUseDiscardEntry? entry = null;
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile,
+            CardMoveReasons.UseFinished, beforeFact: movement =>
+            {
+                if (movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.UseFinished)
+                    entry = new(movement.CardId, movement.Sequence);
+            });
+        return entry;
+    }
+
+    internal void StoreFinishedUseDiscards(long frameId, List<NativeUseDiscardEntry>? finished)
+    {
+        if (finished is not null)
+            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(frameId,
+                use => use with { NativeUseDiscardEntries = finished.AsReadOnly() });
     }
 
     internal void QueueCardUseFinishedWithoutPop(long frameId, Card card, CardKind? playedCardKind)
