@@ -13,7 +13,6 @@ internal readonly struct SlashLimitQueryFacts(EngineStates.CoreMatchDefinitionSt
     public int AdditiveTurnBonus => getCoreGameEngineCardUseModulesRuntime().GetAdditiveTurnRuleModifier(player.Seat, SkillRuleQuery.SlashLimit);
     public bool TracksFengjiRoundLedger => getCharacterChenDengOlRuntime().TracksFengjiRoundLedger;
     public int FengjiRoundAdjustment => getCharacterChenDengOlRuntime().GetFengjiRoundAdjustment(player.Seat, SkillRuleQuery.SlashLimit);
-    public int KuangguSlashBonus => getCharacterWeiYanMobileShiRuntime().MobileShiWeiYanPhaseSlashBonus(player.Seat);
     public int XiezhiOverflowCount => getCharacterZhongHuiMobileShiRuntime().ShiZhHuiOverflowCount(player.Seat);
     public bool HasZhuangshiQuota => getCharacterWeiYanMobileShiRuntime().HasMobileShiZhuangshiQuota(player.Seat);
     public int SequentialDeckShortfallBonus => getCoreGameEngineSequentialDeckKindGrowthRuntime().SequentialDeckKindGrowthBonus(player.Seat);

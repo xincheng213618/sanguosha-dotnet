@@ -37,7 +37,6 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 
 internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 {
-    int KuangguSlashBonus { get; }
     int XiezhiOverflowCount { get; }
     bool HasZhuangshiQuota { get; }
     int SequentialDeckShortfallBonus { get; }
@@ -108,7 +107,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         var contributions = query.Contributions.ToList();
         AddFiniteContribution(contributions, $"campaign:{query.Seat}:market:slash", query.MarketBonus);
         AddFiniteContribution(contributions, $"campaign:{query.Seat}:shared-rank:slash", query.SharedRankBonus);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile:shi-kuanggu:slash-limit", query.KuangguSlashBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile:shi-xiezhi:slash-limit", query.XiezhiOverflowCount);
         if (query.HasZhuangshiQuota) contributions.Add(new UnlimitedRuleQueryContribution("skill:mobile:shi-zhuangshi:quota"));
         AddFiniteContribution(contributions, $"issued:{query.Seat}:sequential-deck-shortfall:slash-limit", query.SequentialDeckShortfallBonus);

@@ -15,7 +15,21 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 47100)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 47100)]
     internal bool IsIssuedMobileShiZhuangshiNoCount(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == actor && e.NoCount);
-    internal int MobileShiWeiYanPhaseSlashBonus(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKuangguSlashGrantedEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : 0;
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 5)]
+    internal void AddKuangguSlashLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        var turn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess;
+        if (query != SkillRuleQuery.SlashLimit || turn._phase != TurnPhase.Play || seat != turn._currentSeat)
+            return;
+
+        var turnNumber = turn._turnNumber;
+        var phaseInstanceId = _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
+        var grantCount = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKuangguSlashGrantedEvent>()
+            .Count(grant => grant.OwnerSeat == seat && grant.TurnNumber == turnNumber && grant.PhaseInstanceId == phaseInstanceId);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:mobile:shi-kuanggu:slash-limit", grantCount);
+    }
+
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 47100)]
     internal bool MobileShiZhuangshiCardDistance(ProgramCardDistanceQuery q) => HasMobileShiZhuangshiDistance(q.Actor.Seat, q.CardUseFrameId);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 47100)]

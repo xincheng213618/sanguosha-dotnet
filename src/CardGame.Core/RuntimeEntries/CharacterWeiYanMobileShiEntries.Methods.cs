@@ -16,7 +16,6 @@ internal sealed partial class CharacterWeiYanMobileShiEntries
     internal bool IsIssuedMobileShiZhuangshiNoCount(long id, int actor) => _resolve().IsIssuedMobileShiZhuangshiNoCount(id, actor);
     internal bool MobileShiKuangguThresholdDrawMatches(ProgramSkillFrame producer, NativeDrawInvocationProof proof) => _resolve().MobileShiKuangguThresholdDrawMatches(producer, proof);
     internal IReadOnlyList<PromptChoice> MobileShiWeiYanChoices(ProgramSkillFrame f) => _resolve().MobileShiWeiYanChoices(f);
-    internal int MobileShiWeiYanPhaseSlashBonus(int seat) => _resolve().MobileShiWeiYanPhaseSlashBonus(seat);
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiWeiYanPublicStates(CharacterState owner, string skillId) => _resolve().MobileShiWeiYanPublicStates(owner, skillId);
     internal int MobileShiYinzhanDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().MobileShiYinzhanDamageBonus(attack);
     internal bool MobileShiZhuangshiCardDistance(ProgramCardDistanceQuery q) => _resolve().MobileShiZhuangshiCardDistance(q);

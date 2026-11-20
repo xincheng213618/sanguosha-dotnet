@@ -57,6 +57,20 @@ internal static class ShiWeiYanChecks
             m.CardId == newlyDrawn && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill.mobile-shi-wei-yan.discard") == 1 &&
             s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
             "Backwater may discard its newly drawn card after cold recovery and grants one real extra Slash this phase without replaying payment.");
+
+        var backwaterGrant = s.E<MobileShiKuangguSlashGrantedEvent>().Single();
+        var fourthCard = s.V(0).Hand.Single(card => card.Kind == CardKind.Slash).Id;
+        s.Slash(3); s.Play();
+        var fourthUse = s.E<MobileShiWeiYanUseEvent>().Single(e => e.OwnerSeat == 0 && e.Ordinal == 4);
+        var accepted = s.E<CardActionAcceptedEvent>().Single(e => e.Action.ActionId == fourthUse.ActionId).Action;
+        s.Need(fourthUse is { NoCount: false, DistanceAndNoResponse: false } &&
+            fourthUse.TurnNumber == backwaterGrant.TurnNumber && fourthUse.PhaseInstanceId == backwaterGrant.PhaseInstanceId &&
+            accepted is { ActorSeat: 0, Type: CardActionType.Use, EffectiveKind: CardKind.Slash } && accepted.TargetSeats.SequenceEqual([3]) &&
+            accepted.PhysicalCards.Single() is { CardId: var paidCard, From: var source } && paidCard == fourthCard && source == CardLocation.Hand(0) &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == fourthUse.UseId && e.CardId == fourthCard && e.CardKind == CardKind.Slash) == 1 &&
+            s.E<MobileShiKuangguSlashGrantedEvent>().SequenceEqual([backwaterGrant]) && s.G.CardMovements.Count(m =>
+                m.CardId == newlyDrawn && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile && m.Reason.Value == YinzhanDiscard) == 1,
+            "The backwater allowance pays for one ordinary fourth physical Slash to completion, and its original discard and grant stay single.");
         s.Replay();
     }
 
