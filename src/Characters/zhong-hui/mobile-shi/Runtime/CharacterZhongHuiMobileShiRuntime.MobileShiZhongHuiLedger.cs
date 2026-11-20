@@ -47,7 +47,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
             case PlayerDiedEvent { VictimSeat: var victim }:
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiDeathRecordedEvent(_coreActualRoundProgressRoundNumberAccess._roundNumber, victim));
                 break;
-            case TurnStartedEvent { ActorSeat: var seat }when _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && ShiZhHuiActiveSizi is { } activation && activation.Source.OwnerSeat == seat:
+            case TurnStartedEvent { ActorSeat: var seat }when _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && FindActiveSizi(seat) is { } activation:
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziExpiredEvent(activation.Ordinal, "owner-turn-start"));
                 break;
         }

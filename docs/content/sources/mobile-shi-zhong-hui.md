@@ -27,10 +27,10 @@
   数值选择；消耗后记 `ShiZhHuiSiziActivatedEvent`（序数、X、激活时体力）。效果 1 由
   `ProgramDamageHook(AdditiveAmount)` 实现（效果存续期间所有角色【杀】伤害+1）。
   效果 2/3 挂在 `turnEnding` 触发（`turnOwnerScope: anyLiving`，任意角色回合结束结算）：
-  先摸 2 张，再按本回合【杀】使用账本（`ShiZhHuiSlashUsedEvent`）对每名使用过【杀】的存活
+  原付款者先摸 2 张，再按本回合【杀】使用账本（`ShiZhHuiSlashUsedEvent`）对每名使用过【杀】的存活
   角色各失去 1 点体力；若无人用杀且 X 大于激活时体力，则当前回合角色失去 1 点体力。
-  每次结算记 `ShiZhHuiSiziElapsedEvent`，耗满 X 或钟会回合开始（观察者）记
-  `ShiZhHuiSiziExpiredEvent`；效果存续查询一律由事件账本推导。
+  回合结束候选按付款座位查找有效发动，受理后由原帧的发动序号继续结算。每次结算记
+  `ShiZhHuiSiziElapsedEvent`，耗满 X 或付款者回合开始时记录这一笔发动的 `ShiZhHuiSiziExpiredEvent`。
 - 挟志：`afterHealthChanged` 锁定触发，按变化绝对值经公共标记加蓄力（上限 4）。
   触顶溢出记 `ShiZhHuiXiezhiOverflowEvent`（每次溢出=1 次）；手牌上限与【杀】次数上限由
   `EvaluateHandLimit` / `EvaluateSlashUseLimit` 的 `issued:*:mobile:shi-xiezhi:*` 贡献项按

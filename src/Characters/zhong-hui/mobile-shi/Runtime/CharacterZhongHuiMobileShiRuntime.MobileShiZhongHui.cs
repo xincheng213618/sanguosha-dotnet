@@ -12,8 +12,20 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal bool HasShiZhHuiKechang(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.Any(grant => grant.IsEnabled && grant.SkillId == ShiZhHuiComposition.KeChangSkill) || _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]).Contains(ShiZhHuiComposition.KeChangSkill, StringComparer.Ordinal);
     internal int ShiZhHuiKechangLevel(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiYunanAwakenedEvent>().Where(entry => entry.Source.OwnerSeat == seat).Select(entry => entry.Level).LastOrDefault();
     internal bool ShiZhHuiRoundHasDeath => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiDeathRecordedEvent>().Any(death => death.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
-    internal ShiZhHuiSiziActivatedEvent? ShiZhHuiActiveSizi => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().LastOrDefault(activation => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>().Any(expired => expired.ActivationOrdinal == activation.Ordinal));
+    internal ShiZhHuiSiziActivatedEvent? ShiZhHuiActiveSizi => FindActiveSizi();
     internal bool ShiZhHuiSiziActive => ShiZhHuiActiveSizi is not null;
+
+    private ShiZhHuiSiziActivatedEvent? FindActiveSizi(int? ownerSeat = null)
+    {
+        var history = _coreProgramEventHistoryOperations.Value;
+        var activations = history.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>();
+        if (activations.Count == 0) return null;
+
+        var expired = history.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>();
+        return activations.LastOrDefault(activation =>
+            (ownerSeat is null || activation.Source.OwnerSeat == ownerSeat) &&
+            !expired.Any(entry => entry.ActivationOrdinal == activation.Ordinal));
+    }
 
     internal IReadOnlyList<int> ShiZhHuiEndingVictims(int turnNumber, int ownerHp, int consumed)
     {
@@ -34,7 +46,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal bool CanOfferShiZhHui(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (candidate.SkillId == ShiZhHuiSizi && trigger.Id == ShiZhHuiComposition.SiziEndingTrigger)
-            return ShiZhHuiSiziActive;
+            return FindActiveSizi(candidate.OwnerSeat) is not null;
         if (candidate.SkillId == ShiZhHuiYunan && trigger.Id == ShiZhHuiComposition.YunanTrigger)
             return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.KillerSeat == candidate.OwnerSeat && ShiZhHuiRoundHasDeath;
         return true;
@@ -64,7 +76,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
 
     internal ShiZhHuiReceipt StartShiZhHuiSiziEnding(ProgramSkillFrame f)
     {
-        if (ShiZhHuiActiveSizi is not { } activation)
+        if (FindActiveSizi(f.OwnerSeat) is not { } activation)
             throw new InvalidOperationException("Sizi ending requires an active effect.");
         return new("sizi-ending", _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)
         {
@@ -181,9 +193,9 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal void ContinueShiZhHuiEnding(ProgramSkillFrame f)
     {
         var r = f.ShiZhHui!;
-        var activation = ShiZhHuiActiveSizi ?? throw new InvalidOperationException("Sizi ending lost its active effect.");
-        if (r.Ordinal != activation.Ordinal)
-            throw new InvalidOperationException("Sizi ending resolved a different activation than its receipt.");
+        var activation = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>()
+            .SingleOrDefault(entry => entry.Ordinal == r.Ordinal && entry.Source.OwnerSeat == f.OwnerSeat)
+            ?? throw new InvalidOperationException("Sizi ending lost its original paid activation.");
         if (r.Stage == 0)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)

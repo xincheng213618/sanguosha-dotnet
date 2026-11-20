@@ -200,7 +200,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         var cursor = r.Cursor + (r.Stage == "gift-children" ? 1 : 0);
         while (cursor < r.OriginalCards.Count && _cardZonesOperations._cardZones.GetLocation(r.OriginalCards[cursor]) != CardLocation.Processing)
             cursor++;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = r with { Stage = "distribute", Cursor = cursor, ChosenHolder = null }, PendingMovementContinuation = null });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = r with { Stage = "distribute", Cursor = cursor, ChosenHolder = null, GiftMovement = null }, PendingMovementContinuation = null });
         if (cursor == r.OriginalCards.Count)
             FinishSimaHui(f);
         else

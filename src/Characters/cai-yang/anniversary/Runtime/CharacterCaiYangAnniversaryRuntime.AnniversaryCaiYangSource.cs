@@ -19,7 +19,10 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 45600)]
     internal void TrackCaiYangBlackUse(CardUseAppearanceCapturedEvent e)
     {
-        if (!HasAnniversaryCaiYang || e.Action is not { Type: CardActionType.Use, EffectiveSuit: Suit.Spade or Suit.Club } a || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangXunjiDueEvent>().Any(d => d.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && d.Target == a.ActorSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangBlackUseEvent>().Any(f => f.ActionId == a.ActionId))
+        if (!HasAnniversaryCaiYang || e.Action is not { Type: CardActionType.Use } a ||
+            (a.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(a.EffectiveSuit)) != false ||
+            !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangXunjiDueEvent>().Any(d => d.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && d.Target == a.ActorSeat) ||
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangBlackUseEvent>().Any(f => f.ActionId == a.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangBlackUseEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, a.ActorSeat, a.ActionId));
     }

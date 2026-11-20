@@ -16,6 +16,8 @@ public sealed record SimaHuiReceipt
     public int Cursor {get;init;}
     public long MovementBefore {get;init;}
     public long MovementAfter {get;init;}
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal CardMovementRecord? GiftMovement { get; init; }
     public SimaHuiChainOriginProof? ChainOrigin {get;init;}
     private IReadOnlyList<int> _candidates=Array.Empty<int>(),_cards=Array.Empty<int>(),_selected=Array.Empty<int>();
     public IReadOnlyList<int> Candidates {get=>_candidates;init=>_candidates=Array.AsReadOnly(value.ToArray());}

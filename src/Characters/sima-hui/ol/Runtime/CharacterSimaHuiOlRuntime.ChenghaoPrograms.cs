@@ -33,10 +33,21 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         var id = r.OriginalCards[r.Cursor];
         if (!_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing)
             throw new InvalidOperationException("Chenghao lost its original privately viewed card.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = r with { Stage = "gift-children", ChosenHolder = recipient, MovementBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == id), CardLocation.Processing, CardLocation.Hand(recipient), new(SimaHuiGiftReason), _nativeGivenCards.Completion(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = f.SimaHui!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimaHuiCardDistributedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.Cursor, id, recipient, f.SimaHui!.MovementBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            SimaHui = r with { Stage = "gift-children", ChosenHolder = recipient, MovementBefore = before, MovementAfter = before },
+            PendingMovementContinuation = new(f.OwnerSeat, 0, null)
+        });
+        _coreHappyWeiYanGainDestinationsOperations.MoveNativeGivenCards(f.Id, f.OwnerSeat, recipient, [id], new(SimaHuiGiftReason), settlement =>
+        {
+            if (settlement.Movements is not [var move] || move.CardId != id || move.From != CardLocation.Processing || move.To.Zone != CardZoneKind.Hand)
+                throw new InvalidOperationException("Chenghao requires one real movement from its private distribution.");
+            var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            _coreRuntimeOperations.ReplaceRuntimeTop(current with { SimaHui = current.SimaHui! with { MovementAfter = move.Sequence, GiftMovement = move } });
+        });
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimaHuiCardDistributedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.Cursor, id, recipient, before, f.SimaHui!.MovementAfter));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
@@ -47,7 +58,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
             return false;
         var r = f.SimaHui!;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = r with { Stage = "return-children", MovementBefore = before, MovementAfter = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = r with { Stage = "return-children", MovementBefore = before, MovementAfter = before, GiftMovement = null }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Processing, CardLocation.DrawPile, new("program.sima-hui.chenghao.return"));
         _cardZonesOperations._cardZones.PlaceDrawPileCardsAtTop(cards.Select(c => c.Id).ToArray());
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimaHui = f.SimaHui!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

@@ -873,6 +873,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Jingce: counts only the paid equipment use that finishes into discard cold", BoundaryMobileJingceEquipmentDiscardChecks.JingceCountsOnlyThePaidEquipmentUseThatFinishesIntoDiscardCold),
     ("Mou Dong Zhuo OL Fengshang: second gift requires its original discard entry cold", MouDongZhuoOlFengshangDiscardEntryChecks.FengshangSecondGiftRequiresItsOriginalDiscardEntryCold),
     ("Mobile Boundary Zongxuan: typed own discard reaches original top placement cold", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensOwnMobileZongxuanCold),
+    ("Anniversary Cai Yang Xunji: uses original black color of a composite Slash cold", AnniversaryCaiYangXunjiColorChecks.XunjiUsesTheOriginalBlackColorOfACompositeSlashCold),
+    ("OL Sima Hui Chenghao: continues after first gift is redirected cold", OlSimaHuiChenghaoGainReplacementChecks.ChenghaoContinuesAfterItsFirstGiftIsRedirectedCold),
+    ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
