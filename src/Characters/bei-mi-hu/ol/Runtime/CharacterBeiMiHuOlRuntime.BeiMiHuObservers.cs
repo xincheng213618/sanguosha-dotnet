@@ -44,7 +44,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
                     : r.Stage == "recovery-children" && hp.Change.Kind == HpChangeKind.Recovery &&
                       hp.Change.SourceSeat == f.OwnerSeat && hp.Change.Amount <= r.RecoveryRequested);
         if (child is ProgramLifecycleTriggerWindowFrame skills)
-            return r.Stage == "grants-children" && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
+            return r.Stage == "grants-children" && ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, skills);
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == "recovery-children" && recovery.ParentFrameId == f.Id && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == f.OwnerSeat && recovery.Attempt.Amount == r.RecoveryRequested && recovery.Attempt.ActualTurnNumber == r.Turn && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.Program && recovery.Attempt.Completion.InstructionIndex == r.InstructionIndex;
         return false;

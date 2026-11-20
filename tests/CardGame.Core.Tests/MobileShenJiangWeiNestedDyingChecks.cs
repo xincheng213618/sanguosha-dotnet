@@ -1,4 +1,5 @@
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static partial class MobileShenJiangWeiChecks
 {
@@ -41,6 +42,18 @@ internal static partial class MobileShenJiangWeiChecks
             g = Cold(g, registry);
             if (rescue) Answer(g, c => c.Cards.SequenceEqual([peach]) && c.Parameters.GetValueOrDefault("response") == "peach");
             else Answer(g, c => c.Parameters.GetValueOrDefault("response") == "let-die");
+            Reach(g, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Watch });
+            var granting = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == root.Id);
+            var watcher = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Watch);
+            var changed = g.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f => f.Id == watcher.WindowContext?.ParentFrameId);
+            Need(granting.MobileJiangWei is { Stage: MobileJiangWeiStage.GrantChildren } &&
+                changed is { Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram } &&
+                changed.ResumeProgramFrameId == root.Id && g.GetRuntimeModule<CharacterJiangWeiMobileGodRuntime>().MobileJwFirstChild(granting, changed) &&
+                E<SkillsAcquiredEvent>(g).Count(f => f.PlayerSeat == 0 && f.SourceSkillId == "mobile:shenpei" && f.SkillIds.SequenceEqual(["mobile:huitian"])) == 1 &&
+                !E<MobileJiangWeiCompletedEvent>(g).Any(f => f.FrameId == root.Id),
+                "The original Shenpei grant owns the live skill-change child before the recovered dying entry returns.");
+            g = Cold(g, registry);
+            Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
             Play(g);
             Need(V(g).IsAlive && V(g).Hp == 2 && V(g, 1).IsAlive == rescue &&
                     E<DyingResolvedEvent>(g).Count(e => e.ResolutionId == nested.Id && e.VictimSeat == 1 && e.Survived == rescue) == 1 &&

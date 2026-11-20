@@ -71,7 +71,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } changed)
-            return r.Stage == MobileJiangWeiStage.GrantChildren && changed.ResumeProgramFrameId == f.Id && changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
+            return r.Stage == MobileJiangWeiStage.GrantChildren && ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, changed);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && MobileJwMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(r.Paid.Contains);
         return r.Stage == MobileJiangWeiStage.ThunderIssued && f.AttackAttempt is not null && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);

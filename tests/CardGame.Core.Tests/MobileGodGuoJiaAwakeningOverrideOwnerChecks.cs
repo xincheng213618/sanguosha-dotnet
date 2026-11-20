@@ -25,6 +25,16 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
          "usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,
          "effects":[{"op":"chooseOption","target":"owner","resultBind":"grant","options":[{"id":"continue"}]}]}
         """;
+    private const string WatchBaijia = """
+        {"id":"maximum-paid","window":"afterHealthChanged","subject":"owner",
+         "condition":{"kind":"healthChangeKindIs","hpChangeKind":"maximumHp"},"optional":false,"isSkillInvocation":false,
+         "effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]},
+                    {"op":"setBooleanState","target":"owner","stateId":"waiting-for-grants","value":true}]},
+        {"id":"actual-grant-child","window":"skillsChanged","subject":"owner",
+         "condition":{"kind":"booleanState","stateId":"waiting-for-grants","expectedValue":true},
+         "usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,
+         "effects":[{"op":"chooseOption","target":"owner","resultBind":"grant","options":[{"id":"continue"}]}]}
+        """;
 
     private static GameEngine CreateMatch(ContentRegistry registry) =>
         GameEngine.CreateStandard(new GameOptions
@@ -36,7 +46,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
 
     internal static void PaidHuishiWaivesBaijiaThresholdForNextPreparationCold()
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:bei-mi-hu", [Baijia, Guju], WatchMaximum));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:bei-mi-hu", [Baijia, Guju], WatchBaijia));
         var match = new HuishiMatch(registry);
         match.Start();
         var firstTurn = match.Game.State.TurnNumber;
@@ -81,9 +91,36 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             "Cold replay retains both original facts and the exact paid awakening waiting for its original health child.");
 
         match.Continue();
-        match.ReachPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch &&
+            match.Facts<BeiMiHuAwakeningCompletedEvent>().Any(fact => fact.FrameId == paid.FrameId));
         var completed = match.Facts<BeiMiHuAwakeningCompletedEvent>().Single();
-        match.Need(completed is { OwnerSeat: 0, LostSkillId: Guju, GrantedSkillId: Canshi } && completed.FrameId == paid.FrameId &&
+        var stack = match.Game.ResolutionStack.ToArray();
+        var grantRoot = stack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId);
+        var grantWatcher = stack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        var grants = stack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == grantWatcher.WindowContext?.ParentFrameId);
+        var grantsIndex = Array.IndexOf(stack, grants);
+        match.Need(grantRoot.BeiMiHu is { Stage: "grants-children" } && grantsIndex > 0 && stack[grantsIndex - 1].Id == grantRoot.Id &&
+            grants is { Window: SkillProgramTriggerWindow.SkillsChanged, OwnerSeat: 0, Continuation: ProgramLifecycleContinuation.ResumeParentProgram } &&
+            grants.ResumeProgramFrameId == grantRoot.Id &&
+            completed is { OwnerSeat: 0, LostSkillId: Guju, GrantedSkillId: Canshi } && completed.FrameId == grantRoot.Id &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Canshi) == 1 && match.Owner.Skills?.All(skill => skill.ContentId != Guju) == true &&
+            match.Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Baijia && fact.SkillIds.SequenceEqual([Canshi])) == 1 &&
+            match.Facts<ProgramBindingResolvedEvent>().All(fact => fact.FrameId != grantRoot.Id),
+            "Baijia has replaced Guju with Canshi while its original frame awaits the real skill-change child.");
+        var grantsPrompt = match.Prompt!.PromptId;
+        match.Restore();
+        var restoredRoot = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == grantRoot.Id);
+        var restoredGrants = match.Game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == grants.Id);
+        var runtime = match.Game.GetRuntimeModule<CharacterBeiMiHuOlRuntime>();
+        match.Need(match.Prompt?.PromptId == grantsPrompt && runtime.BeiMiHuFirstChild(restoredRoot, restoredGrants) &&
+            !runtime.BeiMiHuFirstChild(restoredRoot, restoredGrants with { ResumeProgramFrameId = grantWatcher.Id }) &&
+            !runtime.BeiMiHuFirstChild(restoredRoot, restoredGrants with { Continuation = ProgramLifecycleContinuation.ResumeCharacterStateChange }),
+            "Cold replay retains the original skill-change return and rejects a different parent or continuation.");
+        match.Continue();
+        match.ReachPlay();
+        match.Need(match.Facts<BeiMiHuAwakeningCompletedEvent>() is
+                [{ OwnerSeat: 0, LostSkillId: Guju, GrantedSkillId: Canshi, FrameId: var completedFrame }] && completedFrame == paid.FrameId &&
+            match.Facts<ProgramBindingResolvedEvent>().Count(fact => fact.FrameId == paid.FrameId && fact.Completed) == 1 &&
             match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().SequenceEqual([paid]) && match.Facts<ShenGuoJiaMaximumPaidEvent>().SequenceEqual([expense]) &&
             match.Owner.MaxHp == reducedMaximum + 1 && match.Owner.Skills?.Any(skill => skill.ContentId == Canshi) == true &&
             match.Owner.Skills?.All(skill => skill.ContentId != Guju) == true,
@@ -521,9 +558,13 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, ["mobile:shen-guo-jia", recipientGeneral, .. relatedGenerals]);
+            var watchStates = watchTrigger == WatchBaijia ? """
+                ,"states":[{"id":"waiting-for-grants","initialValue":false,"visibility":"private","resetScope":"game",
+                            "reacquirePolicy":"preserveUntilGameEnd"}]
+                """ : string.Empty;
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-                  {"id":"{{Watch}}","revision":1,"triggers":[{{watchTrigger}}]}
+                  {"id":"{{Watch}}","revision":1{{watchStates}},"triggers":[{{watchTrigger}}]}
                 ]}
                 """, $$"""
                 {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{Watch}}":{

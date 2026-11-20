@@ -22,7 +22,7 @@ internal static partial class MobileShenJiangWeiChecks
     }
     private static (GameEngine, ContentRegistry) Start(bool nestedDying = false)
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture()); var g = GameEngine.CreateStandard(Options(nestedDying), r);
+        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nestedDying)); var g = GameEngine.CreateStandard(Options(nestedDying), r);
         Accept(g, new StartGameCommand()); return (g, r);
     }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
@@ -60,19 +60,23 @@ internal static partial class MobileShenJiangWeiChecks
     private static GameEngine Cold(GameEngine g, ContentRegistry r)
     { var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())), r); Need(State(g) == State(restored), "Cold restore preserves the original private receipt, native parent, paid movements and all four views."); return restored; }
     private static string State(GameEngine g) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(s => SnapshotJson.Serialize(g.CreateSnapshot(s))).ToArray(), Frames = g.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), Facts = g.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(), g.CardMovements, Zones = g.CreateCardZoneDiagnostics(), Commands = CommandJson.Serialize(g.AcceptedCommands) });
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool watchGrant) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mobile-jw", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(new OwnerBuilder(b), Hero);
+            var grant = watchGrant ? """
+                ,{"id":"huitian-grant","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,
+                  "effects":[{"op":"chooseOption","target":"owner","resultBind":"granted","options":[{"id":"continue"}]}]}
+                """ : "";
             var json = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Driver}}","revision":1,"activations":[
                 {"id":"draw","targetKind":"anyLiving","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":12}]},
                 {"id":"hurt","targetKind":"anyLiving","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":1}]},
                 {"id":"give","targetKind":"otherLiving","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"zones":["hand"],"count":1,"destination":"selectedTargetHand","awaitMovementTriggers":true}]}]},
-              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"exchange","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["mobile.xinghun.exchange"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}]},
+              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"exchange","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["mobile.xinghun.exchange"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}{{grant}}]},
               {"id":"{{Rescue}}","revision":1,"triggers":[{"id":"first-rescue","window":"dyingEntering","subject":"owner","optional":false,"priority":-100,"usageScope":"game","usageLimit":1,"effects":[{"op":"recover","target":"owner","amount":1}]}]},
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}]}
             """;
