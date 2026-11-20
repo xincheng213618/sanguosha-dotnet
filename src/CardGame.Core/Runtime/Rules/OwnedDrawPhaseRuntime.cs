@@ -26,7 +26,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                 frame.DrawCount < 0 || frame.InheritedMovementBatchIds is { } inherited &&
                     (inherited.Distinct().Count() != inherited.Count || inherited is not System.Collections.IList { IsReadOnly: true }))
                 throw new InvalidOperationException("An actual draw boundary lost its turn or frozen movement provenance.");
-            if (index == 0 ? frame.ParentFrameId is not null || frame.IsExtra && !OwnsScheduledDrawSkip(frame) :
+            if (index == 0 ? frame.ParentFrameId is not null || frame.IsExtra && !OwnsScheduledDraw(frame) :
                 !frame.IsExtra || frameFacts.FrameAt(index - 1) is not DrawPhaseObligationFrame parent ||
                 parent.Id != frame.ParentFrameId || parent.Stage != DrawPhaseObligationStage.Finished)
                 throw new InvalidOperationException("An extra draw boundary lost its exact finished parent phase.");
@@ -50,23 +50,30 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
             { Stage: DrawPhaseObligationStage.Finished, Skipped: true } parent && parent.ActiveWindowFrameId == child.Id &&
         parent.OwnerSeat == turn.CurrentSeat && parent.ActualTurnNumber == turn.TurnNumber;
 
-    internal bool TryBeginScheduledDrawSkip()
+    internal bool TryBeginScheduledDraw()
     {
         if (schedules.Current is not { Phase: TurnPhase.Draw, Frame: var program } || frames.Top is not null ||
             prompts.Current is not null || program.OwnerSeat != turn.CurrentSeat || phase.Phase != TurnPhase.Draw)
             throw new InvalidOperationException("A scheduled Draw must enter at its original turn boundary.");
-        if (!NextDrawSkip.Consume(participants.Players[program.OwnerSeat])) return false;
+        var skipped = NextDrawSkip.Consume(participants.Players[program.OwnerSeat]);
+        if (skipped)
+            phaseOperations.Clear();
+        else
+        {
+            phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, program.OwnerSeat);
+            if (!facts.HasAttemptCapability) return false;
+        }
 
-        phaseOperations.Clear();
         var frame = new DrawPhaseObligationFrame(frames.NextId(), program.OwnerSeat, turn.TurnNumber, true,
-            0, DrawPhaseObligationStage.SkipObservers, Skipped: true) { PhaseOccurrenceFrameId = program.Id };
+            0, skipped ? DrawPhaseObligationStage.SkipObservers : DrawPhaseObligationStage.Starting, Skipped: skipped)
+        { PhaseOccurrenceFrameId = program.Id, DiscardRecoveryPhase = skipped ? null : actualPhases.Current() };
         frames.Push(frame);
         frames.Advance(frame.Id);
         return true;
     }
 
-    private bool OwnsScheduledDrawSkip(DrawPhaseObligationFrame frame) =>
-        frame is { IsExtra: true, Skipped: true, ParentFrameId: null, PhaseOccurrenceFrameId: { } occurrence } &&
+    private bool OwnsScheduledDraw(DrawPhaseObligationFrame frame) =>
+        frame is { IsExtra: true, ParentFrameId: null, PhaseOccurrenceFrameId: { } occurrence } &&
         schedules.Current is { Phase: TurnPhase.Draw, Frame: var program, ParentFrame: { } parent } &&
         program.Id == occurrence && program.OwnerSeat == frame.OwnerSeat && parent.OwnerSeat == frame.OwnerSeat &&
         program.WindowContext?.ParentFrameId == parent.Id && frame.ActualTurnNumber == turn.TurnNumber;
@@ -140,7 +147,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                     frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.Finished });
                     // A detached schedule supplies its original instruction as well as its frame ID.
                     phaseOperations.RecordSkipped(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat,
-                        OwnsScheduledDrawSkip(frame) ? null : frame.PhaseOccurrenceFrameId ?? (frame.IsExtra ? frame.Id : null), frame.IsExtra);
+                        OwnsScheduledDraw(frame) ? null : frame.PhaseOccurrenceFrameId ?? (frame.IsExtra ? frame.Id : null), frame.IsExtra);
                     if (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase))
                     {
                         events.AdvanceFact(new DrawPhaseSkippedEvent(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber, frame.IsExtra));
@@ -251,8 +258,8 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     {
         if (frame.ActiveWindowFrameId is not null) throw new InvalidOperationException("A draw phase cannot finish before its observer returns.");
         var scheduled = frame.IsExtra && frame.ParentFrameId is null;
-        if (scheduled && !OwnsScheduledDrawSkip(frame))
-            throw new InvalidOperationException("A skipped scheduled Draw lost its original program and lifecycle return.");
+        if (scheduled && !OwnsScheduledDraw(frame))
+            throw new InvalidOperationException("A scheduled Draw lost its original program and lifecycle return.");
         events.AdvanceFact(new ActualDrawPhaseCompletedEvent(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber,
             frame.IsExtra, frame.Skipped, frame.DrawCount));
         frames.Pop(frame.Id, ResolutionFrameKind.DrawPhaseObligation);
@@ -267,7 +274,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
         }
         if (facts.Winner != Winner.None) { native.AdvanceRulesAndPublishState(); return; }
         if (!participants.Players[frame.OwnerSeat].IsAlive) { native.EndTurn(); return; }
-        if (scheduled)
+        if (scheduled && frame.Skipped)
         {
             if (!scheduler.Value.ResumeScheduledProgramPhase())
                 throw new InvalidOperationException("A skipped scheduled Draw could not return to its original program.");
@@ -296,11 +303,13 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
         if (!facts.HasAttemptCapability || frame.Stage != DrawPhaseObligationStage.Drawing ||
             frame.NativeDraw is not null || requested < 0 || frame.NormalDrawReplaced)
             throw new InvalidOperationException("An actual draw phase cannot issue an unrelated draw request.");
-        var reason = frame.IsExtra ? new CardMoveReason("program.extra-draw-phase.draw") : CardMoveReasons.Draw;
         frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.RequestingDraw,
-            NativeDraw = new NativeDrawProducerReceipt(0, requested, null, SkillProgramCardSetVisibility.Private, reason)
+            NativeDraw = new NativeDrawProducerReceipt(0, requested, null, SkillProgramCardSetVisibility.Private, OwnedDrawReason(frame))
             { Recipients = [frame.OwnerSeat], ReturnKind = NativeDrawAttemptReturnKind.DrawPhase } });
     }
+
+    private static CardMoveReason OwnedDrawReason(DrawPhaseObligationFrame frame) =>
+        frame.ParentFrameId is null ? CardMoveReasons.Draw : new("program.extra-draw-phase.draw");
 
     // Like program producers, the real phase waits for its exact pre-attempt
     // return. Stolen replacement entities are never its actual DrawCount.
@@ -332,7 +341,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
             paid.Operation is not null || paid.Recipients is not System.Collections.IList { IsReadOnly: true } ||
             paid.Recipients is not [var recipient] || recipient != frame.OwnerSeat || paid.RecipientIndex != 0 ||
             paid.RequestedCount < 0 || paid.ResultBind is not null || paid.RecipientApplied ||
-            paid.Reason != (frame.IsExtra ? new CardMoveReason("program.extra-draw-phase.draw") : CardMoveReasons.Draw) ||
+            paid.Reason != OwnedDrawReason(frame) ||
             paid.ActiveAttemptId is null && (paid.AttemptReturned || paid.Replacement is not null) ||
             paid.Replacement is not null && !paid.AttemptReturned)
             throw new InvalidOperationException("An actual Draw phase lost its exact requested count or return contract.");

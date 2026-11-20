@@ -39,9 +39,8 @@ internal sealed class ProgramPhaseSchedulingRuntime(IProgramRuntimeFrames frames
         events.AdvanceFact(new ProgramPhaseScheduledEvent(
             frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, phase, Started: true));
         if (phase == TurnPhase.Play) entries.EnterPlayPhase(beneficiary);
-        else if (!drawPhases.Value.TryBeginScheduledDrawSkip())
+        else if (!drawPhases.Value.TryBeginScheduledDraw())
         {
-            phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat);
             if (!entries.TryBeginDrawPhaseProgramWindow(frame.OwnerSeat))
             {
                 entries.ConsumeDuFuRenDrawPhase(frame.OwnerSeat);

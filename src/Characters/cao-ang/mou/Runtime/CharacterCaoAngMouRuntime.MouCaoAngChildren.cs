@@ -11,9 +11,19 @@ internal sealed partial class CharacterCaoAngMouRuntime
         if (child is CardUseFrame use)
             return MouCaUseRidesOn(use, f);
         if (child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is { } p && MouCaMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
-        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return r.Stage == MouCaoAngStage.Drawing;
+        {
+            var (before, after) = (r.Before, r.After);
+            if (r.Operation == SkillProgramEffectOp.ResolveMouCaoAngFengmin)
+            {
+                if (r.Stage != MouCaoAngStage.DrawChildren || MouCaoAng.FengminCompletedDraw(f, r) is not { } draw)
+                    return false;
+                (before, after) = (draw.SequenceBefore, draw.SequenceAfter);
+            }
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > before && m.Sequence <= after);
+        }
+        if (child is NativeDrawAttemptFrame attempt)
+            return r.Stage == MouCaoAngStage.Drawing && attempt.Context.RecipientSeat == f.OwnerSeat && attempt.Context.RequestedCount == r.Requested &&
+                NativeDrawProducerRuntime.MatchesOperationAttempt(f, attempt, SkillProgramEffectOp.ResolveMouCaoAngFengmin, new(MouCaoAngRuntime.FengminDrawReason));
         if (r.Stage == MouCaoAngStage.DiscardChildren && r.Equipment.Any(c => c.Kind == CardKind.SilverLion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == c.Id && m.From == c.From && m.Sequence > r.Before && m.Sequence <= r.After)))
         {
             if (child is RecoveryReplacementFrame rr)

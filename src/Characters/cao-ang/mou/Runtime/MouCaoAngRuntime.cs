@@ -4,6 +4,7 @@ namespace CardGame.Core;
 internal sealed class MouCaoAngRuntime(IMouCaoAngFacts facts,IMouCaoAngNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws):IMouCaoAngRuntime
 {
     internal const string Fengmin="mou:fengmin",Zhiwang="mou:zhiwang",DiscardReason="skill-program.mou:zhiwang.equipment-discard";
+    internal const string FengminDrawReason = "skill-program.mou:fengmin.draw";
     internal static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);
     internal bool Used(int owner,string instance)=>facts.History<MouCaFengminPaidEvent>().Any(e=>e.Owner==owner&&e.Instance==instance&&e.Turn==facts.Turn&&e.TurnOwner==facts.TurnOwner);
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame supplied,SkillProgramEffectOp op)
@@ -11,20 +12,24 @@ internal sealed class MouCaoAngRuntime(IMouCaoAngFacts facts,IMouCaoAngNative na
         var f=frames.ActiveProgram(supplied.Id);if(f.MouCaoAng is not null){Continue(f.Id);return SkillProgramStepOutcome.AwaitChild;}
         if(f.InstructionIndex!=1||!facts.Parent(f)||facts.Program(f.SkillId)?.GameplayHash!=f.GameplayHash)throw new InvalidOperationException("Mou Cao Ang requires the exact original native trigger parent.");
         if(op==SkillProgramEffectOp.ResolveMouCaoAngFengmin&&Used(f.OwnerSeat,f.SkillInstanceId))return SkillProgramStepOutcome.Continue;
-        var r=new MouCaoAngReceipt(Source(f),f.GameplayHash,op,facts.Turn,facts.TurnOwner,f.WindowContext!.ParentFrameId){Before=facts.Sequence,After=facts.Sequence};
+        var r=new MouCaoAngReceipt(Source(f),f.GameplayHash,op,facts.Turn,facts.TurnOwner,f.WindowContext!.ParentFrameId);
         if(op==SkillProgramEffectOp.ResolveMouCaoAngFengmin)
         {
             var loser=facts.LostEquipmentOwner(f);
             r=r with{Stage=MouCaoAngStage.Drawing,Loser=loser,Requested=facts.EmptySlots(loser)};
         }
-        else if(op==SkillProgramEffectOp.ResolveMouCaoAngZhiwang)r=r with{Stage=MouCaoAngStage.DiscardChildren,Equipment=facts.Equipment(f.OwnerSeat)};
+        else if (op == SkillProgramEffectOp.ResolveMouCaoAngZhiwang)
+        {
+            var before = facts.Sequence;
+            r = r with { Stage = MouCaoAngStage.DiscardChildren, Equipment = facts.Equipment(f.OwnerSeat), Before = before, After = before };
+        }
         else throw new InvalidOperationException("Unknown Mou Cao Ang instruction.");
         frames.ReplaceTop(f=f with{MouCaoAng=r});events.AdvanceFact(new MouCaStartedEvent(f.Id,r.Source,r.GameplayHash,op,r.Turn,r.TurnOwner,r.ParentId));
         if(op==SkillProgramEffectOp.ResolveMouCaoAngFengmin)
         {
             events.AdvanceFact(new MouCaFengminPaidEvent(f.Id,f.OwnerSeat,f.SkillInstanceId,r.Turn,r.TurnOwner,r.ParentId,r.Loser,r.Requested));
             if(r.Requested==0){Complete(f);return SkillProgramStepOutcome.AwaitChild;}
-            draws.BeginOperationProgramDraw(f,f.OwnerSeat,r.Requested,new("skill-program.mou:fengmin.draw"));return SkillProgramStepOutcome.AwaitChild;
+            draws.BeginOperationProgramDraw(f,f.OwnerSeat,r.Requested,new(FengminDrawReason));return SkillProgramStepOutcome.AwaitChild;
         }
         if(r.Equipment.Count==0){Complete(f);return SkillProgramStepOutcome.AwaitChild;}
         frames.ReplaceTop(f=f with{PendingMovementContinuation=new(f.OwnerSeat,0,null)});native.Discard(f);Continue(f.Id);return SkillProgramStepOutcome.AwaitChild;
@@ -71,10 +76,20 @@ internal sealed class MouCaoAngRuntime(IMouCaoAngFacts facts,IMouCaoAngNative na
     }
     internal static bool SameAction(LegalAction a,LegalAction b)=>a.Kind==b.Kind&&a.CardId==b.CardId&&a.PlayedCardKind==b.PlayedCardKind&&a.TargetSeat==b.TargetSeat&&a.TargetCardId==b.TargetCardId&&a.ConversionSource==b.ConversionSource&&a.TargetSeats.SequenceEqual(b.TargetSeats)&&(a.AdditionalConversionSources??[]).SequenceEqual(b.AdditionalConversionSources??[])&&a.ProgramSkillId==b.ProgramSkillId&&a.ProgramActivationId==b.ProgramActivationId;
     internal static bool SameUse(MouCaNativeUse a,MouCaNativeUse b)=>(a.FrameId,a.Instruction,a.Source,a.GameplayHash,a.Turn,a.TurnOwner,a.Actor,a.CardId,a.Kind,a.UseId,a.ActionId)==(b.FrameId,b.Instruction,b.Source,b.GameplayHash,b.Turn,b.TurnOwner,b.Actor,b.CardId,b.Kind,b.UseId,b.ActionId)&&a.Targets.SequenceEqual(b.Targets)&&SameAction(a.Action,b.Action);
-    [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouCaoAngFengmin)]private void DrawReturned(ProgramSkillFrame f,NativeDrawOutcome o)
+    internal NativeDrawOutcome? FengminCompletedDraw(ProgramSkillFrame f, MouCaoAngReceipt r) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveMouCaoAngFengmin, new(FengminDrawReason)) is { } draw &&
+        draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Requested && draw.SequenceBefore >= 0 &&
+        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= facts.Sequence ? draw : null;
+
+    [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouCaoAngFengmin)]
+    private void DrawReturned(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if(!Valid(f)||f.MouCaoAng is not{Stage:MouCaoAngStage.Drawing,Draw:null}r||o.RecipientSeat!=f.OwnerSeat||o.RequestedCount!=r.Requested)throw new InvalidOperationException("Fengmin draw must return its actual empty-slot count once.");
-        frames.Replace(f.Id,f with{MouCaoAng=r with{Stage=MouCaoAngStage.DrawChildren,Draw=o,Before=o.SequenceBefore,After=o.SequenceAfter},PendingMovementContinuation=new(f.OwnerSeat,0,null)});events.AdvanceFact(new MouCaDrawReturnedEvent(f.Id,r.Requested,o.ActualDrawIds.Count,o.ReplacementGainedIds.Count,o.AttemptFrameId));Continue(f.Id);
+        f = frames.ActiveProgram(f.Id);
+        if (!Valid(f) || f.MouCaoAng is not { Stage: MouCaoAngStage.Drawing } r || f.NativeDraw is not null || FengminCompletedDraw(f, r) != outcome)
+            throw new InvalidOperationException("Fengmin draw must return its actual empty-slot count once.");
+        frames.Replace(f.Id, f with { MouCaoAng = r with { Stage = MouCaoAngStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        events.AdvanceFact(new MouCaDrawReturnedEvent(f.Id, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.AttemptFrameId));
+        Continue(f.Id);
     }
     private void Complete(ProgramSkillFrame f){events.AdvanceFact(new MouCaCompletedEvent(f.Id));frames.ReplaceTop(f=f with{MouCaoAng=null,PendingMovementContinuation=null});native.Finish(f);}
     [ProgramContinuation(ProgramContinuationKind.Resume,36700)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouCaoAng:not null}f||f.Id!=id)return false;Continue(id);return true;}

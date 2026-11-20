@@ -12,7 +12,7 @@ public sealed record MouCaNativeUse(long FrameId,int Instruction,CardConversionS
 public sealed record MouCaoAngReceipt(CardConversionSource Source,string GameplayHash,SkillProgramEffectOp Operation,int Turn,int TurnOwner,long ParentId)
 {
     public MouCaoAngStage Stage {get;init;} public int Loser {get;init;}=-1;public int Requested {get;init;}public int Actor {get;init;}=-1;public int CardId {get;init;}public int ActualDiscard {get;init;}
-    public long Before {get;init;}public long After {get;init;}public NativeDrawOutcome? Draw {get;init;}public MouCaNativeUse? Native {get;init;}
+    public long Before {get;init;}public long After {get;init;}public MouCaNativeUse? Native {get;init;}
     private IReadOnlyList<MouCaEntity> _equipment=[];
     public IReadOnlyList<MouCaEntity> Equipment {get=>_equipment;init=>_equipment=Array.AsReadOnly(value.ToArray());}
 }
