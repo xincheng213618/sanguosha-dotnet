@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouMobileRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33200, SkillProgramEffectOp.ResolveMouJiangWeiZhiji)]
-    internal bool CanAwakenMouJw(ProgramTriggerLegalityContext g) => g.SkillId == MouJiangWeiComposition.Zhiji && g.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && g.Context.SourceSeat == g.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } p && p.ActorSeat == g.OwnerSeat && g.Owner.IsAlive && (MouJwSelectedCount(g.OwnerSeat) >= 4 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(g.OwnerSeat, g.SkillId, g.Candidate.BindingId)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat);
+    internal bool CanAwakenMouJw(ProgramTriggerLegalityContext g) => g.SkillId == MouJiangWeiComposition.Zhiji && g.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && g.Context.SourceSeat == g.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } p && p.ActorSeat == g.OwnerSeat && g.Owner.IsAlive && (MouJwSelectedCount(g.OwnerSeat) >= 4 || _awakeningOverrides.Granted(g.OwnerSeat, g.SkillId, g.Candidate.BindingId)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat);
     internal void GrantMouJwBeifa(ProgramSkillFrame f)
     {
         var r = f.MouJiangWei!;

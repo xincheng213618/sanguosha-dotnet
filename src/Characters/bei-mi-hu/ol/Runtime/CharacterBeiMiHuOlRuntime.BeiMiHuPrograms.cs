@@ -23,7 +23,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         if (op == SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart)
             return context.Window == SkillProgramTriggerWindow.RoundStarting && context.BeforeTurnPreludeProof is { } roundProof && ValidBeiMiHuBeforeTurnPrelude(roundProof) && BeiMiHuRound > 0 && BeiMiHuLowestUnmarkedOthers(owner).Length > 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BeiMiHuKuiPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Kind == "round" && e.Round == BeiMiHuRound);
         if (op == SkillProgramEffectOp.AwakenFromActualGujuCards)
-            return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && owner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && (BeiMiHuActualCards(owner) >= 7 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner, "ol:baijia", trigger.Id));
+            return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && owner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && (BeiMiHuActualCards(owner) >= 7 || _awakeningOverrides.Granted(owner, "ol:baijia", trigger.Id));
         return true;
     }
 

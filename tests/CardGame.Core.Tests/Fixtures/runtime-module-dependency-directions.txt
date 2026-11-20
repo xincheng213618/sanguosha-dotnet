@@ -2,7 +2,6 @@
 # Ownership comes from compiled portable PDB source paths; remove a row when its dependency is retired.
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterChenZhiMobileShiEntries	chen-zhi/mobile-shi	CardGame.Core.EngineOwners.CharacterChenZhiMobileShiRuntime
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterDongZhaoMobileShiEntries	dong-zhao/mobile-shi	CardGame.Core.EngineOwners.CharacterDongZhaoMobileShiRuntime
-bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries	guo-jia/mobile-god	CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterLuSuMobileShiEntries	lu-su/mobile-shi	CardGame.Core.EngineOwners.CharacterLuSuMobileShiRuntime
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterSimaHuiOlEntries	sima-hui/ol	CardGame.Core.EngineOwners.CharacterSimaHuiOlRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.CharacterDuFuRenOlEntries	du-fu-ren/ol	CardGame.Core.EngineOwners.CharacterDuFuRenOlRuntime
@@ -180,7 +179,6 @@ jian-yong/boundary-mobile	CardGame.Core.EngineOwners.CharacterJianYongBoundaryMo
 jiang-gan/ol	CardGame.Core.EngineOwners.CharacterJiangGanOlRuntime	CardGame.Core.RuntimeEntries.CharacterBianFuRenOlEntries	bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime
 jiang-ji/mou	CardGame.Core.EngineOwners.CharacterJiangJiMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 jiang-wei/mou	CardGame.Core.EngineOwners.CharacterJiangWeiMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
-jiang-wei/mou-mobile	CardGame.Core.EngineOwners.CharacterJiangWeiMouMobileRuntime	CardGame.Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries	guo-jia/mobile-god	CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime
 jiang-wei/mou-mobile	CardGame.Core.EngineOwners.CharacterJiangWeiMouMobileRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 ju-shou/mou	CardGame.Core.EngineOwners.CharacterJuShouMouRuntime	CardGame.Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries	huang-gai/mou-mobile	CardGame.Core.EngineOwners.CharacterHuangGaiMouMobileRuntime
 ju-shou/mou	CardGame.Core.EngineOwners.CharacterJuShouMouRuntime	CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries	sima-yi/mou	CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime
