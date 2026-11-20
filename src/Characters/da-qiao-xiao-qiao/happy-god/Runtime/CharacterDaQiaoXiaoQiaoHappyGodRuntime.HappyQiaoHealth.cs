@@ -328,7 +328,8 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         {
             var change = new HpChangeContext(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parentFrameId, null, targetSeat, HpChangeKind.MaximumHp, Math.Abs(after.MaximumHp - before.MaximumHp), before.Hp(pool), after.Hp(pool))
             {
-                HappyQiaoPool = pool
+                HappyQiaoPool = pool,
+                IsFirstActualHpChangeInTurn = _actualTurnHpChanges.Record(targetSeat, before.Hp(pool), after.Hp(pool))
             };
             _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.Add(change);
             _coreQimeiProgramsOperations.CaptureQimeiHpQualification(change);

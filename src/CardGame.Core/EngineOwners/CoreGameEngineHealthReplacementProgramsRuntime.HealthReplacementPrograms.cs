@@ -17,15 +17,26 @@ internal sealed partial class CoreGameEngineHealthReplacementProgramsRuntime
             DamageAppliedEvent damage => (damage.TargetSeat, HpChangeKind.Damage, damage.ArmorPayment?.ActualHpLost ?? damage.Amount),
             MaximumHpChangedEvent maximum => (maximum.PlayerSeat, HpChangeKind.MaximumHp, Math.Abs(maximum.Delta)),
             _ => (-1, HpChangeKind.Damage, 0)};
-        if (!_coreMatchSetupSetupCompleteAccess._setupComplete || changed.Item1 < 0 || changed.Item3 <= 0 || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[changed.Item1], SkillProgramTriggerWindow.AfterHealthChanged).Count == 0 && !_coreQimeiProgramsOperations.HasQimeiHealthSubject(changed.Item1) && !_characterHuanShuJunOlOperations.HasWenyiHealthSubject(changed.Item1) && !_programPipelineHooksOperations._programPipelineHooks.HealthChangeSubject(changed.Item1)))
+        if (!_coreMatchSetupSetupCompleteAccess._setupComplete || changed.Item1 < 0 || changed.Item3 <= 0 || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
         var owner = _coreMatchParticipantsPlayersAccess._players[changed.Item1];
-        var healthOwner = _coreGrantedEntityPhasesOperations.GrantedEntityTrailerHealthOwner(payload) ?? _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
+        var opensHealthWindow = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.AfterHealthChanged).Count > 0 ||
+            _coreQimeiProgramsOperations.HasQimeiHealthSubject(owner.Seat) || _characterHuanShuJunOlOperations.HasWenyiHealthSubject(owner.Seat) ||
+            _programPipelineHooksOperations._programPipelineHooks.HealthChangeSubject(owner.Seat);
+        if (!opensHealthWindow && !_actualTurnHpChanges.Tracks)
+            return;
+
         var before = payload is DamageAppliedEvent damagePaid ? damagePaid.ArmorPayment?.HpBefore ?? owner.Hp + changed.Item3 : payload is MaximumHpChangedEvent { HpBeforeClamp: { } beforeClamp } ? beforeClamp : owner.Hp;
         var after = payload is DamageAppliedEvent { ArmorPayment: { } payment } ? payment.HpAfter : owner.Hp;
+        var firstActualHpChange = _actualTurnHpChanges.Record(owner.Seat, before, after);
+        if (!opensHealthWindow)
+            return;
+
+        var healthOwner = _coreGrantedEntityPhasesOperations.GrantedEntityTrailerHealthOwner(payload) ?? _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
         var change = new HpChangeContext(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, healthOwner, null, owner.Seat, changed.Item2, changed.Item3, before, after)
         {
-            HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(owner.Seat, healthOwner)
+            HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(owner.Seat, healthOwner),
+            IsFirstActualHpChangeInTurn = firstActualHpChange
         };
         _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.Add(change);
         _coreQimeiProgramsOperations.CaptureQimeiHpQualification(change);

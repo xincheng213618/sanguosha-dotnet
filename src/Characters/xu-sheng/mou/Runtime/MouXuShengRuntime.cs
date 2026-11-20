@@ -3,7 +3,8 @@ namespace CardGame.Core;
 
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNative native, IProgramRuntimeFrames frames,
-    IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouXuShengRuntime
+    IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws,
+    ICardZoneEntryQueries zoneEntries) : IMouXuShengRuntime
 {
     internal const string Action = "mou-xu-sheng",DrawReason = "skill-program.mou:qinqiang.draw",        DiscardReason = "skill-program.mou:yizhen.discard",ClaimReason = "skill-program.mou:yizhen.claim";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
@@ -120,6 +121,9 @@ internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNativ
         frames.ReplaceTop(f with { MouXuSheng = r with { Cursor = r.Cursor + 1, Selected = r.Selected.Append(new(view.Viewer, card)).ToArray() } });
         Continue(f.Id);
     }
+    internal bool IsCurrentPaidDiscard(MouXuShengPaid paid) =>
+        zoneEntries.CurrentEntry(CardLocation.DiscardPile, paid.Card.CardId) == paid.Sequence;
+
     internal void Continue(long id)
     {
         while (prompts.Current is null && frames.Top is ProgramSkillFrame { MouXuSheng: { } r } f && f.Id == id)
@@ -155,7 +159,7 @@ internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNativ
             {
                 if (!facts.Alive(f.OwnerSeat) || r.Paid is not [var first, var second] || first.Card.IsRed is not { } color || second.Card.IsRed != color)
                 { Complete(f); return; }
-                var ids = r.Paid.Select(p => p.Card.CardId).Where(card => facts.Location(card) == CardLocation.DiscardPile).ToArray();
+                var ids = r.Paid.Where(IsCurrentPaidDiscard).Select(paid => paid.Card.CardId).ToArray();
                 if (ids.Length == 0) { Complete(f); return; }
                 var before = facts.MovementSequence;
                 frames.ReplaceTop(f = f with { MouXuSheng = r with { Stage = MouXuShengStage.ClaimChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

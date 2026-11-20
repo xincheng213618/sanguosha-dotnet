@@ -11,7 +11,8 @@ internal sealed partial class CoreGameEngineHpChangeProgramsRuntime
             return null;
         var change = new HpChangeContext(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parentFrameId, sourceSeat, targetSeat, kind, amount, before, after, kind == HpChangeKind.Loss && _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashCapability ? new LossOccurrence(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase) : null, kind == HpChangeKind.Loss && _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashCapability ? Array.AsReadOnly(new[] { SkillProgramTriggerWindow.AfterHpLost, SkillProgramTriggerWindow.AfterHealthChanged }.SelectMany(window => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[targetSeat], window)).ToArray()) : null)
         {
-            HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(targetSeat, parentFrameId)
+            HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(targetSeat, parentFrameId),
+            IsFirstActualHpChangeInTurn = _actualTurnHpChanges.Record(targetSeat, before, after)
         };
         _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.Add(change);
         _characterHuangGaiMouMobileOperations.CaptureMouKurouNativeLoss(change);

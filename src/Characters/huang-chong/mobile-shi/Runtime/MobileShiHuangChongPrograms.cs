@@ -131,7 +131,7 @@ internal sealed class ResolveShiHcSiliDescriptor : ProgramOperationDescriptorBas
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ChooseOption,
         static (_, context) => context.PublicControlValue(1));
-    public override ProgramFactRequirements FactRequirements => new();
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.FirstActualTurnHpChange);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
 }

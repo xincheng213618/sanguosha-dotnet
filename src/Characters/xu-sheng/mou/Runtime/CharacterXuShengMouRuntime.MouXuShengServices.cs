@@ -39,7 +39,6 @@ internal sealed partial class CharacterXuShengMouRuntime
     bool IMouXuShengFacts.SourcedDamage(ProgramSkillWindowContext context, int owner) => context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: var target, DamageFrameId: not null, Amount: > 0 } && target == owner && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source);
     IReadOnlyList<MouXuShengCard> IMouXuShengFacts.Hand(int seat) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Select(c => new MouXuShengCard(c.Id, seat, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], c)))).ToArray());
     bool IMouXuShengFacts.Discardable(int chooser, MouXuShengCard card) => _cardZonesOperations._cardZones.GetLocation(card.CardId) == CardLocation.Hand(card.Holder) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, _coreAdvancedLifecycleOperations.GetAdvancedCard(card.CardId), CardLocation.Hand(card.Holder), OwnedCardMoveIntent.Discard);
-    CardLocation IMouXuShengFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
     void IMouXuShengNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     void IMouXuShengNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     bool IMouXuShengNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
@@ -73,7 +72,9 @@ internal sealed partial class CharacterXuShengMouRuntime
 
     void IMouXuShengNative.Claim(ProgramSkillFrame f, IReadOnlyList<int> ids)
     {
-        if (!MouXuSheng.Valid(f) || f.MouXuSheng is not { Stage: MouXuShengStage.ClaimChildren, Paid: [var first, var second] } r || first.Card.IsRed is not { } color || second.Card.IsRed != color || ids.Any(id => !r.Paid.Any(p => p.Card.CardId == id) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile))
+        if (!MouXuSheng.Valid(f) || f.MouXuSheng is not { Stage: MouXuShengStage.ClaimChildren, Paid: [var first, var second] } r ||
+            first.Card.IsRed is not { } color || second.Card.IsRed != color ||
+            ids.Any(id => !r.Paid.Any(paid => paid.Card.CardId == id && MouXuSheng.IsCurrentPaidDiscard(paid))))
             throw new InvalidOperationException("Yizhen may only recover its matching-color actual discarded entities still in the discard pile.");
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(MouXuShengRuntime.ClaimReason), (_, records) =>
         {

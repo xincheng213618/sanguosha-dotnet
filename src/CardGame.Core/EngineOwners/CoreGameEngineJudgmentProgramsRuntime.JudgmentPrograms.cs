@@ -16,16 +16,35 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
         return true;
     }
 
-    internal bool MatchesFinalJudgment(SkillProgramTrigger trigger, CharacterState owner, JudgmentFrame pending, Card judgmentCard, Suit effectiveSuit) => trigger.Window == SkillProgramTriggerWindow.JudgmentFinalized && (trigger.Subject == SkillProgramTriggerSubject.Any || pending.TargetSeat == owner.Seat) && (trigger.JudgmentSource is null || trigger.JudgmentSource == SkillProgramTriggerSubject.Any || pending.SourceSeat == owner.Seat) && (trigger.JudgmentReasons.Count == 0 || trigger.JudgmentReasons.Contains(pending.Reason, StringComparer.Ordinal)) && trigger.Suits.Contains(effectiveSuit) && _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, judgmentCard.Rank) >= trigger.MinimumRank && _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, judgmentCard.Rank) <= trigger.MaximumRank && !trigger.ExcludedReasons.Contains(pending.Reason, StringComparer.Ordinal) && CanStartFinalJudgmentEffects(owner, trigger) && (!trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ClaimJudgmentCard) || _cardZonesOperations._cardZones.GetLocation(judgmentCard.Id) == CardLocation.Judgment(pending.TargetSeat));
+    internal bool MatchesFinalJudgment(SkillProgramTrigger trigger, CharacterState owner, JudgmentFrame pending, Card judgmentCard, Suit effectiveSuit) =>
+        trigger.Window == SkillProgramTriggerWindow.JudgmentFinalized &&
+        (trigger.Subject == SkillProgramTriggerSubject.Any || pending.TargetSeat == owner.Seat) &&
+        (trigger.JudgmentSource is null || trigger.JudgmentSource == SkillProgramTriggerSubject.Any || pending.SourceSeat == owner.Seat) &&
+        (trigger.JudgmentReasons.Count == 0 || trigger.JudgmentReasons.Contains(pending.Reason, StringComparer.Ordinal)) &&
+        trigger.Suits.Contains(effectiveSuit) &&
+        _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, judgmentCard.Rank) >= trigger.MinimumRank &&
+        _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, judgmentCard.Rank) <= trigger.MaximumRank &&
+        !trigger.ExcludedReasons.Contains(pending.Reason, StringComparer.Ordinal) &&
+        CanStartFinalJudgmentEffects(owner, trigger, pending.TargetSeat, judgmentCard.Id);
     internal bool CanRunProgramJudgmentTrigger(ProgramJudgmentTriggerCandidate candidate, SkillProgramTrigger trigger, JudgmentFinalizedContext judgment)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
-        return owner.IsAlive && trigger.Window == _coreZhenyiJudgmentWindowsOperations.CurrentZhenyiJudgmentWindowKind(judgment.JudgmentFrameId) && (trigger.Subject == SkillProgramTriggerSubject.Any || judgment.SubjectSeat == owner.Seat) && (trigger.JudgmentSource is null || trigger.JudgmentSource == SkillProgramTriggerSubject.Any || judgment.SourceSeat == owner.Seat) && (trigger.JudgmentReasons.Count == 0 || trigger.JudgmentReasons.Contains(judgment.Reason, StringComparer.Ordinal)) && trigger.Suits.Contains(judgment.Suit) && judgment.Rank >= trigger.MinimumRank && judgment.Rank <= trigger.MaximumRank && !trigger.ExcludedReasons.Contains(judgment.Reason, StringComparer.Ordinal) && CanStartFinalJudgmentEffects(owner, trigger) && (!trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ClaimJudgmentCard) || _cardZonesOperations._cardZones.GetLocation(judgment.CardId) == CardLocation.Judgment(judgment.SubjectSeat));
+        return owner.IsAlive &&
+            trigger.Window == _coreZhenyiJudgmentWindowsOperations.CurrentZhenyiJudgmentWindowKind(judgment.JudgmentFrameId) &&
+            (trigger.Subject == SkillProgramTriggerSubject.Any || judgment.SubjectSeat == owner.Seat) &&
+            (trigger.JudgmentSource is null || trigger.JudgmentSource == SkillProgramTriggerSubject.Any || judgment.SourceSeat == owner.Seat) &&
+            (trigger.JudgmentReasons.Count == 0 || trigger.JudgmentReasons.Contains(judgment.Reason, StringComparer.Ordinal)) &&
+            trigger.Suits.Contains(judgment.Suit) && judgment.Rank >= trigger.MinimumRank && judgment.Rank <= trigger.MaximumRank &&
+            !trigger.ExcludedReasons.Contains(judgment.Reason, StringComparer.Ordinal) &&
+            CanStartFinalJudgmentEffects(owner, trigger, judgment.SubjectSeat, judgment.CardId);
     }
 
-    internal bool CanStartFinalJudgmentEffects(CharacterState owner, SkillProgramTrigger trigger)
+    private bool CanStartFinalJudgmentEffects(CharacterState owner, SkillProgramTrigger trigger, int subjectSeat, int cardId)
     {
-        var first = trigger.Effects.FirstOrDefault(effect => effect.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)));
+        var context = _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner);
+        var first = trigger.Effects.FirstOrDefault(effect => effect.Condition.Evaluate(context) &&
+            (effect.Op != SkillProgramEffectOp.ClaimJudgmentCard ||
+                _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Judgment(subjectSeat)));
         if (first is null)
             return false;
         return first.Op != SkillProgramEffectOp.SelectTarget || first.TargetKind is { } kind && _coreProgramLifecycleOperations.GetProgramTargetSeats(owner.Seat, kind).Count > 0;

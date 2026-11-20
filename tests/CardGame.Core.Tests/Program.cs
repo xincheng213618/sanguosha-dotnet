@@ -835,6 +835,11 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Cangming: Xingshang preserves edition scope for original Ming death discard", AnniversaryCangmingDeathCleanupChecks.XingshangKeepsEditionScopeForOriginalMingDeathDiscardCold),
     ("OL Xu Rong Shajue: original dying Slash cannot be claimed after prior native delivery cold", OlXuRongShajueMaterialChecks.ShajueReplenishesButCannotClaimAnAlreadyDeliveredSlashCold),
     ("Classic Guizao: actual phase discards use distinct effective suits cold", ClassicSunZiLiuFangGuizaoDiscardSuitsChecks.GuizaoUsesActualDiscardSuitsAndRejectsEffectiveDuplicatesCold),
+    ("Mou Xu Sheng Yizhen: original same-color discard entries cold", MouXuShengYizhenDiscardEntryChecks.YizhenRecoversOnlyItsOriginalSameColorPaymentsCold),
+    ("Boundary Baonue: earlier claim keeps recovery and original judgment return cold", BoundaryDongZhuoBaonueJudgmentClaimChecks.BaonueRecoversAfterAnEarlierClaimOfTheSameJudgmentCardCold),
+    ("Mobile Shi Huang Chong Sili: only the first actual health change offers after refusal cold", ShiHuangChongSiliFirstHealthChecks.SiliOnlyOffersTheFirstActualHealthChangeEvenAfterRefusalCold),
+    ("Classic Luoshen: Tiandu keeps the original claim and Luoshen continues cold", ClassicZhenJiLuoshenJudgmentEntryChecks.LuoshenContinuesAfterTianduAndUsesTheNextJudgmentEntryCold),
+    ("Classic Kangkai: Jilei forbids use of the gifted equipment cold", ClassicCaoAngKangkaiEquipmentChecks.KangkaiCannotUseEquipmentForbiddenByJileiCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -40,7 +40,8 @@ internal sealed partial class CoreActualTurnsRuntime
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression with
         {
             OwnerSeat = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat,
-            TurnNumber = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber
+            TurnNumber = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber,
+            HpChangedSeats = null
         };
         _coreCardUseModulesOperations.ExpireOwnerTurnStartDamageModifiers(current.Seat);
         _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerPlayPhaseKillCountByCurrentPlayerSlashCountThisTurnUsedOrPlayedSlashDuringPlayPhaseWoodenOxUsedThisTurnAccess._slashCountThisTurn = 0;

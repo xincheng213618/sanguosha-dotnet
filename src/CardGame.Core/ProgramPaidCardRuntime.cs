@@ -45,6 +45,7 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     Card[] ClaimableDamageCards(ProgramSkillFrame frame);
     bool FrozenSuitMatchesChoice(ProgramSkillFrame frame, string cardBind, string choiceBind);
     bool BoundCardsMatchCategories(ProgramSkillFrame frame, string bind, IReadOnlyList<SkillProgramCardCategory> categories);
+    bool CanUseBoundEquipment(ProgramSkillFrame frame, int userSeat, string bind);
 }
 
 internal interface IProgramPaidCardOperations : IProgramRuntimeOperations

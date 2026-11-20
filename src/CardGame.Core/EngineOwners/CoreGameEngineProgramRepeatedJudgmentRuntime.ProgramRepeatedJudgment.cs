@@ -5,6 +5,10 @@ internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
 {
     internal SkillProgramStepOutcome BeginProgramRepeatedJudgment(ProgramSkillFrame frame, string reason, string resultBind, IReadOnlyList<Suit> successSuits)
     {
+        var exact = _coreExactRepeatedJudgmentOperations.Value;
+        if (exact.IsActualRepeatedJudgmentPreparation(frame))
+            return exact.BeginProgramExactRepeatedJudgment(frame, reason, resultBind, successSuits, SkillProgramClaimHandLimitExemption.None);
+
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.RepeatedJudgment is not null || successSuits.Count == 0 || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Repeated judgment requires one active owner and success suit set.");

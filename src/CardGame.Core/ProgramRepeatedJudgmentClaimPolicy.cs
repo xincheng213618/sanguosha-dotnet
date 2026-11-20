@@ -1,7 +1,13 @@
+using System.Text.Json.Serialization;
+
 namespace CardGame.Core;
 
 public enum SkillProgramClaimHandLimitExemption { ActualTurn = 0, None = 1 }
-public sealed record ProgramRepeatedJudgmentFinalOutcome(long JudgmentFrameId, int CardId, CardKind CardKind, Suit FinalSuit, bool Matched);
+public sealed record ProgramRepeatedJudgmentFinalOutcome(long JudgmentFrameId, int CardId, CardKind CardKind, Suit FinalSuit, bool Matched)
+{
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal long? EntrySequence { get; init; }
+}
 public sealed record ProgramRepeatedJudgmentClaimTurn(int TurnNumber, int TurnOwnerSeat);
 public sealed record ProgramRepeatedJudgmentClaimReceipt(int InstructionIndex, long JudgmentFrameId, int CardId, int MovementSequence,
     CardLocation From, CardLocation To, int TurnNumber, int TurnOwnerSeat,

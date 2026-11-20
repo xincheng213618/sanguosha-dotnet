@@ -4,7 +4,8 @@ namespace CardGame.Core;
 // children keep their original frames and receipts; this module stores no state.
 [ProgramRuntimeModule]
 internal sealed class ProgramHealthStateRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
-    IMatchParticipantStateAccess participants, IProgramHealthStateFacts facts, IProgramHealthStateNativeEntries native)
+    IMatchParticipantStateAccess participants, IProgramHealthStateFacts facts, IProgramHealthStateNativeEntries native,
+    IActualTurnHpChangeCapture actualTurnHpChanges)
 {
     internal void RecoverProgramTargetTo(long frameId, int ownerSeat, int targetSeat,
         SkillProgramNumberExpression expression, int minimumValue, bool clampToMaxHp)
@@ -78,7 +79,8 @@ internal sealed class ProgramHealthStateRuntime(IProgramRuntimeFrames frames, IP
             sourceSkillId ?? frame.SkillId)
         {
             HpBeforeClamp = facts.HasQimeiHealthSubject(owner.Seat) || owner.XiaHuiRestrictions is { Count: > 0 } ||
-                facts.HasMouSunJianOlHpSubject(owner.Seat) || facts.HealthChangeSubject(owner.Seat) ? hpBeforeClamp : null
+                facts.HasMouSunJianOlHpSubject(owner.Seat) || facts.HealthChangeSubject(owner.Seat) ||
+                (hpBeforeClamp != owner.Hp && actualTurnHpChanges.Tracks) ? hpBeforeClamp : null
         });
     }
 

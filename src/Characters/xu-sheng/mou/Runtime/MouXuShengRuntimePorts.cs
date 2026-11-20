@@ -17,7 +17,6 @@ internal interface IMouXuShengFacts : IProgramSelectionQuery
     bool SourcedDamage(ProgramSkillWindowContext context, int owner);
     IReadOnlyList<MouXuShengCard> Hand(int seat);
     bool Discardable(int chooser, MouXuShengCard card);
-    CardLocation Location(int id);
 }
 internal interface IMouXuShengNative : IProgramRuntimeOperations
 {

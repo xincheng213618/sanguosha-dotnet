@@ -10,7 +10,9 @@
 
 替换先整体验证旧/新实体及来源，以原子移动建立新的有效判定，再处理装备/手牌离场后果。不能让子窗口观察到成本已经离开、判定却仍指向旧牌的状态。改判候选按统一排序冻结，私有选牌仅向响应者发布。
 
-`judgmentFinalized` 读取改判后的有效花色、点数及最终实体。可用 `judgmentReasons`、`excludedReasons`、`judgmentSource` 等显式过滤；中间被换走的牌不触发最终结果收益。判定结果绑定用于后续领取、伤害或直接死亡，不能在牌已被其他窗口领取后重复移动。
+`judgmentFinalized` 读取改判后的有效花色、点数及最终实体。可用 `judgmentReasons`、`excludedReasons`、`judgmentSource` 等显式过滤。判定结果绑定用于后续领取、伤害或直接死亡。前序候选已领走最终判定牌时，后序候选仍可按生效结果执行回复等独立指令。原判定牌已离开判定主体的判定区时，领取步骤直接结束。
+
+实际回合开始时的连续判定按原生返回冻结每轮的最终花色和入区序号。前序候选领取判定牌后，生效花色仍决定能否继续。领取或取消清理仅作用于该轮尚存的原入区。
 
 正式示例见[经典张角](../../../src/Characters/zhang-jiao/classic/Skills/classic-zhang-jiao.rules.json)、[界张角](../../../src/Characters/zhang-jiao/boundary/Skills/boundary-zhang-jiao.rules.json)和[国战张角](../../../src/Characters/zhang-jiao/national/Skills/national-zhang-jiao.rules.json)。三者的主体、分支、旧牌去向及贡献过滤分别定义。
 
@@ -25,6 +27,8 @@
 ## 回复与体力变化
 
 `recover`、`recoverTo`、`loseHp`、上限变化与伤害分别进入对应流程，不能互相替代。实际回复受目标状态和上限约束，回复被替代或触发 HP 子窗口时，原回复收据留在其拥有帧。
+
+需要判断回合首次体力值变化时，实际回合记录各座位第一次真实变化，原 HP 上下文冻结该次是否为首次。伤害、失去体力、回复和上限夹取都按变化前后的体力值判断，单纯改变上限时体力值不变。是否发动技能不改变首次记录。
 
 用牌回复修正按真实用牌者冻结，普通、转换及零实体桃均保留同一动作的回复收据。濒死酒按实际饮酒者归属；外部材料提供者不把自己的修正传给使用者。[战意](../../../src/Characters/zhu-ling/ol/Skills/ol-zhu-ling.rules.json)通过显式 `recoveryBonus` 与到期策略使用该能力。
 

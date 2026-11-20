@@ -458,13 +458,36 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramExtraTurnPendedEvent(active.Id, active.SkillId, beneficiarySeat));
     }
 
+    internal bool CanUseProgramBoundEquipment(ProgramSkillFrame frame, int userSeat, string sourceBind) =>
+        _coreTableSeatQueriesOperations.IsValidPlayerSeat(userSeat) &&
+        frame.CardSetBindings.SingleOrDefault(item => item.Name == sourceBind) is
+            { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var cardId] } binding &&
+        _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(userSeat) &&
+        CanUseProgramBoundEquipment(binding, _coreMatchParticipantsPlayersAccess._players[userSeat],
+            _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(userSeat)).Single(card => card.Id == cardId));
+
+    private bool CanUseProgramBoundEquipment(ProgramSkillCardSetBinding binding, CharacterState user, Card card)
+    {
+        if (!user.IsAlive || !binding.SourceLocations.SequenceEqual([CardLocation.Hand(user.Seat)]) ||
+            !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind) ||
+            user.EquipmentSlotCapacity(_coreFieldEquipmentOperations.FieldEquipmentSlot(card)) == 0 ||
+            _coreCardConversionsOperations.HasProgramCardIdentity(user, card) ||
+            _coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(user, card) ||
+            _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(user.Seat, [card.Id]))
+            return false;
+
+        var action = new LegalAction(LegalActionKind.Equip, card.Id, null, card.DisplayName);
+        return _coreCardUseModulesOperations.FilterTurnCardUseRestrictions(user, [action], card)
+            .Any(candidate => candidate.Kind == LegalActionKind.Equip && candidate.CardId == card.Id);
+    }
+
     internal SkillProgramStepOutcome UseProgramBoundCardByTarget(ProgramSkillFrame frame, int userSeat, string sourceBind)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.OwnerSeat != frame.OwnerSeat || active.SkillId != frame.SkillId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id)
             throw new InvalidOperationException("A bound-card use requires the current active program frame.");
         var user = _coreMatchParticipantsPlayersAccess._players[userSeat];
-        var binding = frame.CardSetBindings.SingleOrDefault(item => item.Name == sourceBind) ?? throw new InvalidOperationException("A bound-card use references a missing card set.");
+        var binding = active.CardSetBindings.SingleOrDefault(item => item.Name == sourceBind) ?? throw new InvalidOperationException("A bound-card use references a missing card set.");
         var cancel = (string message) =>
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -481,7 +504,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         var cardId = binding.CardIds[0];
         var location = _cardZonesOperations._cardZones.GetLocation(cardId);
         var card = _cardZonesOperations._cardZones.CardsAt(location).SingleOrDefault(item => item.Id == cardId);
-        if (location.OwnerSeat != user.Seat || location.Zone != CardZoneKind.Hand || card is null)
+        if (location != CardLocation.Hand(user.Seat) || card is null)
         {
             cancel("赠出的牌已离开用牌者手牌，使用步骤取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -489,8 +512,17 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
 
         if (!_coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind))
             throw new InvalidOperationException("A bound-card use requires an equipment card.");
+        var plan = ProgramInstructionResolver.Default.Resolve(active, _contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Program!);
+        var instruction = plan.GetPausedInstruction(active.InstructionIndex).Effect;
+        if (instruction.Condition.OptionId is { } optionId &&
+            ProgramPaidCardRuntime.BoundEquipmentUseForOption(plan, active.InstructionIndex - 1, optionId) is not null &&
+            !CanUseProgramBoundEquipment(binding, user, card))
+        {
+            cancel("赠出的装备已无法使用，使用步骤取消。");
+            return SkillProgramStepOutcome.AwaitChild;
+        }
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PendingMovementContinuation = new ProgramMovementContinuation(user.Seat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new ProgramMovementContinuation(user.Seat, 0, null) });
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(SkillProgramEffectOp.UseBoundCardByTarget)}");
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(card, user.Seat, []);
         _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.Processing, reason);

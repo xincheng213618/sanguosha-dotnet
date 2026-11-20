@@ -32,6 +32,7 @@ internal sealed partial class CoreGameEngineSkillProgramsEntries
     internal Suit ProgramSameSuitInputSuit(CharacterState owner, int cardId, bool useEffectiveSuit) => _resolve().ProgramSameSuitInputSuit(owner, cardId, useEffectiveSuit);
     internal void ResetProgramContributionUsesForPlayPhase(int providerSeat) => _resolve().ResetProgramContributionUsesForPlayPhase(providerSeat);
     internal CommandResult SubmitUseProgramSkill(UseProgramSkillCommand command) => _resolve().SubmitUseProgramSkill(command);
+    internal bool CanUseProgramBoundEquipment(ProgramSkillFrame frame, int userSeat, string sourceBind) => _resolve().CanUseProgramBoundEquipment(frame, userSeat, sourceBind);
     internal SkillProgramStepOutcome UseProgramBoundCardByTarget(ProgramSkillFrame frame, int userSeat, string sourceBind) => _resolve().UseProgramBoundCardByTarget(frame, userSeat, sourceBind);
     internal SkillProgramStepOutcome UseProgramSelectedCardsAs(ProgramSkillFrame frame, int targetSeat, string viewAsId, CardKind outputKind) => _resolve().UseProgramSelectedCardsAs(frame, targetSeat, viewAsId, outputKind);
     internal CommandError? ValidateProgramSelection(LegalAction action, IReadOnlyList<int> cards, IReadOnlyList<int> targets) => _resolve().ValidateProgramSelection(action, cards, targets);

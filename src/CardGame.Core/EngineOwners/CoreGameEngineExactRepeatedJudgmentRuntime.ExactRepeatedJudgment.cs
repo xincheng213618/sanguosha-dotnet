@@ -7,7 +7,9 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
     internal SkillProgramStepOutcome BeginProgramExactRepeatedJudgment(ProgramSkillFrame frame, string reason, string bind, IReadOnlyList<Suit> suits, SkillProgramClaimHandLimitExemption policy)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (policy is not (SkillProgramClaimHandLimitExemption.ActualTurn or SkillProgramClaimHandLimitExemption.None) || active.RepeatedJudgment is not null || suits.Count == 0 || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
+        if (policy is not (SkillProgramClaimHandLimitExemption.ActualTurn or SkillProgramClaimHandLimitExemption.None) ||
+            active.RepeatedJudgment is not null || suits.Count == 0 || !IsActualRepeatedJudgmentPreparation(frame) ||
+            !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Exact repeated judgment requires its actual owner preparation turn.");
         active = active with
         {
@@ -21,12 +23,27 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
         return _coreProgramLifecycleOperations.StartProgramJudgment(active, frame.OwnerSeat, reason, bind, SkillProgramCardSetVisibility.Public, frame.OwnerSeat);
     }
 
+    internal bool IsActualRepeatedJudgmentPreparation(ProgramSkillFrame frame)
+    {
+        var turn = _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess;
+        return frame.WindowContext?.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow &&
+            frame.OwnerSeat == turn._currentSeat && frame.OwnerSeat == turn._turnProgression.OwnerSeat &&
+            turn._turnProgression.TurnNumber == turn._turnNumber;
+    }
+
     internal void CaptureProgramRepeatedJudgmentClaimOutcome(JudgmentFrame judgment, Card card, Suit suit)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == judgment.ParentFrameId)is not { RepeatedJudgment: { ClaimHandLimitExemption: not null } repeated } frame)
             return;
-        _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { RepeatedJudgment = repeated with { FinalOutcome = new(judgment.Id, card.Id, card.Kind, suit, repeated.SuccessSuits.Contains(suit)) } });
+        var outcome = new ProgramRepeatedJudgmentFinalOutcome(judgment.Id, card.Id, card.Kind, suit, repeated.SuccessSuits.Contains(suit))
+        {
+            EntrySequence = _zoneEntries.CurrentEntry(CardLocation.Judgment(judgment.TargetSeat), card.Id)
+        };
+        _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { RepeatedJudgment = repeated with { FinalOutcome = outcome } });
     }
+
+    private bool HasOriginalJudgmentEntry(ProgramRepeatedJudgmentFinalOutcome outcome, CardLocation from) =>
+        outcome.EntrySequence is { } sequence && _zoneEntries.CurrentEntry(from, outcome.CardId) == sequence;
 
     internal bool ExactRepeatedJudgmentSourceLive(ProgramSkillFrame frame, ProgramRepeatedJudgment state) => state.ClaimTurn is { } turn && turn.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && turn.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     internal void ResumeProgramExactRepeatedJudgment(JudgmentFrame judgment, ProgramSkillFrame frame, ProgramRepeatedJudgment state)
@@ -42,14 +59,14 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
         if (outcome.JudgmentFrameId != judgment.Id || outcome.CardId != card.Id || outcome.CardKind != card.Kind || state.LastClaimReceipt is not null)
             throw new InvalidOperationException("Exact repeated judgment returned a different final entity.");
         var live = ExactRepeatedJudgmentSourceLive(frame, state);
-        var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
+        var location = CardLocation.Judgment(judgment.TargetSeat);
         var next = state with
         {
             CompletedCount = checked(state.CompletedCount + 1),
             LastMatched = live && outcome.Matched
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { RepeatedJudgment = next });
-        if (location != CardLocation.Judgment(judgment.TargetSeat))
+        if (!HasOriginalJudgmentEntry(outcome, location))
         {
             // A different actual claimant keeps the entity; its final color can still permit another judgment.
             if (!live)
@@ -96,7 +113,7 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
         if (frame.RepeatedJudgment is not { ClaimHandLimitExemption: not null, FinalOutcome: { } outcome, LastClaimReceipt: null })
             return;
         var from = CardLocation.Judgment(frame.OwnerSeat);
-        if (_cardZonesOperations._cardZones.GetLocation(outcome.CardId) != from)
+        if (!HasOriginalJudgmentEntry(outcome, from))
             return;
         var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == outcome.CardId);
         if (card.Kind != outcome.CardKind)

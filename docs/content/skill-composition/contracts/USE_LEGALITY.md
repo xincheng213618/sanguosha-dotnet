@@ -9,6 +9,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Applied card-action restrictions use the shared prohibition store and AppliedCardActionRestrictionsRuntime with declared recipients, material facts and lifetimes. Actual-use expiry consumes shared native declaration and self-response facts independently of source survival; do not rebuild character grant/consume ledgers or treat payment, ordinary play or supplied responses as another actual use.
 
+- An optional use of a gifted equipment card binds the named choice to the original public card set and its recipient. Display, submission and native use read the same equipment eligibility, including current hand ownership, slot availability and use restrictions. The choice supplies the timing for the authorized use.
+
 ## Quotas, directed rights and attack range
 
 - Target card-use quotas use `IProgramTargetQuotaQueries` for the aggregate answer, including general allowances that also permit Slash. Issue independent allowances through directed-policy data; keep native recipient slots on the original instruction and keep quota permission separate from actual use history. Native Slash queries retain their outer use/target guards and ignore-count, out-of-Play, other-actor and HappyQiao Shutu permissions, then check ordinary quota before extra pure allowances. Keep the router's internal BeforeLimit/AfterLimit binding order and the separate actual-debit owner.

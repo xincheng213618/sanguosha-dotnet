@@ -213,7 +213,7 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
             return false;
         return c.Context.Window switch
         {
-            SkillProgramTriggerWindow.AfterHealthChanged => true,
+            SkillProgramTriggerWindow.AfterHealthChanged => c.Context.HpChange is { IsFirstActualHpChangeInTurn: true },
             SkillProgramTriggerWindow.DrawPhaseStarting => ShiHcLedger().PendingDrawGrants(c.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).Count > 0,
             SkillProgramTriggerWindow.TurnStartBeforeNormalFlow => ShiHcLedger().PendingBeishui(c.OwnerSeat).Count > 0,
             _ => false,

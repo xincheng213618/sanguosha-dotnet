@@ -12,6 +12,7 @@ public sealed record HpChangeContext(
 {
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public HappyQiaoPool? HappyQiaoPool { get; init; }
+    internal bool IsFirstActualHpChangeInTurn { get; init; }
 }
 
 public sealed record LossOccurrence(int ActualTurnNumber, int TurnOwnerSeat, TurnPhase Phase);

@@ -9,7 +9,9 @@ internal sealed partial class ProgramPaidCardRuntime
         if (active.ChoiceBindings.Any(binding => binding.Name == resultBind))
             throw new InvalidOperationException("A named program choice cannot be answered twice.");
         var chooser = _facts.Seat(chooserSeat);
-        var choices = options.Where(option => IsProgramOptionAvailable(active, chooserSeat, option)).Select(option =>
+        var plan = ProgramInstructionResolver.Default.Resolve(active, _facts.Skill(active.SkillId).Program!);
+        var choices = options.Where(option => IsProgramOptionAvailable(active, chooserSeat, option,
+            BoundEquipmentUseForOption(plan, active.InstructionIndex, option.Id))).Select(option =>
             new PromptChoice(new ChoiceId($"program-option.frame-{frame.Id}.{resultBind}.{option.Id}"),
                 option.Label, [], [], new Dictionary<string, string>
                 {
@@ -42,8 +44,8 @@ internal sealed partial class ProgramPaidCardRuntime
     {
         var frame = _frames.Top as ProgramSkillFrame ??
             throw new InvalidOperationException("The named choice lost its program frame.");
-        var effect = ProgramInstructionResolver.Default.Resolve(frame,
-            _facts.Skill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        var plan = ProgramInstructionResolver.Default.Resolve(frame, _facts.Skill(frame.SkillId).Program!);
+        var effect = plan.GetPausedInstruction(frame.InstructionIndex).Effect;
         var chooserSeat = effect.ChooserRef is { } chooser
             ? ResolveProgramParticipant(frame, chooser)
             : ResolveProgramEffectTarget(frame, effect.Target);
@@ -56,7 +58,8 @@ internal sealed partial class ProgramPaidCardRuntime
             throw new InvalidOperationException("The choice does not match its suspended instruction.");
         var option = effect.Options.SingleOrDefault(item => item.Id == selected.Parameters.GetValueOrDefault("option-id")) ??
             throw new InvalidOperationException("The selected program option is unavailable.");
-        var stillAvailable = IsProgramOptionAvailable(frame, chooserSeat, option);
+        var stillAvailable = IsProgramOptionAvailable(frame, chooserSeat, option,
+            BoundEquipmentUseForOption(plan, frame.InstructionIndex, option.Id));
         if (!stillAvailable && option.RequiredTargetKind is not null)
             throw new InvalidOperationException("The selected option's required targets are no longer available.");
         if (!stillAvailable && (option.Condition.ContainsHasClaimableDamageCards() ||
@@ -84,23 +87,45 @@ internal sealed partial class ProgramPaidCardRuntime
     {
         if (_frames.Top is not ProgramSkillFrame frame)
             return true;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame,
-            _facts.Skill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        var plan = ProgramInstructionResolver.Default.Resolve(frame, _facts.Skill(frame.SkillId).Program!);
+        var effect = plan.GetPausedInstruction(frame.InstructionIndex).Effect;
         if (effect.Op != SkillProgramEffectOp.ChooseOption)
             return true;
         var option = effect.Options.SingleOrDefault(item => item.Id == selected.Parameters.GetValueOrDefault("option-id"));
         if (option is null) return true;
-        if (option.RequiredTargetKind is null && !option.Condition.ContainsHasClaimableDamageCards() &&
+        var equipmentUse = BoundEquipmentUseForOption(plan, frame.InstructionIndex, option.Id);
+        if (equipmentUse is null && option.RequiredTargetKind is null && !option.Condition.ContainsHasClaimableDamageCards() &&
             !option.Condition.ContainsBoundCardCountAtLeast() && !option.Condition.ContainsHasOwnedCardCategory() &&
             !option.Condition.ContainsBoundCardsMatchCategories() && !option.Condition.ContainsExpression()) return true;
         var chooserSeat = effect.ChooserRef is { } chooser
             ? ResolveProgramParticipant(frame, chooser)
             : ResolveProgramEffectTarget(frame, effect.Target);
-        return IsProgramOptionAvailable(frame, chooserSeat, option);
+        return IsProgramOptionAvailable(frame, chooserSeat, option, equipmentUse);
     }
 
     internal bool IsProgramOptionAvailable(ProgramSkillFrame frame, int chooserSeat, SkillProgramChoiceOption option)
     {
+        var plan = ProgramInstructionResolver.Default.Resolve(frame, _facts.Skill(frame.SkillId).Program!);
+        return IsProgramOptionAvailable(frame, chooserSeat, option,
+            BoundEquipmentUseForOption(plan, frame.InstructionIndex, option.Id));
+    }
+
+    internal static SkillProgramEffect? BoundEquipmentUseForOption(ProgramExecutionPlan plan, int nextIndex, string optionId)
+    {
+        if (nextIndex <= 0 || nextIndex >= plan.Instructions.Count ||
+            plan.Instructions[nextIndex - 1] is not { Op: SkillProgramEffectOp.ChooseOption, ResultBind: { } resultBind } ||
+            plan.Instructions[nextIndex] is not { Op: SkillProgramEffectOp.UseBoundCardByTarget,
+                Condition: { Kind: SkillProgramConditionKind.ChoiceIs } condition } use ||
+            condition.SourceBind != resultBind || condition.OptionId != optionId)
+            return null;
+        return use;
+    }
+
+    private bool IsProgramOptionAvailable(ProgramSkillFrame frame, int chooserSeat, SkillProgramChoiceOption option,
+        SkillProgramEffect? equipmentUse)
+    {
+        if (equipmentUse is not null && !_facts.CanUseBoundEquipment(frame,
+            ResolveProgramEffectTarget(frame, equipmentUse.Target), equipmentUse.SourceBind!)) return false;
         if (option.RequiredTargetKind is { } kind && (chooserSeat != frame.OwnerSeat ||
             !_facts.TargetSeats(chooserSeat, kind, frame.WindowContext).Any(seat => _facts.CanSelectPindianOpponent(frame, seat)))) return false;
         bool? Read(SkillProgramCondition condition)
