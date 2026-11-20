@@ -1,3 +1,5 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 internal sealed partial class MouKongRongRuntime
@@ -10,7 +12,9 @@ internal sealed partial class MouKongRongRuntime
     private bool FirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
         if(!Valid(f))return false;
-        if(child is NativeDrawAttemptFrame draw)return f.MouKrLiwen is{Stage:MouKrLiwenStage.DrawChildren,DrawReturned:false}&&RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(draw,f);
+        if (child is NativeDrawAttemptFrame draw)
+            return f.MouKrLiwen is { Stage: MouKrLiwenStage.DrawChildren, DrawReturned: false } receipt &&
+                CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, receipt.RequestedDraw);
         if(child is CardsMovedTriggerWindowFrame moved)return f.PendingMovementContinuation is not null&&RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(f,moved)&&
             f.MouKrLiwen is{}r&&moved.Batch.Movements.All(m=>m.Sequence>r.Before&&m.Sequence<=r.After);
         if(health.ProgramRecoveryChild(f,child))return true;

@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core.Tests;
 
@@ -13,6 +14,7 @@ internal static class MouWangLingChecks
     {
         var s = Scene.Start(false);
         s.Play();
+        var firstTurn = s.E<TurnStartedEvent>().Single();
         s.Keep = s.V().Hand.Single(c => c.Kind == CardKind.FireAttack).Id;
         var names = new[] { CardKind.Slash, CardKind.DrawTwo, CardKind.Duel, CardKind.IronChain };
         var cards = names.Select(kind => s.V().Hand.Single(c => c.Kind == kind).Id).ToArray();
@@ -32,10 +34,43 @@ internal static class MouWangLingChecks
         s.Need(s.E<MouWangLingGiftEvent>() is [{ RecipientSeat: 0, FirstName: true }] &&
             s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouWangLing is { Stage: MouWangLingStage.GiftChildren, Cursor: 1, Paid: true }),
             "A genuine first DiscardPile gift opens its native gain child before the other three gifts or Draw4.");
-        s.Cold(); s.Answer(_ => true);
+        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold && s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Any());
+        var stack = s.G.ResolutionStack.ToArray();
+        var drawing = stack.OfType<ProgramSkillFrame>().Single(frame => frame.MouWangLing is not null);
+        var attempt = stack.OfType<NativeDrawAttemptFrame>().Single();
+        var index = Array.IndexOf(stack, attempt);
+        var gifts = s.E<MouWangLingGiftEvent>();
+        s.Need(drawing is { OwnerSeat: 0, SkillId: "mou:jichou", MouWangLing:
+                { Stage: MouWangLingStage.Drawing, Paid: true, Cursor: 4, FirstNames: 4, Requested: 4, Draw: null } receipt } &&
+            drawing.WindowContext?.Window == SkillProgramTriggerWindow.TurnEnding && receipt.ActualTurn == firstTurn.TurnNumber &&
+            gifts.Select(e => e.RecipientSeat).SequenceEqual([0, 1, 2, 3]) && gifts.Select(e => e.CardId).SequenceEqual(cards) &&
+            gifts.All(e => e.FrameId == drawing.Id && e.FirstName && s.G.CardMovements.Count(move =>
+                move.CardId == e.CardId && move.Sequence == e.Sequence && move.From == CardLocation.DiscardPile &&
+                move.To == CardLocation.Hand(e.RecipientSeat)) == 1) &&
+            index > 0 && stack[index - 1].Id == drawing.Id && drawing.NativeDraw?.ActiveAttemptId == attempt.Id &&
+            attempt.Context.ParentFrameId == drawing.Id && attempt.Context is { RecipientSeat: 0, RequestedCount: 4 } &&
+            attempt.Context.Reason.Value == "skill-program.mou:jichou.draw" && attempt.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation &&
+            s.E<MouWangLingDrawReturnedEvent>().Length == 0 && s.E<TurnStartedEvent>().SequenceEqual([firstTurn]),
+            "Four completed physical gifts bind the original Ending frame to a native Draw4 before another actual turn begins.");
+        s.Cold();
+        var restoredParent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == drawing.Id);
+        var restoredAttempt = s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(frame => frame.Id == attempt.Id);
+        s.Need(restoredAttempt.Context == attempt.Context && s.E<MouWangLingGiftEvent>().SequenceEqual(gifts) &&
+            CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(restoredParent, restoredAttempt, 0, 4) &&
+            !CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(restoredParent,
+                restoredAttempt with { Context = restoredAttempt.Context with { RecipientSeat = 1 } }, 0, 4) &&
+            !CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(restoredParent,
+                restoredAttempt with { Context = restoredAttempt.Context with { RequestedCount = 3 } }, 0, 4),
+            "Cold replay keeps the original Draw4 cursor and rejects an altered recipient or count.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         s.Reach(() => s.G.State.TurnNumber == 5 && s.P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-        s.Need(s.E<MouWangLingGiftEvent>().Length == 4 && s.E<MouWangLingGiftEvent>().Select(e => e.RecipientSeat).Distinct().Count() == 4 &&
-            s.E<MouWangLingDrawReturnedEvent>().Any(e => e.Requested == 4 && e.Actual == 4) && s.E<MouWangLingCompletedEvent>().Any(e => e.FirstNames == 4) &&
+        var drawn = s.G.CardMovements.Where(move => move.Reason.Value == "skill-program.mou:jichou.draw").ToArray();
+        s.Need(s.E<MouWangLingGiftEvent>().SequenceEqual(gifts) &&
+            s.E<MouWangLingDrawReturnedEvent>().Single() == new MouWangLingDrawReturnedEvent(drawing.Id, 4, 4, 0, attempt.Id) &&
+            drawn.Length == 4 && drawn.Select(move => move.CardId).Distinct().Count() == 4 &&
+            drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) && move.Sequence > attempt.Context.SequenceBefore) &&
+            s.E<MouWangLingCompletedEvent>().Count(e => e.FrameId == drawing.Id && e.FirstNames == 4) == 1 &&
             !s.E<MouWangLingAwakeningAcceptedEvent>().Any(),
             "Four actual distinct gifts to four selected living roles pay native Draw4 once, survive Cold, and do not awaken early.");
         s.Native(s.Keep, 3);
@@ -142,9 +177,19 @@ internal static class MouWangLingChecks
             CharacterFixtureContent.Register(b, Hero);
             foreach (var kind in new[] { CardKind.Slash, CardKind.Dodge, CardKind.DrawTwo, CardKind.Duel, CardKind.IronChain, CardKind.FireAttack })
             { var c = CardCatalog.Get(kind); b.AddCard(new("fixture:mouwl-" + kind, c.DisplayName, c.CategoryName, c.Description, kind)); }
+            var continueEffect = new { op = "chooseOption", target = "owner", resultBind = "gift-hold", options = new[] { new { id = "continue" } } };
             var definitions = new object[] {
                 new { id = Quiet, revision = 1, triggers = new[] { new { id = "quiet", window = "afterNormalDraw", subject = "owner", optional = false, effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } },
-                new { id = Hold, revision = 1, triggers = new[] { new { id = "first-gift", window = "cardsGained", subject = "owner", destinationZones = new[] { "hand" }, movementOccurrence = "perBatch", movementReasons = new[] { "skill-program.mou:jichou.give" }, optional = false, usageScope = "game", usageLimit = 1, effects = new[] { new { op = "chooseOption", target = "owner", resultBind = "gift-hold", options = new[] { new { id = "continue" } } } } } } }
+                new { id = Hold, revision = 1,
+                    states = new[] { new { id = "waiting-for-draw", initialValue = false, visibility = "private", resetScope = "game", reacquirePolicy = "preserveUntilGameEnd" } },
+                    triggers = new object[] {
+                        new { id = "first-gift", window = "cardsGained", subject = "owner", destinationZones = new[] { "hand" },
+                            movementOccurrence = "perBatch", movementReasons = new[] { "skill-program.mou:jichou.give" },
+                            optional = false, usageScope = "game", usageLimit = 1, effects = new object[] {
+                                continueEffect, new { op = "setBooleanState", target = "owner", stateId = "waiting-for-draw", value = true } } },
+                        new { id = "paid-draw-request", window = "nativeDrawStarting", subject = "owner", optional = false, isSkillInvocation = false,
+                            usageScope = "game", usageLimit = 1, condition = new { kind = "booleanState", stateId = "waiting-for-draw", expectedValue = true },
+                            effects = new[] { continueEffect } } } }
             };
             var labels = new Dictionary<string, object> {
                 [Quiet] = new { name = "安静真实同行", description = "正常摸牌后跳过出牌阶段。" },
