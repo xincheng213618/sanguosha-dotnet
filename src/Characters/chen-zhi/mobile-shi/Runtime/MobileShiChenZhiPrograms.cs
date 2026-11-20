@@ -6,8 +6,12 @@ namespace CardGame.Core;
 // Chen Zhi declines. The shared discard classifier decides what "discard" is.
 public sealed record MobileShiChenZhiFirstDiscardEvent(int ActualTurn, long BatchId, int MovementSequence) : IGameEvent;
 public sealed record MobileShiChenZhiExtraGrantedEvent(long FrameId, CardConversionSource Source,
-    string GameplayHash, int IssuedTurn, int IssuedRound) : IGameEvent;
-public sealed record MobileShiChenZhiExtraEnteredEvent(long GrantFrameId, int OwnerSeat, int UpcomingTurn, bool LostHp) : IGameEvent;
+    string GameplayHash, int IssuedTurn, int IssuedRound) : IGameEvent, IProgramExtraTurnPreludeGrantedEvent
+{
+    int IProgramExtraTurnPreludeGrantedEvent.RecipientSeat => Source.OwnerSeat;
+}
+public sealed record MobileShiChenZhiExtraEnteredEvent(long GrantFrameId, int OwnerSeat, int UpcomingTurn, bool LostHp)
+    : IGameEvent, IProgramExtraTurnPreludeEnteredEvent;
 public sealed record MobileShiChenZhiRenxingCompletedEvent(long FrameId, CardConversionSource Source,
     int ActualTurn, long FirstDiscardBatch, string Branch, int TargetSeat) : IGameEvent;
 

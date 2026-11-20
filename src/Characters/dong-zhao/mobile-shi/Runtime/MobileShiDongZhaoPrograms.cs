@@ -23,8 +23,12 @@ public sealed record MobileShiDongZhaoStartedEvent(long FrameId, CardConversionS
 public sealed record MobileShiDongZhaoBenefitEvent(long FrameId, string Branch, int CardId, int Before, int After) : IGameEvent;
 public sealed record MobileShiDongZhaoCostPaidEvent(long FrameId, int CardId, int Before, int After) : IGameEvent;
 public sealed record MobileShiDongZhaoExtraGrantedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    int TargetSeat, int IssuedTurn) : IGameEvent;
-public sealed record MobileShiDongZhaoExtraEnteredEvent(long GrantFrameId, long FrameId, int TargetSeat, int UpcomingTurn) : IGameEvent;
+    int TargetSeat, int IssuedTurn) : IGameEvent, IProgramExtraTurnPreludeGrantedEvent
+{
+    int IProgramExtraTurnPreludeGrantedEvent.RecipientSeat => TargetSeat;
+}
+public sealed record MobileShiDongZhaoExtraEnteredEvent(long GrantFrameId, long FrameId, int TargetSeat, int UpcomingTurn)
+    : IGameEvent, IProgramExtraTurnPreludeEnteredEvent;
 
 internal interface IMobileShiDongZhaoHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op); }
 internal abstract class MobileShiDongZhaoDescriptor(SkillProgramEffectOp op) : ProgramOperationDescriptorBase

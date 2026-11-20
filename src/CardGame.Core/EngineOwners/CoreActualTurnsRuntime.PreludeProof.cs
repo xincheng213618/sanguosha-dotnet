@@ -4,7 +4,22 @@ namespace CardGame.Core.EngineOwners;
 
 internal sealed partial class CoreActualTurnsRuntime
 {
-    internal ProgramExtraTurnPendedEvent? PendingExtraTurnForPrelude(int recipientSeat, string skillId)
+    internal TGrant? PendingExtraTurnPreludeGrant<TGrant, TEntered>(int recipientSeat, string skillId)
+        where TGrant : class, IProgramExtraTurnPreludeGrantedEvent
+        where TEntered : IProgramExtraTurnPreludeEnteredEvent
+    {
+        if (PendingExtraTurnForPrelude(recipientSeat, skillId) is not { } pending)
+            return null;
+
+        var actualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
+        return _eventHistory.Read<TGrant>().SingleOrDefault(grant =>
+            grant.FrameId == pending.FrameId && grant.RecipientSeat == recipientSeat &&
+            grant.Source.SkillId == skillId && grant.IssuedTurn == actualTurn &&
+            grant.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(skillId).Program!.GameplayHash &&
+            !_eventHistory.Read<TEntered>().Any(entry => entry.GrantFrameId == grant.FrameId));
+    }
+
+    private ProgramExtraTurnPendedEvent? PendingExtraTurnForPrelude(int recipientSeat, string skillId)
     {
         if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra ||
             _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != recipientSeat ||

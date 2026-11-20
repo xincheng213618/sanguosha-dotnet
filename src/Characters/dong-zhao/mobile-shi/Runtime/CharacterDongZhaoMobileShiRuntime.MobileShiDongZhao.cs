@@ -9,12 +9,9 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     SkillProgramStepOutcome IMobileShiDongZhaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShiDz(frame, op);
     internal int ShiDzSameNameMaximum(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnTrickUseRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == seat).GroupBy(e => e.EffectiveKind).Select(g => g.Count()).DefaultIfEmpty(0).Max();
     internal IReadOnlyList<PromptChoice> ShiDzPayments(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Discard, canSelect: (zone, card) => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, new(zone, f.OwnerSeat), OwnedCardMoveIntent.Discard));
-    internal MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary)
-    {
-        if (_coreActualTurnsOperations.PendingExtraTurnForPrelude(beneficiary, ShiDzYingjia) is not { } last)
-            return null;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiDongZhaoExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.TargetSeat == beneficiary && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Source.SkillId == ShiDzYingjia && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiDzYingjia).Program!.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiDongZhaoExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
-    }
+    internal MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary) =>
+        _coreActualTurnsOperations.PendingExtraTurnPreludeGrant<MobileShiDongZhaoExtraGrantedEvent, MobileShiDongZhaoExtraEnteredEvent>(
+            beneficiary, ShiDzYingjia);
 
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 47700)]
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeShiDzExtra(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)

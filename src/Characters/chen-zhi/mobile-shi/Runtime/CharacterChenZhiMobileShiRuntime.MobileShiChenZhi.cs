@@ -32,12 +32,8 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
         return batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.Sequence == first.MovementSequence).Select(x => x.i).ToArray();
     }
 
-    internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner)
-    {
-        if (_coreActualTurnsOperations.PendingExtraTurnForPrelude(owner, ShiCzQuanchong) is not { } last)
-            return null;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.Source.OwnerSeat == owner && e.Source.SkillId == ShiCzQuanchong && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiCzQuanchong).Program!.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
-    }
+    internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner) =>
+        _coreActualTurnsOperations.PendingExtraTurnPreludeGrant<MobileShiChenZhiExtraGrantedEvent, MobileShiChenZhiExtraEnteredEvent>(owner, ShiCzQuanchong);
 
     // A paid extra-turn obligation survives loss of its original skill. It is
     // still bound to the last native pend and the original content hash.

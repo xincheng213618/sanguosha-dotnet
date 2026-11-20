@@ -11,3 +11,17 @@ public sealed record ProgramExtraTurnPendedEvent(
     long FrameId,
     string SkillId,
     int Seat) : IGameEvent;
+
+internal interface IProgramExtraTurnPreludeGrantedEvent : IGameEvent
+{
+    long FrameId { get; }
+    CardConversionSource Source { get; }
+    string GameplayHash { get; }
+    int IssuedTurn { get; }
+    int RecipientSeat { get; }
+}
+
+internal interface IProgramExtraTurnPreludeEnteredEvent : IGameEvent
+{
+    long GrantFrameId { get; }
+}
