@@ -827,7 +827,11 @@ public sealed partial record DamageFrame(
     int Amount,
     ResolutionFrameStep Step = ResolutionFrameStep.ResolvingEffect,
     DamageNature Nature = DamageNature.Normal)
-    : ResolutionFrame(Id, ResolutionFrameKind.Damage, Step);
+    : ResolutionFrame(Id, ResolutionFrameKind.Damage, Step)
+{
+    /// <summary>The target's HP immediately after this exact damage segment applied.</summary>
+    internal int? AppliedHpAfter { get; init; }
+}
 
 /// <summary>
 /// A serializable cursor over every eligible after-damage trigger. The cursor

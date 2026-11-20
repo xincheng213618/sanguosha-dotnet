@@ -6,7 +6,6 @@ internal sealed partial class CharacterXuRongOlEntries
     internal bool CanContinueIssuedXuRong(ProgramSkillFrame f) => _resolve().CanContinueIssuedXuRong(f);
     internal bool CanOfferXuRongLifecycle(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().CanOfferXuRongLifecycle(candidate, context);
     internal bool CanTargetXuRong(int owner, int target, SkillProgramActivation activation) => _resolve().CanTargetXuRong(owner, target, activation);
-    internal void CaptureXuRongActualDamageHp(long damageFrameId, GameEngine.IDamageAttempt attack, int hpBefore, int actualAmount) => _resolve().CaptureXuRongActualDamageHp(damageFrameId, attack, hpBefore, actualAmount);
     internal SkillProgramStepOutcome ClaimXuRong(ProgramSkillFrame f) => _resolve().ClaimXuRong(f);
     internal ProgramSkillWindowContext CreateXuRongDyingContext(ProgramSkillWindowContext context) => _resolve().CreateXuRongDyingContext(context);
     internal bool ExactXuRongParent(ProgramSkillFrame f, XuRongPending r) => _resolve().ExactXuRongParent(f, r);

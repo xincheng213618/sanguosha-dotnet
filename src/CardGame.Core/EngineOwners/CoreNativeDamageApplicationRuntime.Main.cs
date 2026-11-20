@@ -113,8 +113,10 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             }
 
             var armorPayment = _coreDamageArmorPaymentsOperations.Value.PrepareDamageArmorPayment(damageFrameId, attack);
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not DamageFrame damage ||
+                damage.Id != damageFrameId || damage.AppliedHpAfter is not null)
+                throw new InvalidOperationException("Applied damage must record HP once on its original damage frame.");
             var healthBefore = target.Hp;
-            _characterXuRongOlOperations.CaptureXuRongActualDamageHp(damageFrameId, attack, target.Hp, amount);
             if (armorPayment is not null)
             {
                 target.Armor = armorPayment.ArmorAfter;
@@ -122,6 +124,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             }
             else
                 target.Hp = checked(target.Hp - amount);
+            _coreRuntimeOperations.ReplaceRuntimeTop(damage with { AppliedHpAfter = target.Hp });
             if (qiaoHealthOwner is { } qiaoParent)
                 _characterDaQiaoXiaoQiaoHappyGodOperations.CompleteHappyQiaoHealthPayment(qiaoParent, target.Seat, HpChangeKind.Damage, healthBefore, target.Hp);
             attack.MarkDamageApplied();

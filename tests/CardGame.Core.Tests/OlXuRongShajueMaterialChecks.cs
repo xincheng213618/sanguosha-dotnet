@@ -65,6 +65,7 @@ internal static class OlXuRongShajueMaterialChecks
             game.CreateCardZoneDiagnostics().Single(item => item.CardId == card).Location == CardLocation.DiscardPile,
             "The very same card has a new discard entry at the real dying boundary while the original Slash retains the earlier delivery.");
         game = Cold(game, content);
+        _ = ReadDyingProof(game, use);
         ContinueWitness(game);
         AssertMarkerReplenished(game, dying);
         Require(game.CardMovements.All(move => move.Reason.Value != Claim) &&
@@ -78,9 +79,11 @@ internal static class OlXuRongShajueMaterialChecks
     private static XuRongDyingProof ReadDyingProof(GameEngine game, CardUseFrame use)
     {
         var dying = game.ResolutionStack.OfType<DyingFrame>().Single();
+        var damage = game.ResolutionStack.OfType<DamageFrame>().Single(frame => frame.Id == dying.ParentFrameId);
         var proof = dying.XuRongProof!;
         Require(proof is { VictimSeat: 1, HpAtEntry: -1, RescueCardsRequired: 2, CauseSourceSeat: 0 } &&
             proof.DyingFrameId == dying.Id && proof.DamageAttemptResolutionId == use.Id && proof.NativeActionId == use.Action!.ActionId &&
+            damage is { AppliedHpAfter: -1, Amount: 2, SourceSeat: 0, TargetSeat: 1 } && damage.ParentFrameId == use.Id &&
             Facts<PlayerDyingEvent>(game).Single().ResolutionId == dying.Id &&
             Facts<DamageAppliedEvent>(game).Single() is { SourceSeat: 0, TargetSeat: 1, Amount: 2, RemainingHp: -1 },
             "The original marked Slash really causes one dying entry that requires two rescue cards, even after delivery.");
