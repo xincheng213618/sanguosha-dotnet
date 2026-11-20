@@ -37,7 +37,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29700, SkillProgramEffectOp.ResolveWuLuKangKegou)]
     internal bool CanOfferWuLuKangKegou(ProgramTriggerLegalityContext c)
     {
-        if (c.SkillId != WuLuKangComposition.Kegou || !c.Owner.IsAlive || !HasWuLuKangPindianInput(c.Owner) || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(c.OwnerSeat, p.Seat)))
+        if (c.SkillId != WuLuKangComposition.Kegou || !c.Owner.IsAlive || !_pindianPolicies.HasPindianInput(c.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(c.OwnerSeat, p.Seat)))
             return false;
         if (c.Context.Window == SkillProgramTriggerWindow.PlayPhaseStarting)
             return c.Context.SourceSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase);
@@ -115,7 +115,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
         if (r.Stage == WuLuKangKegouStage.RepeatChoice)
         {
-            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, p.Seat)))
+            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _pindianPolicies.HasPindianInput(f.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, p.Seat)))
                 choices.Add(new(new($"wu-lu-kang.{(f.Id)}.{(r.Iteration)}.repeat"), "继续拼点", [], [], P("repeat")));
             choices.Add(new(new($"wu-lu-kang.{(f.Id)}.{(r.Iteration)}.repeat-decline"), "结束克构", [], [], P("repeat-decline")));
         }

@@ -20,7 +20,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal void BeginWuLuKangWindow(long parent, WuLuKangPindianStage stage, int comparison, IReadOnlyList<WuLuKangPindianWindowEntry> entries, PindianResult? result) => _resolve().BeginWuLuKangWindow(parent, stage, comparison, entries, result);
     internal void BindWuLuKangKegouSlashUse(CardUseFrame supplied) => _resolve().BindWuLuKangKegouSlashUse(supplied);
     internal bool CanOfferWuLuKangKegou(ProgramTriggerLegalityContext c) => _resolve().CanOfferWuLuKangKegou(c);
-    internal bool CanWuLuKangDiscardForPindian(CharacterState owner) => _resolve().CanWuLuKangDiscardForPindian(owner);
     internal bool CanWuLuKangKegouSlash(ProgramSkillFrame f) => _resolve().CanWuLuKangKegouSlash(f);
     internal void CancelWuLuKangContest(ResolutionFrame parent) => _resolve().CancelWuLuKangContest(parent);
     internal void CancelWuLuKangFromShenduan(ProgramSkillFrame f, string reason) => _resolve().CancelWuLuKangFromShenduan(f, reason);
@@ -49,7 +48,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool HasWuLuKangDixianMaterialPrivilege(CharacterState actor, CardKind kind, IReadOnlyList<int>? ids, CardConversionSource? source = default) => _resolve().HasWuLuKangDixianMaterialPrivilege(actor, kind, ids, source);
     internal bool HasWuLuKangDixianOriginalPayment(ProgramSkillFrame f) => _resolve().HasWuLuKangDixianOriginalPayment(f);
     internal bool HasWuLuKangDixianRankPrivilege(int actorSeat, int? rank, long? useId = default) => _resolve().HasWuLuKangDixianRankPrivilege(actorSeat, rank, useId);
-    internal bool HasWuLuKangPindianInput(CharacterState owner) => _resolve().HasWuLuKangPindianInput(owner);
     internal bool HasWuLuKangPindianSelection(ProgramSkillFrame f, SkillProgramActivation a) => _resolve().HasWuLuKangPindianSelection(f, a);
     internal bool IsIssuedWuLuKangCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedWuLuKangCandidate(candidate, context);
     internal bool IsIssuedWuLuKangKegouUse(CardUseFrame use) => _resolve().IsIssuedWuLuKangKegouUse(use);

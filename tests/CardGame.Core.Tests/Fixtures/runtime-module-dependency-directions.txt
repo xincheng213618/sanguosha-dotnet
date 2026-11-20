@@ -45,7 +45,6 @@ cheng-pu/boundary-mobile	CardGame.Core.EngineOwners.CharacterChengPuBoundaryMobi
 cheng-yu/mou	CardGame.Core.EngineOwners.CharacterChengYuMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 cui-lie/anniversary	CardGame.Core.EngineOwners.CharacterCuiLieAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterHuanShuJunOlEntries	huan-shu-jun/ol	CardGame.Core.EngineOwners.CharacterHuanShuJunOlRuntime
 cui-lie/anniversary	CardGame.Core.EngineOwners.CharacterCuiLieAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterLiuYanOlEntries	liu-yan/ol	CardGame.Core.EngineOwners.CharacterLiuYanOlRuntime
-cui-lie/anniversary	CardGame.Core.EngineOwners.CharacterCuiLieAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries	lu-kang/wumiao	CardGame.Core.EngineOwners.CharacterLuKangWumiaoRuntime
 cui-yan/ol	CardGame.Core.EngineOwners.CharacterCuiYanOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 da-qiao-xiao-qiao/happy-god	CardGame.Core.EngineOwners.CharacterDaQiaoXiaoQiaoHappyGodRuntime	CardGame.Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries	huang-gai/mou-mobile	CardGame.Core.EngineOwners.CharacterHuangGaiMouMobileRuntime
 da-qiao-xiao-qiao/happy-god	CardGame.Core.EngineOwners.CharacterDaQiaoXiaoQiaoHappyGodRuntime	CardGame.Core.RuntimeEntries.CharacterHuaTuoAnniversaryGodEntries	hua-tuo/anniversary-god	CardGame.Core.EngineOwners.CharacterHuaTuoAnniversaryGodRuntime

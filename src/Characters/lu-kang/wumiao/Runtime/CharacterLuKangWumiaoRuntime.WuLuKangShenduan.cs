@@ -164,7 +164,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
                 return true;
             if (assigned.CardId <= 0)
                 return !contest.SourcesReady && !contest.Replacements.Any(p => p.ParticipantSeat == assigned.Seat)
-                    && CanWuLuKangDiscardForPindian(participant);
+                    && _pindianPolicies.CanDiscardForPindian(participant.Seat);
 
             var replacement = contest.Replacements.LastOrDefault(p => p.ParticipantSeat == assigned.Seat && p.ReservedCardId == assigned.CardId);
             if (replacement is not null)
