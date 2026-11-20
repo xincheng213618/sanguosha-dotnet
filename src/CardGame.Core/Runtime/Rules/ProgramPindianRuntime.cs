@@ -5,6 +5,7 @@ internal interface IProgramPindianPolicyQueries : IProgramSelectionQuery
     bool CanDiscardForPindian(int seat);
     bool HasPindianInput(int seat);
     ProgramLegalityParticipant CreateLegalityParticipant(int seat);
+    IReadOnlyList<int> PindianOpponents(int sourceSeat);
 
     bool CanBePindianTarget(int sourceSeat, int targetSeat) =>
         ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(

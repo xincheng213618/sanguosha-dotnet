@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
 {
     internal void BeginSharedPindian(long parentId, SkillPromptPresentation presentation, int sourceSeat, int? opponentSeat = null, int? sourceCardId = null, string? programResultBind = null, SkillProgramCardSetVisibility programResultVisibility = SkillProgramCardSetVisibility.Public, PindianOwnedPileSource? ownedPileSource = null)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parentId || _resolutionStackOperations._resolutionStack.Any(item => item is PindianFrame) || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive || !_pindianPolicyQueries.HasPindianInput(sourceSeat) || opponentSeat is { } opponent && !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(sourceSeat, opponent))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parentId || _resolutionStackOperations._resolutionStack.Any(item => item is PindianFrame) || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive || !_pindianPolicyQueries.HasPindianInput(sourceSeat) || opponentSeat is { } opponent && !_pindianPolicyQueries.CanBePindianTarget(sourceSeat, opponent))
             throw new InvalidOperationException("Pindian requires one suspended parent and a living source with hand cards.");
         var selectedSourceTopChoice = sourceCardId is { } selectedSource && ownedPileSource is null && _resolutionStackOperations._resolutionStack[^1] is ProgramSkillFrame selectedParent && selectedParent.OwnerSeat == sourceSeat && selectedParent.SelectedCardIds.SequenceEqual([selectedSource]) && _corePindianPoliciesOperations.CanOfferPindianTopChoice(_coreMatchParticipantsPlayersAccess._players[sourceSeat]);
         var frame = new PindianFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parentId, presentation.SkillId, presentation, sourceSeat, opponentSeat, sourceCardId, opponentSeat is null ? PindianStep.ChooseParticipants : sourceCardId is null || selectedSourceTopChoice ? PindianStep.ChooseSourceCard : PindianStep.ChooseOpponentCard, ProgramResultBind: programResultBind, ProgramResultVisibility: programResultVisibility, ParentProcessingCardIds: Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Select(card => card.Id).Order().ToArray()))
@@ -28,12 +28,12 @@ internal sealed partial class CoreGameEnginePindianRuntime
         if (frame.PindianStep == PindianStep.ChooseSourceCard && frame.SourceCardId is { } originallySelected)
             hand = hand.Where(card => card.Id == originallySelected).ToArray();
         var targets = frame.PindianStep == PindianStep.ChooseParticipants
-            ? _coreEquipmentSlotGroupProgramsOperations.PindianOpponents(frame.SourceSeat)
+            ? _pindianPolicyQueries.PindianOpponents(frame.SourceSeat)
             : [];
         if (!chooser.IsAlive || !_pindianPolicyQueries.HasPindianInput(chooser.Seat) ||
             frame.PindianStep == PindianStep.ChooseParticipants && targets.Count == 0 ||
             !selectingSource && (chooser.Seat == frame.SourceSeat ||
-                !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(frame.SourceSeat, chooser.Seat) ||
+                !_pindianPolicyQueries.CanBePindianTarget(frame.SourceSeat, chooser.Seat) ||
                 !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame)))
             throw new InvalidOperationException("Pindian participants no longer have legal hand cards.");
         var choices = new List<PromptChoice>();

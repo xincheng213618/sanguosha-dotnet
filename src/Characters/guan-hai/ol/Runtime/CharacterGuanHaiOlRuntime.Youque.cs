@@ -6,7 +6,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     internal IEnumerable<(PublicPersistentPileSource Pile, Card Card)> YouqueBaits(int owner) => XieweiPiles(owner).SelectMany(p => _cardZonesOperations._cardZones.CardsAt(p.Location).Select(c => (Pile: p, Card: c)));
     internal bool YouquePhaseActive(int owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouquePhaseDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Phase == p);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 27579, SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian)]
-    internal bool CanActivateYouque(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _pindianPolicies.HasPindianInput(c.OwnerSeat) && YouquePhaseActive(c.OwnerSeat) && YouqueBaits(c.OwnerSeat).Any() && _coreMatchParticipantsPlayersAccess._players.Any(p => _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(c.OwnerSeat, p.Seat));
+    internal bool CanActivateYouque(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _pindianPolicies.HasPindianInput(c.OwnerSeat) && YouquePhaseActive(c.OwnerSeat) && YouqueBaits(c.OwnerSeat).Any() && _coreMatchParticipantsPlayersAccess._players.Any(p => _pindianPolicies.CanBePindianTarget(c.OwnerSeat, p.Seat));
     internal IReadOnlyList<PromptChoice> YouqueBaitChoices(ProgramSkillFrame f)
     {
         var baits = YouqueBaits(f.OwnerSeat).ToArray();
@@ -18,7 +18,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal void PublishYouque(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !YouquePhaseActive(f.OwnerSeat) || !_pindianPolicies.HasPindianInput(f.OwnerSeat) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, f.GuanHai!.OpponentSeat) || !YouqueBaits(f.OwnerSeat).Any())
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !YouquePhaseActive(f.OwnerSeat) || !_pindianPolicies.HasPindianInput(f.OwnerSeat) || !_pindianPolicies.CanBePindianTarget(f.OwnerSeat, f.GuanHai!.OpponentSeat) || !YouqueBaits(f.OwnerSeat).Any())
         {
             FinishGuanHai(f, false);
             return;

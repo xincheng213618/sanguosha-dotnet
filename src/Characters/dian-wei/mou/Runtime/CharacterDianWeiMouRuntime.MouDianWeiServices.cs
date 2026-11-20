@@ -34,7 +34,7 @@ internal sealed partial class CharacterDianWeiMouRuntime
         return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is ProgramLifecycleTriggerWindowFrame p && p.Id == c.ParentFrameId && p.Window == window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
     }
 
-    IReadOnlyList<int> IMouDianWeiFacts.Opponents(int owner) => _coreEquipmentSlotGroupProgramsOperations.PindianOpponents(owner);
+    IReadOnlyList<int> IMouDianWeiFacts.Opponents(int owner) => _pindianPolicies.PindianOpponents(owner);
     IReadOnlyList<int> IMouDianWeiFacts.NotWon(int owner) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(x => x is TurnStartedEvent or TurnEndedEvent).OfType<PindianResultDeterminedEvent>().SelectMany(x => new[] { x.Result.SourceSeat, x.Result.OpponentSeat }.Where(s => !x.Result.WonBy(s))).Where(s => s != owner && ((IMouDianWeiFacts)this).Alive(s)).Distinct().Order().ToArray();
     bool IMouDianWeiFacts.CanSlash(int actor, int target) => _coreForeignTurnContestsOperations.Value.CanUseForeignTurnContestSlash(actor, target);
     PindianResult IMouDianWeiFacts.Result(ProgramSkillFrame f)

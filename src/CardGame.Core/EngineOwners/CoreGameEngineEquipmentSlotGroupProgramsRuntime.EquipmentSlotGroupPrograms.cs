@@ -7,14 +7,6 @@ internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
     internal ProgramLegalityParticipant CreateProgramLegalityParticipant(int seat) => _pindianPolicyQueries.CreateLegalityParticipant(seat);
     internal bool CanBePindianTarget(int sourceSeat, int targetSeat) => _pindianPolicyQueries.CanBePindianTarget(sourceSeat, targetSeat);
 
-    internal IReadOnlyList<int> PindianOpponents(int sourceSeat) =>
-        !_pindianPolicyQueries.HasPindianInput(sourceSeat) ? [] :
-        _coreMatchParticipantsPlayersAccess._players
-            .Where(player => player.IsAlive && player.Seat != sourceSeat && CanBePindianTarget(sourceSeat, player.Seat))
-            .Select(player => player.Seat)
-            .Order()
-            .ToArray();
-
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 140)]
     internal bool CanPayEquipmentSlotGroup(CharacterState owner, SkillProgramActivation activation) => ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.AbolishEquipmentSlotGroup).All(e => e.EquipmentSlots.Any(slot => owner.EquipmentSlotCapacity(slot) > 0));
     internal bool CanSelectProgramPindianOpponent(ProgramSkillFrame frame, int targetSeat) => _programTargetSelectionOperations.Get().CanSelectPindianOpponent(frame, targetSeat);

@@ -3,6 +3,19 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPindianPortsRuntime
 {
+    IReadOnlyList<int> IProgramPindianPolicyQueries.PindianOpponents(int sourceSeat)
+    {
+        var policies = (IProgramPindianPolicyQueries)this;
+        if (!policies.HasPindianInput(sourceSeat))
+            return [];
+
+        return _coreMatchParticipantsPlayersAccess._players
+            .Where(player => player.IsAlive && player.Seat != sourceSeat && policies.CanBePindianTarget(sourceSeat, player.Seat))
+            .Select(player => player.Seat)
+            .Order()
+            .ToArray();
+    }
+
     ProgramLegalityParticipant IProgramPindianPolicyQueries.CreateLegalityParticipant(int seat)
     {
         var player = _coreMatchParticipantsPlayersAccess._players[seat];

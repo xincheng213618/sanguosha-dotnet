@@ -19,7 +19,7 @@ internal static class ProgramPindianRuntimeChecks
         zones.Move(2, CardLocation.DrawPile, CardLocation.Hand(1));
         var participants = new Participants(zones);
         var turn = new Turn();
-        var policies = new Policies(zones);
+        var policies = new Policies(zones, participants);
         var producer = new Producer();
         var phaseFrames = new ProgramPhaseFrameQueries(frames, turn, turn, capabilities.Get<INativeFrameRoutingFacts>());
         var runtime = new ProgramPindianRuntime(frames, zones, content, participants, phaseFrames, policies, producer);
@@ -166,7 +166,7 @@ internal static class ProgramPindianRuntimeChecks
             string resultBind, SkillProgramCardSetVisibility visibility) => Calls.Add((programFrameId, sourceSeat, opponentSeat, resultBind));
     }
 
-    private sealed class Policies(ICardZoneQueries zones) : IProgramPindianPolicyQueries
+    private sealed class Policies(ICardZoneQueries zones, ISelectionParticipantQueries participants) : IProgramPindianPolicyQueries
     {
         internal bool[] Alternative { get; } = new bool[2];
         internal bool[] Prohibited { get; } = new bool[2];
@@ -174,6 +174,10 @@ internal static class ProgramPindianRuntimeChecks
         public bool HasPindianInput(int seat) => zones.CardsAt(CardLocation.Hand(seat)).Count > 0 || CanDiscardForPindian(seat);
         public ProgramLegalityParticipant CreateLegalityParticipant(int seat) =>
             new(seat, zones.CardsAt(CardLocation.Hand(seat)).Count, Prohibited[seat], Alternative[seat]);
+        public IReadOnlyList<int> PindianOpponents(int sourceSeat) =>
+            !HasPindianInput(sourceSeat) ? [] :
+            participants.Seats.Where(seat => seat != sourceSeat && participants.IsAlive(seat) &&
+                ((IProgramPindianPolicyQueries)this).CanBePindianTarget(sourceSeat, seat)).Order().ToArray();
     }
 
     private sealed class Turn : IProgramTurnQueries, IProgramPhaseQueries
