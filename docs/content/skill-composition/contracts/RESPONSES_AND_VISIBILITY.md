@@ -19,6 +19,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native Bagua starts at `CoreNativeJudgmentRuntime.ResolveBaguaJudgment` for Slash, Arrow Barrage and Qizheng. This owner applies an immediate outcome once. A suspended judgment returns through its original `JudgmentFrame`. A registered `ReturnBaguaResponse` handler may accept the outcome on its original use, as Qizheng does. Ordinary Slash and Arrow Barrage keep their native response continuation. An already-issued equipment invocation and a faction-defense provider keep their own return paths.
 
+- Gouxiang checks the exact effective armor and matching equipment skill instance when the original Dodge response completes. The original attack supplies armor bypass and the compared card appearance. The qualified effect acquires one current hand entity from the original Slash actor through native movement.
+
 - A response exchange reads the accepted response's public entries on its native parent. A direct claim checks those entries before offering and acquiring the materials. When the exchange gives the original card first, it freezes the response entries before delivery and rechecks them after the delivery's children return. Loss of a response entry leaves the earlier delivery and its restriction effective.
 
 - When a counterspell replies to another counterspell, its native window retains only the immediately answered payment receipt alongside its own. An exchange giving that earlier play verifies its action, chain position and current physical entries before delivery.
