@@ -24,7 +24,11 @@ internal static class PhaseHandSeizureChecks
         Require(!g.State.Players[0].IsFaceDown && E<PhaseHandSeizurePaidEvent>(g).Length == 1,
             "The new payment suffix classifies as a real discard, with one exact paid fact and typed movement return.");
         Cold(g, r); Continue(g); Reach(g, p => p.SkillPrompt?.SkillId == Flip);
+        var flip = g.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame =>
+            frame.ResumeProgramFrameId == Root(g).Id && frame.Window == SkillProgramTriggerWindow.CharacterTurnedOver);
         Require(Root(g).PhaseHandSeizure is { Stage: PhaseHandSeizureStage.FlipChildren } && g.State.Players[0].IsFaceDown &&
+            ProgramChildWindowRuntime.MatchesStateChangeChild(Root(g).Id, flip, new ProgramEventHistoryIndex(g.Events, [])) &&
+            !ProgramChildWindowRuntime.MatchesStateChangeChild(Root(g).Id, flip, new ProgramEventHistoryIndex([], [])) &&
             E<PhaseHandSeizureIssuedEvent>(g).Length == 0, "The actual turnover child completes before taking the then-current target hand.");
         Cold(g, r); Continue(g); Reach(g, p => p.SkillPrompt?.SkillId == Gain);
         Require(Root(g).PhaseHandSeizure!.TakenCardIds.SequenceEqual(original) && Moves(g, Take).Length == original.Length &&

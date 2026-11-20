@@ -19,4 +19,12 @@ internal sealed class ProgramChildWindowRuntime(IProgramChildWindowEntries entri
     public bool Begin(long frameId, PostEventContinuation continuation) =>
         entries.Recovery(frameId, continuation) || entries.CharacterState(frameId) ||
         entries.HpChanged(frameId, continuation) || movement.Begin(frameId) || skills.Begin(frameId);
+
+    internal static bool MatchesStateChangeChild(long parentFrameId, ResolutionFrame child, IProgramEventHistoryQueries history) =>
+        child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == parentFrameId &&
+        ((state.Window == SkillProgramTriggerWindow.SkillsChanged &&
+          state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram) ||
+         (state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange &&
+          history.Read<CharacterStateChangedEvent>().Any(entry => entry.Change.Id == state.Id &&
+              entry.Change.ParentFrameId == parentFrameId)));
 }

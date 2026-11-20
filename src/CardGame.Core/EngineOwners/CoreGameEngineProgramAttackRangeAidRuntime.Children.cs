@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(frame, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
             return payment.Stage == ProgramAttackRangeAidPaymentStage.MovementChildren && frame.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && move.Sequence > payment.Before && move.Sequence <= payment.After);
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == frame.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(entry => entry.Change.Id == state.Id && entry.Change.ParentFrameId == frame.Id));
+        return ProgramChildWindowRuntime.MatchesStateChangeChild(frame.Id, child, _coreProgramEventHistoryOperations.Value.ProgramHistory);
     }
 
     private bool ProgramAttackRangeAidSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, childIndex =>

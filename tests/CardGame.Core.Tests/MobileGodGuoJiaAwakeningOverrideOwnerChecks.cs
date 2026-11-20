@@ -407,7 +407,8 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         var skillsChanged = match.Game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
             .Single(frame => frame.Id == watcher.WindowContext!.ParentFrameId);
         match.Need(watcher.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged, OwnerSeat: 0 } &&
-            skillsChanged.ResumeProgramFrameId == original.Id &&
+            ProgramChildWindowRuntime.MatchesStateChangeChild(original.Id, skillsChanged, new ProgramEventHistoryIndex(match.Game.Events, [])) &&
+            !ProgramChildWindowRuntime.MatchesStateChangeChild(original.Id + 1, skillsChanged, new ProgramEventHistoryIndex(match.Game.Events, [])) &&
             skillsChanged.Candidates.Take(skillsChanged.CandidateIndex).Any(candidate =>
                 candidate.SkillId == Dili && candidate.BindingId == "awaken-on-acquisition" &&
                 candidate.OwnerSeat == 0 && candidate.SkillInstanceId == grant.InstanceId) &&
