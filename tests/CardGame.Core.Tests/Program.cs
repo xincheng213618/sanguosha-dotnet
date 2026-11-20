@@ -924,6 +924,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Pang Ji Biguo: native opponent and card menu cold", PangJiBiguoOpponentChecks.ActualBiguoSelectsNativeOpponentAndCardCold),
     ("OL SP Jia Xu Jianshu: paid gift opens recipient's native Pindian cold", OlJianshuPindianTargetChecks.PaidGiftUsesRecipientPindianTargetsCold),
     ("OL Liu Xie Mizhao: whole hand gift opens recipient Pindian cold", OlMizhaoPindianTargetChecks.WholeHandGiftOpensRecipientPindianCold),
+    ("Wu Lu Kang Kegou: actual Play-start retargets original Pindian cold", WuLuKangKegouOpponentChecks.OriginalPlayStartRetargetsNativePindianCold),
+    ("Anniversary Mu Shun Jinjian: actual damage source opens original Pindian cold", AnniversaryMuShunPindianTargetChecks.ActualDamageSourceOpensOriginalPindianCold),
     ("OL Guan Hai Youque: actual bait requires input and preserves its original entity cold", OlGuanHaiPindianInputChecks.RealBaitNeedsPindianInputAndKeepsItsOriginalEntityCold),
     ("OL Sun Ru Weimian: original recovery request and application return cold", SunRuWeimianRecoveryChecks.ActualWeimianReturnsFromReplacementAndOriginalApplicationCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
