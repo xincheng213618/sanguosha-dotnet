@@ -25,7 +25,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool CanOfferBeiMiHuCardAction(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferBeiMiHuCardAction(candidate, trigger, context);
     internal bool CanOfferBeiMiHuLifecycle(int owner, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferBeiMiHuLifecycle(owner, trigger, context);
     internal void CompleteBeiMiHuTargetAddition(ProgramSkillFrame f) => _resolve().CompleteBeiMiHuTargetAddition(f);
-    internal void ContinueBeiMiHuTurnPrelude() => _resolve().ContinueBeiMiHuTurnPrelude();
     internal bool DrainBeiMiHuChildren(ProgramSkillFrame f) => _resolve().DrainBeiMiHuChildren(f);
     internal bool ExactBeiMiHuLifecycleParent(ProgramSkillFrame f) => _resolve().ExactBeiMiHuLifecycleParent(f);
     internal void FinishBeiMiHu(ProgramSkillFrame f) => _resolve().FinishBeiMiHu(f);
