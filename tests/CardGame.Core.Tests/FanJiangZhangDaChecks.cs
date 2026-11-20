@@ -3,11 +3,56 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class FanJiangZhangDaChecks
 {
     private const string Skill = "ol:juesheng", Armor = "ol:yuanchou", Owner = "fixture:fjzd-owner", Driver = "fixture:fjzd-driver", Quiet = "fixture:fjzd-quiet",
         Watch = "fixture:fjzd-watch", Health = "fixture:fjzd-health", Mode = "identity:classic-fan-jiang-zhang-da-fixture";
+
+    internal static void JueshengReturnsOriginalRecipientSkillGrantCold()
+    {
+        var (game, registry) = Start("grant-window");
+        var hpBefore = V(game, 1).Hp;
+        Need(hpBefore > 1 && !HasSkill(game, 1, Skill), "The original living recipient starts without Juesheng.");
+        Juesheng(game, 1);
+        Reach(game, () => P(game) is { PlayerSeat: 1, SkillPrompt.SkillId: Watch });
+
+        var prompt = P(game)!;
+        var grant = E<JueshengSkillGrantedEvent>(game).Single();
+        var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == grant.FrameId);
+        var child = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
+            .Single(frame => frame.Window == SkillProgramTriggerWindow.SkillsChanged);
+        var watcher = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        Need(root.OwnerSeat == 0 && root.Juesheng is { Stage: JueshengStage.GrantChildren, GrantCursor: 1, NativeCompleted: true } receipt &&
+            receipt.FinalTargets.SequenceEqual([1]) && receipt.Origin.UseId == grant.UseId &&
+            grant is { Index: 0, RecipientSeat: 1 } && V(game, 1).IsAlive && V(game, 1).Hp == hpBefore - 1 && HasSkill(game, 1, Skill) &&
+            child.OwnerSeat == 1 && watcher.WindowContext?.ParentFrameId == child.Id &&
+            E<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == grant.UseId && fact.CardKind == CardKind.Duel) == 1 &&
+            E<JueshengCompletedEvent>(game).Length == 0,
+            "The whole native Duel has finished and the original recipient already holds the temporary grant while its SkillsChanged child suspends Juesheng.");
+
+        game = Cold(game, registry);
+        var restoredRoot = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id);
+        var restoredChild = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == child.Id);
+        var runtime = game.GetRuntimeModule<CharacterFanJiangZhangDaOlRuntime>();
+        var restoredPrompt = P(game)!;
+        Need(restoredPrompt.PromptId == prompt.PromptId && restoredPrompt.PlayerSeat == 1 &&
+            runtime.FanJiangZhangDaFirstChild(restoredRoot, restoredChild) &&
+            !runtime.FanJiangZhangDaFirstChild(restoredRoot, restoredChild with { Window = SkillProgramTriggerWindow.TurnBeforeStart }) &&
+            !runtime.FanJiangZhangDaFirstChild(restoredRoot, restoredChild with { ResumeProgramFrameId = restoredChild.Id }) &&
+            !runtime.FanJiangZhangDaFirstChild(restoredRoot, restoredChild with { Continuation = ProgramLifecycleContinuation.NormalTurnStart }),
+            "Cold recovery preserves the original recipient's child and rejects a different window, parent or continuation.");
+
+        Accept(game, new AdvanceOneStepCommand(game.Revision));
+        Play(game);
+        Need(E<JueshengSkillGrantedEvent>(game).SequenceEqual([grant]) &&
+            E<JueshengDuelReturnedEvent>(game).Single().UseId == grant.UseId &&
+            E<JueshengCompletedEvent>(game).SequenceEqual([new JueshengCompletedEvent(root.Id, grant.UseId)]) &&
+            HasSkill(game, 1, Skill) && V(game, 1).Hp == hpBefore - 1,
+            "The original frame completes once after its recipient's child returns, with one grant and one Duel damage.");
+    }
+
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static bool HasSkill(GameEngine g, int seat, string skill) { var skills = V(g, seat).Skills; Need(skills is not null, "A character's own public skill snapshot must exist."); return skills!.Any(s => s.Id == skill); }
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
@@ -78,6 +123,7 @@ internal static class FanJiangZhangDaChecks
             if (scene is "actor" or "actor-black") defs.Add("""{"id":"fixture:fjzd-actor","revision":1,"triggers":[{"id":"actual-actor","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardKinds":["slash"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"otherLegalCurrentCardTarget"},{"op":"replaceCurrentCardUseActor","target":"selectedTarget"}]}]}""");
             if (scene == "actor-black") defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"actual-rewritten-black","window":"cardUseBeforeTargetEffects","ownerRelation":"observer","cardKinds":["slash"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"rewritten","options":[{"id":"continue"}]}]}]}""");
             if (scene == "multi") defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-native-damage","window":"afterDamageApplied","subject":"damageSource","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"damage","options":[{"id":"continue"}]}]}]}""");
+            if (scene == "grant-window") defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"native-recipient-grant","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"grant","options":[{"id":"continue"}]}]}]}""");
             if (scene.StartsWith("committed-", StringComparison.Ordinal)) defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-committed-duel","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["duel"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"committed","options":[{"id":"continue"}]}]}]}""");
             if (scene == "nullified") defs.Add("""{"id":"fixture:fjzd-nullification","revision":1,"viewAs":[{"id":"real-nullification","inputKinds":["crossbow"],"inputSuits":[],"outputKind":"nullification","forPlay":false,"forResponse":true}]}""");
             if (scene == "lion-loss") defs.Add("""{"id":"fixture:fjzd-conditional","revision":1,"skillGrants":[{"id":"healthy-source","skillId":"ol:juesheng","while":[">=",["hp","owner"],12],"onSourceLoss":"finishInvocation"}]}""");
@@ -93,7 +139,14 @@ internal static class FanJiangZhangDaChecks
             if (scene == "multi") own.AddRange(["ol:bingzhong", "ol:fengzi", Watch]); if (scene.StartsWith("lion", StringComparison.Ordinal)) own.Add(Health);
             b.AddGeneral(new(Owner, "实际范疆张达", "ol-fan-jiang-zhang-da", "fixture:fjzd-pick", "wu", 12, own, GeneralGender.Male));
             var peers = Enumerable.Range(1, 3).Select(i => "fixture:fjzd-peer-" + i).ToArray();
-            foreach (var peer in peers) { var skills = new List<string> { "fixture:fjzd-response" }; if (scene == "actor-black") skills.Add(Armor); if (scene == "multi") skills.Add(Skill); b.AddGeneral(new(peer, "实际其他角色", "supporter", Quiet, "qun", 12, skills)); }
+            foreach (var peer in peers)
+            {
+                var skills = new List<string> { "fixture:fjzd-response" };
+                if (scene == "actor-black") skills.Add(Armor);
+                if (scene == "multi") skills.Add(Skill);
+                if (scene == "grant-window") skills.Add(Watch);
+                b.AddGeneral(new(peer, "实际其他角色", "supporter", Quiet, "qun", 12, skills));
+            }
             var kind = Enum.Parse<CardKind>(material, true); var kinds = armor ? new[] { CardKind.Crossbow, CardKind.Tengjia } : [kind];
             foreach (var actual in kinds) b.AddCard(new("fixture:fjzd-card-" + actual, "实际" + actual, CardCatalog.Get(actual).CategoryName, "原生实体", actual));
             b.AddDeck(new("fixture:fjzd-deck", "固定有界原生牌堆", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 96).Select(i => new ContentDeckPhysicalCard("fixture:fjzd-card-" + kinds[i % kinds.Length], scene == "red" ? Suit.Heart : Suit.Spade, 7)).ToArray() });

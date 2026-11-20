@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class ShiXiaoQiaoChecks
 {
@@ -30,11 +31,31 @@ internal static class ShiXiaoQiaoChecks
 
     public static void HeyunSelfLossRetainsOriginalTwoCardDrawCold()
     {
-        var s = Scene.Start(true); s.Play(0);
+        var s = Scene.Start(true, watchLoss: true); s.Play(0);
         var hand = s.V(0).HandCount;
         s.HeyunSelf(Heyun); s.AtWatch();
-        var root = s.Root!;
+        var loss = s.Root!;
         var paid = s.E<ShiXqHeyunPaidEvent>().Single();
+        var stack = s.G.ResolutionStack.ToArray();
+        var watcher = stack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        var skills = stack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == watcher.WindowContext?.ParentFrameId);
+        var index = Array.IndexOf(stack, skills);
+        s.Need(!s.Has(Heyun) && paid is { Target: 0, LostSkillId: Heyun } && paid.FrameId == loss.Id &&
+            loss is { SkillId: Heyun, OwnerSeat: 0, ShiXiaoQiao: { Paid: true, Stage: ShiXqStage.LossChildren } } &&
+            index > 0 && stack[index - 1].Id == loss.Id && skills.ResumeProgramFrameId == loss.Id &&
+            skills is { OwnerSeat: 0, Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram } &&
+            s.V(0).HandCount == hand && s.E<ShiXqDrawPaidEvent>().Length == 0,
+            "The original paid Heyun frame awaits its actual self-loss child before either card is drawn.");
+        s.Cold();
+        var restoredSkills = s.G.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == skills.Id);
+        var runtime = s.G.GetRuntimeModule<CharacterXiaoQiaoMobileShiRuntime>();
+        s.Need(runtime.ShiXqFirstChild(s.Root!, restoredSkills) &&
+            !runtime.ShiXqFirstChild(s.Root!, restoredSkills with { ResumeProgramFrameId = watcher.Id }) &&
+            !runtime.ShiXqFirstChild(s.Root!, restoredSkills with { Continuation = ProgramLifecycleContinuation.NormalTurnStart }),
+            "Cold restore accepts the original skill-loss return and rejects a different parent or continuation.");
+        s.ContinueWatch(); s.AtWatch();
+
+        var root = s.Root!;
         var draw = s.E<ShiXqDrawPaidEvent>().Single();
         CardMovementRecord[] Draws() => s.G.CardMovements.Where(move => move.Reason.Value == "skill.mobile-shi-xiao-qiao.heyun.draw").ToArray();
         var moves = Draws();
@@ -113,9 +134,9 @@ internal static class ShiXiaoQiaoChecks
         { var result = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(result.Accepted, result.Error?.Message ?? "Real Xiao Qiao command rejected."); }
         private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))).ToArray(), Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), G.CardMovements, Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(), Commands = CommandJson.Serialize(G.AcceptedCommands) });
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, P, Root?.ShiXiaoQiao, Copies = E<ShiXqCopiedEvent>(), Clear = E<ShiXqGrantClearedEvent>() });
-        public static Scene Start(bool independent)
+        public static Scene Start(bool independent, bool watchLoss = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(independent));
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(independent, watchLoss));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = 47, PlayerCount = 4, HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
                 AiPolicyVersion = AiDecisionPolicy.CurrentVersion, ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 9 }, registry);
             var s = new Scene(game, registry); s.Submit(new StartGameCommand());
@@ -130,12 +151,16 @@ internal static class ShiXiaoQiaoChecks
             throw new InvalidOperationException("The fixed identity opening did not reach Xiao Qiao's first real round.");
         }
     }
-    private sealed class Fixture(bool independent) : IGameContentPackage
+    private sealed class Fixture(bool independent, bool watchLoss) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shi-xiao-qiao", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(new OwnerBuilder(b, independent), Hero);
+            var lossTrigger = watchLoss ? """
+                ,{"id":"paid-loss-child","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,
+                  "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"lost","options":[{"id":"continue"}]}]}
+                """ : string.Empty;
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Quiet}}","revision":1,"modifiers":[{"id":"keep","query":"handLimit","operation":"add","value":30,"priority":0}],
@@ -144,7 +169,7 @@ internal static class ShiXiaoQiaoChecks
                "triggers":[{"id":"initialize","window":"gameStarting","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"setBooleanState","target":"owner","stateId":"spent","value":true}]},
                  {"id":"one-real-turn-draw","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}]},
               {"id":"{{Donor}}","revision":1,"triggers":[{"id":"actual-acquisition","window":"gameStarting","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["{{Borrowed}}"]}]}]},
-              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"paid-draw-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-xiao-qiao.heyun.draw"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}]}
+              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"paid-draw-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-xiao-qiao.heyun.draw"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}{{lossTrigger}}]}
             ]}
             """;
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,

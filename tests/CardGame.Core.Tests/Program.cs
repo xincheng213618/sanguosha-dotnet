@@ -189,6 +189,7 @@ var tests = new (string Name, Action Body)[]
     ("Shi Deng Ai: full capacity entity losses threshold rewards and paid cold", ShiDengAiChecks.FullCapacityPerEntityLossAndThresholdSpendPaidChildCold),
     ("Shi Sun Chen Lulian: Duel draw and momentum return cold", ShiSunChenChecks.LulianDuelDrawAndMomentumReturnCold),
     ("Shi Xiao Qiao Heyun: self-loss retains original two-card draw cold", ShiXiaoQiaoChecks.HeyunSelfLossRetainsOriginalTwoCardDrawCold),
+    ("OL Fan Jiang Zhang Da Juesheng: original recipient skill grant returns cold", FanJiangZhangDaChecks.JueshengReturnsOriginalRecipientSkillGrantCold),
     ("Shi Wei Yan: paid phase quotas Yinzhan mission and backwater cold", ShiWeiYanChecks.PaidPhaseQuotasYinzhanMissionAndBackwaterCold),
     ("Shi Wei Yan: dying mission failure keeps paid parent and Kunfen cold", ShiWeiYanChecks.DyingMissionFailureKeepsPaidParentAndKunfenCold),
     ("Shi Wang Chang: hidden top deck exact use turn and round name limits cold", ShiWangChangChecks.ShepanHiddenTopDeckExactUseTurnAndRoundNameLimitsCold),
