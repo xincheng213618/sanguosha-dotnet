@@ -181,6 +181,8 @@ var tests = new (string Name, Action Body)[]
     ("Shi Zhao Yun: lifetime hand names, shared round zero quota, unlimited basics and fixed-four cold recovery", ShiZhaoYunChecks.LifetimeHandNamesCardlessRoundQuotaUnlimitedBasicsAndFixedFourCold),
     ("Shi Yu Ji: Fuji marked Slash Duel response and empower expiry", MobileShiYuJiChecks.FujiMarkedSlashDuelResponseAndEmpowerExpiry),
     ("Shi Lu Su: real foreign hand use two refills conversion and next-turn expiry cold", ShiLuSuChecks.ActualForeignHandUseTwoRefillsAndNextTurnExpiryCold),
+    ("Shi Lu Su Dimeng: original lesser hand receives the native draw cold", ShiLuSuChecks.DimengDrawUsesTheOriginalLesserHandRecipientCold),
+    ("Anniversary Qingren: one actual Yizan Use returns the original native Draw cold", AnniversaryQingrenDrawChecks.OneYizanUseReturnsOriginalQingrenDrawCold),
     ("Shi He Qi: issued global Yingji cleanup uses physical move after source loss cold", ShiHeQiChecks.IssuedGlobalYingjiCleanupUsesPhysicalMoveAfterSourceLossCold),
     ("Shi Sun Chen: different suits private simultaneous gifts and damage quota cold", ShiSunChenChecks.DistinctCostPrivateCommitmentsNativeGiftsAndDamageQuotaCold),
     ("Shi Xiao Qiao: exact copy source preserves independent instance and state", ShiXiaoQiaoChecks.ExactCopySourcePreservesIndependentInstanceAndState),

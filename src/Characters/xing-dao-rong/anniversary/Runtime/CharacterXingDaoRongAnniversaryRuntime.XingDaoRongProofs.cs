@@ -45,7 +45,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
         if (f.XingDaoRongXuHe is not { } r || !ValidXingDaoRong(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == XingDaoRongXuHeStage.Drawing && r.Index < r.Targets.Count && draw.Context.RecipientSeat == r.Targets[r.Index] && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == XingDaoRongXuHeStage.Drawing && r.Index < r.Targets.Count && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Targets[r.Index], 1);
         if (r.Stage is not (XingDaoRongXuHeStage.DiscardChildren or XingDaoRongXuHeStage.DrawChildren))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)

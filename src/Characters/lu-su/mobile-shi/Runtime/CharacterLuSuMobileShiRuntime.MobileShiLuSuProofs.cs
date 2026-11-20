@@ -12,7 +12,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
         if (!ValidShiLs(f) || f.ShiLuSu is not { } r)
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiLsStage.Drawing && draw.Context.RecipientSeat == r.Target && draw.Context.RequestedCount == r.X && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiLsStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, r.X);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && ShiLsMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame rec)

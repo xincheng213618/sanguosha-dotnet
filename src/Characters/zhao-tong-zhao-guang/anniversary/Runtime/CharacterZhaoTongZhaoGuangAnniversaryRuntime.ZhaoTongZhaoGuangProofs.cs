@@ -28,7 +28,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         if (f.AnniversaryQingren is not { } r || !ValidAnniversaryQingren(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryQingrenStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f) && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Count;
+            return r.Stage == AnniversaryQingrenStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Count);
         if (child is CardsMovedTriggerWindowFrame moved)
             return r.Stage == AnniversaryQingrenStage.DrawChildren && r.Draw is { } outcome && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter);
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;

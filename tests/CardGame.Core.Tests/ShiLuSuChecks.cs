@@ -66,6 +66,35 @@ internal static class ShiLuSuChecks
             marked.G.GetHumanLegalActions().Any(a => a.ConversionSource?.SkillId == Shanxi && a.TargetSeats.SequenceEqual([3])),
             "The real foreign-material native Duel consumes only its original Play target; another living target remains legal."); marked.Cold(); marked.Replay();
     }
+    public static void DimengDrawUsesTheOriginalLesserHandRecipientCold()
+    {
+        var s = Scene.Start();
+        s.Play();
+        var own = s.V(0).Hand.Select(card => card.Id).Order().ToArray();
+        var other = s.V(1).Hand.Select(card => card.Id).Order().ToArray();
+        var amount = s.V(0).MaxHp - s.V(0).Hp;
+        s.Need(own.Length < other.Length && amount == 2, "The two original hands differ and Lu Su has lost two HP.");
+        s.Skill();
+        s.Answer(choice => Branch(choice) == "pair" && choice.Targets.SequenceEqual([0]));
+        s.Answer(choice => Branch(choice) == "pair" && choice.Targets.SequenceEqual([1]));
+        s.Reach(() => s.P?.Choices.Any(choice => Branch(choice) == "draw") == true);
+        var exchange = s.E<ShiLsExchangeCompletedEvent>().Single();
+        s.Need(s.V(0).Hand.Select(card => card.Id).Order().SequenceEqual(other) &&
+            s.V(1).Hand.Select(card => card.Id).Order().SequenceEqual(own),
+            "The accepted exchange delivers both original hands before the draw choice is made.");
+
+        s.Cold();
+        s.Answer(choice => Branch(choice) == "draw");
+        s.Play();
+        var draws = s.G.CardMovements.Where(move => move.Reason.Value == "skill.mobile-shi-lu-su.dimeng.draw").ToArray();
+        s.Need(s.E<ShiLsBenefitBoundEvent>().SequenceEqual([new(exchange.FrameId, 1, amount, true)]) &&
+            s.E<ProgramSkillResolvedEvent>().Count(fact => fact.FrameId == exchange.FrameId && fact.Completed) == 1 &&
+            draws.Length == amount && draws.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1)) &&
+            s.V(0).Hand.Select(card => card.Id).Order().SequenceEqual(other) &&
+            s.V(1).Hand.Select(card => card.Id).Order().SequenceEqual(own.Concat(draws.Select(move => move.CardId)).Order()),
+            "The original lower hand after exchange receives Lu Su's full missing-HP draw on the paid frame.");
+    }
+
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
