@@ -30,7 +30,7 @@
   原付款者先摸 2 张，再按本回合【杀】使用账本（`ShiZhHuiSlashUsedEvent`）对每名使用过【杀】的存活
   角色各失去 1 点体力；若无人用杀且 X 大于激活时体力，则当前回合角色失去 1 点体力。
   回合结束候选按付款座位查找有效发动，受理后由原帧的发动序号继续结算。每次结算记
-  `ShiZhHuiSiziElapsedEvent`，耗满 X 或付款者回合开始时记录这一笔发动的 `ShiZhHuiSiziExpiredEvent`。
+  `ShiZhHuiSiziElapsedEvent`，耗满 X 时记录这一笔发动的 `ShiZhHuiSiziExpiredEvent`。付款者下一个实际回合开始时，按发动顺序注销该角色以前发动且仍然有效的全部序号。
 - 挟志：`afterHealthChanged` 锁定触发，按变化绝对值经公共标记加蓄力（上限 4）。
   触顶溢出记 `ShiZhHuiXiezhiOverflowEvent`（每次溢出=1 次）；手牌上限与【杀】次数上限由
   `EvaluateHandLimit` / `EvaluateSlashUseLimit` 的 `issued:*:mobile:shi-xiezhi:*` 贡献项按

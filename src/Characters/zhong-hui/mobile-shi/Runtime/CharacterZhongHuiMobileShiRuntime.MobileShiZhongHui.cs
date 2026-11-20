@@ -15,16 +15,18 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal ShiZhHuiSiziActivatedEvent? ShiZhHuiActiveSizi => FindActiveSizi();
     internal bool ShiZhHuiSiziActive => ShiZhHuiActiveSizi is not null;
 
-    private ShiZhHuiSiziActivatedEvent? FindActiveSizi(int? ownerSeat = null)
+    private ShiZhHuiSiziActivatedEvent? FindActiveSizi(int? ownerSeat = null) => ActiveSizi(ownerSeat).LastOrDefault();
+
+    private IEnumerable<ShiZhHuiSiziActivatedEvent> ActiveSizi(int? ownerSeat)
     {
         var history = _coreProgramEventHistoryOperations.Value;
         var activations = history.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>();
-        if (activations.Count == 0) return null;
+        if (activations.Count == 0) return [];
 
-        var expired = history.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>();
-        return activations.LastOrDefault(activation =>
+        var expired = history.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>().Select(entry => entry.ActivationOrdinal).ToHashSet();
+        return activations.Where(activation =>
             (ownerSeat is null || activation.Source.OwnerSeat == ownerSeat) &&
-            !expired.Any(entry => entry.ActivationOrdinal == activation.Ordinal));
+            !expired.Contains(activation.Ordinal));
     }
 
     internal IReadOnlyList<int> ShiZhHuiEndingVictims(int turnNumber, int ownerHp, int consumed)

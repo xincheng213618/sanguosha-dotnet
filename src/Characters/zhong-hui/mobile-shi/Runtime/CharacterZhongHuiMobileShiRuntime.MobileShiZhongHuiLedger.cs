@@ -33,7 +33,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     }
 
     // Observes completed engine facts only: slash uses per turn, deaths per round
-    // and the owner's own turn start that expires a running sizi effect.
+    // and the payer's own turn start that expires their running Sizi effects.
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 67700)]
     internal void ObserveShiZhHuiTurnFacts(IGameEvent payload)
     {
@@ -47,8 +47,11 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
             case PlayerDiedEvent { VictimSeat: var victim }:
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiDeathRecordedEvent(_coreActualRoundProgressRoundNumberAccess._roundNumber, victim));
                 break;
-            case TurnStartedEvent { ActorSeat: var seat }when _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && FindActiveSizi(seat) is { } activation:
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziExpiredEvent(activation.Ordinal, "owner-turn-start"));
+            case TurnStartedEvent { ActorSeat: var seat, TurnNumber: var turn }when _coreMatchParticipantsPlayersAccess._players[seat].IsAlive:
+                var expiring = ActiveSizi(seat).Where(activation => activation.ActualTurn < turn)
+                    .Select(activation => activation.Ordinal).ToArray();
+                foreach (var ordinal in expiring)
+                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziExpiredEvent(ordinal, "owner-turn-start"));
                 break;
         }
     }
