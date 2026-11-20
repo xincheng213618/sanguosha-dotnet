@@ -109,6 +109,7 @@ internal interface ILeCaoZhiWenlanHost { SkillProgramStepOutcome Resolve(Program
 internal sealed class ResolveLeCaoZhiWenlanDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveLeCaoZhiWenlan;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLegacyActualUseCompletion);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;

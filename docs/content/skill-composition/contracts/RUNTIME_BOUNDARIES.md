@@ -35,6 +35,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineNativeUsedDiscardOriginsRuntime` captures the actor and exact discard entry of finished uses and responses during the original movement batch. Xunxian and Tongxie request this fact through their trigger operations. Tongxie observes each queued fact synchronously and validates the original movement and live Slash parent before opening its own later follow-up window.
 
+- `CoreGameEngineActualTurnLegacyCompletionRuntime` normalizes an original zero-entity program use when the actual-use ordinal or the content's native completion fact is required. Trigger operations, the Limu activation and the existing Leiluan conversion declaration contribute that fact at catalog compilation. The original producer frame and typed completion return still control admission and continuation.
+
 - `CoreGameEngineTreatedWoundedRuntime` supplies current wounded status and identity concealment to conditional skill bindings and rule expressions. This uses the same match health rules as native checks, including undefined HP, the active Happy Qiao health pool and qualifying Guiming. Xingzhao reads that current status through its declared condition.
 
 - `CoreGameEngineProgramAttackRangeAidRuntime` owns `requestAttackRangeAid` from the original responder list through weapon payment or the beneficiary's typed native Draw. It advances the current responder only after the original paid children return. Accepted payment and its recovery, damage, movement and skill-change children keep the original parent frame.

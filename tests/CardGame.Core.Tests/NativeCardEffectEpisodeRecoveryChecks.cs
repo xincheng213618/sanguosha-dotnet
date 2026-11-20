@@ -7,6 +7,7 @@ internal static class NativeCardEffectEpisodeRecoveryChecks
 {
     private const string Bingcai = "mou-ol:bingcai", Driver = "fixture:legacy-alcohol-driver",
         Rescue = "fixture:legacy-alcohol-rescue", Hp = "fixture:legacy-alcohol-hp";
+    private const string OrdinalWatcher = "fixture:legacy-alcohol-completed";
     private const BindingFlags Hidden = BindingFlags.Static | BindingFlags.NonPublic;
 
     public static void RealRecastRepeatsBoundSelfRecoveryWithoutAnotherUseOrRescue()
@@ -123,6 +124,9 @@ internal static class NativeCardEffectEpisodeRecoveryChecks
             var original = (IGameContentPackage)Activator.CreateInstance(type,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, [false], null)!;
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(original));
+            if (registry.ProgramDependencies.TracksActualTurnUseOrdinal ||
+                !registry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeLegacyActualUseCompletion))
+                throw new InvalidOperationException("The Bingcai fixture requires the declared legacy completion fact independently of use ordinal tracking.");
             var game = GameEngine.CreateStandard(new() { Seed = 7, PlayerCount = 4, HumanSeat = 0,
                 HumanRole = Role.Renegade, ModeId = "identity:classic-legacy-alcohol-fixture", UseInteractiveSetup = true,
                 AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false, MaxTurns = 8 }, registry);
@@ -146,9 +150,13 @@ internal static class NativeCardEffectEpisodeRecoveryChecks
         private sealed class Builder(IContentRegistryBuilder target) : IContentRegistryBuilder
         {
             public void AddCard(ContentCardDefinition value) => target.AddCard(value);
-            public void AddSkill(ContentSkillDefinition value) => target.AddSkill(value);
+            public void AddSkill(ContentSkillDefinition value)
+            {
+                if (value.Id != OrdinalWatcher)
+                    target.AddSkill(value);
+            }
             public void AddGeneral(ContentGeneralDefinition value) => target.AddGeneral(value.Id == "fixture:legacy-alcohol-owner"
-                ? value with { AdditionalSkillIds = (value.AdditionalSkillIds ?? []).Append(Bingcai).ToArray() } : value);
+                ? value with { AdditionalSkillIds = (value.AdditionalSkillIds ?? []).Where(id => id != OrdinalWatcher).Append(Bingcai).ToArray() } : value);
             public void AddDeck(ContentDeckRecipe value) => target.AddDeck(value);
             public void AddMode(ContentModeDefinition value) => target.AddMode(value);
             public void AddEquipmentContent(EquipmentContentPackage value) => target.AddEquipmentContent(value);

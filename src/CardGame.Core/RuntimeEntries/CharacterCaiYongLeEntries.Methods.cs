@@ -53,6 +53,5 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal bool ValidJiaoweiProtectionSource(JiaoweiLossSource source) => _resolve().ValidJiaoweiProtectionSource(source);
     internal bool FeibaiActualUseScopeIsOpen { get => _resolve().FeibaiActualUseScopeIsOpen; }
     internal long? FeibaiSetupEpoch { get => _resolve().FeibaiSetupEpoch; }
-    internal bool HasLeCaiYongFeibaiCapability { get => _resolve().HasLeCaiYongFeibaiCapability; }
     internal bool HasLeCaiYongJiaoweiCapability { get => _resolve().HasLeCaiYongJiaoweiCapability; }
 }

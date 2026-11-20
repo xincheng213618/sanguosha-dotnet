@@ -3,9 +3,12 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualTurnLegacyCompletionRuntime
 {
+    private bool TracksLegacyActualUseCompletion => _coreCurrentTurnUseKindsOperations.TracksActualTurnUseOrdinal ||
+        _contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeLegacyActualUseCompletion);
+
     internal CardUseFrame NormalizeActualTurnLegacyCompletedUse(CardUseFrame use, long? programParentId)
     {
-        if (!(_coreCurrentTurnUseKindsOperations.TracksActualTurnUseOrdinal || _characterCaiYongLeOperations.HasLeCaiYongFeibaiCapability || _characterCaoZhiLeOperations.HasLeCaoZhiWenlanCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability) || use.Action is not null)
+        if (!TracksLegacyActualUseCompletion || use.Action is not null)
             return use;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || parent.Id != programParentId || !_nativeCardUseAdmission.IsLegacyProducerUse(use) || parent.InstructionIndex < 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LegacyActualUseCompletionCapturedEvent>().Any(e => e.CardUseFrameId == use.Id))
@@ -46,7 +49,7 @@ internal sealed partial class CoreGameEngineActualTurnLegacyCompletionRuntime
 
     internal bool FinishActualTurnLegacyDyingAlcohol(long useId, long programParentId)
     {
-        if (!(_coreCurrentTurnUseKindsOperations.TracksActualTurnUseOrdinal || _characterCaiYongLeOperations.HasLeCaiYongFeibaiCapability || _characterCaoZhiLeOperations.HasLeCaoZhiWenlanCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability))
+        if (!TracksLegacyActualUseCompletion)
             return false;
         var use = NormalizeActualTurnLegacyCompletedUse(_coreCardUseLifecycleOperations.LifecycleCardUse(useId) ?? throw new InvalidOperationException("Legacy Alcohol completion lost its owning use."), programParentId);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);

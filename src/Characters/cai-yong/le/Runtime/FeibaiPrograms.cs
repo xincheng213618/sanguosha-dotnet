@@ -47,6 +47,7 @@ internal interface ILeCaiYongFeibaiHost { SkillProgramStepOutcome Resolve(Progra
 internal sealed class ResolveLeCaiYongFeibaiDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveLeCaiYongFeibai;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLegacyActualUseCompletion);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseCompleted)];

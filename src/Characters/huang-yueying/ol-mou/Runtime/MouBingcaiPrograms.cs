@@ -34,7 +34,8 @@ public sealed record MouBingcaiDrawReturnedEvent(long FrameId, long AttemptFrame
 public sealed record MouBingcaiCompletedEvent(long FrameId, long UseId, bool Recast, bool Matched, bool AddedName) : IGameEvent;
 internal sealed class MouBingcaiDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered:
+        ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLegacyActualUseCompletion);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouHuangYueyingBingcai;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);

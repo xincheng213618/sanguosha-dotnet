@@ -81,5 +81,4 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal bool WenlanRootMatches(ProgramSkillFrame f) => _resolve().WenlanRootMatches(f);
     internal bool WenlanWindowMatches(ProgramCardTriggerWindowFrame window, WenlanPairQualification q) => _resolve().WenlanWindowMatches(window, q);
     internal bool HasLeCaoZhiFuleCapability { get => _resolve().HasLeCaoZhiFuleCapability; }
-    internal bool HasLeCaoZhiWenlanCapability { get => _resolve().HasLeCaoZhiWenlanCapability; }
 }

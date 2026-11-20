@@ -50,6 +50,7 @@ internal sealed class SkillProgramDependencies
         UsesOwnerMarkerCount = programs.Any(program => program.Modifiers.Any(modifier => modifier.ValueExpression == SkillRuleValueExpression.OwnerMarkerCount));
         UsesDrawPhaseDrawCountHandLimit = programs.Any(program => program.Modifiers.Any(modifier =>
             modifier.ValueExpression == SkillRuleValueExpression.CurrentTurnDrawPhaseDrawCountHalfFloor));
+        UsesLeiluanBasicUse = programs.Any(program => program.ViewAs.Any(rule => rule.LeiluanBasicUse is not null));
         var resolver = ProgramInstructionResolver.Default;
         RequiredFacts = ProgramFactRequirements.Close(triggers.Aggregate(ProgramTrackedFact.None, (facts, trigger) =>
                 facts | resolver.Features(trigger).FactRequirements.Triggered) |
@@ -58,6 +59,7 @@ internal sealed class SkillProgramDependencies
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |
+            (UsesLeiluanBasicUse ? ProgramTrackedFact.NativeLegacyActualUseCompletion : ProgramTrackedFact.None) |
             (triggers.Any(trigger => trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
                 ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |
             (triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.CardsMoved &&
@@ -96,7 +98,6 @@ internal sealed class SkillProgramDependencies
         _conditions = triggers.SelectMany(trigger => resolver.Features(trigger).ConditionKinds).ToFrozenSet();
         TracksActualTurnUseOrdinal = triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.NullifyWushuangSecondUse)) || UsesTriggerCondition(SkillProgramTriggerConditionKind.CardActionActualTurnUseOrdinalIs) ||
             triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse));
-        UsesLeiluanBasicUse = programs.Any(program => program.ViewAs.Any(rule => rule.LeiluanBasicUse is not null));
         UsesEqualNameLengthUse = programs.Any(program => program.ViewAs.Any(rule => rule.EqualNameLengthUse));
         UsesRankTwoDamageUse = programs.Any(program => program.ViewAs.Any(rule => rule.RankTwoDamageUse));
         HasRoundSlashUseDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
