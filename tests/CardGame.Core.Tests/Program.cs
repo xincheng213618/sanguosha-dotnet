@@ -913,6 +913,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Tang Zi Xingzhao: real wound lends Xunxun and orders next actual Draw cold", OlTangZiXingzhaoWoundedOwnerChecks.RealWoundLendsXunxunAndOrdersNextActualDrawCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Baijia threshold for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesBaijiaThresholdForNextPreparationCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Dujiang Armor for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesDujiangArmorForNextPreparationCold),
+    ("Mobile Shen Guo Jia: paid Huishi waives Fanxiang witness for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesFanxiangWitnessForNextPreparationCold),
+    ("Mobile Shen Guo Jia: paid Huishi waives Moucuan Bing for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesMoucuanBingForNextPreparationCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
     ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
     ("Boundary Mobile Han Dang Jiefan: native weapon and typed draw return to original responders cold", BoundaryMobileHanDangAttackRangeAidOwnerChecks.NativeWeaponAndTypedDrawReturnToOriginalResponderRosterCold),

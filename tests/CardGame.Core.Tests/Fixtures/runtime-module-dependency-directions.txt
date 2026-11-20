@@ -271,7 +271,6 @@ ma-tie/anniversary	CardGame.Core.EngineOwners.CharacterMaTieAnniversaryRuntime	C
 ma-tie/anniversary	CardGame.Core.EngineOwners.CharacterMaTieAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries	ma-xiu-ma-tie/ol	CardGame.Core.EngineOwners.CharacterMaXiuMaTieOlRuntime
 ma-tie/anniversary	CardGame.Core.EngineOwners.CharacterMaTieAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 ma-xiu-ma-tie/ol	CardGame.Core.EngineOwners.CharacterMaXiuMaTieOlRuntime	CardGame.Core.RuntimeEntries.CharacterKeBiNengOlEntries	ke-bi-neng/ol	CardGame.Core.EngineOwners.CharacterKeBiNengOlRuntime
-ma-yuan-yi/ol	CardGame.Core.EngineOwners.CharacterMaYuanYiOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries	guo-jia/mobile-god	CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime
 meng-da/ol	CardGame.Core.EngineOwners.CharacterMengDaOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 meng-huo/mou-mobile	CardGame.Core.EngineOwners.CharacterMengHuoMouMobileRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 mi-heng/le	CardGame.Core.EngineOwners.CharacterMiHengLeRuntime	CardGame.Core.RuntimeEntries.CharacterCaoZhiLeEntries	cao-zhi/le	CardGame.Core.EngineOwners.CharacterCaoZhiLeRuntime
@@ -1562,7 +1561,6 @@ sun-quan/boundary-mobile	CardGame.Core.EngineOwners.CharacterSunQuanBoundaryMobi
 sun-quan/ol-magic	CardGame.Core.EngineOwners.CharacterSunQuanOlMagicRuntime	CardGame.Core.RuntimeEntries.CharacterSunHongOlEntries	sun-hong/ol	CardGame.Core.EngineOwners.CharacterSunHongOlRuntime
 sun-quan/ol-magic	CardGame.Core.EngineOwners.CharacterSunQuanOlMagicRuntime	CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries	wu-jing/ol	CardGame.Core.EngineOwners.CharacterWuJingOlRuntime
 sun-quan/ol-magic	CardGame.Core.EngineOwners.CharacterSunQuanOlMagicRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
-sun-shangxiang/sp-ol	CardGame.Core.EngineOwners.CharacterSunShangxiangSpOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries	guo-jia/mobile-god	CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime
 sun-shao/mobile-shi	CardGame.Core.EngineOwners.CharacterSunShaoMobileShiRuntime	CardGame.Core.RuntimeEntries.CharacterLuMengMouEntries	lu-meng/mou	CardGame.Core.EngineOwners.CharacterLuMengMouRuntime
 sun-yuan/ol	CardGame.Core.EngineOwners.CharacterSunYuanOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoTuOlEntries	guo-tu/ol	CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime
 sun-yuan/ol	CardGame.Core.EngineOwners.CharacterSunYuanOlRuntime	CardGame.Core.RuntimeEntries.CharacterHuanShuJunOlEntries	huan-shu-jun/ol	CardGame.Core.EngineOwners.CharacterHuanShuJunOlRuntime

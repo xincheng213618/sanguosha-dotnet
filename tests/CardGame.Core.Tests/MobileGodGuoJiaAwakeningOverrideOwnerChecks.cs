@@ -6,6 +6,8 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
 {
     private const string Huishi = "mobile:huishi-gift", Baijia = "ol:baijia", Guju = "ol:guju", Canshi = "ol:canshi";
     private const string Dujiang = "mou-mobile:dujiang", Duojing = "mou-mobile:duojing";
+    private const string Fanxiang = "ol:fanxiang", Liangzhu = "ol:liangzhu", Xiaoji = "classic:xiaoji";
+    private const string Moucuan = "ol:moucuan", Binghuo = "ol:binghuo";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string WatchMaximum = """
@@ -30,197 +32,275 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     internal static void PaidHuishiWaivesBaijiaThresholdForNextPreparationCold()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:bei-mi-hu", [Baijia, Guju], WatchMaximum));
-        var game = CreateMatch(registry);
-
-        PendingDecision? Pending() => game.CreateSnapshot(0).PendingDecision;
-        PlayerSnapshot Owner() => game.CreateSnapshot(0).Players[0];
-        T[] Facts<T>() where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
-        bool AtPlay() => Pending() is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.ResolutionStack.Count == 0;
-        void Need(bool condition, string message)
-        {
-            if (!condition)
-                throw new InvalidOperationException($"{message} Turn {game.State.TurnNumber}, phase {game.State.Phase}, " +
-                    $"prompt {Pending()?.Kind}/{Pending()?.SkillPrompt?.SkillId}.");
-        }
-        void Submit(GameCommand command)
-        {
-            var result = game.Submit(command);
-            Need(result.Accepted, result.Error?.Message ?? "The real Huishi or Baijia command was rejected.");
-        }
-        void Answer(Func<PromptChoice, bool> pick)
-        {
-            var prompt = Pending()!;
-            Submit(new AnswerPromptCommand(0, prompt.PromptId, prompt.Choices.Single(pick).Id, game.Revision));
-        }
-        void ContinueHealthChild() => Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
-        void Reach(Func<bool> ready)
-        {
-            for (var step = 0; step < 155 && !ready(); step++)
-            {
-                if (Pending()?.SkillPrompt?.SkillId == Watch)
-                    ContinueHealthChild();
-                else
-                {
-                    Need(Pending() is null && game.State.Winner == Winner.None, "The awakening fixture reached an unexpected boundary.");
-                    Submit(new AdvanceOneStepCommand(game.Revision));
-                }
-            }
-            Need(ready(), "The actual preparation or its health child was not reached.");
-        }
-
-        Submit(new StartGameCommand());
-        Reach(() => Pending() is { Kind: DecisionKind.SelectGeneral, PlayerSeat: 0 });
-        Submit(new SelectGeneralCommand(0, OwnerGeneral, game.Revision, Pending()!.PromptId));
-        Reach(AtPlay);
-        var firstTurn = game.State.TurnNumber;
-        var initialMaximum = Owner().MaxHp;
-        Need(initialMaximum >= game.PlayerCount && Owner().Skills?.Any(skill => skill.ContentId == Baijia) == true &&
-            Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 0 && Facts<BeiMiHuGujuDrawPaidEvent>().Length == 0,
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(initialMaximum >= match.Game.PlayerCount && match.Owner.Skills?.Any(skill => skill.ContentId == Baijia) == true &&
+            match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 0 && match.Facts<BeiMiHuGujuDrawPaidEvent>().Length == 0,
             "The original first Preparation has zero Guju cards and cannot awaken Baijia on its own.");
 
-        var action = game.GetLegalActions(0).Single(candidate => candidate.ProgramSkillId == Huishi && candidate.ProgramActivationId == "grant-awakening");
-        Need(action.SelectableTargetSeats.Contains(0), "The actual limited skill offers its own owner as a target.");
-        Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [0], game.Revision, Pending()!.PromptId));
-        Reach(() => Pending()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("value") == Baijia) == true);
-        Answer(choice => choice.Parameters.GetValueOrDefault("value") == Baijia);
-        Reach(AtPlay);
-        var granted = Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
-        var expense = Facts<ShenGuoJiaMaximumPaidEvent>().Single();
+        match.GrantToSelf(Baijia);
+        var granted = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var expense = match.Facts<ShenGuoJiaMaximumPaidEvent>().Single();
         var reducedMaximum = initialMaximum - 2;
-        Need(granted is { Recipient: 0, SkillId: Baijia, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+        match.Need(granted is { Recipient: 0, SkillId: Baijia, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
             granted.FrameId == expense.FrameId && expense is { Seat: 0, Purpose: "huishi-gift" } &&
-            expense.Before == initialMaximum && expense.After == reducedMaximum && Owner().MaxHp == reducedMaximum &&
-            Facts<MaximumHpChangedEvent>().Count(fact => fact is { PlayerSeat: 0, Delta: -2, SkillId: Huishi } && fact.MaximumHp == reducedMaximum) == 1 &&
-            Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 0,
+            expense.Before == initialMaximum && expense.After == reducedMaximum && match.Owner.MaxHp == reducedMaximum &&
+            match.Facts<MaximumHpChangedEvent>().Count(fact => fact is { PlayerSeat: 0, Delta: -2, SkillId: Huishi } && fact.MaximumHp == reducedMaximum) == 1 &&
+            match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 0,
             "The original self-targeted Huishi pays precisely two maximum HP and grants the chosen Baijia instance for later Preparation.");
 
-        Submit(new EndPlayPhaseCommand(0, game.Revision, Pending()!.PromptId));
-        Reach(() => Pending()?.SkillPrompt?.SkillId == Watch && Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 1);
-        var paid = Facts<BeiMiHuAwakeningMaximumPaidEvent>().Single();
-        var awaken = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId);
-        var health = game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == paid.FrameId);
-        var healthBinding = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
-        Need(Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, paid.Turn]) &&
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch && match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().Length == 1);
+        var paid = match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().Single();
+        var awaken = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId);
+        var health = match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == paid.FrameId);
+        var healthBinding = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        match.Need(match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, paid.Turn]) &&
             awaken.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, OwnerSeat: 0 } preparation &&
             preparation.ParentFrameId == paid.ParentFrameId && awaken.BeiMiHu is { Stage: "maximum-children" } &&
-            paid.CumulativeActualCards == 0 && Facts<BeiMiHuGujuDrawPaidEvent>().Length == 0 &&
+            paid.CumulativeActualCards == 0 && match.Facts<BeiMiHuGujuDrawPaidEvent>().Length == 0 &&
             paid.Source.SkillInstanceId == granted.InstanceId && paid.GameplayHash == granted.GameplayHash && granted.FrameId < paid.FrameId &&
             paid.MaximumBefore == reducedMaximum && paid.MaximumAfter == reducedMaximum + 1 &&
             health.Change is { Kind: HpChangeKind.MaximumHp, TargetSeat: 0, Amount: 1 } && health.Change.ParentFrameId == paid.FrameId &&
             healthBinding.WindowContext is { Window: SkillProgramTriggerWindow.AfterHealthChanged } change && change.HpChange == health.Change &&
-            Facts<BeiMiHuAwakeningCompletedEvent>().Length == 0,
+            match.Facts<BeiMiHuAwakeningCompletedEvent>().Length == 0,
             "The exact grant waives only the natural seven-card threshold. The next actual Preparation pays original Baijia and awaits its native maximum-HP child.");
 
-        var before = game;
-        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(before.CreateCheckpoint())), registry);
-        Need(Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(before.CreateSnapshot(seat))) &&
-            game.CardMovements.SequenceEqual(before.CardMovements) && Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([granted]) &&
-            Facts<BeiMiHuAwakeningMaximumPaidEvent>().SequenceEqual([paid]) &&
-            JsonSerializer.Serialize(game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId)) == JsonSerializer.Serialize(awaken) &&
-            JsonSerializer.Serialize(game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.Id == health.Id)) == JsonSerializer.Serialize(health),
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([granted]) &&
+            match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().SequenceEqual([paid]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId)) == JsonSerializer.Serialize(awaken) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.Id == health.Id)) == JsonSerializer.Serialize(health),
             "Cold replay retains both original facts and the exact paid awakening waiting for its original health child.");
 
-        ContinueHealthChild();
-        Reach(AtPlay);
-        var completed = Facts<BeiMiHuAwakeningCompletedEvent>().Single();
-        Need(completed is { OwnerSeat: 0, LostSkillId: Guju, GrantedSkillId: Canshi } && completed.FrameId == paid.FrameId &&
-            Facts<BeiMiHuAwakeningMaximumPaidEvent>().SequenceEqual([paid]) && Facts<ShenGuoJiaMaximumPaidEvent>().SequenceEqual([expense]) &&
-            Owner().MaxHp == reducedMaximum + 1 && Owner().Skills?.Any(skill => skill.ContentId == Canshi) == true &&
-            Owner().Skills?.All(skill => skill.ContentId != Guju) == true,
+        match.Continue();
+        match.ReachPlay();
+        var completed = match.Facts<BeiMiHuAwakeningCompletedEvent>().Single();
+        match.Need(completed is { OwnerSeat: 0, LostSkillId: Guju, GrantedSkillId: Canshi } && completed.FrameId == paid.FrameId &&
+            match.Facts<BeiMiHuAwakeningMaximumPaidEvent>().SequenceEqual([paid]) && match.Facts<ShenGuoJiaMaximumPaidEvent>().SequenceEqual([expense]) &&
+            match.Owner.MaxHp == reducedMaximum + 1 && match.Owner.Skills?.Any(skill => skill.ContentId == Canshi) == true &&
+            match.Owner.Skills?.All(skill => skill.ContentId != Guju) == true,
             "Returning that child completes the original awakening once with its normal skill replacement and no second expense.");
     }
 
     internal static void PaidHuishiWaivesDujiangArmorForNextPreparationCold()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("mou:lu-meng-mobile", [Dujiang], WatchSkillGrant));
-        var game = CreateMatch(registry);
-        PendingDecision? Pending() => game.CreateSnapshot(0).PendingDecision;
-        PlayerSnapshot Owner() => game.CreateSnapshot(0).Players[0];
-        T[] Facts<T>() where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
-        bool AtPlay() => Pending() is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.ResolutionStack.Count == 0;
-        void Need(bool condition, string message)
-        {
-            if (!condition)
-                throw new InvalidOperationException($"{message} Turn {game.State.TurnNumber}, phase {game.State.Phase}, " +
-                    $"prompt {Pending()?.Kind}/{Pending()?.SkillPrompt?.SkillId}.");
-        }
-        void Submit(GameCommand command)
-        {
-            var result = game.Submit(command);
-            Need(result.Accepted, result.Error?.Message ?? "The real Huishi or Dujiang command was rejected.");
-        }
-        void Answer(string parameter, string value)
-        {
-            var prompt = Pending()!;
-            var choice = prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault(parameter) == value);
-            Submit(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, game.Revision));
-        }
-        void Reach(Func<bool> ready)
-        {
-            for (var step = 0; step < 155 && !ready(); step++)
-            {
-                Need(Pending() is null && game.State.Winner == Winner.None, "The Dujiang fixture reached an unexpected boundary.");
-                Submit(new AdvanceOneStepCommand(game.Revision));
-            }
-            Need(ready(), "The actual Preparation or original skill grant child was not reached.");
-        }
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(match.Owner.Armor == 0 && match.Facts<MouLuMengDujiangAwakenedEvent>().Length == 0 &&
+            match.Owner.Skills?.Any(skill => skill.ContentId == Dujiang) == true, "The first real Preparation offers no natural Dujiang.");
 
-        Submit(new StartGameCommand());
-        Reach(() => Pending() is { Kind: DecisionKind.SelectGeneral, PlayerSeat: 0 });
-        Submit(new SelectGeneralCommand(0, OwnerGeneral, game.Revision, Pending()!.PromptId));
-        Reach(AtPlay);
-        var firstTurn = game.State.TurnNumber;
-        var initialMaximum = Owner().MaxHp;
-        Need(Owner().Armor == 0 && Facts<MouLuMengDujiangAwakenedEvent>().Length == 0 &&
-            Owner().Skills?.Any(skill => skill.ContentId == Dujiang) == true, "The first real Preparation offers no natural Dujiang.");
+        match.GrantToSelf(Dujiang);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        match.Need(grant is { Recipient: 0, SkillId: Dujiang, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+            match.Owner.MaxHp == initialMaximum - 2 && match.Owner.Armor == 0 &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            match.Facts<MouLuMengDujiangAwakenedEvent>().Length == 0, "Paid Huishi grants the exact Dujiang instance without manufacturing Armor.");
 
-        Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [0], game.Revision, Pending()!.PromptId));
-        Reach(() => Pending()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("value") == Dujiang) == true);
-        Answer("value", Dujiang);
-        Reach(AtPlay);
-        var grant = Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
-        Need(grant is { Recipient: 0, SkillId: Dujiang, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
-            Owner().MaxHp == initialMaximum - 2 && Owner().Armor == 0 &&
-            Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
-            Facts<MouLuMengDujiangAwakenedEvent>().Length == 0, "Paid Huishi grants the exact Dujiang instance without manufacturing Armor.");
-
-        Submit(new EndPlayPhaseCommand(0, game.Revision, Pending()!.PromptId));
-        Reach(() => Pending()?.SkillPrompt?.SkillId == Watch);
-        var awakened = Facts<MouLuMengDujiangAwakenedEvent>().Single();
-        var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.FrameId);
-        var watcher = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
-        Need(awakened is { OwnerSeat: 0, Armor: 0, Phase: { Kind: ActualDiscardRecoveryPhaseKind.Preparation, ActorSeat: 0, ActualTurnOwnerSeat: 0 } } &&
-            Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, awakened.Phase.TurnNumber]) &&
-            Facts<ActualDiscardRecoveryPhaseStartedEvent>().Any(fact => fact.Phase == awakened.Phase) &&
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var awakened = match.Facts<MouLuMengDujiangAwakenedEvent>().Single();
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.FrameId);
+        var watcher = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        match.Need(awakened is { OwnerSeat: 0, Armor: 0, Phase: { Kind: ActualDiscardRecoveryPhaseKind.Preparation, ActorSeat: 0, ActualTurnOwnerSeat: 0 } } &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, awakened.Phase.TurnNumber]) &&
+            match.Facts<ActualDiscardRecoveryPhaseStartedEvent>().Any(fact => fact.Phase == awakened.Phase) &&
             grant.FrameId < root.Id && awakened.Source.SkillInstanceId == grant.InstanceId && awakened.GameplayHash == grant.GameplayHash &&
             root.MouLuMengDujiang == new MouLuMengDujiangReceipt(awakened.Source, awakened.GameplayHash, awakened.Phase) &&
             watcher.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged, OwnerSeat: 0 },
             "Dujiang uses its real Preparation receipt at zero Armor while its original skill grant is awaiting a child.");
 
-        var before = game;
-        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(before.CreateCheckpoint())), registry);
-        Need(Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(before.CreateSnapshot(seat))) &&
-            game.CardMovements.SequenceEqual(before.CardMovements) &&
-            Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
-            Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]) &&
-            JsonSerializer.Serialize(game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            match.Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
             "Cold replay keeps the same grant boundary and exact zero-Armor Dujiang parent.");
-        Answer("option-id", "continue");
-        Reach(AtPlay);
-        Need(Owner().Armor == 0 && Owner().MaxHp == initialMaximum - 2 &&
-            Owner().Skills?.Count(skill => skill.ContentId == Duojing) == 1 &&
-            Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Dujiang && fact.SkillIds.SequenceEqual([Duojing])) == 1 &&
-            Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]),
+        match.Continue();
+        match.ReachPlay();
+        match.Need(match.Owner.Armor == 0 && match.Owner.MaxHp == initialMaximum - 2 &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Duojing) == 1 &&
+            match.Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Dujiang && fact.SkillIds.SequenceEqual([Duojing])) == 1 &&
+            match.Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]),
             "The original Dujiang settles once and grants exactly one Duojing to the recorded recipient.");
     }
 
-    private sealed class Fixture(string recipientGeneral, IReadOnlyList<string> recipientSkills, string watchTrigger) : IGameContentPackage
+    internal static void PaidHuishiWaivesFanxiangWitnessForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(),
+            new Fixture("ol:sp-sun-shangxiang", [Fanxiang, Liangzhu], WatchMaximum, "classic:sun-shangxiang"));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(match.Facts<SpSunShangxiangHelpedEvent>().Length == 0 && match.Facts<SpSunShangxiangFanxiangAcceptedEvent>().Length == 0,
+            "The first real Preparation has no wounded beneficiary and does not award Fanxiang.");
+
+        match.GrantToSelf(Fanxiang);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        var hpBeforeAwakening = match.Owner.Hp;
+        match.Need(grant is { Recipient: 0, SkillId: Fanxiang, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+            match.Owner.MaxHp == reducedMaximum && match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            match.Facts<SpSunShangxiangFanxiangAcceptedEvent>().Length == 0, "Actual paid Huishi grants the same Fanxiang instance for a later turn.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var accepted = match.Facts<SpSunShangxiangFanxiangAcceptedEvent>().Single();
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == accepted.FrameId);
+        var health = match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == root.Id);
+        match.Need(root.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, OwnerSeat: 0 } preparation &&
+            preparation.ParentFrameId == accepted.Receipt.LifecycleId && root.SpSunShangxiangFanxiang == accepted.Receipt &&
+            accepted.Receipt is { QualifiedSeat: -1, Source: { OwnerSeat: 0, BindingId: "assisted-wounded-awakening" } } &&
+            accepted.Receipt.Source.SkillInstanceId == grant.InstanceId && accepted.Receipt.GameplayHash == grant.GameplayHash &&
+            accepted.Receipt.MaximumBefore == reducedMaximum && grant.FrameId < root.Id &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, match.Game.State.TurnNumber]) &&
+            match.Facts<SpSunShangxiangHelpedEvent>().Length == 0 && match.Facts<SpSunShangxiangFanxiangCompletedEvent>().Length == 0 &&
+            health.Change is { Kind: HpChangeKind.MaximumHp, Amount: 1, TargetSeat: 0 } && health.Change.ParentFrameId == root.Id,
+            "Actual Fanxiang uses the issued receipt without an assisted seat and waits for its original maximum-HP child.");
+
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            match.Facts<SpSunShangxiangFanxiangAcceptedEvent>().SequenceEqual([accepted]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+            "Cold replay preserves the original accepted Fanxiang frame and its exact grant.");
+        match.Continue();
+        match.ReachPlay();
+        var completed = match.Facts<SpSunShangxiangFanxiangCompletedEvent>().Single();
+        match.Need(completed == new SpSunShangxiangFanxiangCompletedEvent(root.Id, 0, reducedMaximum + 1) &&
+            match.Owner.MaxHp == reducedMaximum + 1 && match.Owner.Hp == hpBeforeAwakening + 1 &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Xiaoji) == 1 &&
+            match.Owner.Skills?.All(skill => skill.ContentId != Liangzhu) == true &&
+            match.Facts<SpSunShangxiangFanxiangAcceptedEvent>().SequenceEqual([accepted]),
+            "The original Fanxiang recovers one HP, replaces Liangzhu with one Xiaoji and completes once.");
+    }
+
+    internal static void PaidHuishiWaivesMoucuanBingForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:ma-yuan-yi", [Moucuan], WatchMaximum));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(match.Facts<MoucuanMaximumPaidEvent>().Length == 0, "The first actual Preparation does not pay for Moucuan.");
+        match.GrantToSelf(Moucuan);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        match.Need(grant is { Recipient: 0, SkillId: Moucuan } && match.Owner.MaxHp == reducedMaximum &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            match.Facts<MoucuanMaximumPaidEvent>().Length == 0, "Huishi pays for the original Moucuan instance without awakening it immediately.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var paid = match.Facts<MoucuanMaximumPaidEvent>().Single();
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == paid.FrameId);
+        var health = match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == root.Id);
+        match.Need(root.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, OwnerSeat: 0 } preparation &&
+            root.MaYuanYi is { BingBefore: 0, FactionCount: 1, Stage: MaYuanYiStage.MaximumChildren } receipt &&
+            receipt.ParentId == preparation.ParentFrameId && receipt.Source.SkillInstanceId == grant.InstanceId && receipt.GameplayHash == grant.GameplayHash &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, receipt.ActualTurn]) &&
+            grant.FrameId < paid.FrameId && paid.OwnerSeat == 0 && paid.MaximumBefore == reducedMaximum && paid.MaximumAfter == reducedMaximum - 1 &&
+            health.Change is { Kind: HpChangeKind.MaximumHp, Amount: 1, TargetSeat: 0 } && health.Change.ParentFrameId == root.Id &&
+            match.Facts<MoucuanSkillGrantedEvent>().Length == 0,
+            "With zero Bing and one faction, the original actual Preparation pays Moucuan once and awaits its health child.");
+
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            match.Facts<MoucuanMaximumPaidEvent>().SequenceEqual([paid]) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+            "Cold replay retains the actual Moucuan frame and its single expense.");
+        match.Continue();
+        match.ReachPlay();
+        match.Need(match.Owner.MaxHp == reducedMaximum - 1 && match.Owner.Skills?.Count(skill => skill.ContentId == Binghuo) == 1 &&
+            match.Facts<MoucuanMaximumPaidEvent>().SequenceEqual([paid]) && match.Facts<MoucuanSkillGrantedEvent>().SequenceEqual([new(paid.FrameId, 0)]),
+            "The original expense grants exactly one Binghuo to the recipient after the health child.");
+    }
+
+    private sealed class HuishiMatch(ContentRegistry registry)
+    {
+        internal GameEngine Game { get; private set; } = CreateMatch(registry);
+        internal PendingDecision? Prompt => Game.CreateSnapshot(0).PendingDecision;
+        internal PlayerSnapshot Owner => Game.CreateSnapshot(0).Players[0];
+        internal T[] Facts<T>() where T : IGameEvent => Game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
+
+        internal void Need(bool condition, string message)
+        {
+            if (!condition)
+                throw new InvalidOperationException($"{message} Turn {Game.State.TurnNumber}, phase {Game.State.Phase}, " +
+                    $"prompt {Prompt?.Kind}/{Prompt?.SkillPrompt?.SkillId}.");
+        }
+
+        internal void Start()
+        {
+            Submit(new StartGameCommand());
+            Reach(() => Prompt is { Kind: DecisionKind.SelectGeneral, PlayerSeat: 0 });
+            Submit(new SelectGeneralCommand(0, OwnerGeneral, Game.Revision, Prompt!.PromptId));
+            ReachPlay();
+        }
+
+        internal void ReachPlay() => Reach(() => Prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && Game.ResolutionStack.Count == 0);
+        internal void EndPlay() => Submit(new EndPlayPhaseCommand(0, Game.Revision, Prompt!.PromptId));
+        internal void Continue() => Answer("option-id", "continue");
+
+        internal void GrantToSelf(string awakening)
+        {
+            var action = Game.GetLegalActions(0).Single(candidate =>
+                candidate.ProgramSkillId == Huishi && candidate.ProgramActivationId == "grant-awakening");
+            Need(action.SelectableTargetSeats.Contains(0), "The real limited skill offers its owner as a target.");
+            Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [0], Game.Revision, Prompt!.PromptId));
+            Reach(() => Prompt?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("value") == awakening) == true);
+            Answer("value", awakening);
+            ReachPlay();
+        }
+
+        internal void Reach(Func<bool> ready)
+        {
+            for (var step = 0; step < 155 && !ready(); step++)
+            {
+                if (Prompt?.SkillPrompt?.SkillId == Watch)
+                    Continue();
+                else
+                {
+                    Need(Prompt is null && Game.State.Winner == Winner.None, "The awakening fixture reached an unexpected boundary.");
+                    Submit(new AdvanceOneStepCommand(Game.Revision));
+                }
+            }
+            Need(ready(), "The actual Preparation or its native child was not reached.");
+        }
+
+        internal void Restore()
+        {
+            var before = Game;
+            Game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(before.CreateCheckpoint())), registry);
+            Need(Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(Game.CreateSnapshot(seat)) == SnapshotJson.Serialize(before.CreateSnapshot(seat))) &&
+                Game.CardMovements.SequenceEqual(before.CardMovements), "Cold replay preserves every seat view and physical movement.");
+        }
+
+        private void Submit(GameCommand command)
+        {
+            var result = Game.Submit(command);
+            Need(result.Accepted, result.Error?.Message ?? "The actual awakening command was rejected.");
+        }
+
+        private void Answer(string parameter, string value)
+        {
+            var prompt = Prompt!;
+            var choice = prompt.Choices.Single(candidate => candidate.Parameters.GetValueOrDefault(parameter) == value);
+            Submit(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, Game.Revision));
+        }
+    }
+
+    private sealed class Fixture(string recipientGeneral, IReadOnlyList<string> recipientSkills, string watchTrigger, params string[] relatedGenerals) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-huishi-baijia-owner", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "mobile:shen-guo-jia", recipientGeneral);
+            CharacterFixtureContent.Register(builder, ["mobile:shen-guo-jia", recipientGeneral, .. relatedGenerals]);
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
                   {"id":"{{Watch}}","revision":1,"triggers":[{{watchTrigger}}]}
