@@ -24,7 +24,7 @@ internal sealed partial class CharacterSunHuanAnniversaryRuntime
         if (f.AnniversarySunHuan is not { } r || !ValidSunHuan(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversarySunHuanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversarySunHuanStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, 1);
         if (child is CardUseFrame use)
             return r.Stage == AnniversarySunHuanStage.NativeUse && IsSunHuanNative(use);
         if (child is CardDeclarationFrame declaration)

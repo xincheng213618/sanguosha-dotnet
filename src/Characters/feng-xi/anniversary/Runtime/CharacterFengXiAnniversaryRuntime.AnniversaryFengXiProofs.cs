@@ -17,7 +17,7 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
         if (child is HappyQiaoHealthChoiceFrame qiao)
             return _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoHealthChoiceRidesOn(qiao, f);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryFengXiStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Target && draw.Context.RequestedCount == r.Amount && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryFengXiStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, r.Amount);
         if (child is IdentityAppearanceFrame a)
             return r.Stage is AnniversaryFengXiStage.HealthApplying or AnniversaryFengXiStage.HealthChildren && a.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && a.Receipt.ParentFrameId == f.Id && a.Receipt.OwnerSeat == r.Target && a.Receipt.OriginalInstructionIndex == f.InstructionIndex && a.Receipt.RequestedDeduction == r.Amount;
         if (child is CardsMovedTriggerWindowFrame moved)

@@ -43,7 +43,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryMaTieStage.NativeUse && MaTieNativeMatches(use, f);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryMaTieStage.RewardDrawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryMaTieStage.RewardDrawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, 1);
         if (child is DrawFundedDistinctBasicFrame paidDraw)
             return IsAnniversaryMaTiePaymentFrame(paidDraw) && paidDraw.Payment.RequestAcceptance?.Identity.FrameId == f.Id;
         if (child is ChainedStateBasicFrame paidChain)
