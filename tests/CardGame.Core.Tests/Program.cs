@@ -954,6 +954,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Shen Guo Jia: paid Huishi waives Baijia threshold for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesBaijiaThresholdForNextPreparationCold),
     ("Mobile Shen Guo Jia: original foreign four-card draw returns cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.HuishiReturnsOriginalForeignFourCardDrawCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Chengzhang damage for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesChengzhangDamageForNextPreparationCold),
+    ("Mobile Shen Guo Jia: paid Huishi waives Yunan prior death at next owned dying cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesYunanPriorDeathAtNextOwnedDyingCold),
     ("Anniversary Hu Zhao Midu: paid areas return original foreign native draw cold", AnniversaryHuZhaoMiduDrawChecks.PaidAreasReturnOriginalForeignDrawCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Dujiang Armor for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesDujiangArmorForNextPreparationCold),
     ("Mobile Shen Guo Jia: paid Huishi waives Fanxiang witness for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesFanxiangWitnessForNextPreparationCold),

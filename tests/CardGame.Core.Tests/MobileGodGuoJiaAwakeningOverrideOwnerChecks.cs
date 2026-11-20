@@ -15,6 +15,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Dili = "ol:dili", Shengzhi = "ol:shengzhi";
     private const string Chengzhang = "boundary:chengzhang-mobile", ChengzhangBinding = "seven-damage-awakening";
     private const string Jiushi = "boundary:jiushi-mobile", JiushiUpgraded = "boundary:jiushi-mobile-upgraded";
+    private const string Yunan = "mobile:shi-yunan", Kechang = "mobile:shi-kechang", YunanBinding = "awaken-on-dying";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string DrawReason = "skill-program.mobile:huishi-gift.draw";
@@ -591,6 +592,79 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         }
     }
 
+    internal static void PaidHuishiWaivesYunanPriorDeathAtNextOwnedDyingCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("mobile:shi-zhong-hui", [Yunan], WatchMaximum));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        match.Need(match.Owner.MaxHp == 7 && match.Owner.HandCount == 4 && match.Facts<PlayerDyingEvent>().Length == 0,
+            "The first Play starts at seven maximum HP with the four fixed cards and no previous dying entry.");
+
+        match.UseHuishi(0);
+        match.Reach(() => match.Prompt is { Kind: DecisionKind.PlayCard } || match.Prompt?.SkillPrompt?.SkillId == Huishi);
+        match.Need(match.Prompt?.SkillPrompt?.SkillId == Huishi && match.Prompt.Choices is [var choice] &&
+            choice.Parameters.GetValueOrDefault("value") == Yunan && choice.Targets.SequenceEqual([0]),
+            "The real Huishi offer must include its sole unawakened native Yunan binding instead of settling a fallback draw.");
+        match.Answer("value", Yunan);
+        match.ReachPlay();
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var payment = match.Facts<ShenGuoJiaMaximumPaidEvent>().Single();
+        match.Need(grant is { Recipient: 0, SkillId: Yunan, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+            payment is { Seat: 0, Before: 7, After: 5, Purpose: "huishi-gift" } && payment.FrameId == grant.FrameId &&
+            match.Owner.MaxHp == 5 && match.Owner.HandCount == 4 && match.Facts<ShiZhHuiYunanAwakenedEvent>().Length == 0,
+            "Huishi pays two maximum HP and authorizes exactly the selected instance for a later dying entry.");
+        match.Restore();
+
+        var dying = EnterDying(match, 1);
+        var awakening = match.Facts<ShiZhHuiYunanAwakenedEvent>().Single();
+        match.Need(match.Facts<PlayerDyingEvent>() is [{ KillerSeat: 0, VictimSeat: 1 }] && match.Facts<PlayerDiedEvent>().Length == 0 &&
+            awakening is { Source: { OwnerSeat: 0, SkillId: Yunan, BindingId: YunanBinding }, Level: 1, VictimSeat: 1, FactionId: "qun" } &&
+            awakening.FrameId > grant.FrameId && awakening.Source.SkillInstanceId == grant.InstanceId && awakening.GameplayHash == grant.GameplayHash &&
+            match.Facts<ProgramBindingStartedEvent>().Count(e => e.FrameId == awakening.FrameId && e.OwnerSeat == 0 &&
+                e.SkillId == Yunan && e.BindingId == YunanBinding && e.Window == SkillProgramTriggerWindow.DyingEntering) == 1 &&
+            match.Facts<ProgramBindingResolvedEvent>().Count(e => e.FrameId == awakening.FrameId && e.Completed) == 1 &&
+            match.Facts<NativeEffectiveFactionChangedEvent>().Any(e => e.ParentFrameId == awakening.FrameId &&
+                e.TargetSeat == 0 && e.PreviousFactionId == "wei" && e.CurrentFactionId == "qun" && e.Source == awakening.Source) &&
+            match.Facts<SkillAwakenedEvent>().Count(e => e.PlayerSeat == 0 && e.SkillId == Yunan && e.AcquiredSkillIds.SequenceEqual([Kechang])) == 1 &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Kechang) == 1,
+            "The first dying caused by this owner awakens the granted instance, changes faction and announces its original Kechang once before death.");
+        match.Restore();
+        match.Need(match.Game.ResolutionStack.OfType<DyingFrame>().Single().Id == dying.Id &&
+            match.Facts<ShiZhHuiYunanAwakenedEvent>().SequenceEqual([awakening]) &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().SequenceEqual([payment]),
+            "Cold replay returns to the same real dying entry with one paid grant and one original awakening.");
+
+        var control = new HuishiMatch(registry);
+        control.Start();
+        _ = EnterDying(control, 1);
+        control.Need(control.Facts<ShiZhHuiYunanAwakenedEvent>().Length == 0,
+            "Without Huishi an owner's first dying entry before any death keeps Yunan unawakened.");
+        control.Continue();
+        control.ReachPlay();
+        _ = EnterDying(control, 2);
+        control.Need(control.Facts<ShiZhHuiDeathRecordedEvent>() is [{ VictimSeat: 1 }] &&
+            control.Facts<ShiZhHuiYunanAwakenedEvent>() is [{ VictimSeat: 2, Level: 1 }] &&
+            control.Facts<ShenGuoJiaAwakeningOverrideEvent>().Length == 0,
+            "The next native dying entry in the same actual Play still awakens naturally after the first death.");
+
+        static DyingFrame EnterDying(HuishiMatch scene, int victim)
+        {
+            BoundaryLiDianChecks.Accept(scene.Game, new UseProgramSkillCommand(0, Watch, "deal-eight", [], [victim],
+                scene.Game.Revision, scene.Prompt!.PromptId));
+            scene.Reach(() => scene.Prompt is { SkillPrompt.SkillId: Watch, PlayerSeat: 0 } &&
+                scene.Game.ResolutionStack.OfType<DyingFrame>().Any(frame => frame.VictimSeat == victim));
+            var frame = scene.Game.ResolutionStack.OfType<DyingFrame>().Single();
+            var window = scene.Game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f =>
+                f.Window == SkillProgramTriggerWindow.DyingEntering && f.ResumeDyingFrameId == frame.Id);
+            scene.Need(frame.VictimSeat == victim && frame.KillerSeat == 0 && frame.Continuation == DyingContinuationKind.Damage &&
+                scene.Facts<DamageAppliedEvent>().Any(e => e is { SourceSeat: 0, SourceLess: false, Amount: 8, RemainingHp: 0 } && e.TargetSeat == victim) &&
+                scene.Facts<PlayerDyingEvent>().Any(e => e.ResolutionId == frame.Id && e.KillerSeat == 0 && e.VictimSeat == victim) &&
+                window.Continuation == ProgramLifecycleContinuation.ResumeDyingEntry,
+                "The public damage command creates the real original dying entry for the intended victim and killer.");
+            return frame;
+        }
+    }
+
     private sealed class HuishiMatch(ContentRegistry registry)
     {
         internal GameEngine Game { get; private set; } = CreateMatch(registry);
@@ -679,11 +753,19 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         {
             CharacterFixtureContent.Register(builder, ["mobile:shen-guo-jia", recipientGeneral, .. relatedGenerals]);
             var watchRecipientDraw = watchTrigger == WatchDraw;
+            var watchYunanDying = recipientSkills.Contains(Yunan) ? """
+                ,{"id":"after-yunan-at-real-dying","window":"dyingEntering","subject":"any","priority":-100,"optional":false,"isSkillInvocation":false,
+                  "effects":[{"op":"chooseOption","target":"owner","resultBind":"dying","options":[{"id":"continue"}]}]}
+                """ : string.Empty;
             var watchStates = watchTrigger == WatchBaijia ? """
                 ,"states":[{"id":"waiting-for-grants","initialValue":false,"visibility":"private","resetScope":"game",
                             "reacquirePolicy":"preserveUntilGameEnd"}]
                 """ : string.Empty;
-            var watchActivations = recipientSkills.Contains(Chengzhang) ? """
+            var watchActivations = recipientSkills.Contains(Yunan) ? """
+                ,"activations":[
+                  {"id":"deal-eight","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,
+                   "effects":[{"op":"damage","target":"selectedTarget","amount":8}]}]
+                """ : recipientSkills.Contains(Chengzhang) ? """
                 ,"activations":[
                   {"id":"deal-six","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":1,
                    "effects":[{"op":"damage","target":"selectedTarget","amount":6}]},
@@ -692,7 +774,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
                 """ : string.Empty;
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-                  {"id":"{{Watch}}","revision":1{{watchStates}}{{watchActivations}},"triggers":[{{watchTrigger}}]}
+                  {"id":"{{Watch}}","revision":1{{watchStates}}{{watchActivations}},"triggers":[{{watchTrigger}}{{watchYunanDying}}]}
                 ]}
                 """, $$"""
                 {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{Watch}}":{

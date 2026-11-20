@@ -10,7 +10,12 @@ public sealed record ShiZhHuiSlashUsedEvent(int TurnNumber, int TurnOwnerSeat, i
 public sealed record ShiZhHuiDeathRecordedEvent(int RoundNumber, int VictimSeat) : IGameEvent;
 public sealed record ShiZhHuiXiezhiOverflowEvent(long FrameId, int OwnerSeat, int Excess, int Total) : IGameEvent;
 public sealed record ShiZhHuiYunanAwakenedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    int ActualTurn, int VictimSeat, int Level, string FactionId) : IGameEvent;
+    int ActualTurn, int VictimSeat, int Level, string FactionId) : IGameEvent, IProgramAwakeningAcceptedEvent
+{
+    bool IProgramAwakeningAcceptedEvent.MatchesAwakening(int ownerSeat, string skillId) =>
+        skillId == ShiZhHuiComposition.YunanSkill && Source.OwnerSeat == ownerSeat && Source.SkillId == skillId &&
+        Source.BindingId == ShiZhHuiComposition.YunanTrigger;
+}
 
 public sealed record ShiZhHuiReceipt(string Operation, int ActualTurn, int Stage = 0, int TargetSeat = -1)
 {
@@ -144,7 +149,7 @@ internal sealed class ResolveShiZhHuiXiezhiDescriptor : ProgramOperationDescript
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Automatic;
 }
 
-internal sealed class ResolveShiZhHuiYunanDescriptor : ProgramOperationDescriptorBase
+internal sealed class ResolveShiZhHuiYunanDescriptor : ProgramOperationDescriptorBase, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveShiZhHuiYunan;
     public override ISkillProgramEffectHandler Handler { get; } = new ShiZhHuiHandler(SkillProgramEffectOp.ResolveShiZhHuiYunan);

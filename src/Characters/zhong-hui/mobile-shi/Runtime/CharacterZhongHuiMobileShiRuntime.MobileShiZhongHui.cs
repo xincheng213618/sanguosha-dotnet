@@ -50,7 +50,9 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
         if (candidate.SkillId == ShiZhHuiSizi && trigger.Id == ShiZhHuiComposition.SiziEndingTrigger)
             return FindActiveSizi(candidate.OwnerSeat) is not null;
         if (candidate.SkillId == ShiZhHuiYunan && trigger.Id == ShiZhHuiComposition.YunanTrigger)
-            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.KillerSeat == candidate.OwnerSeat && ShiZhHuiRoundHasDeath;
+            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.KillerSeat == candidate.OwnerSeat &&
+                (ShiZhHuiRoundHasDeath || ShiZhHuiKechangLevel(candidate.OwnerSeat) == 0 &&
+                    _awakeningOverrides.Granted(candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, candidate.SkillInstanceId));
         return true;
     }
 
