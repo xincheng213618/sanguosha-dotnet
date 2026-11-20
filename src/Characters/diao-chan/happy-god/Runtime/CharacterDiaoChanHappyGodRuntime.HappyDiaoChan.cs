@@ -13,7 +13,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         var seats = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Any(c => c.Id != discarded)).Select(p => p.Seat).ToArray();
         foreach (var source in seats)
             foreach (var opponent in seats)
-                if (source != opponent && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(source, opponent))
+                if (source != opponent && _pindianPolicies.CanBePindianTarget(source, opponent))
                     yield return (source, opponent);
     }
 
