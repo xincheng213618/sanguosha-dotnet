@@ -21,26 +21,32 @@ internal sealed partial class CoreActualTurnsRuntime
         const SkillProgramTriggerWindow ownWindow = SkillProgramTriggerWindow.TurnBeforeStart;
         const SkillProgramTriggerWindow roundWindow = SkillProgramTriggerWindow.RoundStarting;
 
-        return HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
-            _coreMatchParticipantsPlayersAccess._players.Any(player =>
+        if (owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(ownWindow)
+            .Any(binding => HasOrdinaryBeforeTurnPreludeOperation(ProgramInstructionResolver.Default.Features(binding.Trigger))))
+            return true;
+
+        return _coreMatchParticipantsPlayersAccess._players.Any(player =>
                 HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart)) ||
             _coreMatchParticipantsPlayersAccess._players.Any(player =>
                 HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua)) ||
             (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
                 HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
-                _eventHistory.CountActualTurnStarts(owner.Seat) == 0) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.EditDinghanNames) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.AwakenJianghuo) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ObtainWushuangDeckCards) ||
-            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng);
+                _eventHistory.CountActualTurnStarts(owner.Seat) == 0);
     }
 
     private bool HasBeforeTurnPreludeBinding(CharacterState player, SkillProgramTriggerWindow window, SkillProgramEffectOp operation) =>
         player.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(player).GetInstanceTriggers(window)
             .Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(operation));
+
+    private static bool HasOrdinaryBeforeTurnPreludeOperation(ProgramInstructionFeatures features) =>
+        features.HasOperation(SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
+        features.HasOperation(SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
+        features.HasOperation(SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
+        features.HasOperation(SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash) ||
+        features.HasOperation(SkillProgramEffectOp.EditDinghanNames) ||
+        features.HasOperation(SkillProgramEffectOp.AwakenJianghuo) ||
+        features.HasOperation(SkillProgramEffectOp.ObtainWushuangDeckCards) ||
+        features.HasOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng);
 
     private long OpenBeforeTurnPrelude(CharacterState owner)
     {
@@ -121,17 +127,10 @@ internal sealed partial class CoreActualTurnsRuntime
                     features.HasOperation(SkillProgramEffectOp.GainHappyZuoCiPhantoms));
         }
 
-        return features.HasOperation(SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
+        return HasOrdinaryBeforeTurnPreludeOperation(features) ||
             (features.HasOperation(SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
                 _eventHistory.CountActualTurnStarts(candidate.OwnerSeat) == 0) ||
-            features.HasOperation(SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
-            features.HasOperation(SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
-            features.HasOperation(SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash) ||
-            features.HasOperation(SkillProgramEffectOp.EditDinghanNames) ||
-            features.HasOperation(SkillProgramEffectOp.AwakenJianghuo) ||
-            features.HasOperation(SkillProgramEffectOp.ObtainWushuangDeckCards) ||
             features.HasOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong) ||
-            features.HasOperation(SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia) ||
-            features.HasOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng);
+            features.HasOperation(SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia);
     }
 }
