@@ -145,13 +145,13 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     void IMatchStepTurns.RunAiPlayDecision(int seat) => _coreNativeAiDecisionsOperations.RunOneAiPlayDecision(_coreMatchParticipantsPlayersAccess._players[seat]);
     int IMatchStepTurns.RequiredDiscard(int seat) => _coreTurnHandCategoryRestrictionsOperations.RequiredSelfHandLimitDiscard(_coreMatchParticipantsPlayersAccess._players[seat]);
     void IMatchStepTurns.RequestHumanDiscard(int seat) => _coreDiscardOperations.RequestHumanDiscard(_coreMatchParticipantsPlayersAccess._players[seat]);
-    bool IMatchStepTurns.AutoDiscardAndTryBeginEndedWindow(int seat)
+    void IMatchStepTurns.AutoDiscardAndFinishPhase(int seat)
     {
         // A native encounter may replace a seat while discard effects run.
         // The ended window still belongs to this exact original participant.
         var current = _coreMatchParticipantsPlayersAccess._players[seat];
         _coreActualDiscardPhaseOperations.AutoDiscard(current);
-        return _coreProgramLifecycleOperations.TryBeginDiscardPhaseEndedProgramWindow(current);
+        _coreActualDiscardPhaseOperations.FinishDiscardPhase(current);
     }
 
     internal ProgramCompletionRuntime ProgramCompletion => _programCompletionOperations.Get();

@@ -195,8 +195,7 @@ internal sealed class MatchStepDispatcher(IProgramRuntimeFrames frames, IProgram
                 turns.RequestHumanDiscard(seat);
                 return;
             }
-            if (turns.AutoDiscardAndTryBeginEndedWindow(seat)) return;
-            turns.EndTurn();
+            turns.AutoDiscardAndFinishPhase(seat);
             return;
         }
         throw new InvalidOperationException(
@@ -285,5 +284,5 @@ internal interface IMatchStepTurns : IProgramRuntimeOperations
     void RunAiPlayDecision(int seat);
     int RequiredDiscard(int seat);
     void RequestHumanDiscard(int seat);
-    bool AutoDiscardAndTryBeginEndedWindow(int seat);
+    void AutoDiscardAndFinishPhase(int seat);
 }

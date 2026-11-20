@@ -18,8 +18,7 @@ internal sealed partial class CoreManualDiscardRuntimePortsRuntime
     }
 
     void IManualDiscardTransitions.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    bool IManualDiscardTransitions.BeginDiscardPhaseEnded(CharacterState owner) => _coreProgramLifecycleOperations.TryBeginDiscardPhaseEndedProgramWindow(owner);
-    void IManualDiscardTransitions.EndTurn() => _coreActualTurnsOperations.EndTurn();
+    void IManualDiscardTransitions.FinishDiscardPhase(CharacterState owner) => _coreActualDiscardPhaseOperations.FinishDiscardPhase(owner);
     void IManualDiscardTransitions.Log(string type, string message, int actorSeat) => _coreMatchLogOperations.AddLog(type, message, actorSeat);
     CommandError? IManualDiscardCommands.ValidatePrompt(int actorSeat, PromptId? promptId) => _coreNativePromptBoundaryOperations.ValidateHumanPrompt(actorSeat, DecisionKind.DiscardCards, promptId, CommandErrorCode.IllegalAction);
     CommandResult IManualDiscardCommands.Accept(Action operation) => _kernelCoreMainOperations.Accept(operation);

@@ -12,14 +12,12 @@ internal interface IManualDiscardFacts : IProgramSelectionQuery
     int HandLimit(CharacterState owner);
 }
 
-// The module owns the lifecycle. These primitive transitions retain the current
-// prompt setter and its distinct discard status, native ended window and logs.
+// The manual discard owns its prompts and payment until the native phase finishes.
 internal interface IManualDiscardTransitions : IProgramRuntimeOperations
 {
     void SetPrompt(PendingDecision prompt);
     void PublishState();
-    bool BeginDiscardPhaseEnded(CharacterState owner);
-    void EndTurn();
+    void FinishDiscardPhase(CharacterState owner);
     void Log(string type, string message, int actorSeat);
 }
 

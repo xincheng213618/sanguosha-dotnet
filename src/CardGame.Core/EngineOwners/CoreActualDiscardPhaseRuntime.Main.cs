@@ -118,4 +118,10 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         _coreNativeLogicalDiscardsOperations.MoveLogicalDiscardCards(player.Seat, player.Seat, discarded, CardLocation.Hand(player.Seat), CardMoveReasons.HandLimitDiscard);
         _coreMatchLogOperations.AddLog("CardsDiscarded", $"{(player.Name)} 自动弃置 {(discarded.Length)} 张手牌。", player.Seat);
     }
+
+    internal void FinishDiscardPhase(CharacterState phaseOwner)
+    {
+        if (!_coreProgramLifecycleOperations.TryBeginDiscardPhaseEndedProgramWindow(phaseOwner))
+            _coreActualTurnsOperations.EndTurn();
+    }
 }

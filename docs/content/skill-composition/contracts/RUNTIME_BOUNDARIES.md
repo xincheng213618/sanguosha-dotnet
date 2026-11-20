@@ -39,6 +39,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Draw phase start and end windows resume a selected choice group at the original index after all group members. A single candidate advances one position. A completed native draw replacement keeps its phase-specific completion behavior.
 
+- Automatic and manual hand-limit discard finish through `CoreActualDiscardPhaseRuntime.FinishDiscardPhase`. It confirms the actual discard phase and opens the original end window when eligible. Without a window the same owner advances to turn ending. A skipped phase uses its own skip record and continuation.
+
 - Native multi-stage instructions reuse `ProgramStageRuntime`: declare the next stage before issuing a paid child, reread the original receipt after draining children, and keep dynamic termination rules in the recipe. Ordered random acquisition from other seats uses `ProgramRandomSeatAcquisitionRuntime`; version policies retain selection priority, turnover rules and event projection without repeating the movement loop or scanning history to prove completed payments.
 
 ## Selections and expression bindings

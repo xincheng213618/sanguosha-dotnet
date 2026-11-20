@@ -54,8 +54,7 @@ internal sealed class ManualDiscardRuntime(IProgramRuntimeFrames frames,
         }
         frames.Pop(frame.Id, ResolutionFrameKind.ManualDiscard);
         if (facts.Winner != Winner.None) return;
-        if (transitions.BeginDiscardPhaseEnded(owner)) return;
-        transitions.EndTurn();
+        transitions.FinishDiscardPhase(owner);
     }
 
     internal CommandResult SubmitDiscardCards(DiscardCardsCommand command)
