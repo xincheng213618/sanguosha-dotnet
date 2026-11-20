@@ -53,14 +53,10 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
 
     internal IReadOnlyList<(int Seat, string Instance)> ShenGuoJiaBenefactors(CharacterState owner, string instance) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaBenefactorEvent>().Where(fact => fact.Recipient == owner.Seat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.Benefactor) && _coreMatchParticipantsPlayersAccess._players[fact.Benefactor].IsAlive && _coreMatchParticipantsPlayersAccess._players[fact.Benefactor].MaxHp > 1).Where(fact => owner.SkillGrants.Grants.Any(grant => grant.IsEnabled && grant.SkillId == ShenGuoJiaZuoxing && grant.SkillInstanceId == instance && grant.SourceId == "acquired:" + fact.GrantSource)).Select(fact => (fact.Benefactor, fact.GrantSource)).Distinct().ToArray());
     internal IReadOnlyList<IndexedSkillProgramInstance> ShenGuoJiaUnawakened(int seat) => Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ProgramInstances.Where(instance => _contentRegistryOperations._contentRegistry.GetSkill(instance.SkillId).Tags.HasFlag(SkillTag.Awakening) && !ShenGuoJiaAlreadyAwakened(seat, instance.SkillId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SkillAwakenedEvent>().Any(fact => fact.PlayerSeat == seat && fact.SkillId == instance.SkillId) && !instance.Program.Triggers.Any(trigger => trigger.UsageScope == SkillUsageScope.Game && trigger.UsageLimit == 1 && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(seat, instance.SkillId, _coreProgramLifecycleOperations.ProgramTriggerUsageId(new(seat, instance.SkillId, trigger.Id, instance.SkillInstanceId, instance.Program.GameplayHash, trigger.Priority)), SkillUsageScope.Game) > 0)).DistinctBy(instance => instance.SkillId).ToArray());
-    internal bool ShenGuoJiaAlreadyAwakened(int seat, string skill) => skill switch
-    {
-        "ol:choujue" => _characterWenYangOlOperations.Value.WenYangHasAwakened(seat, 1),
-        "ol:beishui" => _characterWenYangOlOperations.Value.WenYangHasAwakened(seat, 2),
-        "ol:dili" => _skillRuntimeStateOperations._skillRuntimeState.GetUsage(seat, skill, "awakening", SkillUsageScope.Game) > 0,
-        "mou-mobile:zhiji" => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(value => value.OwnerSeat == seat),
-        _ => false
-    };
+    private bool ShenGuoJiaAlreadyAwakened(int seat, string skill) => skill == "ol:dili"
+        ? _skillRuntimeStateOperations._skillRuntimeState.GetUsage(seat, skill, "awakening", SkillUsageScope.Game) > 0
+        : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<IProgramAwakeningAcceptedEvent>()
+            .Any(fact => fact.MatchesAwakening(seat, skill));
     internal PromptChoice ShenGuoJiaChoice(ProgramSkillFrame frame, string branch, string label, IReadOnlyList<int>? targets = null, string? value = null) => new(new($"shen-guo-jia.{(frame.Id)}.{(frame.ShenGuoJia!.Stage)}.{(branch)}.{(value)}"), label, [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "shen-guo-jia", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["value"] = value ?? "" });
     internal IReadOnlyList<PromptChoice> ShenGuoJiaChoices(ProgramSkillFrame frame)
     {

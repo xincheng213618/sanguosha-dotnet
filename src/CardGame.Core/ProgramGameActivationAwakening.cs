@@ -14,6 +14,11 @@ internal interface IProgramAwakeningDamageQuery : IProgramSelectionQuery
     bool AllLivingSeatsHaveTakenPositiveDamage();
 }
 
+internal interface IProgramAwakeningAcceptedEvent : IGameEvent
+{
+    bool MatchesAwakening(int ownerSeat, string skillId);
+}
+
 public enum GameActivationAwakeningStage { MaximumPaid, GrantsIssued, Complete }
 public sealed record ProgramGameActivationAwakeningReceipt
 {

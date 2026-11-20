@@ -14,7 +14,17 @@ public sealed record WenYangReceipt(CardConversionSource Source,string GameplayH
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public WenYangReceipt? WenYang { get; init; } }
 public sealed record WenYangStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,SkillProgramEffectOp Op,long ParentId,int ActualTurn,int TurnOwner,long? DamageId,long? DebtId,int Awakening):IGameEvent;
-public sealed record WenYangAwakenedEvent(long FrameId,int OwnerSeat,int Level,int MaximumBefore,int MaximumAfter,int HpBefore,int HpAfter):IGameEvent;
+public sealed record WenYangAwakenedEvent(long FrameId, int OwnerSeat, int Level, int MaximumBefore, int MaximumAfter, int HpBefore, int HpAfter)
+    : IGameEvent, IProgramAwakeningAcceptedEvent
+{
+    bool IProgramAwakeningAcceptedEvent.MatchesAwakening(int ownerSeat, string skillId) =>
+        OwnerSeat == ownerSeat && (Level switch
+        {
+            1 => skillId == "ol:choujue",
+            2 => skillId == "ol:beishui",
+            _ => false
+        });
+}
 public sealed record WenYangLeafGrantedEvent(long FrameId,int OwnerSeat,string SkillId):IGameEvent;
 public sealed record WenYangMovementIssuedEvent(long FrameId,int Step,WenYangStage Stage,long Before,long After,int Count):IGameEvent;
 public sealed record WenYangEntityMovedEvent(long FrameId,int Step,int CardId,CardKind Kind,CardLocation From,CardLocation To,long Sequence):IGameEvent;

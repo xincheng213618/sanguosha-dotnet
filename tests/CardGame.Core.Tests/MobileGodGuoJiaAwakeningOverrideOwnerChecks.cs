@@ -10,6 +10,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Moucuan = "ol:moucuan", Binghuo = "ol:binghuo";
     private const string Jianghuo = "anniversary:jianghuo", Lishi = "anniversary:lishi";
     private const string Diaoling = "ol:diaoling";
+    private const string Choujue = "ol:choujue", Beishui = "ol:beishui";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string WatchMaximum = """
@@ -307,6 +308,55 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         match.Need(drawn.Length == 2 && drawn.Distinct().Count() == 2 &&
             match.Facts<DiaolingAwakenedEvent>().SequenceEqual([awakened]) && match.Owner.MaxHp == reducedMaximum,
             "Choosing the original reward moves exactly two physical cards to the recorded owner and completes Diaoling once.");
+    }
+
+    internal static void PaidHuishiLetsActualChoujueAcceptBeforeGeneralCompletionCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:wen-yang", [Choujue], WatchMaximum));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var turn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.GrantToSelf(Choujue);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        match.Need(grant is { Recipient: 0, SkillId: Choujue } && match.Owner.MaxHp == reducedMaximum &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            match.Facts<WenYangAwakenedEvent>().Length == 0, "The actual Huishi payment grants later Choujue without starting it immediately.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var accepted = match.Facts<WenYangAwakenedEvent>().Single();
+        var started = match.Facts<WenYangStartedEvent>().Single(fact => fact.FrameId == accepted.FrameId);
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == accepted.FrameId);
+        var parent = match.Game.ResolutionStack.OfType<DeferredTurnEndFrame>().Single(frame => frame.Id == started.ParentId);
+        var health = match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == root.Id);
+        match.Need(accepted is { OwnerSeat: 0, Level: 1 } && accepted.MaximumBefore == reducedMaximum && accepted.MaximumAfter == reducedMaximum - 1 &&
+            Math.Abs(match.Owner.HandCount - accepted.HpBefore) < 3 && grant.FrameId < root.Id &&
+            root.WenYang is { Paid: true, Stage: WenYangStage.MaximumChildren } && started.Source.SkillInstanceId == grant.InstanceId &&
+            started.GameplayHash == grant.GameplayHash && started.Source.BindingId == "own-actual-turn-ended" &&
+            parent.TurnNumber == turn && parent.OwnerSeat == 0 &&
+            match.Facts<TurnEndedEvent>().Any(fact => fact.ActorSeat == 0 && fact.TurnNumber == turn) &&
+            health.Change is { Kind: HpChangeKind.MaximumHp, TargetSeat: 0, Amount: 1 } && health.Change.ParentFrameId == root.Id &&
+            match.Facts<SkillAwakenedEvent>().All(fact => fact.SkillId != Choujue) && match.Facts<WenYangLeafGrantedEvent>().Length == 0,
+            "Choujue accepts at the original actual turn end below its natural threshold, before the general awakening or Beishui grant.");
+
+        match.Restore();
+        var acceptedHistory = new ProgramEventHistoryIndex(match.Game.Events, []).Read<IProgramAwakeningAcceptedEvent>().Single();
+        match.Need(match.Facts<WenYangAwakenedEvent>().SequenceEqual([accepted]) &&
+            match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            acceptedHistory.MatchesAwakening(0, Choujue) && !acceptedHistory.MatchesAwakening(0, Beishui) &&
+            !acceptedHistory.MatchesAwakening(1, Choujue) &&
+            match.Facts<SkillAwakenedEvent>().All(fact => fact.SkillId != Choujue) &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+            "Cold replay preserves the exact accepted event while its original health child is still pending.");
+        match.Continue();
+        match.Reach(() => match.Game.ResolutionStack.All(frame => frame.Id != root.Id));
+        match.Need(match.Facts<WenYangAwakenedEvent>().SequenceEqual([accepted]) &&
+            match.Facts<WenYangLeafGrantedEvent>().SequenceEqual([new(root.Id, 0, Beishui)]) &&
+            match.Facts<SkillAwakenedEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SkillId == Choujue && fact.AcquiredSkillIds.SequenceEqual([Beishui])) == 1 &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == Beishui) == 1,
+            "Returning the original child awards Beishui and emits general completion exactly once.");
     }
 
     private sealed class HuishiMatch(ContentRegistry registry)

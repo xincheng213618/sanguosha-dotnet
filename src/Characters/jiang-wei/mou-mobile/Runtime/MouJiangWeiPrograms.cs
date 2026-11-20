@@ -41,7 +41,12 @@ public sealed record MouJiangWeiSlashReturnedEvent(long FrameId, int Index, long
 public sealed record MouJiangWeiFactionRequestedEvent(long FrameId, int Index, int ActorSeat, int TargetSeat, FactionResponsePolicySource Policy) : IGameEvent;
 public sealed record MouJiangWeiFactionProvidedEvent(long FrameId, int Index, int ActorSeat, int ProviderSeat, CardKind Kind, int MaterialCount) : IGameEvent;
 public sealed record MouJiangWeiFactionDeclinedEvent(long FrameId, int Index, int ActorSeat) : IGameEvent;
-public sealed record MouJiangWeiAwakenedEvent(long FrameId, int OwnerSeat, CardConversionSource Source, string GameplayHash, int SelectedCount) : IGameEvent;
+public sealed record MouJiangWeiAwakenedEvent(long FrameId, int OwnerSeat, CardConversionSource Source, string GameplayHash, int SelectedCount)
+    : IGameEvent, IProgramAwakeningAcceptedEvent
+{
+    bool IProgramAwakeningAcceptedEvent.MatchesAwakening(int ownerSeat, string skillId) =>
+        OwnerSeat == ownerSeat && skillId == MouJiangWeiComposition.Zhiji;
+}
 public sealed record MouJiangWeiBeifaGrantedEvent(long FrameId, CardConversionSource Source, string GameplayHash, int HolderSeat, int TurnOrdinal) : IGameEvent;
 public sealed record MouJiangWeiBeifaExpiredEvent(long FrameId, int HolderSeat, int TurnOrdinal) : IGameEvent;
 public sealed record MouJiangWeiCompletedEvent(long FrameId, SkillProgramEffectOp Op, int SelectedCount) : IGameEvent;
