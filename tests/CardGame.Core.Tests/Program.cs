@@ -900,6 +900,7 @@ var tests = new (string Name, Action Body)[]
     ("Mou Dong Zhuo OL Fengshang: second gift requires its original discard entry cold", MouDongZhuoOlFengshangDiscardEntryChecks.FengshangSecondGiftRequiresItsOriginalDiscardEntryCold),
     ("Mobile Boundary Zongxuan: typed own discard reaches original top placement cold", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensOwnMobileZongxuanCold),
     ("Anniversary Cai Yang Xunji: uses original black color of a composite Slash cold", AnniversaryCaiYangXunjiColorChecks.XunjiUsesTheOriginalBlackColorOfACompositeSlashCold),
+    ("Anniversary Cai Yang Jiaofeng: first native Slash recovery child returns cold", AnniversaryCaiYangJiaofengRecoveryChecks.FirstNativeSlashRecoveryChildReturnsCold),
     ("OL Sima Hui Chenghao: continues after first gift is redirected cold", OlSimaHuiChenghaoGainReplacementChecks.ChenghaoContinuesAfterItsFirstGiftIsRedirectedCold),
     ("OL Sima Hui Jianjie: ordered seals grant before only the first actual turn cold", OlSimaHuiJianjieFirstTurnChecks.OrderedSealsGrantBeforeOnlyFirstActualTurnCold),
     ("Shi Dong Zhao Yingjia: issued foreign extra draws before actual start cold", ShiDongZhaoYingjiaPreludeChecks.IssuedForeignExtraDrawPrecedesActualTurnCold),

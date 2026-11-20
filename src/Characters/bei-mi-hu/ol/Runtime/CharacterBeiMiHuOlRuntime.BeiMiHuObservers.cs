@@ -37,7 +37,12 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         if (child is CardsMovedTriggerWindowFrame moved)
             return r.Stage == "draw-children" && moved.Batch.ParentFrameId == f.Id && moved.Batch.AwaitingProgramFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
         if (child is HpChangedTriggerWindowFrame hp)
-            return hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.ParentFrameId == f.Id && hp.Change.TargetSeat == f.OwnerSeat && (r.Stage == "maximum-children" ? hp.Change.Kind == HpChangeKind.MaximumHp : r.Stage == "recovery-children" && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.Amount <= r.RecoveryRequested);
+            return ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&
+                hp.Change.TargetSeat == f.OwnerSeat &&
+                (r.Stage == "maximum-children"
+                    ? hp.Change.Kind == HpChangeKind.MaximumHp
+                    : r.Stage == "recovery-children" && hp.Change.Kind == HpChangeKind.Recovery &&
+                      hp.Change.SourceSeat == f.OwnerSeat && hp.Change.Amount <= r.RecoveryRequested);
         if (child is ProgramLifecycleTriggerWindowFrame skills)
             return r.Stage == "grants-children" && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is RecoveryReplacementFrame recovery)

@@ -39,7 +39,9 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
         if (child is CardsMovedTriggerWindowFrame moved)
             return r.Stage == AnniversaryCaiYangStage.DrawChildren && r.Draw is { } d && moved.Batch.ParentFrameId == f.Id && (moved.ResumeProgramFrameId == f.Id || moved.Batch.AwaitingProgramFrameId == f.Id) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter);
         if (child is HpChangedTriggerWindowFrame hp)
-            return r.Stage == AnniversaryCaiYangStage.RecoveryChildren && r.RecoveryIssued && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.TargetSeat == f.OwnerSeat;
+            return r.Stage == AnniversaryCaiYangStage.RecoveryChildren && r.RecoveryIssued &&
+                ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&
+                hp.Change.TargetSeat == f.OwnerSeat;
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == AnniversaryCaiYangStage.RecoveryChildren && r.RecoveryIssued && recovery.ParentFrameId == f.Id;
         if (child is DamageFrame damage)
