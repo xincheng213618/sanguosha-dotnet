@@ -62,7 +62,10 @@ internal sealed class ProgramSkillChangeRuntime(IHandLimitExemptionBoundaries ha
             if (spec.Action == SkillStateAction.Transfer) match = new(ids, match.Filter, match.GrantIds);
             operations.SetRestriction(seat, new(source, source,
                 spec.Action == SkillStateAction.Transfer ? SkillStateAction.Suppress : spec.Action,
-                match, new(owner, seat, phases.Current()), lifetime, spec.While));
+                match, new(owner, seat, phases.Current()), lifetime, spec.While)
+            {
+                SuppressesPrintedEquipmentEffects = spec.SuppressesPrintedEquipmentEffects
+            });
         }
         if (spec.Action == SkillStateAction.Transfer)
         {

@@ -114,7 +114,7 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
     {
         if (payload is MouHuCheErDebtEvent debt)
             skillChanges.IssueSkillState(EquipmentDebtOrigin(facts.History<MouHuCheErCompletedEvent>().Single(paid => paid.FrameId == debt.FrameId)),
-                debt.Target, new(SkillStateAction.Suppress, new(filter: new("not", ProgramExpressionType.Bool, [SkillStateFilters.Character])),
+                debt.Target, SkillStateSpec.SuppressEquipment(
                     [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, SkipIssued: true)]));
     }
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 35800)] private void ObserveDamage(IGameEvent payload)

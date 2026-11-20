@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct DistanceQueryFacts(EngineStates.CoreMatchDefinitionState matchDefinitionState, Func<ModeRuleSet> getModeRuleSet, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, Func<EquipmentContentRegistry> getEquipmentContentRegistry, Func<ProgramDistanceRules> getProgramDistanceRules, Func<RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, Func<TurnCardUseEffectStore> getTurnCardUseEffectStore, EngineStates.CoreActualTurnProgressState actualTurnProgressState, CharacterState source, CharacterState target) : IMatchDistanceQuery
+internal readonly struct DistanceQueryFacts(EngineStates.CoreMatchDefinitionState matchDefinitionState, Func<ModeRuleSet> getModeRuleSet, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CoreGameEngineFieldEquipmentEntries> getFieldEquipment, Func<EquipmentContentRegistry> getEquipmentContentRegistry, Func<ProgramDistanceRules> getProgramDistanceRules, Func<RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, Func<TurnCardUseEffectStore> getTurnCardUseEffectStore, EngineStates.CoreActualTurnProgressState actualTurnProgressState, CharacterState source, CharacterState target) : IMatchDistanceQuery
 {
     public string ModeId => matchDefinitionState.ReferenceToModeDefinition.Id;
     public int? FixedDistance => getModeRuleSet().FixedDistance;
@@ -8,8 +8,8 @@ internal readonly struct DistanceQueryFacts(EngineStates.CoreMatchDefinitionStat
     public int TargetSeat => target.Seat;
 
     public int AliveSeatDistance() => getCoreNativeRuleQueriesRuntime().GetAliveSeatDistance(source.Seat, target.Seat);
-    public IReadOnlyList<Card> SourceEquipment => getCharacterHuCheErMouRuntime().KongwuEffectiveEquipment(source);
-    public IReadOnlyList<Card> TargetEquipment => getCharacterHuCheErMouRuntime().KongwuEffectiveEquipment(target);
+    public IReadOnlyList<Card> SourceEquipment => getFieldEquipment().GetEquipmentWithPrintedEffects(source);
+    public IReadOnlyList<Card> TargetEquipment => getFieldEquipment().GetEquipmentWithPrintedEffects(target);
 
     public EquipmentDefinition EquipmentDefinition(CardKind kind) => getEquipmentContentRegistry().Get(kind);
     public void AddBaseTerms(List<RuleQueryBaseTerm> terms) => getProgramDistanceRules().AddDistanceBaseTerms(new(source, target), terms);

@@ -39,6 +39,8 @@ public sealed class CharacterSkillSet
     private bool _hasProjectedGrants;
     public long Revision { get; private set; }
     public long GrantRevision { get; private set; }
+    internal bool ArePrintedEquipmentEffectsSuppressed => _restrictions.Values.Any(restriction => restriction.SuppressesPrintedEquipmentEffects);
+
     public IReadOnlyList<SkillStateRestriction> Restrictions
     {
         get

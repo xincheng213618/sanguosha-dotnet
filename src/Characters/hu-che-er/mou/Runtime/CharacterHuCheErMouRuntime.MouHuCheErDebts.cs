@@ -4,9 +4,9 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
 {
     internal bool MouHuCheErEquipmentDisabled(int target) =>
-        MouHuCheErRuntime.ActiveDebtOrigins(_coreMatchParticipantsPlayersAccess._players[target]).Any();
+        _coreMatchParticipantsPlayersAccess._players[target].SkillGrants.ArePrintedEquipmentEffectsSuppressed;
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) =>
-        MouHuCheErEquipmentDisabled(player.Seat) ? [] : _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
+        _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
     internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(player);
     internal int MouHuCheErDrawPenalty(CharacterState player)

@@ -28,6 +28,14 @@ public sealed class SkillStateSpec
     public ProgramExpression? While { get; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool ChooseOne { get; }
+
+    internal bool SuppressesPrintedEquipmentEffects { get; private init; }
+
+    internal static SkillStateSpec SuppressEquipment(IReadOnlyList<SkillStateBoundarySpec> until) =>
+        new(SkillStateAction.Suppress, new(filter: new("not", ProgramExpressionType.Bool, [SkillStateFilters.Character])), until)
+        {
+            SuppressesPrintedEquipmentEffects = true
+        };
 }
 
 public sealed record SkillStateBoundaryEnd(SkillStateBoundaryEvent Event, int? Seat,
@@ -76,7 +84,10 @@ public sealed record SkillStateDeclarationSource(string SkillId, string GrantId,
     SkillStateDeclaration Declaration);
 public sealed record SkillStateRestriction(string Id, string SourceId, SkillStateAction Action,
     SkillStateMatch Match, SkillStateConditionContext Context, SkillStateLifetime Lifetime,
-    ProgramExpression? While = null, SkillStateDeclarationSource? DeclarationSource = null);
+    ProgramExpression? While = null, SkillStateDeclarationSource? DeclarationSource = null)
+{
+    internal bool SuppressesPrintedEquipmentEffects { get; init; }
+}
 
 public sealed partial record SkillGrant
 {
