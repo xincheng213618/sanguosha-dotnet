@@ -3,7 +3,15 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangFengOlRuntime
 {
-    internal int QujiaPermanentSlashBonus(int ownerSeat)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 70)]
+    internal void AddQujiaSlashLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query == SkillRuleQuery.SlashLimit)
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions,
+                $"issued:{seat}:yang-feng:qujia:slash-limit", QujiaPermanentSlashBonus(seat));
+    }
+
+    private int QujiaPermanentSlashBonus(int ownerSeat)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd))
             return 0;

@@ -378,6 +378,7 @@ var tests = new (string Name, Action Body)[]
     ("Native additional discard: Jianzhuan whole fixed set and separate recast cold", NativeAdditionalDiscardChecks.JianzhuanFixedDiscardProjectsWholeSetAndKeepsRecastSeparateCold),
     ("Native additional discard: Li Yi two card group and paid child cold", NativeAdditionalSelfDiscardChecks.LiYiTwoCardGroupSelectionAndPaidChildCold),
     ("Native additional discard: Yang Feng self group and foreign opaque cold", NativeAdditionalSelfDiscardChecks.YangFengSelfGroupKeepsForeignOpaqueAndColdPayment),
+    ("OL Yang Feng Qujia: completed turn grants two native Slashes cold", OlYangFengQujiaNumericChecks.CompletedTurnGrantPaysTwoNativeSlashesCold),
     ("Native additional discard: Bijing whole discard paid batch cold", NativeAdditionalSelfDiscardChecks.BijingBuffersWholeDiscardAndResumesPaidBatchCold),
     ("Xie Ling Yu: paid children replacement source loss death and privacy cold", XieLingYuChecks.XinyouPaidChildrenReplacementSourceLossDeathAndInputPrivacyCold),
     ("Tao Qian: per recipient native draw replacement paid rights cold", CardGame.Core.Tests.TaoQianChecks.WenrenPerRecipientNativeDrawReplacementPaidRightsCold),

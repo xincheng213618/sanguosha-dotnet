@@ -16,7 +16,6 @@ internal sealed partial class CharacterYangFengOlEntries
     internal void PayJiaweiDiscard(ProgramSkillFrame f) => _resolve().PayJiaweiDiscard(f);
     internal void PublishYangFeng(ProgramSkillFrame f) => _resolve().PublishYangFeng(f);
     internal bool QualifyYangFeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().QualifyYangFeng(candidate, trigger, context);
-    internal int QujiaPermanentSlashBonus(int ownerSeat) => _resolve().QujiaPermanentSlashBonus(ownerSeat);
     internal void RecordYangFengMovement(long id, YangFengStage stage, string reason, long before, int count) => _resolve().RecordYangFengMovement(id, stage, reason, before, count);
     internal bool ResumeYangFeng(long id) => _resolve().ResumeYangFeng(id);
     internal bool ReturnYangFengMovement(ProgramSkillFrame f) => _resolve().ReturnYangFengMovement(f);

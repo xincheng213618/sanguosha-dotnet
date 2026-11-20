@@ -38,7 +38,6 @@ internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
     bool HasZhuangshiQuota { get; }
     int SequentialDeckShortfallBonus { get; }
     bool HasZhajiangPreUsePrivilege { get; }
-    int QujiaSlashBonus { get; }
     int JuzhanSlashBonus { get; }
     bool HasYangweiBonus { get; }
     int DuojingSlashBonus { get; }
@@ -105,7 +104,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         if (query.HasZhuangshiQuota) contributions.Add(new UnlimitedRuleQueryContribution("skill:mobile:shi-zhuangshi:quota"));
         AddFiniteContribution(contributions, $"issued:{query.Seat}:sequential-deck-shortfall:slash-limit", query.SequentialDeckShortfallBonus);
         if (query.HasZhajiangPreUsePrivilege) contributions.Add(new UnlimitedRuleQueryContribution("skill:mou-mobile:zhajiang:first-lost-hp-uses"));
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:yang-feng:qujia:slash-limit", query.QujiaSlashBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:boundary:juzhan-mobile:slash-limit", query.JuzhanSlashBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.SlashLimit, contributions);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-mobile:yangwei:slash-limit", query.HasYangweiBonus ? 1 : 0);

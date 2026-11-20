@@ -19,6 +19,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Mobile Shi Zhong Hui's Xiezhi registers the same permanent issued count for the Slash limit and hand limit. Each genuine health change that overflows charge issues one unit. The charge amount and the independently paid Sizi effect have their own rules.
 
+- OL Yang Feng's Qujia contributes its permanent Slash allowance from the accepted quota choice on the original completed turn. The native gain from the draw pile and the later ordinary Slash payments retain their own physical movement boundaries.
+
 - Target card-use quotas use `IProgramTargetQuotaQueries` for the aggregate answer, including general allowances that also permit Slash. Issue independent allowances through directed-policy data; keep native recipient slots on the original instruction and keep quota permission separate from actual use history. Native Slash queries retain their outer use/target guards and ignore-count, out-of-Play, other-actor and HappyQiao Shutu permissions, then check ordinary quota before extra pure allowances. Keep the router's internal BeforeLimit/AfterLimit binding order and the separate actual-debit owner.
 
 - Slash debit callers retain their own invocation, actor and source scope and consume `RecordSlashUseDebit` as the shared answer for issued exemptions and actual debit recording, without repeating its exemption reads; keep a recorded debit distinct from active or refunded quota state.
