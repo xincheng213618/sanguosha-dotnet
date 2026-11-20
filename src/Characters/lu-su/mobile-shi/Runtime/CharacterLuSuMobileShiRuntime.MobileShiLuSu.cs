@@ -24,6 +24,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
         return from.Zone == CardZoneKind.Hand && from.OwnerSeat is { } owner && owner != actor.Seat && HasShiLsHandView(actor.Seat, owner);
     }
 
+    [ProgramPipelineHook(ProgramPipelinePhase.BeforeTurnPreludeOpened, 10)]
     internal void ExpireShiLsHandGrants(int upcomingOwnerSeat, long preludeId)
     {
         foreach (var g in UnexpiredShiLsGrants().Where(g => g.Source.OwnerSeat == upcomingOwnerSeat).ToArray())

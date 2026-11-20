@@ -41,7 +41,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool ResumeBeiMiHu(long id) => _resolve().ResumeBeiMiHu(id);
     internal bool ReturnBeiMiHuMovement(ProgramSkillFrame f) => _resolve().ReturnBeiMiHuMovement(f);
     internal bool TryAdvanceBeiMiHuSubtree() => _resolve().TryAdvanceBeiMiHuSubtree();
-    internal bool TryBeginBeiMiHuActualTurnPrelude(CharacterState owner) => _resolve().TryBeginBeiMiHuActualTurnPrelude(owner);
     internal bool TryGetBeiMiHuCardUse(int owner, ProgramSkillWindowContext context, SkillProgramEffectOp op, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().TryGetBeiMiHuCardUse(owner, context, op, out use, out window);
     internal bool ValidBeiMiHu(ProgramSkillFrame f) => _resolve().ValidBeiMiHu(f);
     internal bool ValidBeiMiHuTargetMutation(CardUseFrame use) => _resolve().ValidBeiMiHuTargetMutation(use);

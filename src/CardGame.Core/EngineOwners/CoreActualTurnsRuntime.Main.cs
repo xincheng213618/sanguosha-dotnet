@@ -26,7 +26,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
         if (_characterLuBuOlMagicOperations.TryBeginMoLuBuOpening())
             return;
-        if (_characterBeiMiHuOlOperations.TryBeginBeiMiHuActualTurnPrelude(current))
+        if (TryBeginBeforeTurnPrelude(current))
             return;
         _coreMouLuMengOperations.Value.BeginRoundForTurn(current);
         BeginTurnAfterBeforeTurnPrelude(current);

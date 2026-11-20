@@ -1,6 +1,5 @@
 # Exact existing constructor dependency violations: source owner, source module, parameter type, target owner, target implementation.
 # Ownership comes from compiled portable PDB source paths; remove a row when its dependency is retired.
-bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterLuSuMobileShiEntries	lu-su/mobile-shi	CardGame.Core.EngineOwners.CharacterLuSuMobileShiRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.CharacterDuFuRenOlEntries	du-fu-ren/ol	CardGame.Core.EngineOwners.CharacterDuFuRenOlRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterLuSuMouRuntime>	lu-su/mou	CardGame.Core.EngineOwners.CharacterLuSuMouRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterTangTangOlRuntime>	tang-tang/ol	CardGame.Core.EngineOwners.CharacterTangTangOlRuntime
@@ -296,7 +295,6 @@ shared	CardGame.Core.EngineOwners.CoreActualPhaseEndRuntimePortsRuntime	CardGame
 shared	CardGame.Core.EngineOwners.CoreActualPhaseEndRuntimePortsRuntime	CardGame.Core.RuntimeEntries.CharacterSimaShiMouEntries	sima-shi/mou	CardGame.Core.EngineOwners.CharacterSimaShiMouRuntime
 shared	CardGame.Core.EngineOwners.CoreActualPhaseEndRuntimePortsRuntime	CardGame.Core.RuntimeEntries.CharacterYaDanOlEntries	ya-dan/ol	CardGame.Core.EngineOwners.CharacterYaDanOlRuntime
 shared	CardGame.Core.EngineOwners.CoreActualPhaseEndRuntimePortsRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterLuYuShengMobileShiRuntime>	lu-yu-sheng/mobile-shi	CardGame.Core.EngineOwners.CharacterLuYuShengMobileShiRuntime
-shared	CardGame.Core.EngineOwners.CoreActualTurnsRuntime	CardGame.Core.RuntimeEntries.CharacterBeiMiHuOlEntries	bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime
 shared	CardGame.Core.EngineOwners.CoreActualTurnsRuntime	CardGame.Core.RuntimeEntries.CharacterCaoXiOlEntries	cao-xi/ol	CardGame.Core.EngineOwners.CharacterCaoXiOlRuntime
 shared	CardGame.Core.EngineOwners.CoreActualTurnsRuntime	CardGame.Core.RuntimeEntries.CharacterChengGongYingOlEntries	cheng-gong-ying/ol	CardGame.Core.EngineOwners.CharacterChengGongYingOlRuntime
 shared	CardGame.Core.EngineOwners.CoreActualTurnsRuntime	CardGame.Core.RuntimeEntries.CharacterDuFuRenOlEntries	du-fu-ren/ol	CardGame.Core.EngineOwners.CharacterDuFuRenOlRuntime

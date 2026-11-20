@@ -4,7 +4,19 @@ namespace CardGame.Core.EngineOwners;
 
 internal sealed partial class CoreActualTurnsRuntime
 {
-    internal bool HasBeforeTurnPreludeBindingWork(CharacterState owner)
+    private bool TryBeginBeforeTurnPrelude(CharacterState owner)
+    {
+        if (!HasBeforeTurnPreludeBindingWork(owner) &&
+            !_programPipelineHooksOperations._programPipelineHooks.HasBeforeTurnPreludeWork(owner.Seat))
+            return false;
+
+        var id = OpenBeforeTurnPrelude(owner);
+        _programPipelineHooksOperations._programPipelineHooks.OnBeforeTurnPreludeOpened(owner.Seat, id);
+        _coreRuntimeOperations.AdvanceRuntimeFrame(id);
+        return true;
+    }
+
+    private bool HasBeforeTurnPreludeBindingWork(CharacterState owner)
     {
         const SkillProgramTriggerWindow ownWindow = SkillProgramTriggerWindow.TurnBeforeStart;
         const SkillProgramTriggerWindow roundWindow = SkillProgramTriggerWindow.RoundStarting;
@@ -30,7 +42,7 @@ internal sealed partial class CoreActualTurnsRuntime
         player.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(player).GetInstanceTriggers(window)
             .Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(operation));
 
-    internal long OpenBeforeTurnPrelude(CharacterState owner)
+    private long OpenBeforeTurnPrelude(CharacterState owner)
     {
         var oldRound = _coreActualRoundProgressRoundNumberAccess._roundNumber;
         _coreMouLuMengOperations.Value.BeginRoundForTurn(owner);

@@ -15,7 +15,6 @@ internal sealed partial class CharacterLuSuMobileShiEntries
     internal void CollectWindow_CollectShiLsIssuedMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectShiLsIssuedMovementCandidates(batch, result);
     internal bool ContinueShiLs(long id) => _resolve().ContinueShiLs(id);
     internal bool DrainShiLs(long id) => _resolve().DrainShiLs(id);
-    internal void ExpireShiLsHandGrants(int upcomingOwnerSeat, long preludeId) => _resolve().ExpireShiLsHandGrants(upcomingOwnerSeat, preludeId);
     internal Card? FindShiLsPlayableCard(CharacterState actor, int id) => _resolve().FindShiLsPlayableCard(actor, id);
     internal void FinishShiLs(ProgramSkillFrame f) => _resolve().FinishShiLs(f);
     internal bool HasShiLsHandView(int actor, int provider) => _resolve().HasShiLsHandView(actor, provider);

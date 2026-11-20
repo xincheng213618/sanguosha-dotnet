@@ -55,7 +55,8 @@ internal enum ProgramPipelinePhase
     RequiresVirtualSlashAction,
     TryBeginProgramInvocation,
     FieldEquipmentRepresentation,
-    BeforeTurnPreludeWork
+    BeforeTurnPreludeWork,
+    BeforeTurnPreludeOpened
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -80,6 +81,7 @@ internal delegate ForcedHandSelectionSnapshot? ProgramForcedHandSelectionProvide
 internal delegate IReadOnlyList<LegalAction> ProgramPlayPhaseActionFilter(CharacterState actor, IReadOnlyList<LegalAction> actions);
 internal delegate bool ProgramDetachedBindingContinuation(ProgramSkillFrame frame);
 internal delegate bool ProgramTurnStartObligationProbe(int seat);
+internal delegate void ProgramBeforeTurnPreludeOpened(int upcomingOwnerSeat, long preludeId);
 internal delegate bool ProgramResponseUseCompletionObservation(CardActionContext action);
 internal delegate string? ProgramCardEntitySkillLabelProvider(int cardId);
 internal delegate void ProgramCardSkillMarkProjection(int cardId, ref CardSkillMarkProjection projection);
@@ -152,6 +154,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(int)], typeof(bool)),
             [ProgramPipelinePhase.BeforeTurnPreludeWork] = (typeof(ProgramTurnStartObligationProbe),
                 [typeof(int)], typeof(bool)),
+            [ProgramPipelinePhase.BeforeTurnPreludeOpened] = (typeof(ProgramBeforeTurnPreludeOpened),
+                [typeof(int), typeof(long)], typeof(void)),
             [ProgramPipelinePhase.ObservesResponseUseCompletion] = (typeof(ProgramResponseUseCompletionObservation),
                 [typeof(CardActionContext)], typeof(bool)),
             [ProgramPipelinePhase.RequiresVirtualSlashAction] = (typeof(Func<int, bool>), [typeof(int)], typeof(bool)),
@@ -283,6 +287,7 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramDetachedBindingContinuation[] _continueDetachedProgramBinding;
     private readonly ProgramTurnStartObligationProbe[] _unissuedTurnStartObligation;
     private readonly ProgramTurnStartObligationProbe[] _beforeTurnPreludeWork;
+    private readonly ProgramBeforeTurnPreludeOpened[] _beforeTurnPreludeOpened;
     private readonly ProgramResponseUseCompletionObservation[] _observesResponseUseCompletion;
     private readonly Func<int, bool>[] _requiresVirtualSlashAction;
     private readonly ProgramCardEntitySkillLabelProvider[] _cardEntitySkillLabel;
@@ -337,6 +342,7 @@ internal sealed class ProgramPipelineHooks
         _continueDetachedProgramBinding = Bind<ProgramDetachedBindingContinuation>(ProgramPipelinePhase.ContinueDetachedProgramBinding);
         _unissuedTurnStartObligation = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.UnissuedTurnStartObligation);
         _beforeTurnPreludeWork = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.BeforeTurnPreludeWork);
+        _beforeTurnPreludeOpened = Bind<ProgramBeforeTurnPreludeOpened>(ProgramPipelinePhase.BeforeTurnPreludeOpened);
         _observesResponseUseCompletion = Bind<ProgramResponseUseCompletionObservation>(ProgramPipelinePhase.ObservesResponseUseCompletion);
         _requiresVirtualSlashAction = Bind<Func<int, bool>>(ProgramPipelinePhase.RequiresVirtualSlashAction);
         _cardEntitySkillLabel = Bind<ProgramCardEntitySkillLabelProvider>(ProgramPipelinePhase.CardEntitySkillLabel);
@@ -490,6 +496,12 @@ internal sealed class ProgramPipelineHooks
         foreach (var probe in _beforeTurnPreludeWork)
             if (probe(seat)) return true;
         return false;
+    }
+
+    internal void OnBeforeTurnPreludeOpened(int upcomingOwnerSeat, long preludeId)
+    {
+        foreach (var handler in _beforeTurnPreludeOpened)
+            handler(upcomingOwnerSeat, preludeId);
     }
 
     internal bool ObservesResponseUseCompletion(CardActionContext action)

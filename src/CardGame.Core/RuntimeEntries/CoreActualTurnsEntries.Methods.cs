@@ -22,9 +22,7 @@ internal sealed partial class CoreActualTurnsEntries
     internal void FinalizeEndTurn(CharacterState previous) => _resolve().FinalizeEndTurn(previous);
     internal CardKind GetJudgmentEffectiveCardKind(Card card) => _resolve().GetJudgmentEffectiveCardKind(card);
     internal int GetTurnDrawCount(CharacterState current) => _resolve().GetTurnDrawCount(current);
-    internal bool HasBeforeTurnPreludeBindingWork(CharacterState owner) => _resolve().HasBeforeTurnPreludeBindingWork(owner);
     internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _resolve().HasJudgmentEffectiveCard(player, kind);
-    internal long OpenBeforeTurnPrelude(CharacterState owner) => _resolve().OpenBeforeTurnPrelude(owner);
     internal TGrant? PendingExtraTurnPreludeGrant<TGrant, TEntered>(int recipientSeat, string skillId)
         where TGrant : class, IProgramExtraTurnPreludeGrantedEvent
         where TEntered : IProgramExtraTurnPreludeEnteredEvent =>
