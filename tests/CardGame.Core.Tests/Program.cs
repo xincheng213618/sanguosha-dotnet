@@ -891,6 +891,7 @@ var tests = new (string Name, Action Body)[]
     ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),
     ("Shi Zhong Hui Xiezhi: one overflow pays two native Slashes and keeps five cards cold", ShiZhongHuiXiezhiNumericChecks.OneOverflowFundsTwoSlashesAndARealHandLimitCold),
     ("Mobile Boundary Yan Yan Chengshi: takes only the original third Slash discard cold", BoundaryMobileYanYanChengshiDiscardEntryChecks.ChengshiObtainsOnlyTheOriginalThirdSlashDiscardCold),
+    ("Mobile Boundary Yan Yan Chengshi: exactly two ordinary Slashes next actual turn cold", MobileBoundaryYanYanChengshiQuotaChecks.ChengshiAllowsExactlyTwoOrdinarySlashesNextActualTurnCold),
     ("OL SP Pang Tong Guolun: direct exchange excludes Wooden Ox grain cold", OlSpPangTongGuolunWoodenOxChecks.GuolunCanExchangeHeldCardsButNotWoodenOxGrainCold),
     ("OL Dong Zhao Xianlue: continues after first gift stays in its original hand cold", OlDongZhaoXianlueRetainedGainChecks.XianlueContinuesAfterFirstGiftStaysInItsOriginalHandCold),
     ("OL SP Ma Chao Zhuiji: loaded Wooden Ox recast returns the original Slash cold", OlSpMaChaoZhuijiWoodenOxRecastChecks.ZhuijiRecastsTheLoadedTreasureAndReturnsItsOriginalSlashCold),

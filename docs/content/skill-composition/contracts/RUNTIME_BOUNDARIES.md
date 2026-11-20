@@ -35,6 +35,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - OL Chen Deng's Fengji contributes to the actual Draw count and Slash limit through the same numeric entry. Each current-round term reads its original choice and applies the accepted Xuanhui swaps for that round. The Slash query uses the ordinary native debit for each physical use.
 
+- Mobile Boundary Yan Yan's Chengshi adds one to the participant's ordinary Slash limit for each grant Juzhan issues while the original Slash resolves. The grants accumulate across turns. The card claim waits for completion of the original Slash, and the directed card prohibition ends with its turn.
+
 - Mobile Li Yan's Duliang contributes the original grants assigned to the beneficiary's current actual Draw phase. Separate grants can stack on the first actual Draw, including an inserted phase, and survive loss of the issuing skill. The next Draw phase reads its own assignments.
 
 - Anniversary Hu Che Er's Fuzhong reads the effective skill holder's current Zhong count. At least one Zhong adds one card to the actual Draw count, and at least three Zhong add three to the hand limit checked in Discard. A fixed amount from a separate native draw producer uses its own amount.

@@ -6,7 +6,6 @@ internal sealed partial class CharacterYanYanBoundaryMobileEntries
     internal long BoundaryYanYanEpoch(int owner) => _resolve().BoundaryYanYanEpoch(owner);
     internal bool BoundaryYanYanIssuedClaimMatches(CardUseFrame use, BoundaryYanYanClaim p) => _resolve().BoundaryYanYanIssuedClaimMatches(use, p);
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> BoundaryYanYanPublicStates(CharacterState owner, string skillId) => _resolve().BoundaryYanYanPublicStates(owner, skillId);
-    internal int BoundaryYanYanSlashBonus(int owner) => _resolve().BoundaryYanYanSlashBonus(owner);
     internal bool CanOfferBoundaryYanYan(ProgramTriggerLegalityContext gate) => _resolve().CanOfferBoundaryYanYan(gate);
     internal SkillProgramStepOutcome ClaimBoundaryYanYan(ProgramSkillFrame f) => _resolve().ClaimBoundaryYanYan(f);
     internal SkillProgramStepOutcome FinishBoundaryYanYan(ProgramSkillFrame f) => _resolve().FinishBoundaryYanYan(f);

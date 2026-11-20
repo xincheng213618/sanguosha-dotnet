@@ -5,7 +5,17 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
 {
     internal const string BoundaryYanYanClaimReason = "skill.boundary-yan-yan.chengshi";
     internal static SkillPolarity InitialBoundaryYanYanPolarity(CharacterState player, string skillId) => skillId == BoundaryYanYanComposition.Skill && player.General.FactionId == "shu" ? SkillPolarity.Yin : SkillPolarity.Yang;
-    internal int BoundaryYanYanSlashBonus(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryYanYanChengshiGrantedEvent>().Count(e => e.OwnerSeat == owner);
+    private int BoundaryYanYanSlashBonus(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryYanYanChengshiGrantedEvent>().Count(e => e.OwnerSeat == owner);
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 115)]
+    internal void AddChengshiSlashContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.SlashLimit)
+            return;
+
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:boundary:juzhan-mobile:slash-limit", BoundaryYanYanSlashBonus(seat));
+    }
+
     internal long BoundaryYanYanEpoch(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramConversionPolarityCommittedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == BoundaryYanYanComposition.Skill)?.FrameId ?? 0;
     SkillProgramStepOutcome IBoundaryYanYanHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
