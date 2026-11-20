@@ -17,7 +17,11 @@ internal sealed partial class CharacterYanLiangWenChouBoundaryMobileRuntime
         return true;
     }
 
-    internal IReadOnlyList<int> BoundaryYanLiangWenChouResponseEntities(CardUseFrame use, int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).Where(a => a.Type == CardActionType.Response && a.ParentActionId == use.Action!.ActionId && a.ActorSeat != owner && a.ResponderSeat == a.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuelResponseEvent>().Any(e => e.ResolutionId == use.Id && e.ResponderSeat == a.ActorSeat && e.UsedSlash)).SelectMany(a => a.PhysicalCards).Select(c => c.CardId).Distinct().Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile).ToArray();
+    internal IReadOnlyList<int> BoundaryYanLiangWenChouResponseEntities(CardUseFrame use, int owner) =>
+        (use.Continuations.Duel?.ResponseDiscards ?? [])
+        .Where(entry => entry.ResponderSeat != owner &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, entry.CardId) == entry.Sequence)
+        .Select(entry => entry.CardId).Distinct().ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 65710, SkillProgramEffectOp.ClaimBoundaryYanLiangWenChouDuelResponses)]
     internal bool OfferBoundaryYanLiangWenChouClaim(ProgramTriggerLegalityContext c) => BoundaryYanLiangWenChouOriginalDuel(c.OwnerSeat, c.Candidate.SkillInstanceId, c.Context, out var use) && BoundaryYanLiangWenChouResponseEntities(use, c.OwnerSeat).Count > 0;
     internal SkillProgramStepOutcome BeginBoundaryYanLiangWenChouClaim(ProgramSkillFrame supplied)
@@ -52,7 +56,13 @@ internal sealed partial class CharacterYanLiangWenChouBoundaryMobileRuntime
         if (parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()))
             return false;
         var claims = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryYanLiangWenChouResponseClaimedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        return claims.Length == r.CardIds.Count && claims.Select(e => e.CardId).SequenceEqual(r.CardIds) && !claims.Where((e, i) => e.UseId != r.UseId || e.ActionId != r.ActionId || e.OwnerSeat != f.OwnerSeat || e.ClaimIndex != i || e.MovementSequence != r.Before + i + 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryYanLiangWenChouClaimReason) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(a => a.Action.Type == CardActionType.Response && a.Action.ParentActionId == r.ActionId && a.Action.ActorSeat != f.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.Action.EffectiveKind) && a.Action.PhysicalCards.Any(p => p.CardId == e.CardId))).Any();
+        var responseDiscards = use.Continuations.Duel?.ResponseDiscards ?? [];
+        return claims.Length == r.CardIds.Count && claims.Select(e => e.CardId).SequenceEqual(r.CardIds) &&
+            !claims.Where((e, i) => e.UseId != r.UseId || e.ActionId != r.ActionId || e.OwnerSeat != f.OwnerSeat || e.ClaimIndex != i ||
+                e.MovementSequence != r.Before + i + 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m =>
+                    m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.DiscardPile &&
+                    m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryYanLiangWenChouClaimReason) != 1 ||
+                !responseDiscards.Any(entry => entry.CardId == e.CardId && entry.ResponderSeat != f.OwnerSeat)).Any();
     }
 
     internal void ContinueBoundaryYanLiangWenChouClaim(long id)

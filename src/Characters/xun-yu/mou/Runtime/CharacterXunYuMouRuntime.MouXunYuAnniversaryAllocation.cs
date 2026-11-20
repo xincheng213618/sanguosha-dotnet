@@ -49,11 +49,21 @@ internal sealed partial class CharacterXunYuMouRuntime
         if (f.MouXunYuAnniversary is not { Lease: { } grant } || MouXyAllocationLease(f) != grant)
             return[];
         var allocated = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXyAllocatedEvent>().Where(a => a.GrantFrameId == grant.FrameId).Select(a => a.CardId).ToHashSet();
-        var discard = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXyDiscardEntryRecordedEvent>().Where(e => e.Entry.GrantFrameId == grant.FrameId && e.Entry.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && !allocated.Contains(e.Entry.CardId)).OrderBy(e => e.Entry.Sequence).DistinctBy(e => e.Entry.CardId).Where(e => _cardZonesOperations._cardZones.GetLocation(e.Entry.CardId) == CardLocation.DiscardPile && !MouXyCompletedLogicalDiscard(e.Entry) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Entry.Sequence && m.CardId == e.Entry.CardId && m.TurnNumber == e.Entry.ActualTurn && m.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is null)).Select(e =>
-        {
-            var card = _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(e.Entry.CardId);
-            return new MouXyAllocationCard(card.Id, card.Kind, card.DisplayName, CardLocation.DiscardPile, e.Entry.Sequence);
-        });
+        var discard = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXyDiscardEntryRecordedEvent>()
+            .Select(e => e.Entry)
+            .Where(entry => entry.GrantFrameId == grant.FrameId &&
+                entry.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber &&
+                !allocated.Contains(entry.CardId) &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, entry.CardId) == entry.Sequence &&
+                !MouXyCompletedLogicalDiscard(entry) &&
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move =>
+                    move.Sequence == entry.Sequence && move.CardId == entry.CardId && move.TurnNumber == entry.ActualTurn &&
+                    move.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move) is null))
+            .Select(entry =>
+            {
+                var card = _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(entry.CardId);
+                return new MouXyAllocationCard(card.Id, card.Kind, card.DisplayName, CardLocation.DiscardPile, entry.Sequence);
+            });
         var removed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoXianZhifouRemovedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && !allocated.Contains(e.CardId) && MouXyExactZhifouRemoval(e, grant)).Select(e =>
         {
             var card = _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(e.CardId);

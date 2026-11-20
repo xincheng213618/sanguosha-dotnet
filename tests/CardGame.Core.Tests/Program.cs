@@ -807,6 +807,9 @@ var tests = new (string Name, Action Body)[]
     ("Mou Dong Cheng Baojia: claims the original death discard after chained Lightning", MouDongChengBaojiaDiscardEntryChecks.BaojiaClaimsTheOriginalDeathDiscardAfterChainedLightning),
     ("OL Tongxie: completed Slash follows up after Xunxian gives its card cold", OlTongxieChecks.TongxieFollowsCompletedSlashAfterXunxianGivesItsMaterialCold),
     ("Shi Zhang Yan Xiaoge preserves its original Feijing discard entry cold", ShiZhangYanDiscardEntryChecks.XiaogeCannotObtainANewerEntryOfTheFeijingPaymentCold),
+    ("Mou Xun Yu Bizuo: excludes an earlier use entry after rediscard", MouXunYuBizuoDiscardEntryChecks.BizuoExcludesAnEarlierUseThatReenteredByDiscard),
+    ("Mobile Boundary Shuangxiong preserves the original Duel response discard entry cold", BoundaryMobileShuangxiongDiscardEntryChecks.ShuangxiongCannotClaimANewerEntryOfAnOpponentDuelResponseCold),
+    ("Mobile Boundary Shuangxiong collects both native Zhangba response entries without completion observer cold", BoundaryMobileShuangxiongDiscardEntryChecks.ShuangxiongCollectsBothNativeZhangbaDiscardEntriesWithoutCompletionObserverCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -3,6 +3,15 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDuelRuntime
 {
+    [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 300)]
+    internal void CaptureDuelResponseDiscard(CardMovementBatchBuilder batch, CardMovementRecord movement)
+    {
+        if (movement.Reason == CardMoveReasons.ResponseFinished && movement.From == CardLocation.Processing &&
+            movement.To == CardLocation.DiscardPile && _coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel &&
+            batch.ParentFrameId == duel.OwnerFrameId)
+            duel.RecordResponseDiscard(movement);
+    }
+
     internal void ResolveDuel(CharacterState source, CharacterState target, Card duel, CardKind? playedCardKind = null)
     {
         var stillLegal = _coreNativeLegalActionsOperations.BuildLegalActions(source, selectedPhysicalCardId: duel.Id).Any(action => action.Kind == LegalActionKind.Duel && action.CardId == duel.Id && action.TargetSeat == target.Seat && action.PlayedCardKind == playedCardKind);

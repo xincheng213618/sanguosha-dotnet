@@ -32,6 +32,12 @@ internal sealed class DuelHandle : GameEngine.ICardContinuationHandle
     public bool FactionSlashAttempted { get => State.FactionSlashAttempted; set => Update(state => state with { FactionSlashAttempted = value }); }
     public int SuccessfulSlashResponses { get => State.SuccessfulSlashResponses; private set => Update(state => state with { SuccessfulSlashResponses = value }); }
 
+    internal void RecordResponseDiscard(CardMovementRecord movement) => Update(state => state with
+    {
+        ResponseDiscards = Array.AsReadOnly((state.ResponseDiscards ?? [])
+            .Append(new DuelResponseDiscard(movement.CardId, state.ResponderSeat, movement.Sequence)).ToArray())
+    });
+
     public bool RegisterSlashResponse(int requiredCount)
     {
         if (requiredCount < 1 || SuccessfulSlashResponses >= requiredCount)

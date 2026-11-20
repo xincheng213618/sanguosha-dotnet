@@ -115,12 +115,17 @@ public sealed record FactionCardRequestState
     public long? ActiveAttackOwnerId { get; init; }
 }
 
+internal sealed record DuelResponseDiscard(int CardId, int ResponderSeat, int Sequence);
+
 public sealed record DuelState
 {
     public bool Active { get; init; } = true;
     public int ResponderSeat { get; init; }
     public bool FactionSlashAttempted { get; init; }
     public int SuccessfulSlashResponses { get; init; }
+
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal IReadOnlyList<DuelResponseDiscard>? ResponseDiscards { get; init; }
 }
 
 public sealed record GroupCardState
