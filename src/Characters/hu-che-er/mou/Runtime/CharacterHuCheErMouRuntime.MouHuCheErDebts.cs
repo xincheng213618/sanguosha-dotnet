@@ -3,10 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
 {
-    internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) =>
-        _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
-    internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
-
     [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 40)]
     internal void AddKongwuDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {

@@ -9,8 +9,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal bool IsIssuedMouHuCheErUse(CardUseFrame use) => _resolve().IsIssuedMouHuCheErUse(use);
     internal bool IsMouHuCheErUse(long id) => _resolve().IsMouHuCheErUse(id);
     internal void IssueMouHuCheErSlash(ProgramSkillFrame f) => _resolve().IssueMouHuCheErSlash(f);
-    internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) => _resolve().KongwuEffectiveEquipment(player);
-    internal IReadOnlyList<Card> KongwuEffectiveEquipment2(int seat) => _resolve().KongwuEffectiveEquipment(seat);
     internal bool MouHuCheErAdvanceChildren() => _resolve().MouHuCheErAdvanceChildren();
     internal bool MouHuCheErDying() => _resolve().MouHuCheErDying();
     internal bool MouHuCheErEdge(int i) => _resolve().MouHuCheErEdge(i);
