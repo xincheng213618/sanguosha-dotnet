@@ -77,6 +77,7 @@ Required when changing these mechanisms or their consumers. See the
 - Mobile Li Yan's Duliang contributes the original grants assigned to the beneficiary's current actual Draw phase. Separate grants can stack on the first actual Draw, including an inserted phase, and survive loss of the issuing skill. The next Draw phase reads its own assignments.
 
 - A pending next-Draw skip is consumed at the recipient's next actual Draw boundary. A skipped scheduled Draw keeps the original schedule and instruction through its skip observers, then resumes its interrupted phase. It issues no Draw entry or cards. For Shuangshu, Preparation and the later ordinary Draw are still due.
+- The ordinary and owned Draw paths assemble the same ordered Draw-ended observers. A foreign Shuaiyan candidate uses the living Draw owner's hand count at that boundary and returns to the original Draw phase. A skipped Draw opens its own skip observer window, which keeps its original phase occurrence through target selection and cold restore.
 
 - Anniversary Hu Che Er's Fuzhong reads the effective skill holder's current Zhong count. At least one Zhong adds one card to the actual Draw count, and at least three Zhong add three to the hand limit checked in Discard. A fixed amount from a separate native draw producer uses its own amount.
 

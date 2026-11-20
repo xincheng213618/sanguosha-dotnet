@@ -204,10 +204,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                 candidates = guandu.IncludeGuanduForeignDrawObservers(owner, candidates, out windowParticipants);
             }
             if (window == SkillProgramTriggerWindow.DrawPhaseEnded)
-            {
-                candidates = observers.IncludeRecipientCategoryGiftObservers(owner, candidates);
-                candidates = observers.IncludeHongjiPhaseCandidates(owner, window, candidates);
-            }
+                candidates = ProgramDrawDiscardWindowEntryRuntime.IncludeDrawEndedObservers(owner, candidates, observers);
         }
         if (candidates.Count == 0) return false;
         var continuation = window switch

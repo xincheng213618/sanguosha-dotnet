@@ -6,16 +6,23 @@ internal static class MobileYaozhuoShuangshuChecks
 {
     private const string Owner = "fixture:yaozhuo-owner", Peer = "fixture:yaozhuo-peer";
     private const string Yaozhuo = "mobile:yaozhuo", Sisters = "happy:shen-da-qiao-xiao-qiao", Shuangshu = "happy:shuangshu";
+    private const string XuHuang = "boundary:xu-huang", Jiezi = "boundary:jiezi-current";
+    private const string JieziDrawReason = "program.least-hand-marker.draw";
     private const string Deck = "fixture:yaozhuo-shuangshu-deck";
 
-    internal static void WonYaozhuoSkipsInsertedDrawBeforeNaturalDrawCold()
+    internal static void WonYaozhuoSkipsInsertedDrawBeforeNaturalDrawCold() => Run(withJiezi: false);
+
+    internal static void WonYaozhuoReturnsThroughJieziBeforeNaturalDrawCold() => Run(withJiezi: true);
+
+    private static void Run(bool withJiezi)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(withJiezi));
         var peer = new ShanheCombatantDefinition(Peer) { StartingHand = [] };
-        var setup = new ShanheBattleSetup(47, 1, "yaozhuo-shuangshu", Owner, 4, 0, 0, 0, 0, [],
+        var setup = new ShanheBattleSetup(47, 1, "yaozhuo-shuangshu", withJiezi ? XuHuang : Owner, 4, 0, 0, 0, 0,
+            withJiezi ? [Yaozhuo] : [],
             [new(CardKind.Dodge, Suit.Heart, 13)], [], [peer, peer],
             [new(Sisters) { StartingHand = [new(CardKind.Dodge, Suit.Club, 2)] }], new string('a', 64))
-            { DefaultGodFactionId = "wu" };
+            { DefaultGodFactionId = "wu", ExtraSkillSlots = withJiezi ? 1 : 0 };
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
@@ -37,7 +44,8 @@ internal static class MobileYaozhuoShuangshuChecks
 
         game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
         Submit(new EndPlayPhaseCommand(0, game.Revision, HumanPrompt()!.PromptId));
-        Reach(() => game.State.CurrentSeat == target && game.State.Phase == TurnPhase.Play);
+        var jieziFrameId = withJiezi ? ObserveJiezi(target) : (long?)null;
+        Reach(TargetPlayStarted);
 
         var turn = game.State.TurnNumber;
         var history = game.Events.Select(item => item.Payload).ToArray();
@@ -76,7 +84,72 @@ internal static class MobileYaozhuoShuangshuChecks
             $"Schedule ended at {Array.IndexOf(history, schedule[1])}, phases {string.Join(", ", phases.Select(fact => $"{fact.Phase.Kind}@{Array.IndexOf(history, fact)}:{fact.MovementSequenceBefore}"))}; " +
             $"draw movement sequences {string.Join(", ", drawn.Select(move => move.Sequence))}; hand count {handCount}.");
 
+        if (jieziFrameId is { } observerId)
+        {
+            var benefits = history.OfType<ProgramLeastHandMarkerOrDrawEvent>().Where(fact => fact.SkillId == Jiezi).ToArray();
+            var gained = game.CardMovements.Where(move => move.Reason.Value == JieziDrawReason).ToArray();
+            Need(benefits is [{ OwnerSeat: 0, TargetSeat: 0, GrantedMarker: false } benefit] && benefit.FrameId == observerId &&
+                gained is [var card] && card.TurnNumber == turn && card.From == CardLocation.DrawPile && card.To == CardLocation.Hand(0) &&
+                card.Sequence < drawn[0].Sequence &&
+                Array.IndexOf(history, skipBoundaries[0]) < Array.IndexOf(history, benefit) && Array.IndexOf(history, benefit) < Array.IndexOf(history, schedule[1]),
+                "The restored Jiezi selection draws one physical card once before the same Shuangshu phase closes and the natural Draw occurs.");
+            Need(history.OfType<ProgramBindingResolvedEvent>().Count(fact => fact.FrameId == observerId && fact.SkillId == Jiezi &&
+                fact.OwnerSeat == 0 && fact.Window == SkillProgramTriggerWindow.DrawPhaseSkipped && fact.Activated && fact.Completed) == 1,
+                "The original skipped Draw window sees exactly one completed Jiezi binding.");
+        }
+
+        bool TargetPlayStarted() => game.State.CurrentSeat == target && game.State.Phase == TurnPhase.Play;
         PendingDecision? HumanPrompt() => game.CreateSnapshot(0).PendingDecision;
+
+        long ObserveJiezi(int skippedSeat)
+        {
+            Reach(() => HumanPrompt()?.SkillPrompt?.SkillId == Jiezi || TargetPlayStarted());
+            Need(HumanPrompt() is { PlayerSeat: 0, SkillPrompt.SkillId: Jiezi } &&
+                HumanPrompt()!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"),
+                "The real boundary Xu Huang must receive Jiezi during the skipped inserted Draw, before the sisters' natural Play.");
+            Choose("activate");
+            Reach(() => HumanPrompt()?.SkillPrompt?.SkillId == Jiezi || TargetPlayStarted());
+            var prompt = HumanPrompt();
+            Need(prompt is { PlayerSeat: 0, SkillPrompt.SkillId: Jiezi } && prompt.Choices.Any(choice =>
+                choice.Parameters.GetValueOrDefault("program-action") == "select-targets" && choice.Targets.SequenceEqual([0])),
+                "Activated Jiezi publishes its original target selection for the real Draw1 branch.");
+
+            var turnNumber = game.State.TurnNumber;
+            var facts = game.Events.Select(item => item.Payload).ToArray();
+            var started = facts.OfType<ProgramPhaseScheduledEvent>().Single(fact => fact.SkillId == Shuangshu &&
+                fact.OwnerSeat == skippedSeat && fact.Phase == TurnPhase.Draw && fact.Started);
+            var skipped = facts.OfType<ActualPhaseSkippedEvent>().Single(fact => fact.TurnNumber == turnNumber &&
+                fact.ActorSeat == skippedSeat && fact.Kind == ActualDiscardRecoveryPhaseKind.Draw);
+            var obligation = game.ResolutionStack.OfType<DrawPhaseObligationFrame>().Single();
+            var window = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == obligation.ActiveWindowFrameId);
+            var observer = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Jiezi);
+            var players = game.CreateSnapshot(0).Players;
+            Need(players[0].GeneralId == XuHuang && players[0].HandCount > players.Min(player => player.HandCount) &&
+                skipped.IsExtra && skipped.NativeFrameId == started.FrameId && obligation.PhaseOccurrenceFrameId == started.FrameId &&
+                obligation is { IsExtra: true, Skipped: true } && obligation.OwnerSeat == skippedSeat && obligation.ActualTurnNumber == turnNumber &&
+                window is { Window: SkillProgramTriggerWindow.DrawPhaseSkipped, Continuation: ProgramLifecycleContinuation.ResumeDrawPhaseObligation } &&
+                window.ResumeDrawPhaseObligationFrameId == obligation.Id && observer.OwnerSeat == 0 && observer.WindowContext?.ParentFrameId == window.Id &&
+                facts.OfType<DrawPhaseSkippedEvent>().Single(fact => fact.ActualTurnNumber == turnNumber && fact.OwnerSeat == skippedSeat).FrameId == obligation.Id &&
+                !facts.OfType<ProgramLeastHandMarkerOrDrawEvent>().Any(fact => fact.SkillId == Jiezi),
+                "The unpaid target choice belongs to Jiezi's observer of the same exact Shuangshu schedule and skipped Draw obligation.");
+
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            Need(HumanPrompt()?.PromptId == prompt!.PromptId && game.ResolutionStack.OfType<DrawPhaseObligationFrame>().Single() is { } restored &&
+                restored.Id == obligation.Id && restored.ActiveWindowFrameId == window.Id && restored.PhaseOccurrenceFrameId == started.FrameId &&
+                game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Jiezi).Id == observer.Id &&
+                game.Events.Select(item => item.Payload).OfType<ActualPhaseSkippedEvent>().Count(fact => fact == skipped) == 1,
+                "Cold restore keeps the original skip fact, observer return and exact target choice open on that schedule.");
+            Choose("select-targets", 0);
+            return observer.Id;
+        }
+
+        void Choose(string action, int? chosenSeat = null)
+        {
+            var prompt = HumanPrompt()!;
+            var choice = prompt.Choices.Single(option => option.Parameters.GetValueOrDefault("program-action") == action &&
+                (chosenSeat is null || option.Targets.SequenceEqual([chosenSeat.Value])));
+            Submit(new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, choice.Id, game.Revision));
+        }
 
         void Reach(Func<bool> ready)
         {
@@ -100,7 +173,7 @@ internal static class MobileYaozhuoShuangshuChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool withJiezi) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-yaozhuo-shuangshu", new(1, 0));
 
@@ -108,11 +181,12 @@ internal static class MobileYaozhuoShuangshuChecks
         {
             // Li Yan's registered Duliang makes the native phase journal observable without a participant using it.
             CharacterFixtureContent.Register(builder, Sisters, "classic:li-yan", "mobile:li-yan", "mobile:shi-chang-shi");
+            if (withJiezi) CharacterFixtureContent.Register(builder, XuHuang);
             builder.AddGeneral(new(Owner, "谣诼使用者", "", Yaozhuo, "wei", 4));
             builder.AddGeneral(new(Peer, "固定同桌", "", "standard:none", "wei", 4));
             builder.AddDeck(new(Deck, "固定闪牌堆", 0, 2, [new("standard:dodge", 40)]));
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "谣诼遇双姝", 4, 4, new Dictionary<string, int>(), Deck,
-                GeneralPoolIds: [Owner, Sisters, Peer], ModeKind: ContentModeKind.Team,
+                GeneralPoolIds: withJiezi ? [XuHuang, Sisters, Peer] : [Owner, Sisters, Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }

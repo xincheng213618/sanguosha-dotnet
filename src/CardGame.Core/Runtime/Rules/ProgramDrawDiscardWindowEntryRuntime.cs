@@ -102,9 +102,7 @@ internal sealed class ProgramDrawDiscardWindowEntryRuntime(IProgramRuntimeFrames
         var ownerSeat = owner.Seat;
         var captured = candidatesQuery.Capture(owner);
         var candidates = candidatesQuery.Eligible(owner, SkillProgramTriggerWindow.DrawPhaseEnded, captured);
-        candidates = observers.IncludeRecipientCategoryGiftObservers(owner, candidates);
-        candidates = observers.IncludeHongjiPhaseCandidates(owner, SkillProgramTriggerWindow.DrawPhaseEnded, candidates);
-        candidates = observers.AppendAnniversaryHanSongDrawEndedCandidates(owner, candidates);
+        candidates = IncludeDrawEndedObservers(owner, candidates, observers);
         if (candidates.Count == 0) return false;
         frames.Push(new ProgramLifecycleTriggerWindowFrame(
             frames.NextId(), ownerSeat, SkillProgramTriggerWindow.DrawPhaseEnded,
@@ -112,6 +110,14 @@ internal sealed class ProgramDrawDiscardWindowEntryRuntime(IProgramRuntimeFrames
         { DrawPhaseEndedDelayedEffects = delayedEffects });
         frames.AdvanceTop<ProgramLifecycleTriggerWindowFrame>();
         return true;
+    }
+
+    internal static IReadOnlyList<ProgramTriggerCandidate> IncludeDrawEndedObservers(CharacterState owner,
+        IReadOnlyList<ProgramTriggerCandidate> candidates, IProgramDrawDiscardWindowObservers observers)
+    {
+        candidates = observers.IncludeRecipientCategoryGiftObservers(owner, candidates);
+        candidates = observers.IncludeHongjiPhaseCandidates(owner, SkillProgramTriggerWindow.DrawPhaseEnded, candidates);
+        return observers.AppendAnniversaryHanSongDrawEndedCandidates(owner, candidates);
     }
 
     internal bool TryBeginDiscardPhase(CharacterState owner)
