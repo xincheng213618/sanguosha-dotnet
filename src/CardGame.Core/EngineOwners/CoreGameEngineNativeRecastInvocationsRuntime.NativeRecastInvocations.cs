@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
 {
-    internal bool TracksNativeRecastInvocations => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHuangZuRecast) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangYueyingBingcai) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveChanshuangEnding);
+    private bool TracksNativeRecastInvocations => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHuangZuRecast) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangYueyingBingcai) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveChanshuangEnding);
 
     internal NativeRecastInvocationDraft? CaptureNativeRecastInvocation(int initiatorSeat, int executorSeat, IReadOnlyList<int> originalPrimaryIds, long? parentFrameId = null, int? instructionIndex = null, int? participantCursor = null, CardMoveReason? reason = null)
     {
@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
             ActualTurnOwnerSeat = _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat,
             InitiatorSeat = initiatorSeat,
             ExecutorSeat = executorSeat,
-            SequenceBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
+            SequenceBefore = _coreCardMovementJournalMovementSequenceAccess._movementSequence,
             ParentFrameId = parentFrameId ?? _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id,
             InstructionIndex = instructionIndex,
             ParticipantCursor = participantCursor,
@@ -41,12 +41,7 @@ internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
             return;
         if (!TracksNativeRecastInvocations || draft.InvocationId <= 0 || draft.InvocationId > _coreResolutionIdentityBoundaryOperations._resolutionSequence || draft.Materials.Count == 0 || actualDrawCount < 0 || actualDrawCount > draft.Materials.Count || draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeRecastInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             throw new InvalidOperationException("A native recast must complete its whole original participant group exactly once.");
-        foreach (var material in draft.Materials)
-        {
-            var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draft.SequenceBefore && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.CardId == material.CardId && m.CardKind == material.PrintedKind && m.From == material.From && m.Reason == draft.Reason && (m.To == CardLocation.DiscardPile || (material.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, m.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.To == CardLocation.OutsideGame)).ToArray();
-        }
-
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeRecastInvocationRecordedEvent(draft.InvocationId, draft.TurnNumber, draft.ActualTurnOwnerSeat, draft.InitiatorSeat, draft.ExecutorSeat, draft.Materials.Count, draft.Materials.Count, actualDrawCount, draft.ParentFrameId, draft.InstructionIndex, draft.ParticipantCursor, draft.SequenceBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeRecastInvocationRecordedEvent(draft.InvocationId, draft.TurnNumber, draft.ActualTurnOwnerSeat, draft.InitiatorSeat, draft.ExecutorSeat, draft.Materials.Count, draft.Materials.Count, actualDrawCount, draft.ParentFrameId, draft.InstructionIndex, draft.ParticipantCursor, draft.SequenceBefore, _coreCardMovementJournalMovementSequenceAccess._movementSequence));
     }
 
     internal ProgramSkillFrame BeginFrameNativeRecastInvocation(ProgramSkillFrame frame, int executorSeat, IReadOnlyList<int> originalPrimaryIds, int? participantCursor = null)
