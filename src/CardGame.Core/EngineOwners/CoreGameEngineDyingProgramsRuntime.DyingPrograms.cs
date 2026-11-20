@@ -17,9 +17,12 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
         var unique = _cardZonesOperations._cardZones.CardsAt(location).All(existing => existing.Rank != card.Rank);
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, unique ? location : CardLocation.DiscardPile, new CardMoveReason(unique ? "skill-program.dying-rank.retain" : "skill-program.dying-rank.duplicate"));
         if (unique)
-            owner.Hp = Math.Min(owner.MaxHp, rescueHp);
+            _coreProgramLifecycleOperations.RecoverProgramTargetTo(active.Id, owner.Seat, owner.Seat,
+                SkillProgramNumberExpression.IntegerConstant, rescueHp, clampToMaxHp: true);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramUniqueRankDyingResolvedEvent(dying.FrameId, active.SkillId, owner.Seat, zone, card.Id, card.Rank, unique, Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(location).Select(item => item.Id).ToArray())));
-        _coreMatchLogOperations.AddLog("SkillTriggered", unique ? $"{(owner.Name)} 亮出点数 {(card.Rank)}，与已有牌不同，回复至 {(owner.Hp)} 点体力。" : $"{(owner.Name)} 亮出重复点数 {(card.Rank)}，该牌置入弃牌堆并继续濒死结算。", owner.Seat);
+        _coreMatchLogOperations.AddLog("SkillTriggered", unique
+            ? $"{owner.Name} 亮出点数 {card.Rank}，与已有牌不同，置为“创”并尝试回复至 {Math.Min(owner.MaxHp, rescueHp)} 点体力。"
+            : $"{owner.Name} 亮出重复点数 {card.Rank}，该牌置入弃牌堆并继续濒死结算。", owner.Seat);
     }
 
     internal void UseProgramBoundCardAsDyingAlcohol(ProgramSkillFrame frame, string sourceBind, CardMoveReason reason)

@@ -33,6 +33,57 @@ internal static class ShiGuoYuanChecks
             "An already applied permanent hand-limit increase remains after Xiugeng is lost through the shared mutation layer."); s.Replay();
     }
 
+    internal static void QingdaoOmitsEmptyHandUseAndKeepsRealBenefits()
+    {
+        Check(withEquipment: true);
+        Check(withEquipment: false);
+
+        static void Check(bool withEquipment)
+        {
+            var dodge = new ShanheStartingCard(CardKind.Dodge, Suit.Heart, 2);
+            var crossbow = new ShanheStartingCard(CardKind.Crossbow, Suit.Club, 1);
+            var s = Scene.Start(aggressor: true, startingHand: withEquipment ? [dodge, crossbow] : [dodge]);
+            s.Play();
+            var dodgeId = s.V(0).Hand.Single(card => card.Kind == CardKind.Dodge).Id;
+            var crossbowId = s.V(0).Hand.SingleOrDefault(card => card.Kind == CardKind.Crossbow)?.Id;
+            var hp = s.V(0).Hp;
+            s.End();
+            s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
+            var slash = s.G.ResolutionStack.OfType<CardUseFrame>().Last();
+            s.Need(slash is { SourceSeat: 1, CardKind: CardKind.Slash, Action.PhysicalCards: [{ CardKind: CardKind.Slash }] },
+                "Another actor uses a real physical Slash against Guo Yuan.");
+            s.Answer(choice => choice.Cards.SequenceEqual([dodgeId]));
+            s.Offer(Qingdao);
+            s.Need(s.V(0).Hp == hp && s.V(0).HandCount == (withEquipment ? 1 : 0) &&
+                s.E<CardUseFinishedEvent>().Any(fact => fact.ResolutionId == slash.Id && fact.CardId == slash.CardId) &&
+                s.G.CardMovements.Any(move => move.CardId == dodgeId && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.ResponseFinished) &&
+                s.G.CardMovements.Any(move => move.CardId == slash.CardId && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.UseFinished),
+                "The accepted Dodge pays the real entity without damage, and the original Slash has finished in the discard pile.");
+            s.Activate();
+            s.Reach(() => s.P?.SkillPrompt?.SkillId == Qingdao && s.P.Choices.Any(choice => Branch(choice) == "obtain"));
+            var frame = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(item => item.SkillId == Qingdao);
+            s.Cold();
+            if (withEquipment)
+            {
+                s.Answer(choice => Branch(choice) == "use");
+                s.Answer(choice => Branch(choice) == "native" && choice.Cards.SequenceEqual([crossbowId!.Value]));
+                s.Reach(() => s.E<ShiGyNativeReturnedEvent>().Any(fact => fact.FrameId == frame.Id));
+                s.Need(s.V(0).Equipment.Any(card => card.Id == crossbowId) &&
+                    s.E<ShiGyNativeIssuedEvent>().Any(fact => fact.FrameId == frame.Id && fact.CardId == crossbowId),
+                    "Qingdao retains the legal use and installs the actual remaining Crossbow through native resolution.");
+                return;
+            }
+
+            s.Need(s.P!.Choices.All(choice => Branch(choice) != "use"),
+                "With the sole hand card already paid as Dodge, Qingdao cannot offer to use a hand card.");
+            s.Answer(choice => Branch(choice) == "obtain");
+            s.Need(s.E<ShiGyBenefitObtainedEvent>().Single(fact => fact.FrameId == frame.Id).CardId == slash.CardId &&
+                s.V(0).Hand.Single().Id == slash.CardId && s.G.CardMovements.Any(move => move.CardId == slash.CardId &&
+                    move.From == CardLocation.DiscardPile && move.To == CardLocation.Hand(0)),
+                "The remaining choice obtains the exact finished Slash from the discard pile.");
+        }
+    }
+
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
@@ -82,10 +133,10 @@ internal static class ShiGuoYuanChecks
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), G.CardMovements, Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(), Commands = CommandJson.Serialize(G.AcceptedCommands) });
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, P, Compared = E<ShiGyComparedEvent>(), Paid = E<ShiGyDiscardPaidEvent>(),
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray() });
-        public static Scene Start(bool aggressor = false)
+        public static Scene Start(bool aggressor = false, IReadOnlyList<ShanheStartingCard>? startingHand = null)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-            ShanheStartingCard[] hand = [new(CardKind.Slash, Suit.Spade, 5), new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4), new(CardKind.Alcohol, Suit.Club, 6)];
+            var hand = startingHand ?? [new(CardKind.Slash, Suit.Spade, 5), new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4), new(CardKind.Alcohol, Suit.Club, 6)];
             var foes = Enumerable.Range(1, 3).Select(seat => new ShanheCombatantDefinition(aggressor && seat == 1 ? Foe : Peer, Hp: 8)
             { StartingHand = [new(aggressor && seat == 1 ? CardKind.Slash : CardKind.Peach, Suit.Heart, 7)] }).ToArray();
             var setup = new ShanheBattleSetup(631, 1, "shi-guo-yuan-native", Hero, 3, 0, 0, 0, 0, [Driver, Watch], hand, [], foes, [], new string('a', 64));

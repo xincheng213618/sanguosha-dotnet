@@ -846,6 +846,9 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Pingxi: first discard child returns or finishes the match cold", AnniversaryWangChangPingxiTerminalChecks.FirstPingxiDiscardDeathReturnsToTheOriginalGroupOrFinishesCold),
     ("Classic Shicai: tops only the original completed Slash cold", ClassicShicaiOriginalSlashChecks.ShicaiCannotTopTheRediscardedOriginalSlashCold),
     ("OL Chenqing: actual Peach user supplies the allied Jiuyuan bonus cold", OlChenqingRescueAttributionChecks.ChenqingPeachUsesActualPayerFactionForJiuyuanCold),
+    ("Shi Guo Yuan Qingdao: empty hand omits use and keeps real benefits cold", ShiGuoYuanChecks.QingdaoOmitsEmptyHandUseAndKeepsRealBenefits),
+    ("OL Souying: Wooden Ox equipment but not stored grain is discardable cold", OlHuaManSouyingWoodenOxChecks.SouyingCanDiscardTreasureButCannotDirectlyDiscardItsGrainCold),
+    ("OL Buqu: own Play recovery allows Liangzhu cold", OlBoundaryBuquRecoveryChecks.BuquInOwnPlayQualifiesRealLiangzhuAndDrawCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -101,7 +101,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
             };
             if (r.Damaged)
                 choices.AddRange(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => ShiGyDiscardChoices(f, p.Seat)));
-            else
+            else if (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count > 0)
                 choices.Add(C("use", "无距离限制使用一张手牌"));
             return choices.ToArray();
         }
@@ -133,6 +133,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
             ShiGyStage.Record => "修耕：记录至多两名角色当前的手牌数；确认后替换上次记录。",
             ShiGyStage.Discard => $"陈赦：依次弃置本人、濒死角色、伤害来源各一张区域牌（第{(r.Index + 1)}/3项）。",
             ShiGyStage.UseChoice => "清蹈：可以无距离限制使用一张手牌。",
+            ShiGyStage.Benefit when !r.Damaged && choices.Count == 1 => "清蹈：你未受此牌伤害，可以获得一张【杀】。",
             _ => r.Damaged ? "清蹈：你受过此牌伤害，选择获得闪或弃置一名角色的一张区域牌。" : "清蹈：你未受此牌伤害，选择获得杀或无距离使用手牌。"
         }, choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         {
