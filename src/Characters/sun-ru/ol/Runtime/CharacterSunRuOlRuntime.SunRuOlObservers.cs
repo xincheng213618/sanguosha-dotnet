@@ -11,7 +11,10 @@ internal sealed partial class CharacterSunRuOlRuntime
         if (producer.SunRuOlWeimian is not { Paid: true } r || r.Source != SunRuOlSource(producer) || recovery.ParentFrameId != producer.Id || recovery.Return != new RecoveryReplacementReturn(PostEventContinuation.Program, producer.Id))
             return false;
         if (r.Stage == SunRuOlWeimianStage.RecoveryChildren)
-            return recovery.Attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.Program, producer.InstructionIndex) && recovery.Attempt.SourceSeat == producer.OwnerSeat && recovery.Attempt.TargetSeat == r.RecipientSeat && recovery.Attempt.Amount == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunRuOlWeimianBenefitIssuedEvent>().Any(e => e.FrameId == producer.Id && e.Benefit == 2 && e.RecipientSeat == r.RecipientSeat);
+            return recovery.Attempt.SourceSeat == producer.OwnerSeat && recovery.Attempt.TargetSeat == r.RecipientSeat &&
+                recovery.Attempt.Amount == 1 && _healthChildren.ProgramRecoveryChild(producer, recovery) &&
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunRuOlWeimianBenefitIssuedEvent>()
+                    .Any(e => e.FrameId == producer.Id && e.Benefit == 2 && e.RecipientSeat == r.RecipientSeat);
         return r.Stage == SunRuOlWeimianStage.CostChildren && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == new CardMoveReason("equipment.slot-abolished") && recovery.Attempt.Amount == 1 && recovery.Attempt.SourceSeat == producer.OwnerSeat && recovery.Attempt.TargetSeat == producer.OwnerSeat && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.From == CardLocation.Equipment(producer.OwnerSeat) && m.Reason.Value == "equipment.slot-abolished" && _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Kind == CardKind.SilverLion);
     }
 
@@ -36,7 +39,11 @@ internal sealed partial class CharacterSunRuOlRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsSunRuOlRecoveryParent(root, recovery);
         if (child is HpChangedTriggerWindowFrame hp && root.SunRuOlWeimian is { Paid: true } w)
-            return hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && (w.Stage == SunRuOlWeimianStage.CostChildren && hp.Change.TargetSeat == root.OwnerSeat || w.Stage == SunRuOlWeimianStage.RecoveryChildren && hp.Change.TargetSeat == w.RecipientSeat && hp.Change.SourceSeat == root.OwnerSeat);
+            return hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Continuation == PostEventContinuation.Program &&
+                hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 &&
+                (w.Stage == SunRuOlWeimianStage.CostChildren && hp.Change.TargetSeat == root.OwnerSeat ||
+                 w.Stage == SunRuOlWeimianStage.RecoveryChildren && hp.Change.TargetSeat == w.RecipientSeat &&
+                 hp.Change.SourceSeat == root.OwnerSeat && _healthChildren.ProgramRecoveryChild(root, hp));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && CanContinuePaidSunRuOl(root);
     }
 
