@@ -212,6 +212,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Lu Shi Zhuyan: opening hand cap and actual Ending recovery cold", OlLuShiZhuyanDrawChecks.OpeningHandCapAndActualEndingRecoveryCold),
     ("Mou Cao Ang Fengmin: foreign equipment loss draws for empty slots once cold", MouCaoAngAnniversaryChecks.ForeignEquipmentLossDrawsForEmptySlotsOnceCold),
     ("Happy Shuangshu: inserted and natural Draw each open their native attempt cold", HappyShuangshuNativeDrawChecks.InsertedAndNaturalDrawEachOpenTheirNativeAttemptCold),
+    ("OL Du Fu Ren Shunshi: paid off-turn gift funds the first unskipped Draw cold", OlDuFuRenShunshiDrawBoundaryChecks.OffTurnGiftFundsFirstUnskippedDrawCold),
+    ("OL Zhang Shi Ping Hongji: foreign promise returns through second native Draw cold", OlZhangShiPingHongjiNativeDrawChecks.ForeignPromiseReturnsThroughSecondNativeDrawCold),
     ("Shi Chen Zhi: paid HE extra turn lease and dying recovery cold", ShiChenZhiChecks.ExtraTurnDiscardChildrenDyingRecoveryAndSameRoundLimitCold),
     ("Multiplayer: human seats prompts privacy and cold replay", MultiplayerChecks.MultipleHumansWaitRespondAndReplay),
     ("LAN rooms: HTTP players AI isolation retries and match completion", LanRoomChecks.HttpPlayersAiAndIsolation),

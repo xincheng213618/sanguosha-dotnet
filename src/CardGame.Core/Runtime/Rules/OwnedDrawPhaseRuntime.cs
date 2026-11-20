@@ -50,21 +50,22 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
             { Stage: DrawPhaseObligationStage.Finished, Skipped: true } parent && parent.ActiveWindowFrameId == child.Id &&
         parent.OwnerSeat == turn.CurrentSeat && parent.ActualTurnNumber == turn.TurnNumber;
 
-    internal bool TryBeginScheduledDraw()
+    internal bool TryBeginScheduledDraw(int actorSeat)
     {
-        if (schedules.Current is not { Phase: TurnPhase.Draw, Frame: var program } || frames.Top is not null ||
-            prompts.Current is not null || program.OwnerSeat != turn.CurrentSeat || phase.Phase != TurnPhase.Draw)
+        if (schedules.Current is not { Phase: TurnPhase.Draw, Frame: var program, ParentFrame: { } parent } ||
+            program.WindowContext?.ParentFrameId != parent.Id || parent.OwnerSeat != actorSeat || actorSeat != turn.CurrentSeat ||
+            frames.Top is not null || prompts.Current is not null || phase.Phase != TurnPhase.Draw)
             throw new InvalidOperationException("A scheduled Draw must enter at its original turn boundary.");
-        var skipped = NextDrawSkip.Consume(participants.Players[program.OwnerSeat]);
+        var skipped = NextDrawSkip.Consume(participants.Players[actorSeat]);
         if (skipped)
             phaseOperations.Clear();
         else
         {
-            phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, program.OwnerSeat);
+            phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, actorSeat);
             if (!facts.HasAttemptCapability) return false;
         }
 
-        var frame = new DrawPhaseObligationFrame(frames.NextId(), program.OwnerSeat, turn.TurnNumber, true,
+        var frame = new DrawPhaseObligationFrame(frames.NextId(), actorSeat, turn.TurnNumber, true,
             0, skipped ? DrawPhaseObligationStage.SkipObservers : DrawPhaseObligationStage.Starting, Skipped: skipped)
         { PhaseOccurrenceFrameId = program.Id, DiscardRecoveryPhase = skipped ? null : actualPhases.Current() };
         frames.Push(frame);
@@ -75,7 +76,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     private bool OwnsScheduledDraw(DrawPhaseObligationFrame frame) =>
         frame is { IsExtra: true, ParentFrameId: null, PhaseOccurrenceFrameId: { } occurrence } &&
         schedules.Current is { Phase: TurnPhase.Draw, Frame: var program, ParentFrame: { } parent } &&
-        program.Id == occurrence && program.OwnerSeat == frame.OwnerSeat && parent.OwnerSeat == frame.OwnerSeat &&
+        program.Id == occurrence && parent.OwnerSeat == frame.OwnerSeat &&
         program.WindowContext?.ParentFrameId == parent.Id && frame.ActualTurnNumber == turn.TurnNumber;
 
     internal bool TryBeginActualDrawCompletion(CharacterState owner, int delayedEffects)

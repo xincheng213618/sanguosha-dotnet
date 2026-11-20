@@ -30,8 +30,8 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
         else
         {
             _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase = TurnPhase.Draw;
-            _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Draw, recipientSeat);
-            if (!_coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(_coreMatchParticipantsPlayersAccess._players[recipientSeat], false))
+            if (!_coreDrawPhaseObligationsOperations.Value.TryBeginScheduledDraw(recipientSeat) &&
+                !_coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(_coreMatchParticipantsPlayersAccess._players[recipientSeat], false))
             {
                 _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, recipientSeat);
                 _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(recipientSeat);
