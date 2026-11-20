@@ -20,8 +20,15 @@ internal static class RecordedSuitSlashChecks
         Require(States(game).All(s => s.Value), "Actual uses record all four public suits without duplicate records.");
         var initialHand = game.State.Players[0].Hand.Count;
         var hp = game.State.Players[1].Hp;
-        Slash(game);
+        var slash = Slash(game);
         Reach(game, p => p.SkillPrompt?.SkillId == Skill);
+        var accepted = game.Events.Select(entry => entry.Payload).OfType<CardActionAcceptedEvent>().Select(entry => entry.Action)
+            .Single(action => action is { Type: CardActionType.Use, ActorSeat: 0, PhysicalCards: [var cost] } && cost.CardId == slash.CardId);
+        Require(accepted is { EffectiveKind: CardKind.Slash,
+                PhysicalCards: [{ CardKind: CardKind.FireSlash or CardKind.ThunderSlash, From: { Zone: CardZoneKind.Hand, OwnerSeat: 0 } }],
+                ConversionChain: [{ SkillId: Skill, BindingId: "unarmed-ordinary-slash", OwnerSeat: 0 } identity] } &&
+            identity == slash.ConversionSource && !string.IsNullOrWhiteSpace(identity.SkillInstanceId),
+            "Unarmed Liegong must pay an original elemental Slash as an ordinary Slash through the published skill instance.");
         Cold(game, registry);
         Answer(game, "activate");
         var receipt = game.Events.Select(e => e.Payload).OfType<ProgramRecordedSuitSlashIssuedEvent>().Single().Receipt;
@@ -54,10 +61,11 @@ internal static class RecordedSuitSlashChecks
     private static void Play(GameEngine game, int cardId, int[] targets, LegalAction? action = null) =>
         Accept(game, new PlayCardCommand(0, cardId, targets, game.Revision, Prompt(game)!.PromptId, action?.PlayedCardKind)
         { ConversionSource = action?.ConversionSource, AdditionalConversionSources = action?.AdditionalConversionSources });
-    private static void Slash(GameEngine game)
+    private static LegalAction Slash(GameEngine game)
     {
         var action = game.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeat == 1);
         Play(game, action.CardId!.Value, [1], action);
+        return action;
     }
     private static void Settle(GameEngine game) => Reach(game, p => p.Kind == DecisionKind.PlayCard && p.PlayerSeat == 0);
     private static void Reach(GameEngine game, Func<PendingDecision, bool> goal)

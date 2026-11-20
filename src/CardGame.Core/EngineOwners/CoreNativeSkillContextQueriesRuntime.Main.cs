@@ -12,7 +12,8 @@ internal sealed partial class CoreNativeSkillContextQueriesRuntime
             Armor = player.Armor,
             HpUndefined = !player.HasHpValue,
             RuleWounded = _coreTreatedWoundedOperations.UsesTreatedWounded ? _coreTreatedWoundedOperations.IsRuleWounded(player) : null,
-            HasWeapon = _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
+            HasWeapon = _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player)
+                .Any(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
         };
         context = context with
         {

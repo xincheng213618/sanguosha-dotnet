@@ -11,6 +11,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - An optional use of a gifted equipment card binds the named choice to the original public card set and its recipient. Display, submission and native use read the same equipment eligibility, including current hand ownership, slot availability and use restrictions. The choice supplies the timing for the authorized use.
 
+- Skill context conditions such as `noWeapon` read current effective equipment through the field owner. Armor, mount and treasure presence conditions read actual occupied slots.
+
 ## Quotas, directed rights and attack range
 
 - `MatchTurnNumericQueries` combines finite Slash-limit terms from declared turn modifiers and registered runtime contributors. OL Jiangchi grants a finite `+1` for the current turn separately from its unrestricted distance. Cao Xi's Gangshu adds a finite term while its own grant remains eligible. Mobile Shi Huang Chong's Cujun contributes during the recipient's first actual Play phase after the original grant. Mobile Shi Wei Yan's upgraded Kuanggu contributes once per completed backwater payment in the payer's current actual Play phase. Zhuangshi's issued no-count permission has its own qualification and debit rules. Directed quota exemptions qualify against the original target and use their own actual-debit rules.
