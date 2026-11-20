@@ -3,6 +3,13 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
 {
+    public bool AllLivingSeatsHaveTakenPositiveDamage()
+    {
+        var damageHistory = _awakeningHistory.Read<DamageAppliedEvent>();
+        return _coreMatchParticipantsPlayersAccess._players.All(player => !player.IsAlive ||
+            damageHistory.Any(damage => damage.TargetSeat == player.Seat && damage.Amount > 0));
+    }
+
     internal long[] GameProgramActivationFrames(int owner, string skill, string activation, long beforeFrame = long.MaxValue) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillStartedEvent>().Where(e => e.OwnerSeat == owner && e.SkillId == skill && e.ActivationId == activation && e.FrameId < beforeFrame).Select(e => e.FrameId).Distinct().Order().ToArray();
     internal int GameProgramActivationCount(int ownerSeat, string skillId, string activationId) => GameProgramActivationFrames(ownerSeat, skillId, activationId).Length;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 950)]

@@ -22,7 +22,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
             SkillProgramEffectOp.ResolveLinjieRound => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && LinCold(p.Seat) == 0),
             SkillProgramEffectOp.ResolveLinjieDamage => c is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } seat } && seat != gate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && LinCold(seat) > 0 && LinjieDiscardCards(gate.OwnerSeat, seat).Count > 0,
             SkillProgramEffectOp.ResolveDuzhang => DuzhangAction(c)is { EffectiveIsRed: false, TargetSeats: [var target] } a && (a.ActorSeat == gate.OwnerSeat || target == gate.OwnerSeat),
-            SkillProgramEffectOp.AwakenJianghuo => _awakeningOverrides.Granted(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).All(p => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(d => d.TargetSeat == p.Seat && d.Amount > 0)),
+            SkillProgramEffectOp.AwakenJianghuo => _awakeningOverrides.Granted(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _awakeningDamage.AllLivingSeatsHaveTakenPositiveDamage(),
             SkillProgramEffectOp.ResolveLishiPhase => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { } phase && phase.ActorSeat == gate.OwnerSeat && LishiActiveEffects(phase).Any(e => e.Option == (c?.Window == SkillProgramTriggerWindow.JudgmentPhaseStarting ? 2 : 3)),
             _ => true
         };

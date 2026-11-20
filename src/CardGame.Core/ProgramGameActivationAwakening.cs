@@ -9,6 +9,11 @@ internal interface IProgramAwakeningOverrideQuery : IProgramSelectionQuery
     bool Issued(ProgramSkillFrame frame);
 }
 
+internal interface IProgramAwakeningDamageQuery : IProgramSelectionQuery
+{
+    bool AllLivingSeatsHaveTakenPositiveDamage();
+}
+
 public enum GameActivationAwakeningStage { MaximumPaid, GrantsIssued, Complete }
 public sealed record ProgramGameActivationAwakeningReceipt
 {

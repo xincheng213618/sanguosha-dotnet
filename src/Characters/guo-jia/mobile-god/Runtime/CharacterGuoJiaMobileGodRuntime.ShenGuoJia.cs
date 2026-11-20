@@ -14,7 +14,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     internal bool CanActivateShenGuoJiaZuoxing(CharacterState owner) => ShenGuoJiaBenefactors(owner, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, ShenGuoJiaZuoxing)).Count > 0 && ShenGuoJiaPlans(owner.Seat).Count > 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 38000, SkillProgramEffectOp.ResolveShenGuoJiaTianyi)]
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38000, SkillProgramEffectOp.ResolveShenGuoJiaTianyi)]
-    internal bool CanAwakenShenGuoJia(ProgramTriggerLegalityContext gate) => _awakeningOverrides.Granted(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).All(player => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(damage => damage.TargetSeat == player.Seat && damage.Amount > 0));
+    internal bool CanAwakenShenGuoJia(ProgramTriggerLegalityContext gate) => _awakeningOverrides.Granted(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId) || _awakeningDamage.AllLivingSeatsHaveTakenPositiveDamage();
     internal SkillProgramStepOutcome BeginShenGuoJia(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
