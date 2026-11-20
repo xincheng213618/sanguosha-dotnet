@@ -43,7 +43,6 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
             }
 
             var amount = Math.Max(0, Math.Min(5, _coreMatchParticipantsPlayersAccess._players[target].MaxHp) - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryFengXi = r with { Amount = amount } });
             _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, target, amount, FengXiDrawReason);
         }
 
@@ -229,9 +228,11 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan)]
     internal void ReturnFengXiDraw(ProgramSkillFrame f, NativeDrawOutcome d)
     {
-        if (f.AnniversaryFengXi is not { Stage: AnniversaryFengXiStage.Drawing, Draw: null } r || d.RecipientSeat != r.Target || d.RequestedCount != r.Amount || d.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        if (f.AnniversaryFengXi is not { Stage: AnniversaryFengXiStage.Drawing } r ||
+            NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan, FengXiDrawReason) != d ||
+            d.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Boyan lost its actual capped-total-Hand native draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryFengXi = r with { Stage = AnniversaryFengXiStage.DrawChildren, Draw = d, Before = d.SequenceBefore, After = d.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryFengXi = r with { Stage = AnniversaryFengXiStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryFengXiDrawReturnedEvent(f.Id, d.RecipientSeat, d.RequestedCount, d.ActualDrawIds.Count, d.SequenceBefore, d.SequenceAfter, d.AttemptFrameId));
         ContinueFengXi(f.Id);
     }

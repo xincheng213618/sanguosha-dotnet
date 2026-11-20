@@ -3,6 +3,15 @@ namespace CardGame.Core.RuntimeSkills;
 [Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_NativeDrawAttempts
 {
+    internal static bool MatchesIssuedAttempt(ResolutionFrame parent, NativeDrawAttemptFrame attempt) =>
+        parent.NativeDraw is { AttemptReturned: false, RecipientApplied: false } paid &&
+        paid.ActiveAttemptId == attempt.Id && attempt.Context.AttemptFrameId == attempt.Id &&
+        attempt.Context.ParentFrameId == parent.Id && paid.ReturnKind == attempt.Return.Kind &&
+        paid.InstructionIndex == attempt.Return.InstructionIndex && paid.RecipientIndex == attempt.Return.RecipientIndex &&
+        paid.RecipientIndex >= 0 && paid.RecipientIndex < paid.Recipients.Count &&
+        paid.Recipients[paid.RecipientIndex] == attempt.Context.RecipientSeat &&
+        paid.RequestedCount == attempt.Context.RequestedCount && paid.Reason == attempt.Context.Reason;
+
     internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) =>
         child is NativeDrawAttemptFrame attempt &&
             attempt.Context.ParentFrameId == parent.Id && parent.NativeDraw is { } paid &&

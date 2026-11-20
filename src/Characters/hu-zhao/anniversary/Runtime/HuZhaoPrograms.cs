@@ -20,7 +20,7 @@ internal sealed class ResolveAnniversaryHuZhaoMiduHandler : ISkillProgramEffectH
 public enum HuZhaoMiduStage { Areas, Recipient, CostChildren, Drawing, DrawChildren, Completed }
 public sealed record HuZhaoMiduReceipt(CardConversionSource Source, string GameplayHash, int Turn, int TurnOwner,
     HuZhaoMiduStage Stage, int AvailableMask, int SelectedMask = 0, bool Restore = false, int Recipient = -1,
-    bool Paid = false, long Before = 0, long After = 0, NativeDrawOutcome? Draw = null);
+    bool Paid = false, long Before = 0, long After = 0);
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HuZhaoMiduReceipt? HuZhaoMidu { get; init; }

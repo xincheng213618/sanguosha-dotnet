@@ -98,6 +98,21 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
         return SkillProgramStepOutcome.AwaitChild;
     }
 
+    internal static NativeDrawProducerReceipt? PendingOperationDraw(ProgramSkillFrame frame,
+        SkillProgramEffectOp operation, CardMoveReason reason) =>
+        frame.NativeDraw is { ReturnKind: NativeDrawAttemptReturnKind.ProgramOperation, Recipients: [_], RecipientIndex: 0 } paid &&
+        paid.InstructionIndex == frame.InstructionIndex && paid.Operation == operation && paid.Reason == reason ? paid : null;
+
+    internal static bool MatchesOperationAttempt(ProgramSkillFrame parent, NativeDrawAttemptFrame attempt,
+        SkillProgramEffectOp operation, CardMoveReason reason) =>
+        PendingOperationDraw(parent, operation, reason) is not null &&
+        RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.MatchesIssuedAttempt(parent, attempt);
+
+    internal static NativeDrawOutcome? CompletedOperationDraw(ProgramSkillFrame frame, int instructionIndex,
+        SkillProgramEffectOp operation, CardMoveReason reason) => frame.NativeOperationDrawReturns
+        .SingleOrDefault(receipt => receipt.InstructionIndex == instructionIndex && receipt.Operation == operation && receipt.Reason == reason)
+        ?.Outcome;
+
     [ProgramContinuation(ProgramContinuationKind.Resume, 0)]
     internal bool ResumeProgramNativeDraw(long id)
     {

@@ -17,11 +17,24 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
         if (child is HappyQiaoHealthChoiceFrame qiao)
             return _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoHealthChoiceRidesOn(qiao, f);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryFengXiStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, r.Amount);
+            return r.Stage == AnniversaryFengXiStage.Drawing && NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan, FengXiDrawReason);
         if (child is IdentityAppearanceFrame a)
             return r.Stage is AnniversaryFengXiStage.HealthApplying or AnniversaryFengXiStage.HealthChildren && a.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && a.Receipt.ParentFrameId == f.Id && a.Receipt.OwnerSeat == r.Target && a.Receipt.OriginalInstructionIndex == f.InstructionIndex && a.Receipt.RequestedDeduction == r.Amount;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && FengXiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        {
+            if (f.PendingMovementContinuation is not { } p || !FengXiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) ||
+                !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
+                return false;
+
+            var (before, after) = (r.Before, r.After);
+            if (r.Stage == AnniversaryFengXiStage.DrawChildren)
+            {
+                if (NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan, FengXiDrawReason) is not { } outcome)
+                    return false;
+                (before, after) = (outcome.SequenceBefore, outcome.SequenceAfter);
+            }
+            return moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        }
         if (child is RecoveryReplacementFrame recovery)
             return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == (f.PendingMovementContinuation is null ? PostEventContinuation.Program : PostEventContinuation.AwaitedProgramMovement);
         if (child is HpChangedTriggerWindowFrame hp)

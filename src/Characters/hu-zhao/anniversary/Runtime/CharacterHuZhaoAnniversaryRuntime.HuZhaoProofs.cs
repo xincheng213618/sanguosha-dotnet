@@ -9,17 +9,25 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             return false;
         var payments = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuZhaoMiduPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         var completed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuZhaoMiduCompletedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var draw = CompletedHuZhaoDraw(f);
         if (!r.Paid)
-            return r.Stage is HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient && !r.Restore && r.Recipient == -1 && r.Draw is null && payments.Length == 0 && completed.Length == 0 && r.Before == 0 && r.After == 0 && (r.Stage != HuZhaoMiduStage.Areas || r.SelectedMask == 0) && (r.SelectedMask & r.AvailableMask) == r.SelectedMask;
-        if (payments is not [var paid] || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.SelectedMask != r.SelectedMask || paid.Restore != r.Restore || paid.Recipient != r.Recipient || paid.Before < 0 || paid.After != paid.Before || paid.Before > r.Before || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Recipient) || r.Stage is HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient || (r.Restore ? HuZhaoCount(r.SelectedMask) != 1 || (r.SelectedMask & r.AvailableMask) != 0 || r.Recipient != f.OwnerSeat || r.Draw is not null : (r.SelectedMask & r.AvailableMask) != r.SelectedMask))
+            return r.Stage is HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient && !r.Restore && r.Recipient == -1 && draw is null && payments.Length == 0 && completed.Length == 0 && r.Before == 0 && r.After == 0 && (r.Stage != HuZhaoMiduStage.Areas || r.SelectedMask == 0) && (r.SelectedMask & r.AvailableMask) == r.SelectedMask;
+        if (payments is not [var paid] || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.SelectedMask != r.SelectedMask || paid.Restore != r.Restore || paid.Recipient != r.Recipient || paid.Before != r.Before || paid.After != paid.Before || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Recipient) || r.Stage is HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient || (r.Restore ? !IsSingleHuZhaoArea(r.SelectedMask) || (r.SelectedMask & r.AvailableMask) != 0 || r.Recipient != f.OwnerSeat || draw is not null : (r.SelectedMask & r.AvailableMask) != r.SelectedMask))
+            return false;
+        if (draw is not null && (draw.SequenceBefore < r.After ||
+            draw.SequenceAfter < draw.SequenceBefore || draw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence))
             return false;
         if (r.Stage == HuZhaoMiduStage.Completed)
-            return completed is [var done] && done == new HuZhaoMiduCompletedEvent(f.Id, r.Restore, r.Recipient, r.Restore ? 0 : HuZhaoCount(r.SelectedMask)) && f.ChoiceBindings.Count(b => b.Name == "midu-branch" && b.ChooserSeat == f.OwnerSeat && b.OptionId == (r.Restore ? "restore" : "abolish")) == 1;
+        {
+            var (recipient, requestedDraw) = HuZhaoDrawRequest(f, r);
+            return completed is [var done] && done == new HuZhaoMiduCompletedEvent(f.Id, r.Restore, recipient, requestedDraw) && f.ChoiceBindings.Count(b => b.Name == "midu-branch" && b.ChooserSeat == f.OwnerSeat && b.OptionId == (r.Restore ? "restore" : "abolish")) == 1;
+        }
         if (completed.Length != 0 || r.Restore && r.Stage != HuZhaoMiduStage.CostChildren)
             return false;
         if (r.Stage == HuZhaoMiduStage.Drawing)
-            return !r.Restore && HuZhaoCount(r.SelectedMask) > 0 && r.Draw is null;
-        return r.Stage == HuZhaoMiduStage.CostChildren ? r.Draw is null : r.Stage == HuZhaoMiduStage.DrawChildren && r.Draw is { } draw && draw.RecipientSeat == r.Recipient && draw.RequestedCount == HuZhaoCount(r.SelectedMask) && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After;
+            return !r.Restore && (draw is { RequestedCount: > 0 } ? f.NativeDraw is null :
+                NativeDrawProducerRuntime.PendingOperationDraw(f, SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu, HuZhaoDrawReason) is { RequestedCount: > 0 });
+        return r.Stage == HuZhaoMiduStage.CostChildren ? draw is null : r.Stage == HuZhaoMiduStage.DrawChildren && draw is { RequestedCount: > 0 };
     }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 43000)]
@@ -29,9 +37,20 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
         if (f.HuZhaoMidu is not { } r || !ValidHuZhaoMidu(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == HuZhaoMiduStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Recipient, HuZhaoCount(r.SelectedMask));
+            return r.Stage == HuZhaoMiduStage.Drawing && NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu, HuZhaoDrawReason);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && moved.ResumeProgramFrameId == f.Id && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason == CardMoveReasons.Reshuffle || r.Stage == HuZhaoMiduStage.DrawChildren && m.Reason.Value == HuZhaoDrawReason && m.From == CardLocation.DrawPile || r.Stage == HuZhaoMiduStage.CostChildren && (m.Reason.Value == "equipment.slot-abolished" && m.From == CardLocation.Equipment(f.OwnerSeat) || m.Reason.Value == HuZhaoJudgmentReason && m.From == CardLocation.Judgment(f.OwnerSeat))));
+        {
+            var outcome = CompletedHuZhaoDraw(f);
+            var (before, after) = outcome is not null && r.Stage == HuZhaoMiduStage.DrawChildren
+                ? (outcome.SequenceBefore, outcome.SequenceAfter)
+                : (r.Before, r.After);
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) &&
+                moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) &&
+                    m.Sequence > before && m.Sequence <= after && (m.Reason == CardMoveReasons.Reshuffle ||
+                    r.Stage == HuZhaoMiduStage.DrawChildren && m.Reason == HuZhaoDrawReason && m.From == CardLocation.DrawPile ||
+                    r.Stage == HuZhaoMiduStage.CostChildren && (m.Reason.Value == "equipment.slot-abolished" && m.From == CardLocation.Equipment(f.OwnerSeat) ||
+                        m.Reason.Value == HuZhaoJudgmentReason && m.From == CardLocation.Judgment(f.OwnerSeat))));
+        }
         if (child is RecoveryReplacementFrame recovery)
             return HuZhaoRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)

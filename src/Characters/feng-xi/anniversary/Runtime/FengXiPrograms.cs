@@ -28,7 +28,6 @@ public sealed record AnniversaryFengXiReceipt(CardConversionSource Source, strin
     public int? TargetHp { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
     private IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
 }

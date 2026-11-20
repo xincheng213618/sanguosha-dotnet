@@ -172,11 +172,9 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
             attempt.Stage != NativeDrawAttemptStage.Returning || prompts.Current is not null ||
             !Enum.IsDefined(attempt.Return.Kind) ||
             frames.ParentOf(attempt.Id) is not { } parent ||
-            parent.Id != attempt.Context.ParentFrameId || parent.NativeDraw is not { } paid ||
-            paid.ActiveAttemptId != id || paid.AttemptReturned || paid.RecipientApplied ||
-            paid.ReturnKind != attempt.Return.Kind || paid.InstructionIndex != attempt.Return.InstructionIndex || paid.RecipientIndex != attempt.Return.RecipientIndex ||
-            paid.Recipients[paid.RecipientIndex] != attempt.Context.RecipientSeat || paid.RequestedCount != attempt.Context.RequestedCount)
+            !RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.MatchesIssuedAttempt(parent, attempt))
             throw new InvalidOperationException("A draw request cannot return to an unissued producer or cursor.");
+        var paid = parent.NativeDraw!;
         events.AdvanceFact(new NativeDrawAttemptDecidedEvent(id, parent.Id,
             attempt.Context.RecipientSeat, attempt.Context.RequestedCount, attempt.Replacement is not null));
         frames.Pop(id, ResolutionFrameKind.NativeDrawAttempt);

@@ -49,7 +49,8 @@ internal static class AnniversaryFengXiBoyanDrawChecks
         var window = stack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == attempt.ActiveWindowFrameId);
         var index = Array.IndexOf(stack, attempt);
         Require(started.Source is { OwnerSeat: owner, SkillId: Boyan } && started.Target == target &&
-            parent.AnniversaryFengXi is { Stage: AnniversaryFengXiStage.Drawing, Target: target, Amount: amount } &&
+            parent.AnniversaryFengXi is { Stage: AnniversaryFengXiStage.Drawing, Target: target } &&
+            parent.NativeDraw is { Operation: SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan, Recipients: [target], RequestedCount: amount } &&
             index > 0 && index + 1 < stack.Length && stack[index - 1].Id == parent.Id && stack[index + 1].Id == window.Id &&
             window is { OwnerSeat: target, Window: SkillProgramTriggerWindow.NativeDrawStarting,
                 Continuation: ProgramLifecycleContinuation.ResumeNativeDrawAttempt } &&
@@ -72,13 +73,39 @@ internal static class AnniversaryFengXiBoyanDrawChecks
             !runtime.FengXiFirstChild(restoredParent, restoredAttempt with { Context = restoredAttempt.Context with { RecipientSeat = owner } }) &&
             !runtime.FengXiFirstChild(restoredParent, restoredAttempt with { Context = restoredAttempt.Context with { RequestedCount = amount + 1 } }),
             "Cold restore accepts the original foreign request and rejects replacing its recipient with Feng Xi or raising its count.");
-        Settle(game);
 
+        Reach(game, prompt => IsDrawWatch(prompt) && game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>()
+            .Any(frame => frame.Batch.ParentFrameId == parent.Id));
+        var gainPromptId = P(game)!.PromptId;
+        var paid = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var gain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.ParentFrameId == parent.Id);
+        var receipt = paid.NativeOperationDrawReturns.Single();
+        var outcome = receipt.Outcome;
         var returned = Facts<AnniversaryFengXiDrawReturnedEvent>().Single();
         var drawn = game.CardMovements.Where(move => move.Reason.Value == Reason).ToArray();
         var gainedIds = drawn.Select(move => move.CardId).ToArray();
+        Require(paid.AnniversaryFengXi is { Stage: AnniversaryFengXiStage.DrawChildren } && paid.NativeDraw is null &&
+            receipt.InstructionIndex == parent.InstructionIndex && receipt.Operation == SkillProgramEffectOp.ResolveAnniversaryFengXiBoyan &&
+            receipt.Reason.Value == Reason && outcome is { RecipientSeat: target, RequestedCount: amount, Replacement: null } &&
+            outcome.AttemptFrameId == attempt.Id && outcome.ActualDrawIds.SequenceEqual(gainedIds) &&
+            outcome.SequenceBefore == returned.Before && outcome.SequenceAfter == returned.After &&
+            Facts<HandCardColorRestrictionGrantedEvent>().All(entry => entry.Restriction.ParentFrameId != parent.Id),
+            "The original completed Draw receipt backs the real gain window before either hand restriction is granted.");
+
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredPaid = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredGain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Id == gain.Id);
+        runtime = game.GetRuntimeModule<CharacterFengXiAnniversaryRuntime>();
+        Require(P(game)?.PromptId == gainPromptId && JsonSerializer.Serialize(restoredPaid.NativeOperationDrawReturns.Single()) == JsonSerializer.Serialize(receipt) &&
+            runtime.FengXiFirstChild(restoredPaid, restoredGain) &&
+            !runtime.FengXiFirstChild(restoredPaid with { NativeOperationDrawReturns = [] }, restoredGain),
+            "Cold restore keeps the original native return and the gain child requires that receipt on its parent.");
+        Settle(game);
+
         Require(returned is { Target: target, Requested: amount, Actual: amount } && returned.FrameId == parent.Id &&
             returned.AttemptId == attempt.Id && returned.Before == attempt.Context.SequenceBefore &&
+            Facts<AnniversaryFengXiDrawReturnedEvent>().SequenceEqual([returned]) &&
+            game.CardMovements.Where(move => move.Reason.Value == Reason).SequenceEqual(drawn) &&
             drawn.Length == amount && gainedIds.Distinct().Count() == amount && drawn.All(move =>
                 move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(target) &&
                 move.Sequence > returned.Before && move.Sequence <= returned.After) &&
@@ -101,11 +128,15 @@ internal static class AnniversaryFengXiBoyanDrawChecks
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{DrawWatch}}","revision":1,"triggers":[
                   {"id":"boyan-foreign-draw","window":"nativeDrawStarting","subject":"owner","condition":{"kind":"phaseIsPlay"},
                    "optional":true,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen",
+                    "options":[{"id":"continue"}]}]},
+                  {"id":"boyan-foreign-gain","window":"cardsGained","subject":"owner","destinationZones":["hand"],
+                   "movementOccurrence":"perBatch","movementReasons":["{{Reason}}"],"optional":true,"isSkillInvocation":false,
+                   "effects":[{"op":"chooseOption","target":"owner","resultBind":"seen",
                     "options":[{"id":"continue"}]}]}]}]}
                 """, JsonSerializer.Serialize(new
                 {
                     schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                    skills = new Dictionary<string, object> { [DrawWatch] = new { name = "观察驳言摸牌", description = "暂停在受领者的原生请求。",
+                    skills = new Dictionary<string, object> { [DrawWatch] = new { name = "观察驳言摸牌", description = "在受领者的摸牌请求和获得牌时暂停。",
                         optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } }
                 }));
             builder.AddSkill(new(DrawWatch, catalog.Presentations[DrawWatch].Name, catalog.Presentations[DrawWatch].Description)

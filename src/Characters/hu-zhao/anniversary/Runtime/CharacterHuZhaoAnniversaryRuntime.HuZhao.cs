@@ -6,12 +6,18 @@ using System.Numerics;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuZhaoAnniversaryRuntime
 {
-    internal const string HuZhaoDrawReason = "skill-program.anniversary:midu.draw";
+    private static CardMoveReason HuZhaoDrawReason => new("skill-program.anniversary:midu.draw");
     internal const string HuZhaoJudgmentReason = "skill-program.anniversary:midu.abolish-judgment";
     SkillProgramStepOutcome IAnniversaryHuZhaoHost.Resolve(ProgramSkillFrame frame) => BeginHuZhaoMidu(frame);
     internal CardConversionSource HuZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int HuZhaoAvailable(int seat) => CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots.Select((s, i) => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) > 0 ? 1 << i : 0).Aggregate(_coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished ? 0 : 32, (a, b) => a | b);
-    internal static int HuZhaoCount(int mask) => BitOperations.PopCount((uint)mask);
+    private static int HuZhaoDrawCount(int mask) => BitOperations.PopCount((uint)mask);
+    private static bool IsSingleHuZhaoArea(int mask) => BitOperations.IsPow2((uint)mask);
+    private static NativeDrawOutcome? CompletedHuZhaoDraw(ProgramSkillFrame frame) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(frame, 1, SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu, HuZhaoDrawReason);
+    private static (int Recipient, int Count) HuZhaoDrawRequest(ProgramSkillFrame frame, HuZhaoMiduReceipt receipt) =>
+        CompletedHuZhaoDraw(frame) is { } draw ? (draw.RecipientSeat, draw.RequestedCount) :
+            (receipt.Recipient, receipt.Restore ? 0 : HuZhaoDrawCount(receipt.SelectedMask));
     internal static string HuZhaoAreaName(int index) => index == 5 ? "判定区" : CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[index] switch
     {
         EquipmentSlot.Weapon => "武器栏",
@@ -42,14 +48,19 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             var available = HuZhaoAvailable(f.OwnerSeat);
             for (var mask = 0; mask < 64; mask++)
                 if ((mask & available) == mask)
-                    list.Add(Choice("abolish", mask, mask == 0 ? "不废除区域，令一名角色摸零张牌" : "废除" + string.Join("、", Enumerable.Range(0, 6).Where(i => (mask & (1 << i)) != 0).Select(HuZhaoAreaName)) + $"，令一名角色摸{(HuZhaoCount(mask))}张牌"));
+                {
+                    var areas = mask == 0 ? "不废除区域" : "废除" + string.Join("、", Enumerable.Range(0, 6).Where(i => (mask & (1 << i)) != 0).Select(HuZhaoAreaName));
+                    var count = HuZhaoDrawCount(mask);
+                    var quantity = count == 0 ? "零" : count.ToString(CultureInfo.InvariantCulture);
+                    list.Add(Choice("abolish", mask, $"{areas}，令一名角色摸{quantity}张牌"));
+                }
             for (var i = 0; i < 6; i++)
                 if ((available & (1 << i)) == 0)
                     list.Add(Choice("restore", 1 << i, "恢复" + HuZhaoAreaName(i) + "，获得活墨"));
         }
         else if (r.Stage == HuZhaoMiduStage.Recipient)
             foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-                list.Add(Choice("recipient", r.SelectedMask, $"令{(p.Name)}摸{(HuZhaoCount(r.SelectedMask))}张牌", p.Seat));
+                list.Add(Choice("recipient", r.SelectedMask, $"令{(p.Name)}摸{(HuZhaoDrawCount(r.SelectedMask))}张牌", p.Seat));
         return Array.AsReadOnly(list.ToArray());
     }
 
@@ -82,7 +93,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
 
         var restore = mode == "restore";
         var available = HuZhaoAvailable(f.OwnerSeat);
-        if (restore ? r.Stage != HuZhaoMiduStage.Areas || HuZhaoCount(mask) != 1 || (mask & available) != 0 : r.Stage != HuZhaoMiduStage.Recipient || mask != r.SelectedMask || (mask & available) != mask)
+        if (restore ? r.Stage != HuZhaoMiduStage.Areas || !IsSingleHuZhaoArea(mask) || (mask & available) != 0 : r.Stage != HuZhaoMiduStage.Recipient || mask != r.SelectedMask || (mask & available) != mask)
             throw new InvalidOperationException("Midu cannot pay an unavailable or changed area selection.");
         var recipient = restore ? f.OwnerSeat : c.Targets.Single();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
@@ -130,17 +141,19 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             return;
         }
 
-        if (r.Stage == HuZhaoMiduStage.CostChildren && !r.Restore && HuZhaoCount(r.SelectedMask) > 0 && _coreMatchParticipantsPlayersAccess._players[r.Recipient].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None)
+        if (r.Stage is not (HuZhaoMiduStage.CostChildren or HuZhaoMiduStage.DrawChildren))
+            return;
+
+        var (recipient, requestedDraw) = HuZhaoDrawRequest(f, r);
+        if (r.Stage == HuZhaoMiduStage.CostChildren && requestedDraw > 0 && _coreMatchParticipantsPlayersAccess._players[recipient].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None)
         {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, HuZhaoMidu = r with { Stage = HuZhaoMiduStage.Drawing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.Recipient, HuZhaoCount(r.SelectedMask), new(HuZhaoDrawReason));
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, HuZhaoMidu = r with { Stage = HuZhaoMiduStage.Drawing } });
+            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, recipient, requestedDraw, HuZhaoDrawReason);
             return;
         }
 
-        if (r.Stage is not (HuZhaoMiduStage.CostChildren or HuZhaoMiduStage.DrawChildren))
-            return;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, HuZhaoMidu = r with { Stage = HuZhaoMiduStage.Completed }, ChoiceBindings = Array.AsReadOnly(f.ChoiceBindings.Append(new ProgramChoiceResultBinding("midu-branch", r.Restore ? "restore" : "abolish", f.OwnerSeat)).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuZhaoMiduCompletedEvent(f.Id, r.Restore, r.Recipient, r.Restore ? 0 : HuZhaoCount(r.SelectedMask)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuZhaoMiduCompletedEvent(f.Id, r.Restore, recipient, requestedDraw));
         _coreRuntimeOperations.AdvanceRuntimeProgram(id);
     }
 
@@ -149,9 +162,9 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.HuZhaoMidu!;
-        if (!ValidHuZhaoMidu(f) || r.Stage != HuZhaoMiduStage.Drawing || f.NativeDraw is not null || outcome.RecipientSeat != r.Recipient || outcome.RequestedCount != HuZhaoCount(r.SelectedMask) || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        if (!ValidHuZhaoMidu(f) || r.Stage != HuZhaoMiduStage.Drawing || f.NativeDraw is not null || CompletedHuZhaoDraw(f) != outcome || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Midu lost its once-paid original native draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { HuZhaoMidu = r with { Stage = HuZhaoMiduStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, Draw = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { HuZhaoMidu = r with { Stage = HuZhaoMiduStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         ContinueHuZhaoMidu(f.Id);
     }
 
