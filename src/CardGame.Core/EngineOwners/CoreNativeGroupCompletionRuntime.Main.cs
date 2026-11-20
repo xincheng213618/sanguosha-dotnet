@@ -42,7 +42,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             }
         }
 
-        if (finished is not null && _coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ClaimResolvedGlobalCard, group.Card.Kind))is { } claimant && group.SourceSeat != claimant.Seat)
+        if (finished is not null && _coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && player.Seat != group.SourceSeat && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ClaimResolvedGlobalCard, group.Card.Kind)) is { } claimant)
         {
             var claimed = new List<int>();
             foreach (var (card, entrySequence) in finished)

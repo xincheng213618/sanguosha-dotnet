@@ -865,6 +865,8 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Saowei: cannot obtain a later discard of delivered Slash cold", AnniversaryQiaoRuiSaoweiDiscardEntryChecks.SaoweiCannotObtainANewerDiscardOfAnAlreadyDeliveredSlashCold),
     ("Classic Funan: gifts the directly answered counterspell entry cold", ClassicFunanRespondedCounterspellChecks.FunanGiftsOnlyTheDirectlyAnsweredCounterspellEntryCold),
     ("Mobile Boundary Sidi: first native Shensu Slash consumes private forecast cold", MobileBoundarySidiShensuChecks.SidiConsumesFirstActualShensuSlashCold),
+    ("Classic Juxiang: skips the actual Barbarian user and reaches the next claimant cold", ClassicJuxiangOriginalBarbarianChecks.JuxiangSkipsTheActualUserAndReachesTheEligibleClaimantCold),
+    ("Classic Jili: original attack range before equipment installation cold", ClassicShaMoKeJiliEquipmentTimingChecks.JiliUsesTheOriginalAttackRangeBeforeInstallingEquipmentCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

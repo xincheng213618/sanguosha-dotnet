@@ -15,6 +15,36 @@
           "optional": true,
           "priority": 0,
           "condition": {
+            "kind": "all",
+            "children": [
+              {
+                "kind": "not",
+                "children": [{ "kind": "cardActionCategoryIs", "categories": ["equipment"] }]
+              },
+              {
+                "kind": "compare",
+                "left": { "kind": "cardsUsedOrRespondedThisTurn" },
+                "operator": "equal",
+                "right": { "kind": "currentAttackRange" }
+              }
+            ]
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "numberExpression": "currentAttackRange"
+            }
+          ]
+        },
+        {
+          "id": "draw-on-xth-equipment-use",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardCategories": ["equipment"],
+          "optional": true,
+          "priority": 0,
+          "condition": {
             "kind": "compare",
             "left": {
               "kind": "cardsUsedOrRespondedThisTurn"

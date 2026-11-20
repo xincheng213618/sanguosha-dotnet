@@ -7,6 +7,7 @@ internal static class ClassicJuxiangOriginalBarbarianChecks
 {
     private const string CaoCao = "boundary:cao-cao-mobile", Jianxiong = "boundary:jianxiong-mobile";
     private const string ZhuRong = "classic:zhu-rong", Source = "fixture:juxiang-source", Peer = "fixture:juxiang-peer";
+    private const string Juxiang = "classic:juxiang";
     private const string Watch = "fixture:juxiang-native-claim-child";
     private const string Claim = "skill-program.boundary:jianxiong-mobile.ClaimDamageCards";
     private const string Rediscard = "skill-program." + Watch + ".SelectAndMoveOwnedCard";
@@ -62,6 +63,34 @@ internal static class ClassicJuxiangOriginalBarbarianChecks
             $"Classic Juxiang must leave entry {newer.Sequence} in discard after this Barbarian delivered the entity at {delivery.Sequence}.");
     }
 
+    internal static void JuxiangSkipsTheActualUserAndReachesTheEligibleClaimantCold()
+    {
+        var (game, content) = Start(sourceHasJuxiang: true);
+        var source = game.CreateSnapshot(0).Players[0];
+        var claimant = game.CreateSnapshot(2).Players[2];
+        Require(source.Skills?.Any(skill => skill.Id == Juxiang) == true && claimant.Skills?.Any(skill => skill.Id == Juxiang) == true,
+            "Both the lower-numbered actual user and the other living character have the real Juxiang skill.");
+        var barbarian = game.GetLegalActions(0).First(action => action.Kind == LegalActionKind.BarbarianAssault);
+        var card = barbarian.CardId!.Value;
+        Accept(game, new PlayCardCommand(0, card, barbarian.TargetSeats, game.Revision, P(game)!.PromptId, barbarian.PlayedCardKind));
+        Reach(game, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Jianxiong });
+        var use = game.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.CardId == card);
+        Require(use is { SourceSeat: 0, CardKind: CardKind.BarbarianAssault, Action.Type: CardActionType.Use } &&
+            use.Action.PhysicalCards.Single().CardId == card && use.MaterialClaims.Count == 0,
+            "The lower-numbered Juxiang holder is the actual user of the native physical Barbarian Assault.");
+        game = Cold(game, content);
+        Skip(game);
+        Settle(game);
+        var original = game.CardMovements.Single(move => move.CardId == card && move.Reason == CardMoveReasons.UseFinished);
+        Require(Finished(game, use.Id, card) && original.From == CardLocation.Processing && original.To == CardLocation.DiscardPile &&
+            game.CreateSnapshot(2).Players[2].Hp == claimant.Hp,
+            "The original physical Barbarian is fully resolved and discarded, and the other Juxiang holder remains immune and alive.");
+        Require(Facts<JuxiangCardClaimedEvent>(game).ToArray() is [{ OwnerSeat: 2 } claim] && claim.ResolutionId == use.Id &&
+            claim.CardIds.SequenceEqual([card]) && game.CardMovements.Where(move => move.CardId == card && move.Reason == CardMoveReasons.JuxiangGain).ToArray() is [var gain] &&
+            gain.From == CardLocation.DiscardPile && gain.To == CardLocation.Hand(2) && gain.Sequence > original.Sequence,
+            "The actual user cannot claim their own Barbarian or block the other living and eligible holder from claiming its exact original entry.");
+    }
+
     private static bool Finished(GameEngine game, long useId, int card) => Facts<CardUseFinishedEvent>(game)
         .Count(fact => fact.ResolutionId == useId && fact.CardKind == CardKind.BarbarianAssault && fact.CardId == card) == 1;
 
@@ -76,9 +105,9 @@ internal static class ClassicJuxiangOriginalBarbarianChecks
         return restored;
     }
 
-    private static (GameEngine Game, ContentRegistry Content) Start()
+    private static (GameEngine Game, ContentRegistry Content) Start(bool sourceHasJuxiang = false)
     {
-        var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture(sourceHasJuxiang));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 47, PlayerCount = 4, ModeId = Mode,
             HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord, UseInteractiveSetup = true,
             UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, content);
@@ -93,7 +122,7 @@ internal static class ClassicJuxiangOriginalBarbarianChecks
         return (game, content);
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool sourceHasJuxiang) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-classic-juxiang-original-barbarian", new(1, 0));
 
@@ -111,8 +140,8 @@ internal static class ClassicJuxiangOriginalBarbarianChecks
             var catalog = SkillProgramCatalog.LoadCurrent(rules, presentation);
             builder.AddSkill(new(Watch, catalog.Presentations[Watch].Name, catalog.Presentations[Watch].Description)
                 { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
-            foreach (var peer in new[] { Source, Peer })
-                builder.AddGeneral(new(peer, "同桌", "supporter", "standard:none", "wei", 8));
+            builder.AddGeneral(new(Source, "同桌", "supporter", sourceHasJuxiang ? Juxiang : "standard:none", "wei", 8));
+            builder.AddGeneral(new(Peer, "同桌", "supporter", "standard:none", "wei", 8));
             builder.AddDeck(new(Deck, "固定实体南蛮", 2, 0, []) { PhysicalCards = Enumerable.Range(0, 24)
                 .Select(_ => new ContentDeckPhysicalCard("standard:barbarian_assault", Suit.Spade, 7)).ToArray() });
             builder.AddMode(new(Mode, "巨象原南蛮", 4, 4, new Dictionary<string, int>
