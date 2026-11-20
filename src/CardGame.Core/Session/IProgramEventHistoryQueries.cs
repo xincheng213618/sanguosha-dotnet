@@ -6,6 +6,12 @@ internal interface IProgramEventHistoryQueries : IProgramSelectionQuery
     IReadOnlyList<T> Read<T>() where T : IGameEvent;
 }
 
+internal static class ProgramEventHistoryQueries
+{
+    internal static int CountActualTurnStarts(this IProgramEventHistoryQueries history, int actorSeat) =>
+        history.Read<TurnStartedEvent>().Count(entry => entry.ActorSeat == actorSeat);
+}
+
 internal interface IProgramEventBoundaryQueries : IProgramSelectionQuery
 {
     IEnumerable<IGameEvent> SinceLastBoundary(Func<IGameEvent, bool> boundary);

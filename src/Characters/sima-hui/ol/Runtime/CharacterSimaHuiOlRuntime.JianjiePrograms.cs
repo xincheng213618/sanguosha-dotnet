@@ -6,7 +6,6 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     internal CardConversionSource SimaHuiIssuer(ProgramSkillFrame f) => new("ol:jianjie", "seals", f.OwnerSeat, f.SkillInstanceId);
     internal static string SimaHuiSealSource(CardConversionSource issuer, PlayerMarkerKind marker) => RuntimeSkills.RuntimeRules_sima_hui_ol_Jianjie_Programs.SimaHuiSealSource(issuer, marker);
     internal int? SimaHuiHolder(CardConversionSource issuer, PlayerMarkerKind marker) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().LastOrDefault(e => e.Issuer == issuer && e.Marker == marker)?.Holder;
-    internal int SimaHuiOwnTurns(int owner) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count(e => e.ActorSeat == owner);
     internal void SetSimaHuiSeal(ProgramSkillFrame f, CardConversionSource issuer, PlayerMarkerKind marker, int? from, int? to)
     {
         if (SimaHuiHolder(issuer, marker) != from || to == from || to is { } recipient && !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)

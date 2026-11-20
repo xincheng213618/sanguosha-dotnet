@@ -3,7 +3,6 @@
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterChenZhiMobileShiEntries	chen-zhi/mobile-shi	CardGame.Core.EngineOwners.CharacterChenZhiMobileShiRuntime
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterDongZhaoMobileShiEntries	dong-zhao/mobile-shi	CardGame.Core.EngineOwners.CharacterDongZhaoMobileShiRuntime
 bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterLuSuMobileShiEntries	lu-su/mobile-shi	CardGame.Core.EngineOwners.CharacterLuSuMobileShiRuntime
-bei-mi-hu/ol	CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime	CardGame.Core.RuntimeEntries.CharacterSimaHuiOlEntries	sima-hui/ol	CardGame.Core.EngineOwners.CharacterSimaHuiOlRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.CharacterDuFuRenOlEntries	du-fu-ren/ol	CardGame.Core.EngineOwners.CharacterDuFuRenOlRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterLuSuMouRuntime>	lu-su/mou	CardGame.Core.EngineOwners.CharacterLuSuMouRuntime
 bian-fu-ren/ol	CardGame.Core.EngineOwners.CharacterBianFuRenOlRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterTangTangOlRuntime>	tang-tang/ol	CardGame.Core.EngineOwners.CharacterTangTangOlRuntime

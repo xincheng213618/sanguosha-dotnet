@@ -23,7 +23,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
             return true;
         var owner = candidate.OwnerSeat;
         if (op == SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn)
-            return context.BeforeTurnPreludeProof is { } p && p.UpcomingOwnerSeat == owner && _characterBeiMiHuOlOperations.ValidBeiMiHuBeforeTurnPrelude(p) && SimaHuiOwnTurns(owner) == 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().Any(e => e.Issuer.OwnerSeat == owner) && _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Seat != owner) >= 2;
+            return context.BeforeTurnPreludeProof is { } p && p.UpcomingOwnerSeat == owner && _characterBeiMiHuOlOperations.ValidBeiMiHuBeforeTurnPrelude(p) && _eventHistory.CountActualTurnStarts(owner) == 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().Any(e => e.Issuer.OwnerSeat == owner) && _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Seat != owner) >= 2;
         if (op == SkillProgramEffectOp.TransferDeadDragonPhoenixSeal)
             return context.Window == SkillProgramTriggerWindow.CharacterDied && context.TargetSeat is { } victim && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.VictimSeat == victim && CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => SimaHuiHolder(new("ol:jianjie", "seals", owner, candidate.SkillInstanceId), m) == victim) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != victim);
         return true;
@@ -34,7 +34,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     {
         var features = ProgramInstructionResolver.Default.Features(activation);
         if (features.HasOperation(SkillProgramEffectOp.TransferOwnedDragonOrPhoenixSeal))
-            return SimaHuiOwnTurns(owner) > 1 && CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => _coreMatchParticipantsPlayersAccess._players.Any(p => p.MarkerSourceCounts.GetValueOrDefault((m, owner)) > 0));
+            return _eventHistory.CountActualTurnStarts(owner) > 1 && CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => _coreMatchParticipantsPlayersAccess._players.Any(p => p.MarkerSourceCounts.GetValueOrDefault((m, owner)) > 0));
         if (features.HasOperation(SkillProgramEffectOp.ConsumeDragonPhoenixForNativeYeyan))
             return CharacterSimaHuiOlDefinitions.SimaHuiSeals.All(m => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(m) > 0);
         return true;

@@ -894,6 +894,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Zongxuan: typed own discard reaches original top placement cold", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensOwnMobileZongxuanCold),
     ("Anniversary Cai Yang Xunji: uses original black color of a composite Slash cold", AnniversaryCaiYangXunjiColorChecks.XunjiUsesTheOriginalBlackColorOfACompositeSlashCold),
     ("OL Sima Hui Chenghao: continues after first gift is redirected cold", OlSimaHuiChenghaoGainReplacementChecks.ChenghaoContinuesAfterItsFirstGiftIsRedirectedCold),
+    ("OL Sima Hui Jianjie: ordered seals grant before only the first actual turn cold", OlSimaHuiJianjieFirstTurnChecks.OrderedSealsGrantBeforeOnlyFirstActualTurnCold),
     ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),
     ("Shi Zhong Hui Xiezhi: one overflow pays two native Slashes and keeps five cards cold", ShiZhongHuiXiezhiNumericChecks.OneOverflowFundsTwoSlashesAndARealHandLimitCold),
     ("Mobile Boundary Yan Yan Chengshi: takes only the original third Slash discard cold", BoundaryMobileYanYanChengshiDiscardEntryChecks.ChengshiObtainsOnlyTheOriginalThirdSlashDiscardCold),

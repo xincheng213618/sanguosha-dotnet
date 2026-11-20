@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
     internal IEnumerable<IGameEvent> CompleteProgramEventHistory() => _coreProgramEventHistoryOperations.ProgramHistory.Complete();
     void IAlternatingBenefitsProgramHost.ApplyAlternatingChoiceBenefit(ProgramSkillFrame f, SkillProgramEffect e) => ApplyAlternatingChoiceBenefit(f, e);
     SkillProgramStepOutcome IAlternatingBenefitsProgramHost.ObtainDeckCardWithConsecutiveTarget(ProgramSkillFrame f, int seat, SkillProgramEffect e) => ObtainDeckCardWithConsecutiveTarget(f, seat, e);
-    internal int AlternatingOwnerTurnOrdinal(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == owner);
+    internal int AlternatingOwnerTurnOrdinal(int owner) => _coreProgramEventHistoryOperations.ProgramHistory.CountActualTurnStarts(owner);
     internal AlternatingChoiceBenefitResolvedEvent? GetAlternatingChoicePredecessor(int owner, string skill, string instance, SkillProgramEffect effect)
     {
         var last = _coreProgramEventHistoryOperations.ProgramEventHistory<AlternatingChoiceBenefitResolvedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == skill && e.SkillInstanceId == instance && e.StateId == effect.StateId);
@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
     {
         if (frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || targetSeat == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding)
             throw new InvalidOperationException("A deck gift needs the owner's ending and a living other target.");
-        var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == frame.OwnerSeat);
+        var ordinal = AlternatingOwnerTurnOrdinal(frame.OwnerSeat);
         var last = _coreProgramEventHistoryOperations.ProgramEventHistory<ConsecutiveTargetDeckGiftEvent>().LastOrDefault(e => e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.SkillInstanceId == frame.SkillInstanceId && e.StateId == effect.StateId);
         var repeated = last is not null && last.TargetSeat == targetSeat && last.OwnerTurnOrdinal == ordinal - 1;
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => effect.Suits.Contains(c.Suit) && effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, category)));

@@ -30,7 +30,6 @@ internal sealed partial class CharacterSimaHuiOlEntries
     internal int? SimaHuiHolder(CardConversionSource issuer, PlayerMarkerKind marker) => _resolve().SimaHuiHolder(issuer, marker);
     internal CardConversionSource SimaHuiIssuer(ProgramSkillFrame f) => _resolve().SimaHuiIssuer(f);
     internal ProgramSkillFrame? SimaHuiObserverRoot() => _resolve().SimaHuiObserverRoot();
-    internal int SimaHuiOwnTurns(int owner) => _resolve().SimaHuiOwnTurns(owner);
     internal SkillProgramEffect? SimaHuiPausedEffect(ProgramSkillFrame f) => _resolve().SimaHuiPausedEffect(f);
     internal IEnumerable<Card> SimaHuiPrivatelyViewedCards(int viewer) => _resolve().SimaHuiPrivatelyViewedCards(viewer);
     internal CardConversionSource SimaHuiSource(ProgramSkillFrame f) => _resolve().SimaHuiSource(f);
