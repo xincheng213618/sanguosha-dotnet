@@ -340,6 +340,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe battle: dynamic rosters private views team AI cold replay", ShanheBattleChecks.DynamicRostersPrivateViewsAndTeamAiColdReplay),
     ("Shanhe battle: invalid recipes external collection isolation", ShanheBattleChecks.RejectInvalidRecipesAndFreezeExternalCollections),
     ("Shenwu activity: real shared draft private rotated seats and replay", ShenwuActivityChecks.RealSharedDraftPrivacyRotatedSeatsEquipmentAndColdReplay),
+    ("Shenwu field equipment: Qimen blocks the original Slash and Dustless keeps directed distance cold", ShenwuFieldEquipmentChecks.QimenAndDustlessUseTheirOriginalFieldEquipmentCold),
     ("Shanhe Gouxiang: actual equipped armor and Qinggang bypass cold", ShanheGouXiangFieldEquipmentChecks.MatchingDodgeUsesEffectiveArmorAndHonoursQinggangCold),
     ("Shanhe Sanshou armor: original equipped grant and actual damage cold", ShanheSanshouFieldEquipmentChecks.OriginalEquippedGrantPreventsOnlyWhileArmorIsEffectiveCold),
     ("Shanhe Huxin Mirror: original armor payment and decline cold", ShanheHuxinFieldEquipmentChecks.OriginalEquippedMirrorPaysOnceOrDeclinesCold),

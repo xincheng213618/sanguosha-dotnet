@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineShenwuEquipmentRuntime
     internal bool ShenwuRobeDirectedTargetProhibited(ProgramDirectedTargetQuery query) => IsShenwuRobeTargetProhibited(query.ActorSeat, query.TargetSeat, query.Kind);
     internal string? ShenwuEquipmentSkillId(CardKind kind) => _coreEquipmentContentOperations.EquipmentRules.GetSkillBinding(kind)is { } binding && binding.SkillId.StartsWith("shenwu:", StringComparison.Ordinal) ? binding.SkillId : null;
     internal string? ShenwuEquipmentSkillGrantId(Card card) => ShenwuEquipmentSkillId(card.Kind)is null ? null : _coreEquipmentSkillsOperations.EquipmentSkillGrantId(card);
-    internal bool HasShenwuArmor(CharacterState player, CardKind kind) => player.IsAlive && !_coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(player) && _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => card.Kind == kind);
+    internal bool HasShenwuArmor(CharacterState player, CardKind kind) => player.IsAlive && !_coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(player) && _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player).Any(card => card.Kind == kind);
     internal bool IsShenwuRobeTargetProhibited(int actorSeat, int targetSeat, CardKind kind) => actorSeat != targetSeat && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && HasShenwuArmor(_coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.NationalStyleRobe);
     internal bool TryApplyShenwuQimen(NativeOwners.CardAttackHandle attack)
     {
@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineShenwuEquipmentRuntime
     internal DamageNature ShenwuDamageNature(GameEngine.IDamageAttempt attack, DamageNature original) => !attack.IsSourceLess && (_coreShenwuNpcProgramsOperations.ShenwuEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "shenwu:zhaohuo") || _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.CrimsonSoulZither)) ? DamageNature.Fire : original;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 240)]
     internal int ShenwuShuraDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && !attack.IsSourceLess && attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], CardKind.ShuraInfernoHalberd) ? 1 : 0;
-    internal int ShenwuDustlessDistanceBonus(CharacterState source, CharacterState target) => _coreMatchParticipantsPlayersAccess._players.Count(owner => owner.IsAlive && owner.Seat != target.Seat && owner.TeamId is { } team && team == target.TeamId && source.TeamId != team && _characterHuCheErMouOperations.KongwuEffectiveEquipment(owner).Any(card => card.Kind == CardKind.DustlessGoldenSpear));
+    internal int ShenwuDustlessDistanceBonus(CharacterState source, CharacterState target) => _coreMatchParticipantsPlayersAccess._players.Count(owner => owner.IsAlive && owner.Seat != target.Seat && owner.TeamId is { } team && team == target.TeamId && source.TeamId != team && _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(owner).Any(card => card.Kind == CardKind.DustlessGoldenSpear));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27800)]
     internal bool AllowsShenwuShuraRecovery(ProgramTriggerLegalityContext gate)
     {
