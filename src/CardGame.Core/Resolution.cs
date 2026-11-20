@@ -829,6 +829,9 @@ public sealed partial record DamageFrame(
     DamageNature Nature = DamageNature.Normal)
     : ResolutionFrame(Id, ResolutionFrameKind.Damage, Step)
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsVirtual { get; init; }
+
     /// <summary>The target's HP immediately after this exact damage segment applied.</summary>
     internal int? AppliedHpAfter { get; init; }
 }

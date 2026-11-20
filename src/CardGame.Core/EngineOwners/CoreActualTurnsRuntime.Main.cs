@@ -6,9 +6,12 @@ internal sealed partial class CoreActualTurnsRuntime
     internal void BeginTurn()
     {
         var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat];
-        if (!current.IsAlive)
+        var isNormalTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind == ActualTurnKind.Normal;
+        if (!current.IsAlive && (!isNormalTurn || !current.IsResting))
         {
-            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat = _coreTableSeatQueriesOperations.FindNextAliveSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat = isNormalTurn
+                ? _coreTableSeatQueriesOperations.FindNextNormalTurnSeat(current.Seat)
+                : _coreTableSeatQueriesOperations.FindNextAliveSeat(current.Seat);
             current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat];
         }
 
@@ -22,6 +25,19 @@ internal sealed partial class CoreActualTurnsRuntime
 
             _coreMatchOutcomesOperations.EndAsDraw($"达到最大回合数 {(_coreMatchDefinitionOptionsAccess._options.MaxTurns)}");
             return;
+        }
+
+        if (isNormalTurn && current.IsResting)
+        {
+            if (current.IsAlive || current.MaxHp <= 0)
+                throw new InvalidOperationException("A resting character must be off the table with a positive maximum HP.");
+
+            current.Hp = current.MaxHp;
+            current.IsResting = false;
+            current.IsAlive = true;
+            current.ReturnedFromRestThisTurn = true;
+            _coreMatchLogOperations.AddLog("PlayerReturnedFromRest", $"{current.Name} 结束休整，回到游戏。", current.Seat);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerReturnedFromRestEvent(current.Seat));
         }
 
         if (_characterLuBuOlMagicOperations.TryBeginMoLuBuOpening())
@@ -190,7 +206,9 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (!skippedActualJudgment && _coreActualPhaseEndsOperations.TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Judgment, ActualPhaseEndContinuation.Judgment, (int)delayedEffects))
             return;
-        if (_characterKanZeOlOperations.ConsumeKuanshiDrawSkip(current.Seat))
+        var hasScheduledDrawSkip = current.SkipNextDrawPhase;
+        current.SkipNextDrawPhase = false;
+        if (_characterKanZeOlOperations.ConsumeKuanshiDrawSkip(current.Seat) || hasScheduledDrawSkip)
         {
             delayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
             _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;

@@ -62,7 +62,8 @@ internal sealed class ReduceCurrentDamageDescriptor : ProgramOperationDescriptor
         var amount = r.RequiredInt("amount");
         if (amount <= 0 || amount > 20) throw new InvalidOperationException($"Invalid skill program at {r.Path}.amount: requires 1..20.");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), amount, r.Condition());
-        RequireAlways(effect, r.Path);
+        if (effect.Condition.Kind != SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
+            RequireAlways(effect, r.Path);
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];

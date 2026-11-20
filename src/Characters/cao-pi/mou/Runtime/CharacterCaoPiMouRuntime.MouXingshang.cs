@@ -5,7 +5,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
 {
     internal bool HasMouXingshang(CharacterState owner) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, "mou:xingshang");
     internal static bool HasPrintedMouXingshang(CharacterState owner) => owner.General.Skills.Concat(owner.SecondaryGeneral?.Skills ?? []).Any(s => s.ContentId == "mou:xingshang");
-    internal string[] MouCaoPiPrintedSkills(CharacterState dead) => dead.General.Skills.Concat(dead.SecondaryGeneral?.Skills ?? []).Where(s => s.ContentId is { } id && !_contentRegistryOperations._contentRegistry.GetSkill(id).Tags.HasFlag(SkillTag.Lord)).Select(s => s.ContentId!).Distinct(StringComparer.Ordinal).ToArray();
     [ProgramNativeDrawReturn(SkillProgramEffectOp.MouCaoPiXingshang)]
     internal void ReturnMouCaoPiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {

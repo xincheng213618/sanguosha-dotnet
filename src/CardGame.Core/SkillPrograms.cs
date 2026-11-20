@@ -284,11 +284,19 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    RevealAttendantPair = 610900,
+    PursueDeadGeneral = 62210,
+    MarkHongyiTarget = 62211,
+    DistributeYijinGold = 62212,
+    IssueVirtualDamage = 62214,
     IssueCurrentResponseRule = 2103,
     ApplyResponseRelation = 2104,
     IssueCurrentCardEffectEpisode = 2105,
     GrantHandLimitExemption = 2106,
     AddCurrentCardDamage = 2102,
+    CauseOwnerDeath = 62215,
+    ScheduleNextDrawSkip = 62216,
+    CollectSuitJudgments = 62217,
     OfferGeneratedEquipment = 910000,
     SelectRandomPileEquipment = 910001,
     PlaceBoundEquipment = 910002,
@@ -3722,9 +3730,9 @@ public sealed class SkillProgramCatalog
                         state.Visibility == SkillProgramStateVisibility.Public && state.ResetScope == SkillProgramStateResetScope.Game))
                     Fail(skillPath, "next-use reveal bonus requires a declared initially-false public Game state");
             foreach (var effect in activations.SelectMany(item => item.Effects).Concat(triggers.SelectMany(item => item.Effects)))
-                if (effect.Op == SkillProgramEffectOp.RevealRecordedSuitSlash &&
+                if (effect.Op == SkillProgramEffectOp.RevealRecordedSuitSlash && effect.StateId is { } recordedSuitPrefix &&
                     ProgramRecordedSuitSlash.Suits.Any(suit => !booleanStates.Any(state =>
-                        state.Id == ProgramRecordedSuitSlash.StateId(effect.StateId!, suit) && !state.InitialValue &&
+                        state.Id == ProgramRecordedSuitSlash.StateId(recordedSuitPrefix, suit) && !state.InitialValue &&
                         state.Visibility == SkillProgramStateVisibility.Public && state.ResetScope == SkillProgramStateResetScope.Game)))
                     Fail(skillPath, "recorded-suit Slash requires four initially-false public Game suit states");
             foreach (var effect in activations.SelectMany(item => item.Effects).Concat(triggers.SelectMany(item => item.Effects)))
@@ -6171,6 +6179,10 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             (effect, effectPath) => ParseCompositionEffect(effect, effectPath,
                 isAfterDamageTrigger: window == SkillProgramTriggerWindow.AfterDamageApplied,
                 allowZeroDraw: drawPhaseMode == SkillProgramDrawPhaseMode.Replacement));
+        if (effects.Any(effect => effect.Op == SkillProgramEffectOp.CauseOwnerDeath) &&
+            (effects is not [{ Op: SkillProgramEffectOp.CauseOwnerDeath }] ||
+             subject != SkillProgramTriggerSubject.Owner || turnOwnerScope != SkillProgramTurnOwnerScope.Own))
+            Fail(path, "direct owner death requires a standalone own before-start or after-turn lifecycle trigger");
         var isSourceDingxiDiscard = skillId == "shanhe:source-dingxi-3601" && id == "actual-used-damage-enters-discard" &&
             window == SkillProgramTriggerWindow.DiscardPileReceived && subject == SkillProgramTriggerSubject.Owner && optional &&
             sourceZones is [CardZoneKind.Processing] && node.TryGetProperty("movementOccurrence", out _) &&
@@ -6287,8 +6299,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path + ".effects", "damageAppliedBeforeDying supports only owner attributed-marker records");
         if (effects.Any(effect => ContainsCardUseColorCondition(effect.Condition)) && !isCardActionWindow)
             Fail(path + ".effects", "cardUseIsRed requires a card-action trigger");
-        if (!isNativeGiveMovement && window != SkillProgramTriggerWindow.AfterDamageApplied &&
-            !(window == SkillProgramTriggerWindow.BeforeDamageApplied && subject == SkillProgramTriggerSubject.DamageSource) &&
+        if (!isNativeGiveMovement && window is not (SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.BeforeDamageApplied) &&
             window is not (SkillProgramTriggerWindow.JudgmentReplacing or SkillProgramTriggerWindow.JudgmentFinalized) &&
             ownerRelation is not (SkillProgramCardActionOwnerRelation.Target or
                 SkillProgramCardActionOwnerRelation.ConversionSource) &&

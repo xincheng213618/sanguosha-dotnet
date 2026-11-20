@@ -1,0 +1,51 @@
+{
+  "skills": [
+    {
+      "id": "mobile:hongyi",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "designate",
+          "targetKind": "otherLiving", "minTargets": 1, "maxTargets": 1,
+          "minCards": 0, "maxCards": 0, "usesPerTurn": null, "usesPerPhase": 1,
+          "effects": [{ "op": "markHongyiTarget", "target": "owner" }]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "marked-damage-judgment", "window": "beforeDamageApplied", "subject": "any", "optional": false,
+          "effects": [
+            { "op": "selectTarget", "target": "owner", "targetKind": "eventSource" },
+            { "op": "startJudgment", "target": "selectedTarget", "sourceRef": { "kind": "eventTarget" }, "judgmentReason": "skill.mobile.hongyi", "resultBind": "hongyi-card", "outcomeBind": "hongyi-result", "visibility": "public" },
+            { "op": "draw", "target": "owner", "targetRef": { "kind": "eventTarget" }, "amount": 1, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "hongyi-result", "suits": ["heart", "diamond"] } },
+            { "op": "reduceCurrentDamage", "target": "owner", "amount": 1, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "hongyi-result", "suits": ["spade", "club"] } },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "hongyi-card", "destination": "discardPile" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:quanfeng",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "pursue", "window": "characterDied", "subject": "owner", "optional": true,
+          "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "quanfeng",
+          "effects": [
+            { "op": "pursueDeadGeneral", "target": "owner", "skillIds": ["mobile:hongyi"] },
+            { "op": "changeMaximumHp", "target": "owner", "amount": 1 },
+            { "op": "recover", "target": "owner", "amount": 1 }
+          ]
+        },
+        {
+          "id": "self-rescue", "window": "dyingEntering", "subject": "owner", "optional": true,
+          "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "quanfeng",
+          "effects": [
+            { "op": "changeMaximumHp", "target": "owner", "amount": 2 },
+            { "op": "recover", "target": "owner", "amount": 4 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -240,7 +240,7 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
         ChainedTargetSeats = Array.AsReadOnly(targetSeats.ToArray());
     }
 
-    public bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers, out int fromSeat)
+    public bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers, bool sourceLess, out int fromSeat)
     {
         fromSeat = TargetSeat;
         while (ChainedTargetIndex < ChainedTargetSeats.Count)
@@ -253,6 +253,7 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
 
             TargetSeat = nextSeat;
             IsChainPropagation = true;
+            IsSourceLess = sourceLess;
             if (resetDamageForTargetModifiers)
             {
                 DamageAmountFinalized = false;

@@ -114,6 +114,10 @@ public sealed partial class CharacterState
     internal Func<CharacterState,GeneralGender?>? GeneralLibraryGenderQuery {get;set;}
     public GeneralGender Gender => IdentityConcealed ? GeneralGender.Male : GeneralLibraryGenderQuery?.Invoke(this) ?? GenderOverride ?? General.Gender;
     public bool IsAlive { get; set; } = true;
+    internal bool IsResting { get; set; }
+    internal bool ReturnedFromRestThisTurn { get; set; }
+    internal Func<DeathFrame, bool>? DeathRestRule { get; set; }
+    internal bool SkipNextDrawPhase { get; set; }
     public int AlcoholDamageBonus { get; set; }
     public bool HasAlcoholEffect { get => AlcoholDamageBonus > 0; set => AlcoholDamageBonus = value ? 1 : 0; }
     public bool UsedPlayPhaseAlcoholThisTurn { get; set; }

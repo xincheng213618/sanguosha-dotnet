@@ -115,7 +115,8 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
                 return;
             }
 
-            var count = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations.Any(g => g.TargetSeat == target) ? 2 : 1;
+            var count = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations
+                .Any(relation => !relation.IsRetired && relation.Grant.TargetSeat == target) ? 2 : 1;
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chouce = p with { Stage = ChouceStage.NativeChildren, Before = before, After = before, Count = 0 }, PendingMovementContinuation = new(target, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
             var actual = _coreMatchParticipantsPlayersAccess._players[target].IsAlive ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[target], count, true, new("program.chouce.red")).Count : 0;

@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:yang-hui-yu",
+  "skills": [
+    {
+      "registrationOrder": 62210,
+      "programBundle": "mobile-yang-hui-yu", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:hongyi", "name": "弘仪", "description": "出牌阶段限一次，你可以指定另一名角色，直到你的下个回合开始。其造成伤害时判定，红色则受伤角色摸一张牌，黑色则此伤害减1。", "actionForms": "Active", "executionForms": "State, Trigger" }
+    },
+    {
+      "registrationOrder": 62211,
+      "programBundle": "mobile-yang-hui-yu", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:quanfeng", "name": "劝封", "description": "限定技，其他角色死亡后，你可以失去弘仪并追思该角色，然后增加1点体力上限并回复1点体力。你进入濒死时，也可以改为增加2点体力上限并回复4点体力。", "tags": "Limited", "executionForms": "Trigger" }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 62212,
+      "pools": { "current": 62212 },
+      "definition": { "id": "mobile:yang-hui-yu", "name": "羊徽瑜", "portraitKey": "mobile-yang-hui-yu", "skillId": "mobile:hongyi", "additionalSkillIds": ["mobile:quanfeng"], "factionId": "wei", "baseHp": 3, "gender": "Female", "characterId": "character:yang-hui-yu", "variantId": "ordinary", "rulesetId": "sanguosha-mobile" }
+    }
+  ]
+}

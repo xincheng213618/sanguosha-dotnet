@@ -535,6 +535,9 @@ public sealed record ChainedDamagePropagatedEvent(
     int Amount,
     DamageNature Nature) : IGameEvent
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool SourceLess { get; init; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ProgramUseInstructionIndex { get; init; }
 }
@@ -719,7 +722,13 @@ public sealed record RecoveryAppliedEvent(
     int Amount,
     int RemainingHp) : IGameEvent;
 
-public sealed record PlayerDiedEvent(int VictimSeat, int? KillerSeat) : IGameEvent;
+public sealed record PlayerDiedEvent(int VictimSeat, int? KillerSeat) : IGameEvent
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsResting { get; init; }
+}
+
+public sealed record PlayerReturnedFromRestEvent(int PlayerSeat) : IGameEvent;
 
 public sealed record PlayerDyingEvent(
     long ResolutionId,

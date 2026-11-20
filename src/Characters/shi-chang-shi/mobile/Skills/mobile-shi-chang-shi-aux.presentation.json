@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:picai": { "name": "庀材", "description": "每个出牌阶段可发动一次。依次判定，出现重复花色时停止，也可提前停止。选一名角色获得这批判定牌。" },
+    "mobile:yaozhuo": { "name": "谣诼", "description": "每个出牌阶段可与另一名角色拼点一次。赢则跳过对方下次摸牌，未赢则弃置自己的两张牌。" },
+    "mobile:chixia": { "name": "叱吓", "description": "你以杀指定唯一目标后，可以亮出牌堆顶两张。每有一张与杀同花色，此杀伤害加一。目标不能用亮出的花色响应此杀。" }
+  }
+}

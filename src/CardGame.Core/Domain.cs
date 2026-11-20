@@ -166,6 +166,14 @@ public enum DamageNature
 /// </summary>
 public enum PlayerMarkerKind
 {
+    Pursued = 62200,
+    YijinWushi = 62201,
+    YijinHouren = 62202,
+    YijinTongshen = 62203,
+    YijinJinmi = 62204,
+    YijinJiaxiong = 62205,
+    YijinYongbi = 62206,
+    Hongyi = 62207,
     ShanheSourceNu = 62048,
     MobileBoundaryAnguo = 53200,
     AnniversaryHuCheErZhong = 49500,
@@ -273,6 +281,14 @@ public static class PlayerMarkerCatalog
 {
     public static string GetDisplayName(PlayerMarkerKind marker) => marker switch
     {
+        PlayerMarkerKind.Pursued => "已追思",
+        PlayerMarkerKind.YijinWushi => "膴仕",
+        PlayerMarkerKind.YijinHouren => "厚任",
+        PlayerMarkerKind.YijinTongshen => "通神",
+        PlayerMarkerKind.YijinJinmi => "金迷",
+        PlayerMarkerKind.YijinJiaxiong => "贾凶",
+        PlayerMarkerKind.YijinYongbi => "拥蔽",
+        PlayerMarkerKind.Hongyi => "弘仪",
         PlayerMarkerKind.ShanheSourceNu => "怒",
         PlayerMarkerKind.MobileBoundaryAnguo => "安国",
         PlayerMarkerKind.MuShunJin => "劲",

@@ -15,6 +15,7 @@ to mechanism topics. [RUNTIME.md](../RUNTIME.md) and
 | Skill grants, upgrades, availability, restrictions, applied states, physical marks, hand limits, judgment attachments or generated equipment | [Skills and applied states](SKILLS_AND_STATES.md) |
 | Use/target admission, quotas/debits, distance/range, directed rights, Slash requests, Zhangba materials or action-menu snapshots | [Card-use legality](USE_LEGALITY.md) |
 | Actual-use/phase history, confirmation, native returns/targets, repeated effects, damage adjustments or HP recovery receipts | [Card-use history and resolution](USE_RESOLUTION.md) |
+| Direct death, death disposition, temporary absence, or return to the normal turn order | [Death and return](DEATH_AND_RETURN.md) |
 | Card representations, physical entities, claims, deliveries, retirement, acquisition, Give or exact movement requests | [Materials and movement](MATERIALS_AND_MOVEMENT.md) |
 | Cursor suspension, response requirements/relations, card-action invalidation or public reveal windows/history | [Responses and visibility](RESPONSES_AND_VISIBILITY.md) |
 | Formats, save compatibility, tests or artifact cleanup | [Development gates](../../../DEVELOPMENT_GATES.md) |

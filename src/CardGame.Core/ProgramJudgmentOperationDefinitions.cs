@@ -95,3 +95,34 @@ internal sealed class RepeatJudgmentProgramOperationDescriptor : ProgramOperatio
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         effect.ClaimHandLimitExemption is null ? [] : [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnStartBeforeNormalFlow)];
 }
+
+internal interface ICollectSuitJudgments : IProgramRuntimeOperations
+{
+    SkillProgramStepOutcome BeginCollectingJudgments(ProgramSkillFrame frame, string reason, string bind);
+}
+
+internal sealed class CollectSuitJudgmentsDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.CollectSuitJudgments;
+    public override ISkillProgramEffectHandler Handler => this;
+    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
+    public override ProgramOperationAiPolicy AiPolicy { get; } = new(
+        ProgramOperationAiSemantic.StartJudgment, static (_, context) => context.PublicControlValue(3));
+
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
+    {
+        reader.AllowOnly("op", "target", "resultBind", "judgmentReason", "condition");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0,
+            reader.Condition(), judgmentReason: reader.RequiredIdentifier("judgmentReason"),
+            resultBind: reader.RequiredIdentifier("resultBind"));
+        RequireAlways(effect, reader.Path);
+        return effect;
+    }
+
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        [new CreateCardSet(effect.ResultBind!, 5, true)];
+
+    public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat,
+        ISkillProgramEffectHost host) => host.GetCapability<ICollectSuitJudgments>()
+            .BeginCollectingJudgments(frame, effect.JudgmentReason!, effect.ResultBind!);
+}

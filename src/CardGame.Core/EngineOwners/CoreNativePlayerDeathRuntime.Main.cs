@@ -28,14 +28,22 @@ internal sealed partial class CoreNativePlayerDeathRuntime
             (null, not null, null)when causingProgramSkillFrameId == parentFrameId => DeathReturnKind.ProgramSkill,
             (null, null, not null)when causingCardDamageReplacementId == parentFrameId && _coreCardAttackStateOperations.GetCardAttackState(parentFrameId).MaximumHpReplacement is { MaximumHpAfter: 0, TargetSeat: var seat } && seat == victim.Seat => DeathReturnKind.CardDamageReplacement,
             _ => throw new InvalidOperationException("A death resolution needs exactly one matching parent continuation.")};
-        var deathFrameId = _coreNativeDeathFramesOperations.BeginDeath(parentFrameId, victim.Seat, killer?.Seat, returnKind);
+        var death = _coreNativeDeathFramesOperations.BeginDeath(parentFrameId, victim, killer?.Seat, returnKind);
+        var deathFrameId = death.Id;
         _characterHeJinOlOperations.CaptureHeJinYanhuoDeath(deathFrameId, victim);
         try
         {
             if (!_characterDaQiaoXiaoQiaoHappyGodOperations.TryCompleteHappyQiaoWholeDeath(deathFrameId, victim))
-                victim.Hp = 0;
+                victim.Hp = dying is not null || victim.MaxHp <= 0 ? 0 : death.HpAtDeath;
             var caoYuDeathMinimum = _characterCaoYuOlOperations.CaptureCaoYuDeathMinimumSources(victim.Seat);
             victim.IsAlive = false;
+            victim.IsResting = death.WillRest;
+            victim.SkipNextDrawPhase = false;
+            if (death.WillRest)
+            {
+                victim.IsFaceDown = false;
+                victim.HasAlcoholEffect = false;
+            }
             if (causingCardDamageReplacementId is { } replacementId)
                 _coreCardDamageMaximumHpReplacementOperations.PublishMaximumHpDamageReplacement(replacementId);
             _characterCaoYuOlOperations.RecordCaoYuDeathMinimumTransitions(deathFrameId, victim.Seat, caoYuDeathMinimum);
@@ -49,22 +57,20 @@ internal sealed partial class CoreNativePlayerDeathRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IronChainStateChangedEvent(chainResolutionId, chainSourceSeat, victim.Seat, IsChained: false));
             }
 
-            victim.RoleRevealed = true;
-            if (_coreNativeDamageHandlesOperations.Value.IsTeamMode)
+            if (!death.WillRest)
             {
-                victim.TeamRevealed = true;
+                victim.RoleRevealed = true;
+                if (_coreNativeDamageHandlesOperations.Value.IsTeamMode)
+                    victim.TeamRevealed = true;
+
+                if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
+                    _coreNationalGeneralRevealOperations.RevealNationalInformation(victim);
+                else
+                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoleRevealedEvent(victim.Seat, victim.Role));
+
+                _modeRuntimeOperations._modeRuntime.ApplyDeathReward(victim.Seat, killer?.Seat);
             }
 
-            if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
-            {
-                _coreNationalGeneralRevealOperations.RevealNationalInformation(victim);
-            }
-            else
-            {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoleRevealedEvent(victim.Seat, victim.Role));
-            }
-
-            _modeRuntimeOperations._modeRuntime.ApplyDeathReward(victim.Seat, killer?.Seat);
             if (_characterYuanYinAnniversaryOperations.Value.TryBeginAnniversaryYuanYinDeathBeforeCleanup(deathFrameId))
                 return;
             _coreDeathProgramsOperations.ContinuePlayerDeathCleanup(deathFrameId);

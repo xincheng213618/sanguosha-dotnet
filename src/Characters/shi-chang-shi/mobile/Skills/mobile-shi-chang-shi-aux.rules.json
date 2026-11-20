@@ -1,0 +1,51 @@
+{
+  "skills": [
+    {
+      "id": "mobile:picai",
+      "revision": 1,
+      "activations": [{
+        "id": "collect-judgments",
+        "minCards": 0, "maxCards": 0,
+        "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving",
+        "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [
+          { "op": "collectSuitJudgments", "target": "owner", "judgmentReason": "skill.mobile.picai", "resultBind": "judged" },
+          { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "judged", "destination": "selectedTargetHand" }
+        ]
+      }]
+    },
+    {
+      "id": "mobile:yaozhuo",
+      "revision": 1,
+      "activations": [{
+        "id": "contest",
+        "minCards": 1, "maxCards": 1, "sourceZones": ["hand"],
+        "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand",
+        "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [
+          { "op": "pindian", "target": "selectedTarget", "amount": 1 },
+          { "op": "scheduleNextDrawSkip", "target": "selectedTarget", "condition": { "kind": "pindianWon" } },
+          { "op": "chooseOwnCardDiscard", "target": "owner", "zones": ["hand", "equipment"], "condition": { "kind": "pindianNotWon" } },
+          { "op": "chooseOwnCardDiscard", "target": "owner", "zones": ["hand", "equipment"], "condition": { "kind": "pindianNotWon" } }
+        ]
+      }]
+    },
+    {
+      "id": "mobile:chixia",
+      "revision": 1,
+      "triggers": [{
+        "id": "sole-slash-target", "window": "cardUseTargetsFinalized", "ownerRelation": "actor",
+        "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": true,
+        "condition": {
+          "kind": "compare", "left": { "kind": "cardUseDesignatedTargetCount" },
+          "operator": "equal", "right": { "kind": "integerConstant", "value": 1 }
+        },
+        "effects": [
+          { "op": "revealRecordedSuitSlash", "target": "owner", "amount": 2, "resultBind": "turned-up" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "turned-up", "destination": "discardPile", "awaitMovementTriggers": true }
+        ]
+      }]
+    }
+  ]
+}

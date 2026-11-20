@@ -155,6 +155,8 @@ internal sealed class SkillProgramDependencies
         UsesActualPlayPhaseUseLedger = HasCardPolicy(SkillProgramCardPolicyKind.FirstActualPlayUseDistanceUnlimited) ||
             HasCardPolicy(SkillProgramCardPolicyKind.MaximumOwnPlayCardUses) ||
             HasCardPolicy(SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount) ||
+            triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.CardUseCommitted &&
+                trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ObtainDeckCards)) ||
             _triggerOperationSkillIds.Keys.Concat(_activationOperations).Any(op =>
                 ProgramOperationCatalog.Default.Resolve(op) is IActualPlayPhaseUseLedgerOperation);
         UsesRoundOnceCardlessBasics = programs.Any(program => program.ViewAs.Any(rule => rule.RoundOnceCardlessBasic is not null));

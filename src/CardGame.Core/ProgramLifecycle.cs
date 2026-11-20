@@ -53,6 +53,10 @@ public sealed record ProgramRepeatedJudgment(
     string Reason, string ResultBind, IReadOnlyList<Suit> SuccessSuits, int CompletedCount,
     bool? LastMatched = null)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool CollectDistinctSuits { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int PreviousSuitMask { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramClaimHandLimitExemption? ClaimHandLimitExemption { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

@@ -57,6 +57,7 @@ internal static class PublicMarkerChecks
         var lethalRegistry = CreateRegistry(ownerHp: 1, packageId: "wuhun-marker-lethal",
             deckCards: [new ContentDeckCardCount("standard:slash", 60)]);
         var lethal = FindFixture(lethalRegistry, requireAlcohol: false);
+        var attackerHp = lethal.CreateSnapshot(0).Players[0].Hp;
         PlayAlcoholAndSlash(lethal, useAlcohol: false);
         var events = lethal.Events.Select(item => item.Payload).ToArray();
         var appliedIndex = Array.FindIndex(events, item => item is DamageAppliedEvent damage &&
@@ -81,6 +82,10 @@ internal static class PublicMarkerChecks
                 attackerDeathIndex > directIndex && cleanupIndex > attackerDeathIndex &&
                 lethal.ResolutionStack.All(frame => frame is not DeathFrame),
             "Nested Wuhun direct death must return to the outer owner-death frame before marker cleanup.");
+        Require(lethal.CreateSnapshot(0).Players[0] is { IsAlive: false } directVictim &&
+                attackerHp > 0 && directVictim.Hp == attackerHp &&
+                settled.OfType<PlayerDyingEvent>().All(dying => dying.VictimSeat != 0),
+            "A direct Wuhun death must retain its positive HP and skip the rescue window.");
         var settledReplay = GameReplay.Restore(RoundTrip(lethal.CreateCheckpoint()), lethalRegistry);
         Require(SnapshotJson.Serialize(settledReplay.CreateSnapshot(0, revealAll: true)) ==
                 SnapshotJson.Serialize(lethal.CreateSnapshot(0, revealAll: true)) &&

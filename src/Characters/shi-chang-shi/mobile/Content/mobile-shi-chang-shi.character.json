@@ -1,0 +1,172 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:shi-chang-shi",
+  "skills": [
+    {
+      "registrationOrder": 912000,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:danggu",
+        "name": "党锢",
+        "description": "锁定技。开局取得十张常侍牌并结党。结束休整回到游戏后，重新结党并摸一张牌。亮出的两位常侍提供各自的技能。",
+        "executionForms": "Trigger",
+        "tags": "Locked"
+      }
+    },
+    {
+      "registrationOrder": 912001,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:mowang",
+        "name": "殁亡",
+        "description": "锁定技。你的回合结束后，你直接死亡。死亡时，若你拥有党锢且仍有未亮出的常侍牌，进入休整。",
+        "executionForms": "Trigger",
+        "tags": "Locked"
+      }
+    },
+    {
+      "registrationOrder": 912002,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:attendant-taoluan",
+        "name": "滔乱",
+        "description": "每个出牌阶段限一次。你可以将一张牌当任意基本牌或普通锦囊牌使用。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      }
+    },
+    {
+      "registrationOrder": 912003,
+      "definition": {
+        "id": "mobile:chiyan",
+        "name": "鸱咽",
+        "description": "你以杀指定目标后可以暂扣其一张牌，本回合结束时归还。此杀对手牌数和装备数均不大于你的目标造成的伤害加一。",
+        "executionForms": "Trigger"
+      },
+      "includeProgramPresentation": true,
+      "programBundle": "mobile-shi-chang-shi"
+    },
+    {
+      "registrationOrder": 912004,
+      "definition": {
+        "id": "mobile:zimou",
+        "name": "自谋",
+        "description": "锁定技。你在出牌阶段使用第2、4、6张牌时，分别从牌堆获得酒、杀、决斗。",
+        "tags": "Locked",
+        "executionForms": "Trigger"
+      },
+      "includeProgramPresentation": true,
+      "programBundle": "mobile-shi-chang-shi"
+    },
+    {
+      "registrationOrder": 912005,
+      "definition": {
+        "id": "mobile:picai",
+        "name": "庀材",
+        "description": "每个出牌阶段可发动一次。依次判定，出现重复花色时停止，也可提前停止。选一名角色获得这批判定牌。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      },
+      "includeProgramPresentation": true,
+      "programBundle": "mobile-shi-chang-shi-aux"
+    },
+    {
+      "registrationOrder": 912006,
+      "definition": {
+        "id": "mobile:yaozhuo",
+        "name": "谣诼",
+        "description": "每个出牌阶段可与另一名角色拼点一次。赢则跳过对方下次摸牌，未赢则弃置自己的两张牌。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      },
+      "includeProgramPresentation": true,
+      "programBundle": "mobile-shi-chang-shi-aux"
+    },
+    {
+      "registrationOrder": 912007,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:xiaolu",
+        "name": "宵赂",
+        "description": "每个出牌阶段限一次。你可以摸两张牌，然后弃置两张手牌或把两张手牌交给一名其他角色。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      }
+    },
+    {
+      "registrationOrder": 912008,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:kuiji",
+        "name": "窥机",
+        "description": "每个出牌阶段限一次。你可以查看一名其他角色的手牌，并从双方手牌中任选四张不同花色的牌弃置。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      }
+    },
+    {
+      "registrationOrder": 912009,
+      "definition": {
+        "id": "mobile:chixia",
+        "name": "叱吓",
+        "description": "你以杀指定唯一目标后，可以亮出牌堆顶两张。每有一张与杀同花色，此杀伤害加一。目标不能用亮出的花色响应此杀。",
+        "executionForms": "Trigger"
+      },
+      "includeProgramPresentation": true,
+      "programBundle": "mobile-shi-chang-shi-aux"
+    },
+    {
+      "registrationOrder": 912010,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:niqu",
+        "name": "逆取",
+        "description": "每个出牌阶段限一次。你可以对一名角色造成一点火焰伤害。",
+        "executionForms": "State",
+        "actionForms": "Active"
+      }
+    },
+    {
+      "registrationOrder": 912011,
+      "programBundle": "mobile-shi-chang-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:miaoyu",
+        "name": "妙语",
+        "description": "你可以用一或两张同花色的牌转化。红桃作桃，方块作火杀，梅花作闪，黑桃作无懈可击。两张红牌转化时，伤害或回复量加一；两张黑牌转化后，弃置当前回合角色的一张牌。",
+        "executionForms": "Trigger",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 912099,
+      "definition": {
+        "id": "mobile:shi-chang-shi",
+        "name": "十常侍·移动版",
+        "portraitKey": "mobile-shi-chang-shi",
+        "skillId": "mobile:danggu",
+        "additionalSkillIds": [
+          "mobile:mowang"
+        ],
+        "factionId": "qun",
+        "baseHp": 1,
+        "gender": "Male",
+        "characterId": "character:shi-chang-shi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      },
+      "pools": {
+        "current": 912099
+      }
+    }
+  ]
+}

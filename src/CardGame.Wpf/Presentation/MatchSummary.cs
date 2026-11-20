@@ -7,6 +7,8 @@ public sealed record PlayerMatchResult(int Seat, string GeneralName, string Camp
     int CardsUsed, int Responses, int DamageDealt, int DamageTaken, int Recovery, int RescueCards, int Defeats)
 {
     public string? SecondaryGeneralName { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsResting { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? SurvivalRank { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -15,7 +17,7 @@ public sealed record PlayerMatchResult(int Seat, string GeneralName, string Camp
     public int? TeamTreasures { get; init; }
     [JsonIgnore] public string RankOrCamp => TeamRank is { } teamRank ? $"{Camp}·{teamRank}" : SurvivalRank is { } rank ? $"第{rank}名" : Camp;
     public string PlayerLabel => $"{Seat + 1:00}  {GeneralName}" + (SecondaryGeneralName is null ? "" : $" / {SecondaryGeneralName}") + (IsHuman ? " · 你" : string.Empty);
-    public string StatusLabel => IsAlive ? "存活" : "阵亡";
+    public string StatusLabel => IsResting ? "休整" : IsAlive ? "存活" : "阵亡";
 }
 
 /// <summary>End-of-match aggregates. Never carries hands, card identifiers or private choices.</summary>
@@ -69,7 +71,7 @@ public sealed record MatchSummary(int TurnCount, IReadOnlyList<PlayerMatchResult
                     if (totals.TryGetValue(rescue.ResponderSeat, out var rescuer))
                         rescuer.RescueCards += (rescue.UsedPeach ? 1 : 0) + (rescue.UsedAlcohol ? 1 : 0);
                     break;
-                case PlayerDiedEvent { KillerSeat: { } killer } death when killer != death.VictimSeat:
+                case PlayerDiedEvent { KillerSeat: { } killer, IsResting: false } death when killer != death.VictimSeat:
                     if (totals.TryGetValue(killer, out var victor)) victor.Defeats++;
                     break;
             }
@@ -92,7 +94,7 @@ public sealed record MatchSummary(int TurnCount, IReadOnlyList<PlayerMatchResult
             };
             return new PlayerMatchResult(player.Seat, player.GeneralName, camp, player.IsHuman, player.IsAlive,
                 total.CardsUsed, total.Responses, total.DamageDealt, total.DamageTaken, total.Recovery, total.RescueCards, total.Defeats)
-            { SecondaryGeneralName = player.SecondaryGeneralName, SurvivalRank = player.SurvivalRank,
+            { SecondaryGeneralName = player.SecondaryGeneralName, IsResting = player.IsResting, SurvivalRank = player.SurvivalRank,
                 TeamRank = teamResult?.Rank, TeamTreasures = teamResult?.Treasures };
         }).ToArray()) { IsSurvival = survival, DragonBoatTeams = dragonBoat, DragonBoatRounds = dragonBoat is null ? null : rounds };
     }

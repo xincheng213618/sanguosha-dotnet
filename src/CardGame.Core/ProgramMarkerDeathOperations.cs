@@ -76,6 +76,26 @@ internal sealed class CauseDeathUnlessBoundCardKindProgramOperationDescriptor : 
         [new MoveCardSet(effect.SourceBind!, null, SkillProgramCardDestination.DiscardPile), new ReadSelectedTarget()];
 }
 
+internal sealed class CauseOwnerDeathProgramOperationDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.CauseOwnerDeath;
+    public override ISkillProgramEffectHandler Handler => this;
+    public override ProgramOperationAiPolicy AiPolicy { get; } = new(
+        ProgramOperationAiSemantic.CauseDeath, static (_, _) => { });
+
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
+    {
+        reader.AllowOnly("op", "target", "condition");
+        return new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0, reader.Condition());
+    }
+
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        [new RequireTriggerWindows([SkillProgramTriggerWindow.TurnBeforeStart, SkillProgramTriggerWindow.AfterTurnEnded])];
+
+    public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat,
+        ISkillProgramEffectHost host) => host.CauseOwnerDeath(frame);
+}
+
 public sealed class CauseDeathUnlessBoundCardKindSkillProgramEffectHandler : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => SkillProgramEffectOp.CauseDeathUnlessBoundCardKind;

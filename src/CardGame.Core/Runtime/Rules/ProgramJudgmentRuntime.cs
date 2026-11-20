@@ -83,12 +83,13 @@ internal sealed class ProgramJudgmentRuntime(IProgramRuntimeFrames frames, IProg
         var instructions = ProgramInstructionResolver.Default.Resolve(frame, program).Instructions;
         if (frame.InstructionIndex < 1 || frame.InstructionIndex > instructions.Count ||
             instructions[frame.InstructionIndex - 1] is not
-            { Op: SkillProgramEffectOp.StartJudgment or SkillProgramEffectOp.StartOwnedDamagePointJudgment or SkillProgramEffectOp.StartChouceDamagePointJudgment or SkillProgramEffectOp.RepeatJudgment or SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeSuitDiscard or SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard or SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard } effect ||
+            { Op: SkillProgramEffectOp.StartJudgment or SkillProgramEffectOp.StartOwnedDamagePointJudgment or SkillProgramEffectOp.StartChouceDamagePointJudgment or SkillProgramEffectOp.RepeatJudgment or SkillProgramEffectOp.CollectSuitJudgments or SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeSuitDiscard or SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard or SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard } effect ||
             reason != effect.JudgmentReason || resultBind != effect.ResultBind)
             return false;
-        if (effect.Op == SkillProgramEffectOp.RepeatJudgment &&
+        if (effect.Op is SkillProgramEffectOp.RepeatJudgment or SkillProgramEffectOp.CollectSuitJudgments &&
             (frame.RepeatedJudgment is not { } repeated ||
-             repeated.Reason != reason || repeated.ResultBind != resultBind))
+             repeated.Reason != reason || repeated.ResultBind != resultBind ||
+             repeated.CollectDistinctSuits != (effect.Op == SkillProgramEffectOp.CollectSuitJudgments)))
             return false;
         if (effect.Op == SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard)
             return native.IsDamageJudgmentInstructionTarget(frame, targetSeat);

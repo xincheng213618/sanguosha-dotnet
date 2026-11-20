@@ -26,7 +26,6 @@ internal sealed partial class CharacterCaoPiMouEntries
     internal bool MouCaoPiLegalActionForbidden(ProgramLegalActionQuery query) => _resolve().MouCaoPiLegalActionForbidden(query);
     internal bool MouCaoPiMaterialUseForbidden(ProgramCardMaterialQuery query) => _resolve().MouCaoPiMaterialUseForbidden(query);
     internal ProgramSkillFrame? MouCaoPiObserverRoot() => _resolve().MouCaoPiObserverRoot();
-    internal string[] MouCaoPiPrintedSkills(CharacterState dead) => _resolve().MouCaoPiPrintedSkills(dead);
     internal bool MouCaoPiResponseForbidden(int actor, CardKind kind, CardActionType type) => _resolve().MouCaoPiResponseForbidden(actor, kind, type);
     internal int? MouCaoPiResponseSource() => _resolve().MouCaoPiResponseSource();
     internal void PublishMouCaoPi(ProgramSkillFrame f) => _resolve().PublishMouCaoPi(f);

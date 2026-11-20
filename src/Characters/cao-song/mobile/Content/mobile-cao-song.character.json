@@ -1,0 +1,45 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-song",
+  "skills": [
+    {
+      "registrationOrder": 62220, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin", "name": "亿金", "description": "锁定技，游戏开始时获得六种金。回合开始时，若你没有金，你直接死亡。出牌阶段开始时，你将一种金交给另一名没有金的角色，直到其下个回合结束。", "tags": "Locked", "executionForms": "State, Trigger" }
+    },
+    {
+      "registrationOrder": 62221, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:guanzong", "name": "惯纵", "description": "出牌阶段限一次，你可以令一名其他角色对另一名其他角色造成1点虚拟伤害。", "actionForms": "Active" }
+    },
+    {
+      "registrationOrder": 62222, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-wushi", "name": "膴仕", "description": "摸牌阶段多摸四张牌，出牌阶段使用杀的次数上限加一。", "tags": "Locked", "executionForms": "State, Trigger" }
+    },
+    {
+      "registrationOrder": 62223, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-houren", "name": "厚任", "description": "回合结束时回复3点体力。", "tags": "Locked", "executionForms": "Trigger" }
+    },
+    {
+      "registrationOrder": 62224, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-tongshen", "name": "通神", "description": "防止你受到的非雷电伤害。", "tags": "Locked", "executionForms": "Trigger" }
+    },
+    {
+      "registrationOrder": 62225, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-jinmi", "name": "金迷", "description": "跳过出牌和弃牌阶段。", "tags": "Locked", "executionForms": "Trigger" }
+    },
+    {
+      "registrationOrder": 62226, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-jiaxiong", "name": "贾凶", "description": "出牌阶段开始时失去1点体力，本回合手牌上限减3。", "tags": "Locked", "executionForms": "State, Trigger" }
+    },
+    {
+      "registrationOrder": 62227, "programBundle": "mobile-cao-song", "includeProgramPresentation": false,
+      "definition": { "id": "mobile:yijin-yongbi", "name": "拥蔽", "description": "准备阶段跳过接下来的摸牌阶段。", "tags": "Locked", "executionForms": "Trigger" }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 62228, "pools": { "current": 62228 },
+      "definition": { "id": "mobile:cao-song", "name": "曹嵩", "portraitKey": "ol-cao-song", "skillId": "mobile:yijin", "additionalSkillIds": ["mobile:guanzong"], "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:cao-song", "variantId": "ordinary", "rulesetId": "sanguosha-mobile" }
+    }
+  ]
+}

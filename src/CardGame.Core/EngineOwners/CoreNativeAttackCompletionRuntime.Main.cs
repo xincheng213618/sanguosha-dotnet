@@ -35,8 +35,8 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
 
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreProgramAttackAttemptOperations.TryAdvanceChainedDamageTarget(attack, out var fromSeat))
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChainedDamagePropagatedEvent(attack.ResolutionId, attack.SourceSeat, fromSeat, attack.TargetSeat, attack.DamageAmount, _coreNativeCardClassificationsOperations.GetDamageNature(attack)) { ProgramUseInstructionIndex = _coreProgramVirtualDuelOperations.DamageProgramUseInstructionIndex(attack) });
-            _coreMatchLogOperations.AddLog("ChainDamage", $"连环伤害从 {(_coreMatchParticipantsPlayersAccess._players[fromSeat].Name)} 传导至 {(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Name)}。", attack.SourceSeat, attack.TargetSeat);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChainedDamagePropagatedEvent(attack.ResolutionId, attack.SourceSeat, fromSeat, attack.TargetSeat, attack.DamageAmount, _coreNativeCardClassificationsOperations.GetDamageNature(attack)) { ProgramUseInstructionIndex = _coreProgramVirtualDuelOperations.DamageProgramUseInstructionIndex(attack), SourceLess = attack.IsSourceLess });
+            _coreMatchLogOperations.AddLog("ChainDamage", $"连环伤害从 {(_coreMatchParticipantsPlayersAccess._players[fromSeat].Name)} 传导至 {(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Name)}。", attack.IsSourceLess ? null : attack.SourceSeat, attack.TargetSeat);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             {
                 CompleteAttack(attack);

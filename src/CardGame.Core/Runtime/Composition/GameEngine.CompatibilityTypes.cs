@@ -60,7 +60,7 @@ internal interface IDamageAttempt
         void RedirectFinalizedDamageTarget(int targetSeat, ProgramDamageTransferFollowup followup);
         bool TryConsumeProgramDamageTransferFollowup(out ProgramDamageTransferFollowup followup);
         void SetChainedTargets(IReadOnlyList<int> targetSeats);
-        bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers,
+        bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers, bool sourceLess,
             out int fromSeat);
     }
     internal sealed record ProgramBooleanStateLease(CardUseEffectSource Source, string StateId, int TurnNumber, int TurnSeat, SkillProgramDamageModifierExpiration Expiration);

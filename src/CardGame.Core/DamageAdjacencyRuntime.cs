@@ -194,6 +194,16 @@ internal sealed class DamageAdjacencyRuntime(
         native.SetWindowStep(window.Id, ResolutionFrameStep.Completed);
         var target = attack.BindTarget();
         frames.Pop(window.Id, ResolutionFrameKind.DamageTriggerWindow);
+        if (frames.Top is DamageFrame { IsVirtual: true } virtualDamage && virtualDamage.Id == window.ParentFrameId)
+        {
+            if (window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied ||
+                frames.ParentOf(virtualDamage.Id) is not ProgramSkillFrame owner ||
+                !VirtualDamageProgram.IsExactVirtualDamage(owner, virtualDamage))
+                throw new InvalidOperationException("Virtual damage lost its exact owner and post-damage window.");
+            frames.Pop(virtualDamage.Id, ResolutionFrameKind.Damage);
+            target.CompleteAttack();
+            return;
+        }
         if (window.TriggerWindow == SkillProgramTriggerWindow.DamageAppliedBeforeDying)
         {
             if (target.Hp <= 0 && target.IsAlive)

@@ -74,6 +74,38 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         return death;
     }
 
+    internal SkillProgramStepOutcome CauseOwnerDeath(ProgramSkillFrame frame)
+    {
+        var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
+        if (active.WindowContext is not { } context || active.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat ||
+            context.OwnerSeat != owner.Seat || context.SourceSeat != owner.Seat || context.TargetSeat != owner.Seat ||
+            _resolutionStackOperations._resolutionStack.Count < 2 ||
+            _resolutionStackOperations._resolutionStack[^2] is not { } parent || parent.Id != context.ParentFrameId)
+            throw new InvalidOperationException("Direct owner death lost its exact turn boundary.");
+
+        var candidate = parent switch
+        {
+            ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.TurnBeforeStart } before
+                when context.Window == before.Window && before.OwnerSeat == owner.Seat && before.BeforeTurnPreludeProof is not null &&
+                     before.CandidateIndex < before.Candidates.Count => before.Candidates[before.CandidateIndex],
+            DeferredTurnEndFrame { AfterTurnEnded.CurrentChild: { } child } ended
+                when context.Window == SkillProgramTriggerWindow.AfterTurnEnded && ended.OwnerSeat == owner.Seat &&
+                     child.FrameId == active.Id && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Finished => child.Candidate,
+            _ => null
+        };
+        if (candidate is null || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, candidate))
+            throw new InvalidOperationException("Direct owner death requires the binding scheduled by the actual owner turn.");
+        if (!owner.IsAlive || _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner != Winner.None)
+            return SkillProgramStepOutcome.Continue;
+
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(
+            active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, owner.Seat));
+        _coreNativePlayerDeathOperations.BeginPlayerDeath(active.Id, owner, killer: null, attack: null, dying: null,
+            causingProgramSkillFrameId: active.Id);
+        return SkillProgramStepOutcome.AwaitChild;
+    }
+
     internal void UpdateDeathFrame(long frameId, Func<DeathFrame, DeathFrame> update)
     {
         var death = GetCurrentDeathFrame(frameId);
@@ -223,6 +255,12 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
     internal void ContinueDeathOutcome(long deathFrameId)
     {
         var death = GetCurrentDeathFrame(deathFrameId);
+        if (death.WillRest)
+        {
+            ContinueDeathResolution(deathFrameId);
+            return;
+        }
+
         var victim = _coreMatchParticipantsPlayersAccess._players[death.VictimSeat];
         var killer = death.KillerSeat is { } killerSeat ? _coreMatchParticipantsPlayersAccess._players[killerSeat] : null;
         if (killer is { } killerState && killerState.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play)
@@ -485,10 +523,14 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
                 PendingNativeCleanup = null,
                 NativeCleanupDiscardEntries = discardEntries.Length == 0 ? null : Array.AsReadOnly(discardEntries)
             });
-            _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
+            if (death.WillRest)
+                _coreMatchLogOperations.AddLog("PlayerResting", $"{victim.Name} 进入休整。", killer?.Seat, victim.Seat);
+            else
+                _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
+
             _coreConvertingGiftsOperations.MarkConvertingGiftExactDeath(deathFrameId, victim.Seat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDiedEvent(victim.Seat, killer?.Seat));
-            if (_characterPangTongAnniversaryGodOperations.TryBeginShenPangTongKunyuDeath(GetCurrentDeathFrame(deathFrameId)))
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDiedEvent(victim.Seat, killer?.Seat) { IsResting = death.WillRest });
+            if (!death.WillRest && _characterPangTongAnniversaryGodOperations.TryBeginShenPangTongKunyuDeath(GetCurrentDeathFrame(deathFrameId)))
                 return;
             ContinueDeathOutcome(deathFrameId);
         }

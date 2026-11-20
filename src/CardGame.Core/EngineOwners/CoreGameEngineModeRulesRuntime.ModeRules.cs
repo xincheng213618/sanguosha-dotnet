@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineModeRulesRuntime
     internal IMatchModeSetupPresentation ModeSetupPresentation => _modeRuntimeOperations._modeRuntime.Find<IMatchModeSetupPresentation>() ?? throw new InvalidOperationException("The mode requires its installed setup presentation.");
     internal IMatchModeFactionPolicy ModeFactionPolicy => _modeRuntimeOperations._modeRuntime.Find<IMatchModeFactionPolicy>() ?? throw new InvalidOperationException("The mode requires its installed faction policy.");
 
-    internal ModePlayerLife[] CaptureModeLife() => _coreMatchParticipantsPlayersAccess._players.Select(player => new ModePlayerLife(player.Seat, player.Role, player.IsAlive, player.TeamId, player.NationalFactionId)).ToArray();
+    internal ModePlayerLife[] CaptureModeLife() => _coreMatchParticipantsPlayersAccess._players.Select(player => new ModePlayerLife(player.Seat, player.Role, player.IsAlive || player.IsResting, player.TeamId, player.NationalFactionId)).ToArray();
     internal RuleQueryEvaluation ApplyModeNumericRules(CharacterState player, RuleQueryEvaluation ordinary, SkillRuleQuery query) => _modeRuntimeOperations._modeRuntime.AdjustNumericEvaluation(player.Seat, ordinary, query);
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 10)]
     internal void AddModeDistanceBaseTerms(ProgramDistanceQuery query, List<RuleQueryBaseTerm> terms) => terms.AddRange(_modeRuntimeOperations._modeRuntime.BaseDistanceTerms(query.Source.Seat, query.Target.Seat));

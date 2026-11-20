@@ -108,7 +108,7 @@ internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProg
             ChainedTargetSeats = Array.AsReadOnly(targetSeats.ToArray())
         };
     });
-    public bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers, out int fromSeat)
+    public bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers, bool sourceLess, out int fromSeat)
     {
         var state = State;
         fromSeat = state.TargetSeat;
@@ -119,7 +119,7 @@ internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProg
             var next = targets[cursor++];
             if (!isAlive(next))
                 continue;
-            Update(current => current with { TargetSeat = next, ChainedTargetIndex = cursor, IsChainPropagation = true, DamageAmountFinalized = resetDamageForTargetModifiers ? false : current.DamageAmountFinalized });
+            Update(current => current with { TargetSeat = next, ChainedTargetIndex = cursor, IsChainPropagation = true, SourceLess = sourceLess, DamageAmountFinalized = resetDamageForTargetModifiers ? false : current.DamageAmountFinalized });
             getCoreGameEngineRecipientScopedDamageRuntime().Value.RestoreRecipientScopedDamageBase(this, fromSeat);
             return true;
         }

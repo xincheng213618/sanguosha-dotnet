@@ -239,7 +239,7 @@ public sealed class LanRoomViewModel : ObservableObject, IDisposable
             var player = view.Game?.Players.FirstOrDefault(p => p.Seat == seat.Seat);
             var detail = player is null ? seat.Kind == RoomSeatKind.Empty ? "等待加入" : seat.Ready ? "已准备" : "未准备"
                 : $"{player.GeneralName} · {RoleText(player.Role)}\n体力 {player.Hp}/{player.MaxHp} · 手牌 {player.HandCount}\n" +
-                  (!player.IsAlive ? "已阵亡" : player.Equipment.Count > 0 ? string.Join(" / ", player.Equipment.Select(c => CardCatalog.Get(c.Kind).DisplayName)) : "无装备");
+                  (player.IsResting ? "休整中" : !player.IsAlive ? "已阵亡" : player.Equipment.Count > 0 ? string.Join(" / ", player.Equipment.Select(c => CardCatalog.Get(c.Kind).DisplayName)) : "无装备");
             Seats.Add(new(seat.Seat, $"{seat.Seat + 1} 号位 · {seat.Name}", detail,
                 (seat.IsHost ? "房主 " : "") + (seat.Seat == view.ViewerSeat ? "你" : seat.Kind == RoomSeatKind.Ai ? "AI" : seat.Kind == RoomSeatKind.Human ? "真人" : "空位"),
                 CanManageSeats && seat.Kind == RoomSeatKind.Empty, CanManageSeats && seat.Kind == RoomSeatKind.Ai));

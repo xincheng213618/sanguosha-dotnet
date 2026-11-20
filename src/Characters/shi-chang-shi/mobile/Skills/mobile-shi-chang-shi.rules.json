@@ -1,0 +1,865 @@
+{
+  "skills": [
+    {
+      "id": "mobile:danggu",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "opening-pair",
+          "window": "gameStarting",
+          "subject": "owner",
+          "optional": false,
+          "priority": 100,
+          "effects": [
+            {
+              "op": "revealAttendantPair",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "return-pair",
+          "window": "turnStartBeforeNormalFlow",
+          "subject": "owner",
+          "optional": false,
+          "priority": 100,
+          "effects": [
+            {
+              "op": "revealAttendantPair",
+              "target": "owner"
+            },
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:mowang",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "own-turn-death",
+          "window": "afterTurnEnded",
+          "subject": "owner",
+          "optional": false,
+          "turnOwnerScope": "own",
+          "effects": [
+            {
+              "op": "causeOwnerDeath",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:xiaolu",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "draw-then-settle",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 2
+            },
+            {
+              "op": "selectOwnedCards",
+              "target": "owner",
+              "minimumCards": 2,
+              "maximumCards": 2,
+              "zones": [
+                "hand"
+              ],
+              "resultBind": "two-hand-cards"
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "settlement",
+              "options": [
+                {
+                  "id": "discard"
+                },
+                {
+                  "id": "give",
+                  "requiredTargetKind": "otherLiving"
+                }
+              ]
+            },
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "otherLiving",
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "settlement",
+                "optionId": "give"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "two-hand-cards",
+              "destination": "discardPile",
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "settlement",
+                "optionId": "discard"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "two-hand-cards",
+              "destination": "selectedTargetHand",
+              "giveBy": "owner",
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "settlement",
+                "optionId": "give"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:niqu",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "inflict-fire",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "damage",
+              "target": "selectedTarget",
+              "amount": 1,
+              "nature": "fire"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:attendant-taoluan",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "use-slash",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "slash",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-fireSlash",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "fireSlash",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-thunderSlash",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "thunderSlash",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-peach",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "peach",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-alcohol",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "alcohol",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-drawTwo",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "drawTwo",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-duel",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "duel",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-barbarianAssault",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "barbarianAssault",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-arrowBarrage",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "arrowBarrage",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-peachGarden",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "peachGarden",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-fiveGrains",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "fiveGrains",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-dismantlement",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "dismantlement",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-snatch",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "snatch",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-fireAttack",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "fireAttack",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-ironChain",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "ironChain",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-borrowedSword",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "borrowedSword",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        },
+        {
+          "id": "use-qizhengXiangsheng",
+          "inputKinds": [],
+          "inputSuits": [],
+          "sourceZones": [
+            "hand",
+            "equipment",
+            "woodenOxGrain"
+          ],
+          "outputKind": "qizhengXiangsheng",
+          "forPlay": true,
+          "forResponse": false,
+          "useOnly": true,
+          "allowSameKind": true,
+          "singleCardTrickUse": true,
+          "usesPerPhase": 1,
+          "usageGroup": "attendant-taoluan"
+        }
+      ]
+    },
+    {
+      "id": "mobile:miaoyu",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "1-heart",
+          "inputKinds": [],
+          "inputSuits": [
+            "heart"
+          ],
+          "outputKind": "peach",
+          "forPlay": true,
+          "forResponse": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        },
+        {
+          "id": "1-diamond",
+          "inputKinds": [],
+          "inputSuits": [
+            "diamond"
+          ],
+          "outputKind": "fireSlash",
+          "forPlay": true,
+          "forResponse": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        },
+        {
+          "id": "1-club",
+          "inputKinds": [],
+          "inputSuits": [
+            "club"
+          ],
+          "outputKind": "dodge",
+          "forPlay": false,
+          "forResponse": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        },
+        {
+          "id": "1-spade",
+          "inputKinds": [],
+          "inputSuits": [
+            "spade"
+          ],
+          "outputKind": "nullification",
+          "forPlay": false,
+          "forResponse": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        },
+        {
+          "id": "2-heart",
+          "inputKinds": [],
+          "inputSuits": [
+            "heart"
+          ],
+          "outputKind": "peach",
+          "forPlay": true,
+          "forResponse": true,
+          "inputCount": 2,
+          "sameSuit": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true,
+          "recoveryBonus": 1
+        },
+        {
+          "id": "2-diamond",
+          "inputKinds": [],
+          "inputSuits": [
+            "diamond"
+          ],
+          "outputKind": "fireSlash",
+          "forPlay": true,
+          "forResponse": true,
+          "inputCount": 2,
+          "sameSuit": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true,
+          "damageBonus": 1
+        },
+        {
+          "id": "2-club",
+          "inputKinds": [],
+          "inputSuits": [
+            "club"
+          ],
+          "outputKind": "dodge",
+          "forPlay": false,
+          "forResponse": true,
+          "inputCount": 2,
+          "sameSuit": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        },
+        {
+          "id": "2-spade",
+          "inputKinds": [],
+          "inputSuits": [
+            "spade"
+          ],
+          "outputKind": "nullification",
+          "forPlay": false,
+          "forResponse": true,
+          "inputCount": 2,
+          "sameSuit": true,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "extendedUse": true
+        }
+      ],
+      "activations": [
+        {
+          "id": "two-heart",
+          "minCards": 2,
+          "maxCards": 2,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "selectedCardsSameSuit": true,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "condition": {
+            "kind": "wounded"
+          },
+          "effects": [
+            {
+              "op": "useSelectedCardsAs",
+              "target": "owner",
+              "sourceBind": "2-heart",
+              "outputKind": "peach"
+            }
+          ]
+        },
+        {
+          "id": "two-diamond",
+          "minCards": 2,
+          "maxCards": 2,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "selectedCardsSameSuit": true,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "effects": [
+            {
+              "op": "useSelectedCardsAs",
+              "target": "selectedTarget",
+              "sourceBind": "2-diamond",
+              "outputKind": "fireSlash"
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "two-club-discard",
+          "isSkillInvocation": false,
+          "window": "cardResponseAccepted",
+          "ownerRelation": "conversionSource",
+          "allowNoEventTarget": true,
+          "sourceSkillId": "mobile:miaoyu",
+          "sourceViewAsId": "2-club",
+          "optional": false,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "currentTurnPlayer"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "selectedTarget"
+              },
+              "zones": [
+                "hand",
+                "equipment"
+              ],
+              "count": 1,
+              "destination": "discardPile",
+              "skipIfNoCards": true
+            }
+          ]
+        },
+        {
+          "id": "two-spade-discard",
+          "isSkillInvocation": false,
+          "window": "cardResponseAccepted",
+          "ownerRelation": "conversionSource",
+          "allowNoEventTarget": true,
+          "sourceSkillId": "mobile:miaoyu",
+          "sourceViewAsId": "2-spade",
+          "optional": false,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "currentTurnPlayer"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "selectedTarget"
+              },
+              "zones": [
+                "hand",
+                "equipment"
+              ],
+              "count": 1,
+              "destination": "discardPile",
+              "skipIfNoCards": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:kuiji",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "inspect-four-suits",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "selectDistinctSuitHandDiscards",
+              "target": "selectedTarget",
+              "resultBind": "four-suits"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "four-suits",
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:chiyan",
+      "revision": 1,
+      "minimumRulesVersion": 173,
+      "triggers": [
+        {
+          "id": "hold-slash-target-cards",
+          "window": "slashBeforeResponse",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash"
+          ],
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "holdTargetCards",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "eventTarget"
+              },
+              "zones": [
+                "hand",
+                "equipment",
+                "judgment"
+              ],
+              "resultBind": "chiyan-hold",
+              "minimumCards": 1,
+              "maximumCards": 1
+            }
+          ]
+        }
+      ],
+      "damageModifiers": [
+        {
+          "id": "not-fewer-hand-and-equipment",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash"
+          ],
+          "amount": 1,
+          "condition": "sourceNotFewerHandAndEquipmentThanTarget"
+        }
+      ]
+    },
+    {
+      "id": "mobile:zimou",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "second-use",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "optional": false,
+          "effects": [
+            {
+              "op": "obtainDeckCards",
+              "target": "owner",
+              "amount": 1,
+              "cardKinds": [
+                "alcohol"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fourth-use",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "optional": false,
+          "effects": [
+            {
+              "op": "obtainDeckCards",
+              "target": "owner",
+              "amount": 1,
+              "cardKinds": [
+                "slash",
+                "fireSlash",
+                "thunderSlash"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sixth-use",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "optional": false,
+          "effects": [
+            {
+              "op": "obtainDeckCards",
+              "target": "owner",
+              "amount": 1,
+              "cardKinds": [
+                "duel"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

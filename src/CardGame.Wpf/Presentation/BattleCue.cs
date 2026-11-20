@@ -335,7 +335,7 @@ public static class BattleCueProjector
                 DyingResolvedEvent { Survived: true } rescued => new(envelope.Sequence, BattleCueKind.Rescued, rescued.VictimSeat,
                     Seats([rescued.VictimSeat]), "脱离濒死", Name(rescued.VictimSeat))
                     { LifeResolutionId = rescued.ResolutionId },
-                PlayerDiedEvent died => new(envelope.Sequence, BattleCueKind.Death, died.VictimSeat, Seats([died.VictimSeat]), "阵 亡", Name(died.VictimSeat)),
+                PlayerDiedEvent died => new(envelope.Sequence, BattleCueKind.Death, died.VictimSeat, Seats([died.VictimSeat]), died.IsResting ? "休 整" : "阵 亡", Name(died.VictimSeat)),
                 _ => null
             };
 

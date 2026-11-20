@@ -6,6 +6,7 @@ internal sealed partial class CoreGameEngineDeathProgramsEntries
     internal void AdvanceOwnerDiedProgramCandidate(ProgramDeathTriggerWindowFrame frame, ProgramTriggerCandidate candidate, bool activated, bool completed) => _resolve().AdvanceOwnerDiedProgramCandidate(frame, candidate, activated, completed);
     internal void AdvanceOwnerDiedProgramCursor(ProgramDeathTriggerWindowFrame frame) => _resolve().AdvanceOwnerDiedProgramCursor(frame);
     internal SkillProgramStepOutcome CauseProgramDeathUnlessBoundCardKind(ProgramSkillFrame frame, string sourceBind, IReadOnlyList<CardKind> excludedCardKinds) => _resolve().CauseProgramDeathUnlessBoundCardKind(frame, sourceBind, excludedCardKinds);
+    internal SkillProgramStepOutcome CauseOwnerDeath(ProgramSkillFrame frame) => _resolve().CauseOwnerDeath(frame);
     internal void ChangeProgramAttributedMarker(ProgramSkillFrame frame, ProgramParticipantReference targetReference, PlayerMarkerKind marker, int amount) => _resolve().ChangeProgramAttributedMarker(frame, targetReference, marker, amount);
     internal void ClaimProgramDeathCleanupCards(ProgramSkillFrame frame) => _resolve().ClaimProgramDeathCleanupCards(frame);
     internal void ClearAttributedMarkerSources(CharacterState owner, long resolutionId) => _resolve().ClearAttributedMarkerSources(owner, resolutionId);

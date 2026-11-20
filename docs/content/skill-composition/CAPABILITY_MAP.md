@@ -82,6 +82,8 @@
 | 伤害、失去体力、回复、濒死与死亡 | [伤害落定](../../../src/CardGame.Core/EngineOwners/CoreNativeDamageApplicationRuntime.Main.cs)在原伤害帧记录实际体力，[煞决](../../../src/Characters/xu-rong/ol/Runtime/CharacterXuRongOlRuntime.XuRongObservers.cs)从原濒死父帧读取。[濒死救援](../../../src/CardGame.Core/EngineOwners/CoreNativeDyingRuntime.Main.cs)和[死亡帧](../../../src/CardGame.Core/EngineOwners/CoreNativeDeathFramesRuntime.Main.cs)各有入口。[共用受伤状态](../../../src/CardGame.Core/EngineOwners/CoreGameEngineTreatedWoundedRuntime.TreatedWounded.cs)供原生规则、条件技能和表达式读取。普通桃和技能 `Recover` 共用[原回复帧的体力写入](../../../src/CardGame.Core/EngineOwners/CoreNativeRecoveryFramesRuntime.Main.cs)。[苦肉](../../../src/Characters/huang-gai/classic/Skills/classic-kujin-skills.rules.json)用“失去体力、摸牌”两个步骤表达。 | 其他具名伤害观察仍可分批迁入。受伤、失去体力、回复替换和成功救援各有独立时机。 |
 | 回合、阶段和持续状态 | [阶段身份](../../../src/CardGame.Core/Runtime/Rules/ActualDiscardRecoveryPhaseRuntime.cs)区分本次实际阶段。[弃牌阶段入口](../../../src/CardGame.Core/EngineOwners/CoreActualDiscardPhaseRuntime.Main.cs)接管自动、手动收尾及已受理的同步跳过，再归回合结束。[弃牌前政策](../../../src/CardGame.Core/EngineOwners/CoreActualDiscardPhaseRuntime.NativeDiscardEntry.cs)在原入口帧保留选择和发动子窗，[移动克己](../../../src/Characters/lu-meng/mobile/Skills/mobile-lu-meng.rules.json)直接声明这个时点。[技能变更](../../../src/CardGame.Core/Runtime/Rules/ProgramSkillChangeRuntime.cs)按声明期限处理[孔武](../../../src/Characters/hu-che-er/mou/Runtime/MouHuCheErRuntime.cs)的装备失效，使用受影响者下一次实际回合结束边界。 | [肆恣](../../../src/Characters/zhong-hui/mobile-shi/Runtime/CharacterZhongHuiMobileShiRuntime.MobileShiZhongHuiLedger.cs)仍自己处理每次付款的剩余结算次数和到期。阶段核心负责开始、跳过和结束，技能保留发动条件及期限。 |
 
+死亡帧与休整返场的入口见[死亡与返场](contracts/DEATH_AND_RETURN.md)。
+
 ### 从真实对局迁移
 
 现有命令、阶段身份、技能索引和步骤执行器从第一批起就直接使用。以下顺序针对尚需接管的职责。

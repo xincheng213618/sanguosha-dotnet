@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:yijin": {
+      "name": "亿金",
+      "description": "锁定技，游戏开始时获得六种金。回合开始时，若你没有金，你直接死亡。出牌阶段开始时，你将一种金交给另一名没有金的角色，直到其下个回合结束。"
+    },
+    "mobile:guanzong": {
+      "name": "惯纵",
+      "description": "出牌阶段限一次，你可以令一名其他角色对另一名其他角色造成1点虚拟伤害。"
+    },
+    "mobile:yijin-wushi": {
+      "name": "膴仕",
+      "description": "摸牌阶段多摸四张牌，出牌阶段使用杀的次数上限加一。"
+    },
+    "mobile:yijin-houren": {
+      "name": "厚任",
+      "description": "回合结束时回复3点体力。"
+    },
+    "mobile:yijin-tongshen": {
+      "name": "通神",
+      "description": "防止你受到的非雷电伤害。"
+    },
+    "mobile:yijin-jinmi": {
+      "name": "金迷",
+      "description": "跳过出牌和弃牌阶段。"
+    },
+    "mobile:yijin-jiaxiong": {
+      "name": "贾凶",
+      "description": "出牌阶段开始时失去1点体力，本回合手牌上限减3。"
+    },
+    "mobile:yijin-yongbi": {
+      "name": "拥蔽",
+      "description": "准备阶段跳过接下来的摸牌阶段。"
+    }
+  }
+}

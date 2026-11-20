@@ -62,7 +62,7 @@ internal sealed partial class CharacterCaoPiMouRuntime
         }
 
         if (r.Op == SkillProgramEffectOp.MouCaoPiXingshang && HasMouXingshang(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && HasPrintedMouXingshang(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
-            foreach (var dead in _coreMatchParticipantsPlayersAccess._players.Where(p => !p.IsAlive && MouCaoPiPrintedSkills(p).Length > 0))
+            foreach (var dead in _coreMatchParticipantsPlayersAccess._players.Where(p => DeadGeneralPursuit.CanPursue(p, _contentRegistryOperations._contentRegistry)))
                 Add("inherit", $"4颂：追思{(dead.General.Name)}，获得其非主公技并失去行殇、放逐、颂威", dead.Seat, 4);
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -112,7 +112,7 @@ internal sealed partial class CharacterCaoPiMouRuntime
             LoseMouCaoPiSkills(recipient, f.OwnerSeat, null);
         else if (option == "inherit")
         {
-            _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], "mou:xingshang", MouCaoPiPrintedSkills(recipient));
+            _coreProgramSkillChangesOperations.ProgramSkillChanges.PursueDeadGeneral(f, target, _contentRegistryOperations._contentRegistry);
             LoseMouCaoPiSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.OwnerSeat, ["mou:xingshang", "mou:fangzhu", "mou:songwei"]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoPiInheritedEvent(f.Id, f.OwnerSeat, target, recipient.General.Id));
         }

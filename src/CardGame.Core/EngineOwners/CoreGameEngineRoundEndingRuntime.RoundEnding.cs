@@ -13,8 +13,9 @@ internal sealed partial class CoreGameEngineRoundEndingRuntime
         var progress = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression;
         if (progress.PendingBeneficiarySeat is { } beneficiary && _coreMatchParticipantsPlayersAccess._players[beneficiary].IsAlive)
             return false;
-        var resume = progress.NormalResumeSeat ?? _coreTableSeatQueriesOperations.FindNextAliveSeat(previous.Seat);
-        var next = _coreMatchParticipantsPlayersAccess._players[resume].IsAlive ? resume : _coreTableSeatQueriesOperations.FindNextAliveSeat(resume);
+        var resume = progress.NormalResumeSeat ?? _coreTableSeatQueriesOperations.FindNextNormalTurnSeat(previous.Seat);
+        var normalActor = _coreMatchParticipantsPlayersAccess._players[resume];
+        var next = normalActor.IsAlive || normalActor.IsResting ? resume : _coreTableSeatQueriesOperations.FindNextNormalTurnSeat(resume);
         if (!_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Contains(next))
             return false;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.Count != 0 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Finished || progress.OwnerSeat != previous.Seat || previous.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || progress.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber)

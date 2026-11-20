@@ -1,0 +1,92 @@
+{
+  "skills": [
+    {
+      "id": "mobile:yijin", "revision": 1,
+      "triggers": [
+        {
+          "id": "initial-stock", "window": "gameStarting", "subject": "owner", "optional": false, "isSkillInvocation": false,
+          "effects": [
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinWushi", "amount": 1 },
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinHouren", "amount": 1 },
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinTongshen", "amount": 1 },
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinJinmi", "amount": 1 },
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinJiaxiong", "amount": 1 },
+            { "op": "setMarkerAmount", "target": "owner", "marker": "yijinYongbi", "amount": 1 }
+          ]
+        },
+        {
+          "id": "no-gold", "window": "turnBeforeStart", "subject": "owner", "optional": false,
+          "condition": { "kind": "all", "children": [
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinWushi" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } },
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinHouren" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } },
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinTongshen" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } },
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinJinmi" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } },
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinJiaxiong" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } },
+            { "kind": "compare", "left": { "kind": "ownerAttributedMarkerCount", "marker": "yijinYongbi" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 0 } }
+          ] },
+          "effects": [{ "op": "causeOwnerDeath", "target": "owner" }]
+        },
+        {
+          "id": "give-gold", "window": "playPhaseStarting", "subject": "owner", "optional": false,
+          "effects": [{ "op": "distributeYijinGold", "target": "owner" }]
+        }
+      ]
+    },
+    {
+      "id": "mobile:guanzong", "revision": 1,
+      "activations": [{
+        "id": "virtual-damage", "targetKind": "otherLiving", "minTargets": 2, "maxTargets": 2,
+        "minCards": 0, "maxCards": 0, "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [{ "op": "issueVirtualDamage", "target": "owner", "amount": 1 }]
+      }]
+    },
+    {
+      "id": "mobile:yijin-wushi", "revision": 1,
+      "triggers": [{
+        "id": "extra-draw", "window": "drawPhaseStarting", "drawPhaseMode": "additive", "subject": "owner", "optional": false,
+        "effects": [{ "op": "adjustNormalDraw", "target": "owner", "amount": 4 }]
+      }],
+      "modifiers": [{ "id": "extra-slash", "query": "slashLimit", "operation": "add", "value": 1, "priority": 0 }]
+    },
+    {
+      "id": "mobile:yijin-houren", "revision": 1,
+      "triggers": [{
+        "id": "recover-turn-end", "window": "turnEnding", "subject": "owner", "optional": false,
+        "effects": [{ "op": "recover", "target": "owner", "amount": 3 }]
+      }]
+    },
+    {
+      "id": "mobile:yijin-tongshen", "revision": 1,
+      "triggers": [{
+        "id": "prevent-nonthunder", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": false,
+        "condition": { "kind": "not", "children": [{ "kind": "damageNatureIs", "damageNature": "thunder" }] },
+        "effects": [{ "op": "preventCurrentDamage", "target": "owner" }]
+      }]
+    },
+    {
+      "id": "mobile:yijin-jinmi", "revision": 1,
+      "triggers": [{
+        "id": "skip-play", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+        "effects": [{ "op": "skipTurnPhases", "target": "owner", "phases": ["play"] }]
+      }, {
+        "id": "skip-discard", "window": "discardPhaseStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "skipTurnPhases", "target": "owner", "phases": ["discard"] }]
+      }]
+    },
+    {
+      "id": "mobile:yijin-jiaxiong", "revision": 1,
+      "triggers": [{
+        "id": "lose-vitality", "window": "playPhaseStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "loseHp", "target": "owner", "amount": 1 }]
+      }],
+      "modifiers": [{ "id": "hand-limit-penalty", "query": "handLimit", "operation": "add", "value": -3, "priority": 0 }]
+    },
+    {
+      "id": "mobile:yijin-yongbi", "revision": 1,
+      "triggers": [{
+        "id": "skip-draw", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+        "effects": [{ "op": "skipTurnPhases", "target": "owner", "phases": ["draw"] }]
+      }]
+    }
+  ]
+}

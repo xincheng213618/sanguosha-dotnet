@@ -6,6 +6,9 @@ internal sealed partial class CoreGameEngineActualPlayPhaseCardUsesRuntime
     internal bool TracksActualPlayPhaseCardUses => _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesActualPlayPhaseUseLedger;
 
     internal int GetActualPlayPhaseUseCount(int actorSeat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && actorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat ? _coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Count : 0;
+    internal bool IsCurrentPlayPhaseUse(int actorSeat, long actionId, int ordinal) =>
+        GetActualPlayPhaseUseCount(actorSeat) == ordinal &&
+        _coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Contains(actionId);
     internal void RecordActualPlayPhaseUse(CardActionContext action)
     {
         _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action, qualifiedActualUse: true);

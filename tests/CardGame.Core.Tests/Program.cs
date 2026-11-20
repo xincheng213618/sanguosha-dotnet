@@ -89,6 +89,9 @@ if (unknownArguments.Length > 0)
 // Default/manual discard validation and complete-match coverage live in ManualDiscardChecks.
 var tests = new (string Name, Action Body)[]
 {
+    ("Death interactions: self Fire Attack chain removes a dead source and preserves only the qualified Xianfu echo cold", DeathInteractionChecks.FireAttackChainLosesDeadSourceAndPreservesOnlyQualifiedXianfuCold),
+    ("mobile pursuit and gold state", MobilePursuitChecks.Run),
+    ("Mobile Shi Chang Shi: private opening and all five pair appearances replay", MobileShiChangShiChecks.OpeningAndRestReturnPreserveAttendantReserve),
     ("Applied response relations: actual names frozen uses and current counterspell nodes", AppliedResponseRelationChecks.ActualNamesFreezeNativeUsesAndCurrentCounterspellNodes),
     ("typed deferred capabilities preserve cycles ref out and match identity", DeferredCapabilityChecks.TypedFactoriesDeferCyclesAndRetainRefOutAndMatchIdentity),
     ("SP Pang Tong runtime: Guolun original paid exchange and gain child cold", CardGame.Core.Tests.SpPangTongRuntimeChecks.GuolunExchangeReturnsOriginalPaidChildrenCold),

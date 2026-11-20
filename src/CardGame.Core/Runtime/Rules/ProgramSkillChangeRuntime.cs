@@ -17,6 +17,36 @@ internal sealed class ProgramSkillChangeRuntime(IHandLimitExemptionBoundaries ha
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
     internal ProgramSkillFrame Prepare(ProgramSkillFrame supplied) => facts.ActiveFrame(supplied.Id);
 
+    internal void PursueDeadGeneral(ProgramSkillFrame supplied, int victimSeat, IProgramContentQueries content,
+        string? lostSkill = null)
+    {
+        var frame = Prepare(supplied);
+        if (victimSeat == frame.OwnerSeat || !facts.IsValidSeat(victimSeat) || !facts.Alive(frame.OwnerSeat) ||
+            !DeadGeneralPursuit.CanPursue(facts.Player(victimSeat), content))
+            throw new InvalidOperationException("追思 requires an eligible, permanently dead character.");
+
+        var victim = facts.Player(victimSeat);
+        var printed = DeadGeneralPursuit.PrintedNonLordSkills(victim, content);
+        var cost = lostSkill is null ? [] : facts.Grants(frame.OwnerSeat)
+            .Where(grant => grant.SkillId == lostSkill && grant.IsEnabled && !grant.IsModeRule).ToArray();
+        if (lostSkill is not null && cost.Length == 0)
+            throw new InvalidOperationException("追思 could not pay the required skill loss.");
+
+        observations.Capture(participants.Players);
+        foreach (var grant in cost)
+            operations.RemoveGrant(frame.OwnerSeat, grant.GrantId);
+        if (lostSkill is not null)
+        {
+            operations.InvalidateBindings(frame.OwnerSeat);
+            operations.AdvanceFact(new CharacterSkillsLostEvent(frame.OwnerSeat, frame.OwnerSeat, [lostSkill]));
+        }
+
+        victim.Markers.Add(PlayerMarkerKind.Pursued, 1);
+        operations.AdvanceFact(new PlayerMarkerChangedEvent(frame.Id, victimSeat, PlayerMarkerKind.Pursued, 1, 1,
+            frame.OwnerSeat, "rule.dead-general-pursuit"));
+        AcquireRuntimeSkills(frame.OwnerSeat, frame.SkillId, printed);
+    }
+
     private SkillStateBoundary? _processingBoundary;
     internal int ActualTurnNumber => turn.TurnNumber;
     internal IEnumerable<IGameEvent> AdvancingFacts => facts.AdvancingFacts;

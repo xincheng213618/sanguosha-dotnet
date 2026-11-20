@@ -199,6 +199,12 @@ public sealed partial class MainViewModel
             CurrentGuideBody = GameOverText;
             steps = ["打开战报回顾公开行动与关键伤害。", "点击「再战一局」可重新选择模式与阵营。"];
         }
+        else if (human is { IsResting: true } && prompt?.PlayerSeat != human.Seat)
+        {
+            CurrentGuideTitle = "你正在休整";
+            CurrentGuideBody = "继续推进牌局，轮到你的下个正常回合时返场。";
+            steps = [];
+        }
         else if (human is { IsAlive: false } && prompt?.PlayerSeat != human.Seat)
         {
             CurrentGuideTitle = "你已阵亡，仍可观战";

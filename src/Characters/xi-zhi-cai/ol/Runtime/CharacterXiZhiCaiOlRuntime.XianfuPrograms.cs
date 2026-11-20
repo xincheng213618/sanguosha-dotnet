@@ -17,20 +17,43 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         get
         {
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-                if (p.XianfuRelations.Count > 0)
+                if (p.XianfuRelations.Any(relation => !relation.IsRetired))
                     return true;
             return false;
         }
     }
 
-    internal IEnumerable<XianfuRelationGrant> LiveXianfuRelations() => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.XianfuRelations.Count > 0).SelectMany(p => p.XianfuRelations).Where(g => _coreMatchParticipantsPlayersAccess._players[g.TargetSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], g.Source.SkillId, g.Source.SkillInstanceId));
+    internal IEnumerable<XianfuRelationGrant> LiveXianfuRelations() => _coreMatchParticipantsPlayersAccess._players
+        .Where(owner => owner.IsAlive)
+        .SelectMany(owner => owner.XianfuRelations.Where(relation => !relation.IsRetired).Select(relation => relation.Grant))
+        .Where(grant => _coreMatchParticipantsPlayersAccess._players[grant.TargetSeat].IsAlive &&
+            _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[grant.Source.OwnerSeat],
+                grant.Source.SkillId, grant.Source.SkillInstanceId));
+
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 131)]
+    internal void RetireXianfuRelationsOnDeath(PlayerDiedEvent died)
+    {
+        foreach (var owner in _coreMatchParticipantsPlayersAccess._players)
+        {
+            if (!owner.XianfuRelations.Any(Expires))
+                continue;
+            // Keep the issuance so an echo already qualified on the lethal
+            // damage still returns through its original damage occurrence.
+            owner.XianfuRelations = owner.XianfuRelations.Select(relation =>
+                Expires(relation) ? relation with { IsRetired = true } : relation).ToArray();
+        }
+
+        bool Expires(XianfuRelationState relation) => !relation.IsRetired &&
+            (relation.Grant.Source.OwnerSeat == died.VictimSeat || relation.Grant.TargetSeat == died.VictimSeat);
+    }
+
     internal SkillProgramStepOutcome ArmXianfuRelation(ProgramSkillFrame supplied, int target)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } w || f.SelectedTargetSeats is not [var selected] || selected != target || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations.Any(g => g.Source.SkillInstanceId == f.SkillInstanceId))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } w || f.SelectedTargetSeats is not [var selected] || selected != target || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations.Any(relation => relation.Grant.Source.SkillInstanceId == f.SkillInstanceId))
             throw new InvalidOperationException("Xianfu requires its original actual game-start other-character selection.");
         var g = new XianfuRelationGrant(f.Id, XiZhiCaiSource(f), f.GameplayHash, target, w.ParentFrameId);
-        _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations.Append(g).ToArray();
+        _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].XianfuRelations.Append(new(g)).ToArray();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianfuRelationArmedEvent(g));
         return SkillProgramStepOutcome.Continue;
     }
@@ -59,13 +82,22 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
 
     internal bool IsXianfuEchoTrigger(SkillProgramTrigger trigger) => trigger.Effects is [{ Op: SkillProgramEffectOp.SettleXianfuNativeEcho }];
     internal XianfuEchoQualification? XianfuQualification(ProgramTriggerCandidate c, long nativeId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianfuEchoQualifiedEvent>().Select(e => e.Receipt).SingleOrDefault(r => r.NativeChangeId == nativeId && r.Grant.Source.OwnerSeat == c.OwnerSeat && r.Grant.Source.SkillId == c.SkillId && r.Grant.Source.SkillInstanceId == c.SkillInstanceId);
-    internal bool XianfuQualifiedSourceEnabled(XianfuEchoQualification r) => _coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat].XianfuRelations.Contains(r.Grant) && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat], r.Grant.Source.SkillId, r.Grant.Source.SkillInstanceId);
+    internal bool XianfuQualifiedSourceEnabled(XianfuEchoQualification r) => _coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat].XianfuRelations.Any(relation => relation.Grant == r.Grant) && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[r.Grant.Source.OwnerSeat], r.Grant.Source.SkillId, r.Grant.Source.SkillInstanceId);
     internal bool XianfuEchoConsumed(XianfuEchoQualification r) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianfuEchoIssuedEvent>().Any(e => e.Receipt.Grant == r.Grant && e.Receipt.NativeChangeId == r.NativeChangeId);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectXianfuHpCandidates(HpChangeContext change)
     {
-        if (!HasXianfuRelation || change.Kind != HpChangeKind.Recovery || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.XianfuRelations.Any(g => g.TargetSeat == change.TargetSeat)))
-            return[];
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.XianfuRelations.Count > 0).SelectMany(p => p.XianfuRelations).Where(g => g.TargetSeat == change.TargetSeat).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered).Where(c => c.SkillId == g.Source.SkillId && c.SkillInstanceId == g.Source.SkillInstanceId && IsXianfuEchoTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) && XianfuQualification(c, change.Id)is { } q && XianfuQualifiedSourceEnabled(q) && !XianfuEchoConsumed(q))).Distinct().ToArray();
+        if (change.Kind != HpChangeKind.Recovery)
+            return [];
+        return _coreMatchParticipantsPlayersAccess._players.Where(owner => owner.IsAlive)
+            .SelectMany(owner => owner.XianfuRelations.Select(relation => relation.Grant))
+            .Where(grant => grant.TargetSeat == change.TargetSeat)
+            .SelectMany(grant => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(
+                _coreMatchParticipantsPlayersAccess._players[grant.Source.OwnerSeat], SkillProgramTriggerWindow.AfterHpRecovered)
+                .Where(candidate => candidate.SkillId == grant.Source.SkillId && candidate.SkillInstanceId == grant.Source.SkillInstanceId &&
+                    IsXianfuEchoTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)) &&
+                    XianfuQualification(candidate, change.Id) is { } qualification && XianfuQualifiedSourceEnabled(qualification) &&
+                    !XianfuEchoConsumed(qualification)))
+            .Distinct().ToArray();
     }
 
     internal ProgramSkillWindowContext CreateXianfuHpContext(HpChangeContext change, ProgramTriggerCandidate c)
@@ -90,7 +122,12 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     {
         if (!IsXianfuEchoTrigger(trigger))
             return true;
-        return _coreMatchParticipantsPlayersAccess._players[ownerSeat].XianfuRelations.Any(g => g.Source.OwnerSeat == ownerSeat && g.TargetSeat == attack.TargetSeat && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianfuEchoQualifiedEvent>().Any(e => e.Receipt.Grant == g && e.Receipt.Kind == XianfuEchoKind.Damage && e.Receipt.NativeParentFrameId == attack.ResolutionId && XianfuQualifiedSourceEnabled(e.Receipt) && !XianfuEchoConsumed(e.Receipt)));
+        return _coreMatchParticipantsPlayersAccess._players[ownerSeat].XianfuRelations.Select(relation => relation.Grant)
+            .Any(grant => grant.Source.OwnerSeat == ownerSeat && grant.TargetSeat == attack.TargetSeat &&
+                _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XianfuEchoQualifiedEvent>().Any(item =>
+                    item.Receipt.Grant == grant && item.Receipt.Kind == XianfuEchoKind.Damage &&
+                    item.Receipt.NativeParentFrameId == attack.ResolutionId && XianfuQualifiedSourceEnabled(item.Receipt) &&
+                    !XianfuEchoConsumed(item.Receipt)));
     }
 
     internal bool CanRunXianfuEcho(ProgramTriggerCandidate c, ProgramSkillWindowContext context)

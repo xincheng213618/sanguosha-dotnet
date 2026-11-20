@@ -1,8 +1,24 @@
 #nullable enable
 
 namespace CardGame.Core.EngineOwners;
+[Core.ProgramCapability]
 internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
+    : ICollectSuitJudgments
 {
+    public SkillProgramStepOutcome BeginCollectingJudgments(ProgramSkillFrame supplied, string reason, string bind)
+    {
+        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        if (frame.ActivationId is null || frame.RepeatedJudgment is not null ||
+            !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
+            throw new InvalidOperationException("Collecting judgments requires a live active owner.");
+        _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, bind, [], SkillProgramCardSetVisibility.Public);
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var state = new ProgramRepeatedJudgment(reason, bind, [], 0) { CollectDistinctSuits = true };
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { RepeatedJudgment = state });
+        return _coreProgramLifecycleOperations.StartProgramJudgment(frame, frame.OwnerSeat, state.Reason, state.ResultBind,
+            SkillProgramCardSetVisibility.Public, frame.OwnerSeat);
+    }
+
     internal SkillProgramStepOutcome BeginProgramRepeatedJudgment(ProgramSkillFrame frame, string reason, string resultBind, IReadOnlyList<Suit> successSuits)
     {
         var exact = _coreExactRepeatedJudgmentOperations.Value;
@@ -31,6 +47,11 @@ internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
         }
 
         var card = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending);
+        if (card is not null && state.CollectDistinctSuits)
+        {
+            StoreCollectedJudgment(frame, state, pending, card);
+            return;
+        }
         if (card is null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { RepeatedJudgment = null });
@@ -46,6 +67,53 @@ internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(card, location, matched ? CardLocation.Hand(frame.OwnerSeat) : CardLocation.DiscardPile, new CardMoveReason($"skill-program.{(frame.SkillId)}.repeatJudgment"));
         if (matched)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJudgmentCardClaimedEvent(pending.Id, frame.SkillId, frame.OwnerSeat, card.Id, card.Kind));
+        if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
+            _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
+    }
+
+    private void StoreCollectedJudgment(ProgramSkillFrame frame, ProgramRepeatedJudgment state, JudgmentFrame judgment,
+        Card card)
+    {
+        var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
+        var from = CardLocation.Judgment(owner.Seat);
+        if (judgment.TargetSeat != owner.Seat || judgment.Reason != state.Reason ||
+            _cardZonesOperations._cardZones.GetLocation(card.Id) != from)
+            throw new InvalidOperationException("A collected judgment lost its exact source location.");
+
+        var previous = _coreProgramLifecycleOperations.GetProgramCardSet(frame, state.ResultBind);
+        var suit = _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(judgment,
+            _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
+        var bit = ProgramRecordedSuitSlash.Bit(suit);
+        var collect = owner.IsAlive;
+        var mayContinue = collect && bit != 0 && (state.PreviousSuitMask & bit) == 0;
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with
+        {
+            RepeatedJudgment = state with
+            {
+                CompletedCount = checked(state.CompletedCount + 1),
+                LastMatched = mayContinue,
+                PreviousSuitMask = state.PreviousSuitMask | bit
+            },
+            PendingMovementContinuation = new ProgramMovementContinuation(owner.Seat, 0, null)
+        });
+        var to = collect ? CardLocation.Processing : CardLocation.DiscardPile;
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, to, new CardMoveReason($"skill-program.{frame.SkillId}.judgment-collection"));
+        if (collect && _cardZonesOperations._cardZones.GetLocation(card.Id) == to)
+        {
+            var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+            if (previous.CardIds.Contains(card.Id))
+                throw new InvalidOperationException("A collected judgment cannot enter the same reserve twice.");
+            var cards = previous.CardIds.Append(card.Id).ToArray();
+            var locations = previous.SourceLocations.Append(to).ToArray();
+            // Reuse the binding writer so the expanded set freezes the same
+            // location and entry witnesses as every other program card set.
+            _coreRuntimeOperations.ReplaceRuntimeTop(active with
+            {
+                CardSetBindings = Array.AsReadOnly(active.CardSetBindings.Where(binding => binding.Name != state.ResultBind).ToArray())
+            });
+            _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, state.ResultBind, cards,
+                SkillProgramCardSetVisibility.Public, locations);
+        }
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
     }

@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public enum XianfuEchoKind { Damage, Recovery }
 public sealed record XianfuRelationGrant(long FrameId,CardConversionSource Source,string GameplayHash,int TargetSeat,long GameStartingWindowId);
+internal sealed record XianfuRelationState(XianfuRelationGrant Grant, bool IsRetired = false);
 public sealed record XianfuEchoQualification(XianfuRelationGrant Grant,XianfuEchoKind Kind,long NativeChangeId,long NativeParentFrameId,int OriginalTargetSeat,int ActualAmount,int? OriginalSourceSeat,int? HpBefore,int HpAfter);
 public sealed record XianfuRelationArmedEvent(XianfuRelationGrant Grant):IGameEvent;
 public sealed record XianfuEchoQualifiedEvent(XianfuEchoQualification Receipt):IGameEvent;
@@ -17,8 +18,12 @@ public sealed record ChouceOutcomeIssuedEvent(long FrameId,long JudgmentFrameId,
 public sealed record ChouceCompletedEvent(long FrameId,long JudgmentFrameId,int PointIndex):IGameEvent;
 public sealed partial class CharacterState
 {
- private IReadOnlyList<XianfuRelationGrant> _xianfuRelations=Array.AsReadOnly(Array.Empty<XianfuRelationGrant>());
- internal IReadOnlyList<XianfuRelationGrant> XianfuRelations{get=>_xianfuRelations;set=>_xianfuRelations=Array.AsReadOnly(value.ToArray());}
+    private IReadOnlyList<XianfuRelationState> _xianfuRelations = [];
+    internal IReadOnlyList<XianfuRelationState> XianfuRelations
+    {
+        get => _xianfuRelations;
+        set => _xianfuRelations = Array.AsReadOnly(value.ToArray());
+    }
 }
 public sealed partial record ProgramSkillWindowContext
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public XianfuEchoQualification? XianfuEcho{get;init;}}

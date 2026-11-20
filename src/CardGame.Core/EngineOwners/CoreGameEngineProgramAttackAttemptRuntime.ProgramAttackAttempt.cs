@@ -14,7 +14,18 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
             return false;
         }
 
-        if (!attack.TryAdvanceChainedTarget(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreNativeDamageHandlesOperations.Value.UsesFormalTengjia || _coreNativeDamageHandlesOperations.Value.UsesFormalSilverLion || _coreRecipientScopedDamageOperations.Value.HasShenwuRecipientDamageModifiers || _modeRulesOperations._modeRules.RequiresRecipientDamageReevaluation || _characterCheZhouAnniversaryOperations.Value.HasAnniversaryCheZhouRules || _coreRecipientScopedDamageOperations.Value.HasPublicEnemyRecipientDamageScope(attack) || _coreRecipientScopedDamageOperations.Value.HasFixedTargetRecipientDamageScope(attack) || _corePassiveRulePoliciesOperations.HasPerOccurrenceSourceDamageModifiers(attack.SourceSeat) || _corePassiveDamageCapsOperations.HasNextRecipientPassiveDamageCap(attack), out fromSeat))
+        var sourceLess = attack.IsSourceLess || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive;
+        var reevaluateDamage = _coreNativeDamageHandlesOperations.Value.UsesFormalTengjia ||
+            _coreNativeDamageHandlesOperations.Value.UsesFormalSilverLion ||
+            _coreRecipientScopedDamageOperations.Value.HasShenwuRecipientDamageModifiers ||
+            _modeRulesOperations._modeRules.RequiresRecipientDamageReevaluation ||
+            _characterCheZhouAnniversaryOperations.Value.HasAnniversaryCheZhouRules ||
+            _coreRecipientScopedDamageOperations.Value.HasPublicEnemyRecipientDamageScope(attack) ||
+            _coreRecipientScopedDamageOperations.Value.HasFixedTargetRecipientDamageScope(attack) ||
+            _corePassiveRulePoliciesOperations.HasPerOccurrenceSourceDamageModifiers(attack.SourceSeat) ||
+            _corePassiveDamageCapsOperations.HasNextRecipientPassiveDamageCap(attack);
+        if (!attack.TryAdvanceChainedTarget(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive,
+            reevaluateDamage, sourceLess, out fromSeat))
             return false;
         _coreProgramDamageHooksOperations.DamageHooks.AdvanceChain(ProgramDamagePhase.AfterChainAdvance, attack);
         return true;
@@ -58,8 +69,8 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
 
         if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && TryAdvanceChainedDamageTarget(attack, out var fromSeat))
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChainedDamagePropagatedEvent(attack.ResolutionId, attack.SourceSeat, fromSeat, attack.TargetSeat, attack.DamageAmount, _coreNativeCardClassificationsOperations.GetDamageNature(attack)));
-            _coreMatchLogOperations.AddLog("ChainDamage", $"连环伤害从 {(_coreMatchParticipantsPlayersAccess._players[fromSeat].Name)} 传导至 {(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Name)}。", attack.SourceSeat, attack.TargetSeat);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChainedDamagePropagatedEvent(attack.ResolutionId, attack.SourceSeat, fromSeat, attack.TargetSeat, attack.DamageAmount, _coreNativeCardClassificationsOperations.GetDamageNature(attack)) { SourceLess = attack.IsSourceLess });
+            _coreMatchLogOperations.AddLog("ChainDamage", $"连环伤害从 {(_coreMatchParticipantsPlayersAccess._players[fromSeat].Name)} 传导至 {(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Name)}。", attack.IsSourceLess ? null : attack.SourceSeat, attack.TargetSeat);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
                 CompleteProgramAttack(attack);
             return;

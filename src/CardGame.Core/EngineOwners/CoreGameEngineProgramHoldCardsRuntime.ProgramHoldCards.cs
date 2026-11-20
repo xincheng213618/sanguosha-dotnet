@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
 {
-    internal SkillProgramStepOutcome HoldProgramTargetCards(ProgramSkillFrame frame, int chooserSeat, int holderSeat, IReadOnlyList<CardZoneKind> zones, string resultBind, int minimumCards)
+    internal SkillProgramStepOutcome HoldProgramTargetCards(ProgramSkillFrame frame, int chooserSeat, int holderSeat, IReadOnlyList<CardZoneKind> zones, string resultBind, int minimumCards, int maximumCards = 0)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.HoldCardSelection is not null || active.CardSetBindings.Any(binding => binding.Name == resultBind))
@@ -15,7 +15,8 @@ internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
             var location = new CardLocation(zone, holderSeat);
             return _cardZonesOperations._cardZones.CardsAt(location).Select((card, index) => (card.Id, Location: location, Slot: index));
         }).ToArray();
-        var requiredCount = candidates.Length == 0 ? 0 : Math.Clamp(_coreMatchParticipantsPlayersAccess._players[holderSeat].Hp, minimumCards, candidates.Length);
+        var holdLimit = maximumCards > 0 ? maximumCards : _coreMatchParticipantsPlayersAccess._players[holderSeat].Hp;
+        var requiredCount = candidates.Length == 0 ? 0 : Math.Clamp(holdLimit, minimumCards, candidates.Length);
         if (requiredCount < minimumCards)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "目标没有可扣置的区域牌，技能结算已取消。");

@@ -376,8 +376,8 @@ internal sealed class ProgramOperationNodeReader
             var requiredTargetKind = reader.Has("requiredTargetKind")
                 ? reader.RequiredEnum<SkillProgramTargetKind>("requiredTargetKind") : (SkillProgramTargetKind?)null;
             if (requiredTargetKind is not null and not
-                (SkillProgramTargetKind.OtherLivingInAttackRange or SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or SkillProgramTargetKind.OtherLivingVirtualDuelTarget or SkillProgramTargetKind.BoundaryBuLianShiAnxuLeast or SkillProgramTargetKind.BoundaryLingTongMovableEquipmentSource))
-                Fail(reader.Path + ".requiredTargetKind", "requires an attack-range, discardable-card, virtual-Duel, original Anxu pair or movable-equipment source target set");
+                (SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.OtherLivingInAttackRange or SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or SkillProgramTargetKind.OtherLivingVirtualDuelTarget or SkillProgramTargetKind.BoundaryBuLianShiAnxuLeast or SkillProgramTargetKind.BoundaryLingTongMovableEquipmentSource))
+                Fail(reader.Path + ".requiredTargetKind", "requires other living targets, an attack-range, discardable-card, virtual-Duel, original Anxu pair or movable-equipment source target set");
             return new SkillProgramChoiceOption(reader.RequiredIdentifier("id"), reader.Condition())
             {
                 Number = reader.Has("number") ? reader.RequiredInt("number") : null,
@@ -878,19 +878,18 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
             exceptBind: except, destination: destination, destinationZone: destinationZone, awaitMovementTriggers: awaitMovementTriggers,
             resultBind: result) { GiveBy = ProgramCardGiving.Parse(r, destination) };
         if (result is not null) RequireAlways(effect, r.Path);
-        // A named-choice branch may gate a discard, a gain into the owner's own
-        // hand (Pindian winnings, or Guzheng's optional claim of the remaining
-        // cards), or a placement onto the draw pile top (Gongxin).
+        // A named choice can spend one frozen card set by discarding, gifting,
+        // gaining, or returning it to the draw pile.
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             !(effect.Condition.Kind == SkillProgramConditionKind.BoundCardsMatchSuits && destination == SkillProgramCardDestination.OwnerHand) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
                 destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.OwnerPersistentZone or SkillProgramCardDestination.SelectedTargetHand) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
               destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or
-                SkillProgramCardDestination.DrawPileTop) &&
+                SkillProgramCardDestination.SelectedTargetHand or SkillProgramCardDestination.DrawPileTop) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.PindianWon &&
               destination is SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.SelectedTargetHand))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: conditional card movement requires a named-choice discard or gain branch.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: conditional card movement requires a supported discard, gain, gift or pile branch.");
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
@@ -902,7 +901,8 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
             ? [new RequireBoundParticipantGiftEntry(effect.SourceBind!), new ReadSelectedTarget(),
                 new RequireOwnedCardSet(effect.SourceBind!, SkillProgramEffectTarget.Owner, null, [CardZoneKind.Hand, CardZoneKind.Equipment]),
                 new MoveCardSet(effect.SourceBind!, effect.ExceptBind, SkillProgramCardDestination.SelectedTargetHand)] :
-        effect is { Destination: SkillProgramCardDestination.SelectedTargetHand, Condition.Kind: SkillProgramConditionKind.JudgmentOutcomeMatchesSuits }
+        effect is { Destination: SkillProgramCardDestination.SelectedTargetHand,
+            Condition.Kind: SkillProgramConditionKind.JudgmentOutcomeMatchesSuits or SkillProgramConditionKind.ChoiceIs }
             ? [new ReadSelectedTarget(), new MoveCardSet(effect.SourceBind!, effect.ExceptBind, SkillProgramCardDestination.SelectedTargetHand)] :
         effect.Destination == SkillProgramCardDestination.PhaseOwnerHand
             ? [new RequireContext(ProgramContextCapability.PhaseOwner),
@@ -1030,7 +1030,7 @@ internal sealed class SelectTargetProgramOperationDescriptor : ProgramOperationD
             actorReference: actorRef, skipIfNoTarget: skipIfNoTarget)
             { TargetSetExpression = r.ParticipantSetExpression("targetSetExpr") };
         if (effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
-            (targetKind is not (SkillProgramTargetKind.OtherLivingInAttackRange or
+            (targetKind is not (SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.OtherLivingInAttackRange or
                 SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or
                 SkillProgramTargetKind.OtherLivingVirtualDuelTarget) ||
              zones.Count != 0 || actorRef is not null || skipIfNoTarget))

@@ -70,6 +70,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 - Barbarian Assault keeps its original card user and assigned damage source on the group continuation. A living assigned source remains responsible after skill loss. If that replacement source dies, a later failed response starts a source-less damage attempt while the original use continues with its assigned seats.
 
+- Chained damage takes its source eligibility from the original damage source when the continuation advances to its next recipient. After that source dies, propagation retains the original use and proceeds without a damage source or credited killer. The source-less flag travels with the continuing damage attempt, including across nested dying and death windows.
+
 ## Recovery applications
 
 - `CoreNativeRecoveryFramesRuntime.ApplyRecovery` applies capped HP recovery from the current original `RecoveryFrame`. Ordinary Peach and the program `Recover` step use the returned before and after HP. Request amounts, replacement admission, dual-health selection, and the typed continuation stay with their native or program producers.

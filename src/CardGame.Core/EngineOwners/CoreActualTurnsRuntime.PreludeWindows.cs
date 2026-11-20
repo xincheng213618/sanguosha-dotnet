@@ -42,6 +42,7 @@ internal sealed partial class CoreActualTurnsRuntime
         features.HasOperation(SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua);
 
     private static bool HasOrdinaryBeforeTurnPreludeOperation(ProgramInstructionFeatures features) =>
+        features.HasOperation(SkillProgramEffectOp.CauseOwnerDeath) ||
         features.HasOperation(SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
         features.HasOperation(SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
         features.HasOperation(SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
@@ -110,6 +111,8 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (!owner.IsAlive)
         {
+            if (owner.IsResting)
+                _coreActualTurnProgressionOperations.Value.AdvanceActualTurnProgression(owner);
             BeginTurn();
             return;
         }

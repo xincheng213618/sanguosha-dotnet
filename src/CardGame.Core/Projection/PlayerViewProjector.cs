@@ -96,6 +96,7 @@ internal sealed class PlayerViewProjector(ICardZoneQueries zones, IProgramCardSn
                 player.HasAlcoholEffect)
             {
                 ViewerCanUseHand = sharedHandAccess,
+                IsResting = player.IsResting,
                 IdentityConcealed = player.IdentityConcealed,
                 HappyQiaoHealth = player.HasHpValue ? player.HappyQiaoHealth : null,
                 WushuangBuild = visibility.IsWushuangMode && (primarySkills is not null || secondarySkills is not null)

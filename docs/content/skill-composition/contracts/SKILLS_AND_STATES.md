@@ -21,6 +21,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Applied states outlive their caster and original skill. After application, evaluate the recipient's declared conditions, lifetime and removal rules; do not revoke a state merely because its caster died or lost the skill. Source qualification controls new applications and future windows; it does not requalify an already applied state. Read HP through the existing match health query, including its mode conversions and selected health receipts.
 
+- Xianfu retires the original game-start relation when either participant dies. Returning to the same seat does not resume echoes or the Chouce target bonus. An echo already qualified by the lethal damage retains that occurrence's eligibility if its Xianfu owner lives and the original skill instance remains effective.
+
 - Mou Hu Che Er's Kongwu uses its original paid origin to issue one equipment restriction through the target's next actual `TurnEnded` Before boundary. This lifetime skips the turn of issuance. The typed restriction suppresses both matching equipment skill grants and printed equipment effects, including cards with no skill grant. Field equipment and Wooden Ox read the same recipient restriction. The hand-size and HP qualification belongs to the original Play-phase settlement, and the draw penalty uses the original next-turn binding.
 
 ## Physical marks and hand limits

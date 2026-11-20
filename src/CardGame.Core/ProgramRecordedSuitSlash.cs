@@ -13,7 +13,7 @@ internal static class ProgramRecordedSuitSlash
 
 public sealed record ProgramRecordedSuitSlashReceipt(long ActionId, long CardUseFrameId, long ProducerFrameId,
     int ActorSeat, int TargetSeat, string SkillId, string SkillInstanceId, string GameplayHash,
-    string TriggerId, int EffectIndex, string StatePrefix, int SuitMask, int DamageBonus);
+    string TriggerId, int EffectIndex, string? StatePrefix, int SuitMask, int DamageBonus);
 public sealed record ProgramRecordedSuitSlashIssuedEvent(ProgramRecordedSuitSlashReceipt Receipt) : IGameEvent;
 
 public sealed partial record CardUseFrame
@@ -37,17 +37,20 @@ internal sealed class RevealRecordedSuitSlashDescriptor : ProgramOperationDescri
         static (effect, context) => context.RecordedSuitSlashValue(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "stateId", "resultBind", "condition");
-        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(),
-            stateId: r.RequiredIdentifier("stateId"), resultBind: r.RequiredIdentifier("resultBind"),
+        r.AllowOnly("op", "target", "stateId", "amount", "resultBind", "condition");
+        if (r.Has("stateId") == r.Has("amount"))
+            throw new InvalidOperationException("A Slash reveal requires recorded suits or a fixed reveal count.");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r),
+            r.Has("amount") ? DrawProgramOperationDescriptor.Amount(r, 4) : 0, r.Condition(),
+            stateId: r.OptionalIdentifier("stateId"), resultBind: r.RequiredIdentifier("resultBind"),
             visibility: SkillProgramCardSetVisibility.Public);
         RequireAlways(effect, r.Path);
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized), new RequireCardActionActor(),
-         new RequireCardActionRelation(SkillProgramCardActionOwnerRelation.Actor, [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash]),
-         new CreateCardSet(effect.ResultBind!, 3, true)];
+         new RequireCardActionRelation(SkillProgramCardActionOwnerRelation.Actor, [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash]),
+         new CreateCardSet(effect.ResultBind!, effect.StateId is null ? effect.Amount : 3, true)];
 }
 
 internal sealed class RevealRecordedSuitSlashHandler : ISkillProgramEffectHandler

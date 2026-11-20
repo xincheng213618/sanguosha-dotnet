@@ -142,6 +142,10 @@ public interface ISkillProgramEffectHost
         int minimumCards, int maximumCards, IReadOnlyList<CardKind> cardKinds, IReadOnlyList<Suit> suits);
     SkillProgramStepOutcome HoldTargetCards(ProgramSkillFrame frame, int chooserSeat, int holderSeat,
         IReadOnlyList<CardZoneKind> zones, string resultBind, int minimumCards);
+    SkillProgramStepOutcome HoldTargetCards(ProgramSkillFrame frame, int chooserSeat, int holderSeat,
+        IReadOnlyList<CardZoneKind> zones, string resultBind, int minimumCards, int maximumCards) =>
+        maximumCards == 0 ? HoldTargetCards(frame, chooserSeat, holderSeat, zones, resultBind, minimumCards)
+        : throw new NotSupportedException("This host does not implement a configured hold limit.");
     SkillProgramStepOutcome RevealTargetHandCard(ProgramSkillFrame frame,
         ProgramParticipantReference chooser, ProgramParticipantReference cardOwner,
         string resultBind, SkillProgramRevealMode mode,
@@ -263,6 +267,8 @@ public interface ISkillProgramEffectHost
         ProgramSkillFrame frame,
         string sourceBind,
         IReadOnlyList<CardKind> excludedCardKinds);
+    SkillProgramStepOutcome CauseOwnerDeath(ProgramSkillFrame frame) =>
+        throw new NotSupportedException("The effect host does not support direct owner death.");
     SkillProgramStepOutcome SelectTargets(
         long frameId,
         int ownerSeat,
