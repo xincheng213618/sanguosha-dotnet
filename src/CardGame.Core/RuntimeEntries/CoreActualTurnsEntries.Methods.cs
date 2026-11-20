@@ -23,6 +23,7 @@ internal sealed partial class CoreActualTurnsEntries
     internal CardKind GetJudgmentEffectiveCardKind(Card card) => _resolve().GetJudgmentEffectiveCardKind(card);
     internal int GetTurnDrawCount(CharacterState current) => _resolve().GetTurnDrawCount(current);
     internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _resolve().HasJudgmentEffectiveCard(player, kind);
+    internal void ReturnBeforeTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame window) => _resolve().ReturnBeforeTurnPreludeWindow(window);
     internal bool ValidBeforeTurnPrelude(BeiMiHuBeforeTurnProof proof) => _resolve().ValidBeforeTurnPrelude(proof);
     internal bool ValidBeforeTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame frame) => _resolve().ValidBeforeTurnPreludeWindow(frame);
 }

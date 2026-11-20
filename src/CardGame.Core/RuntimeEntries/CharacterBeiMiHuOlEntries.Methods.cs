@@ -37,13 +37,11 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool KuiCancelTargetNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().KuiCancelTargetNormalizeImplicitDrawTwoTargetWindow(query);
     internal BeiMiHuReceipt NewBeiMiHuReceipt(ProgramSkillFrame f, string stage) => _resolve().NewBeiMiHuReceipt(f, stage);
     internal void PayBeiMiHuKui(ProgramSkillFrame f, int target, int delta, string kind) => _resolve().PayBeiMiHuKui(f, target, delta, kind);
-    internal bool ProveBeiMiHuTurnPrelude(CharacterState owner, ProgramSkillWindowContext context) => _resolve().ProveBeiMiHuTurnPrelude(owner, context);
     internal void PublishBeiMiHuChoice(ProgramSkillFrame f) => _resolve().PublishBeiMiHuChoice(f);
     internal CardUseFrame RequireBeiMiHuCardParent(ProgramSkillFrame f, scoped out ProgramCardTriggerWindowFrame window) => _resolve().RequireBeiMiHuCardParent(f, out window);
     internal void ResolveBeiMiHuChoice(PromptChoice selected) => _resolve().ResolveBeiMiHuChoice(selected);
     internal bool ResumeBeiMiHu(long id) => _resolve().ResumeBeiMiHu(id);
     internal bool ReturnBeiMiHuMovement(ProgramSkillFrame f) => _resolve().ReturnBeiMiHuMovement(f);
-    internal void ReturnBeiMiHuTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame window) => _resolve().ReturnBeiMiHuTurnPreludeWindow(window);
     internal bool TryAdvanceBeiMiHuSubtree() => _resolve().TryAdvanceBeiMiHuSubtree();
     internal bool TryBeginBeiMiHuActualTurnPrelude(CharacterState owner) => _resolve().TryBeginBeiMiHuActualTurnPrelude(owner);
     internal bool TryGetBeiMiHuCardUse(int owner, ProgramSkillWindowContext context, SkillProgramEffectOp op, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().TryGetBeiMiHuCardUse(owner, context, op, out use, out window);

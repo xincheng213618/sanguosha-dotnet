@@ -123,15 +123,4 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
             features.HasOperation(SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia) ||
             features.HasOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng);
     }
-
-    internal void ReturnBeiMiHuTurnPreludeWindow(ProgramLifecycleTriggerWindowFrame window)
-    {
-        if (!_coreActualTurnsOperations.ValidBeforeTurnPreludeWindow(window) || window.CandidateIndex != window.Candidates.Count || _resolutionStackOperations._resolutionStack.LastOrDefault()is not BeiMiHuTurnPreludeFrame parent)
-            throw new InvalidOperationException("Completed before-turn work lost its singular parent return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(parent with { Stage = parent.Stage + 1, WindowId = null });
-        _coreRuntimeOperations.AdvanceRuntimeFrame(parent.Id);
-    }
-
-    [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 180, SkillProgramTriggerWindow.TurnBeforeStart)]
-    internal bool ProveBeiMiHuTurnPrelude(CharacterState owner, ProgramSkillWindowContext context) => context.BeforeTurnPreludeProof is { } proof && _coreActualTurnsOperations.ValidBeforeTurnPrelude(proof) && context.SourceSeat == proof.UpcomingOwnerSeat && context.TargetSeat == proof.UpcomingOwnerSeat && owner.Seat == proof.UpcomingOwnerSeat;
 }

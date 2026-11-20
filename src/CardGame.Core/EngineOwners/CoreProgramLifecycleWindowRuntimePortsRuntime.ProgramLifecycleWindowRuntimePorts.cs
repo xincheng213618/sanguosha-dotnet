@@ -31,7 +31,7 @@ internal sealed partial class CoreProgramLifecycleWindowRuntimePortsRuntime
     bool IProgramLifecycleReturns.ChengGongYingPaidPreparation(ProgramLifecycleTriggerWindowFrame frame) => _characterChengGongYingOlOperations.TryReturnChengGongYingPaidPreparation(frame);
     void IProgramLifecycleReturns.NormalTurnStart(int seat) => _coreProgramLifecycleOperations.BeginNormalTurnStartAfterProgramBindings(_coreMatchParticipantsPlayersAccess._players[seat]);
     void IProgramLifecycleReturns.IdentityAppearance(ProgramLifecycleTriggerWindowFrame frame) => _coreIdentityConcealmentOperations.ResumeIdentityAppearanceWindow(frame);
-    void IProgramLifecycleReturns.BeiMiHuPrelude(ProgramLifecycleTriggerWindowFrame frame) => _characterBeiMiHuOlOperations.ReturnBeiMiHuTurnPreludeWindow(frame);
+    void IProgramLifecycleReturns.BeiMiHuPrelude(ProgramLifecycleTriggerWindowFrame frame) => _coreActualTurnsOperations.ReturnBeforeTurnPreludeWindow(frame);
     void IProgramLifecycleReturns.AfterRoundPrograms(int seat) => _coreActualTurnsOperations.ContinueTurnAfterRoundPrograms(_coreMatchParticipantsPlayersAccess._players[seat]);
     void IProgramLifecycleReturns.DrawPhase(ProgramLifecycleTriggerWindowFrame frame, bool actualPhaseSubstituted) => _coreActualTurnsOperations.CompleteDrawPhaseAfterProgramWindow(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkipPlayPhaseAfterDraw, frame.NormalDrawReplaced, frame.NormalDrawAdjustment, frame.FrozenBaseDrawCount, actualPhaseSubstituted);
     void IProgramLifecycleReturns.PlayPhase() => _coreProgramLifecycleOperations.CompletePlayPhaseAfterProgramWindow();
