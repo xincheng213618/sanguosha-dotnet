@@ -1,6 +1,14 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
+public sealed record ShenGuoJiaAwakeningOverrideEvent(long FrameId, CardConversionSource Source, int Recipient, string SkillId, string InstanceId, string GameplayHash) : IGameEvent;
+
+internal interface IProgramAwakeningOverrideQuery : IProgramSelectionQuery
+{
+    bool Granted(int owner, string skill, string? binding = null);
+    bool Issued(ProgramSkillFrame frame);
+}
+
 public enum GameActivationAwakeningStage { MaximumPaid, GrantsIssued, Complete }
 public sealed record ProgramGameActivationAwakeningReceipt
 {

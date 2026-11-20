@@ -39,6 +39,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineTreatedWoundedRuntime` supplies current wounded status and identity concealment to conditional skill bindings and rule expressions. This uses the same match health rules as native checks, including undefined HP, the active Happy Qiao health pool and qualifying Guiming. Xingzhao reads that current status through its declared condition.
 
+- `CoreGameEngineGameActivationAwakeningRuntime` reads Huishi's original awakening-override fact for native qualification and continuation. A live query matches the current skill instance and eligible binding. An issued query matches the earlier fact to the original frame, recipient, instance, binding and gameplay hash. Huishi still issues the grant through its own paid choice.
+
 - `CoreGameEngineProgramAttackRangeAidRuntime` owns `requestAttackRangeAid` from the original responder list through weapon payment or the beneficiary's typed native Draw. It advances the current responder only after the original paid children return. Accepted payment and its recovery, damage, movement and skill-change children keep the original parent frame.
 
 - Dingpan's native activation limit and public progress both read the same count of living Rebels through `IMatchRoleQueries`. The public progress retains the zero-limit entry. Target equipment eligibility and the accepted equipment choice still belong to Dingpan.

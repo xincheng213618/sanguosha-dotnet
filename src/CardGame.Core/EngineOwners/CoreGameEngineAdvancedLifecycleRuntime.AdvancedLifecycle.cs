@@ -49,7 +49,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
                 _corePhysicalDrawFacadesOperations.DrawCards(owner, grants.Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal).Count(), true);
                 return SkillProgramStepOutcome.Continue;
             case SkillProgramEffectOp.ReplaceSkillsOnAwakening:
-                if (!_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner.Seat, frame.SkillId, frame.TriggerId) && _coreLordSkillProjectionsOperations.AdvancedOwnedSkillIds(owner).Count <= owner.MaxHp || !_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(owner.Seat, frame.SkillId, "awakening", SkillUsageScope.Game, 1))
+                if (!_awakeningOverrides.Granted(owner.Seat, frame.SkillId, frame.TriggerId) && _coreLordSkillProjectionsOperations.AdvancedOwnedSkillIds(owner).Count <= owner.MaxHp || !_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(owner.Seat, frame.SkillId, "awakening", SkillUsageScope.Game, 1))
                     return SkillProgramStepOutcome.Continue;
                 _coreProgramLifecycleOperations.ChangeProgramMaximumHp(frame, -1);
                 return BeginAdvancedSelection(frame, effect, _coreLordSkillProjectionsOperations.AdvancedOwnedSkillIds(owner).Where(id => id != frame.SkillId).ToArray());

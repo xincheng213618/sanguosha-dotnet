@@ -36,15 +36,12 @@ public sealed record ShenGuoJiaStartedEvent(long FrameId, CardConversionSource S
 public sealed record ShenGuoJiaJudgmentReturnedEvent(long FrameId, int Index, ShenGuoJiaJudgment Outcome) : IGameEvent;
 public sealed record ShenGuoJiaMaximumPaidEvent(long FrameId, int Index, int Seat, int Before, int After, string Purpose) : IGameEvent;
 public sealed record ShenGuoJiaBenefactorEvent(long FrameId, int Benefactor, int Recipient, string GrantSource) : IGameEvent;
-public sealed record ShenGuoJiaAwakeningOverrideEvent(long FrameId, CardConversionSource Source, int Recipient, string SkillId, string InstanceId, string GameplayHash) : IGameEvent;
 public sealed record ShenGuoJiaNativeIssuedEvent(long FrameId, long UseId, long ActionId, CardKind Kind, int Benefactor) : IGameEvent;
 public sealed record ShenGuoJiaNativeReturnedEvent(long FrameId, long UseId, long ActionId, bool HadAttack) : IGameEvent;
 public sealed record ShenGuoJiaCompletedEvent(long FrameId) : IGameEvent;
 public sealed record ShenGuoJiaUnpaidCancelledEvent(long FrameId, CardConversionSource Source, int TurnUsesBefore, int PhaseUsesBefore) : IGameEvent;
 
 internal interface IShenGuoJiaHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation); }
-internal interface IProgramAwakeningOverrideQuery : IProgramSelectionQuery
-{ bool Granted(int owner, string skill, string? binding = null); bool Issued(ProgramSkillFrame frame); }
 internal abstract class ShenGuoJiaDescriptor(SkillProgramEffectOp operation) : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => operation;

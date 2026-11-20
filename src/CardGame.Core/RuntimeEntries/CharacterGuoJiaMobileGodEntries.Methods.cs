@@ -32,8 +32,6 @@ internal sealed partial class CharacterGuoJiaMobileGodEntries
     internal bool ReturnShenGuoJiaMovement(ProgramSkillFrame frame) => _resolve().ReturnShenGuoJiaMovement(frame);
     internal ProgramSkillFrame SetShenGuoJiaChildren(ProgramSkillFrame frame, ShenGuoJiaStage stage) => _resolve().SetShenGuoJiaChildren(frame, stage);
     internal bool ShenGuoJiaAlreadyAwakened(int seat, string skill) => _resolve().ShenGuoJiaAlreadyAwakened(seat, skill);
-    internal IEnumerable<string> ShenGuoJiaAwakeningBindings(string skill) => _resolve().ShenGuoJiaAwakeningBindings(skill);
-    internal bool ShenGuoJiaAwakeningOverride(ProgramTriggerLegalityContext gate) => _resolve().ShenGuoJiaAwakeningOverride(gate);
     internal IReadOnlyList<(int Seat, string Instance)> ShenGuoJiaBenefactors(CharacterState owner, string instance) => _resolve().ShenGuoJiaBenefactors(owner, instance);
     internal PromptChoice ShenGuoJiaChoice(ProgramSkillFrame frame, string branch, string label, IReadOnlyList<int>? targets = default, string? value = default) => _resolve().ShenGuoJiaChoice(frame, branch, label, targets, value);
     internal IReadOnlyList<PromptChoice> ShenGuoJiaChoices(ProgramSkillFrame frame) => _resolve().ShenGuoJiaChoices(frame);

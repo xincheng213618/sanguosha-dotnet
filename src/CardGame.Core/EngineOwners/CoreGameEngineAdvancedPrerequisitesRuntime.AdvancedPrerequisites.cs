@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineAdvancedPrerequisitesRuntime
     {
         foreach (var effect in trigger.Effects)
         {
-            if (effect.Op == SkillProgramEffectOp.ReplaceSkillsOnAwakening && (!_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner.Seat, skillId, trigger.Id) && _coreLordSkillProjectionsOperations.AdvancedOwnedSkillIds(owner).Count <= owner.MaxHp || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, "awakening", SkillUsageScope.Game) > 0))
+            if (effect.Op == SkillProgramEffectOp.ReplaceSkillsOnAwakening && (!_awakeningOverrides.Granted(owner.Seat, skillId, trigger.Id) && _coreLordSkillProjectionsOperations.AdvancedOwnedSkillIds(owner).Count <= owner.MaxHp || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, "awakening", SkillUsageScope.Game) > 0))
                 return false;
             if (effect.Op == SkillProgramEffectOp.ObtainDeckRankSum && (effect.Marker is not { } marker || owner.Markers.GetValueOrDefault(marker) <= _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) || !RankSubsetSearch.CanComplete(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Select(card => card.Rank), effect.MaximumRankSum)))
                 return false;

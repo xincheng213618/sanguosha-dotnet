@@ -911,6 +911,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
     ("OL Tang Zi Xingzhao: real wound lends Xunxun and orders next actual Draw cold", OlTangZiXingzhaoWoundedOwnerChecks.RealWoundLendsXunxunAndOrdersNextActualDrawCold),
+    ("Mobile Shen Guo Jia: paid Huishi waives Baijia threshold for next Preparation cold", MobileGodGuoJiaAwakeningOverrideOwnerChecks.PaidHuishiWaivesBaijiaThresholdForNextPreparationCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
     ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
     ("Boundary Mobile Han Dang Jiefan: native weapon and typed draw return to original responders cold", BoundaryMobileHanDangAttackRangeAidOwnerChecks.NativeWeaponAndTypedDrawReturnToOriginalResponderRosterCold),

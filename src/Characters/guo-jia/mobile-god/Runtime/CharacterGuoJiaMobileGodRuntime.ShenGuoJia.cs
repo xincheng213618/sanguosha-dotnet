@@ -7,8 +7,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
 {
     internal const string ShenGuoJiaHuishi = "mobile:huishi", ShenGuoJiaTianyi = "mobile:tianyi", ShenGuoJiaHuiShi = "mobile:huishi-gift", ShenGuoJiaZuoxing = "mobile:zuoxing";
     SkillProgramStepOutcome IShenGuoJiaHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginShenGuoJia(frame, operation);
-    bool IProgramAwakeningOverrideQuery.Granted(int owner, string skill, string? binding) => HasShenGuoJiaAwakeningCondition(owner, skill, binding);
-    bool IProgramAwakeningOverrideQuery.Issued(ProgramSkillFrame frame) => HasShenGuoJiaAwakeningReceipt(frame);
     internal CardConversionSource ShenGuoJiaSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 38000, SkillProgramEffectOp.ResolveShenGuoJiaHuishi)]
     internal bool CanActivateShenGuoJiaHuishi(CharacterState owner) => owner.HasHpValue && owner.MaxHp < 10;
@@ -63,10 +61,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         "mou-mobile:zhiji" => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(value => value.OwnerSeat == seat),
         _ => false
     };
-    internal IEnumerable<string> ShenGuoJiaAwakeningBindings(string skill) => _contentRegistryOperations._contentRegistry.GetSkill(skill).Program!.Triggers.Where(trigger => trigger.Effects.Any(effect => effect.Op is SkillProgramEffectOp.ChangeMaximumHp or SkillProgramEffectOp.GrantSkills or SkillProgramEffectOp.ReplaceSkillsOnAwakening or SkillProgramEffectOp.ResolveMouJiangWeiZhiji or SkillProgramEffectOp.ResolveMouCaoShuangFanshi || effect.Op.ToString().Contains("Awaken", StringComparison.Ordinal))).Select(trigger => trigger.Id);
-    internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = null) => _contentRegistryOperations._contentRegistry.Skills.TryGetValue(skill, out var definition) && definition.Tags.HasFlag(SkillTag.Awakening) && (binding is null || ShenGuoJiaAwakeningBindings(skill).Contains(binding, StringComparer.Ordinal)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaAwakeningOverrideEvent>().Any(fact => fact.Recipient == seat && fact.SkillId == skill && definition.Program?.GameplayHash == fact.GameplayHash && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skill, fact.InstanceId));
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.AwakeningConditionOverride, 38000)]
-    internal bool ShenGuoJiaAwakeningOverride(ProgramTriggerLegalityContext gate) => HasShenGuoJiaAwakeningCondition(gate.OwnerSeat, gate.SkillId, gate.Candidate.BindingId);
+    internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = null) => _awakeningOverrides.Granted(seat, skill, binding);
     internal PromptChoice ShenGuoJiaChoice(ProgramSkillFrame frame, string branch, string label, IReadOnlyList<int>? targets = null, string? value = null) => new(new($"shen-guo-jia.{(frame.Id)}.{(frame.ShenGuoJia!.Stage)}.{(branch)}.{(value)}"), label, [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "shen-guo-jia", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["value"] = value ?? "" });
     internal IReadOnlyList<PromptChoice> ShenGuoJiaChoices(ProgramSkillFrame frame)
     {
