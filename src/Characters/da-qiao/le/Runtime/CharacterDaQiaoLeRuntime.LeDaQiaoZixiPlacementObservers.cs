@@ -24,7 +24,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (!HasPaidZixiPlacement(f))
             return false;
-        if (_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement)
+        if (_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program)
             return recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == recovery.Attempt.TargetSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason == new CardMoveReason(ZixiPlacementReason) && ZixiPlacementLionRemoval(f, recovery.Attempt.TargetSeat);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == recovery.Id);
@@ -40,7 +40,9 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsZixiPlacementRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
-            return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == hp.Change.TargetSeat && hp.Change.Amount == 1 && ZixiPlacementLionRemoval(f, hp.Change.TargetSeat);
+            return ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&
+                hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == hp.Change.TargetSeat &&
+                hp.Change.Amount == 1 && ZixiPlacementLionRemoval(f, hp.Change.TargetSeat);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.Window == state.Window);

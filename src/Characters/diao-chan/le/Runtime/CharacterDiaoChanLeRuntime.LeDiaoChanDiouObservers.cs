@@ -143,7 +143,8 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
-        return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
+        return child is HpChangedTriggerWindowFrame hp &&
+            ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.AwaitedProgramMovement);
     }
 
     internal bool DiouNativeWindowEdge(int index)

@@ -14,6 +14,7 @@ Required when changing these mechanisms or their consumers. See the
 - The playable-card query publishes an available declared card with the original hand. Otherwise the formal Wooden Ox rules append the owner's grain after the hand when the field contains an effective Wooden Ox. The field equipment owner reads the original equipment zone through `ICardZoneQueries`.
 
 - Silver Lion departure starts from the original card and equipment location after the actual move. The original holder's typed equipment suppression applies at this boundary, alongside the existing health and armor conditions. Recovery belongs to the original movement continuation.
+- Zixi's Qin placement drains post-instruction windows with `Program` on the paid placement frame. A direct Silver Lion HP child and a queued recovery replacement both return to that frame. The HP child inside a replacement returns to the replacement itself. The paid entity identifies the original armor holder independently of the seat receiving the Qin in Judgment.
 
 ## Claims, deliveries and retirement
 

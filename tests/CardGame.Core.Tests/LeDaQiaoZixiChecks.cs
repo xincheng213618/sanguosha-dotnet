@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core.Tests;
 
@@ -14,6 +15,74 @@ internal static partial class LeDaQiaoZixiChecks
     private const string ZdDriver = "fixture:ldz-driver", ZdWatch = "fixture:ldz-watch", ZdQuiet = "fixture:ldz-quiet", ZdGrant = "fixture:ldz-grant", ZdInsert = "fixture:ldz-insert";
     private const string ZdPlace = "skill-program.le-da-qiao.zixi.place", ZdDraw = "skill-program.le-da-qiao.zixi.draw", ZdObtain = "skill-program.le-da-qiao.zixi.obtain";
     private const string ZdEffect = "unique-target-judgment-effects";
+
+    public static void ZixiPlacementOriginalSilverLionRecoveryCold()
+    {
+        VerifyZixiPlacementLionRecovery(false);
+        VerifyZixiPlacementLionRecovery(true);
+    }
+
+    private static void VerifyZixiPlacementLionRecovery(bool offerReplacement)
+    {
+        var s = ZdScenario.Start(offerReplacement ? "placement-lion-replacement" : "placement-lion");
+        s.OpenPlacement(); s.Confirm(); s.Play();
+        var lion = s.Hand().First(card => s.Marks().Contains(card.Id) && card.Kind == CardKind.SilverLion).Id;
+        s.Native(s.Actions().Single(action => action.Kind == LegalActionKind.Equip && action.CardId == lion)); s.Play();
+        var replacementOwner = offerReplacement
+            ? s.G.CreateSnapshot(0, revealAll: true).Players.Single(player => player.Role == Role.Lord).Seat
+            : -1;
+        if (offerReplacement)
+        {
+            s.Use("hurt-three", targets: [replacementOwner]); s.Play();
+            s.Use("hurt-three", targets: [replacementOwner]); s.Play();
+        }
+        s.Use("hurt-three", targets: [0]); s.Play();
+        var hp = s.V().Hp;
+        s.Need(s.V().Equipment.Any(card => card.Id == lion) && s.E<CardUseFinishedEvent>().Count(fact => fact.CardId == lion) == 1,
+            "The original marked Lion was equipped by a real native Use before the owner is wounded.");
+
+        s.End(); s.Reach(() => s.Optional("end-place-qin")); s.OpenPlacement();
+        s.Select(lion, 1, "indulgence"); s.Confirm();
+        RecoveryReplacementFrame? replacement = null;
+        if (offerReplacement)
+        {
+            s.Reach(() => s.P?.Kind == DecisionKind.RecoveryReplacement);
+            replacement = s.G.ResolutionStack.OfType<RecoveryReplacementFrame>().Single();
+            var placement = s.Frame(replacement.ParentFrameId);
+            s.Need(replacement.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, placement.Id) &&
+                replacement.Attempt is { Completion.Producer: RecoveryAttemptProducer.SilverLion, SourceSeat: 0, TargetSeat: 0, Amount: 1 } &&
+                s.G.GetRuntimeModule<CharacterDaQiaoLeRuntime>().ZixiPlacementFirstChild(placement, replacement) &&
+                s.V().Hp == hp && s.P!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("recovery-action") == "redirect" && choice.Targets.SequenceEqual([replacementOwner])),
+                "The actual replacement offer belongs to the paid placement and names the original recovering owner.");
+            s.Cold(); s.Answer(choice => choice.Parameters.GetValueOrDefault("recovery-action") == "keep");
+        }
+        s.Reach(() => s.Hold("recovered"));
+        var sealedTail = s.E<ZixiPlacementTailSealedEvent>().Single();
+        var root = s.Frame(sealedTail.FrameId);
+        var recoveryParentId = replacement?.Id ?? root.Id;
+        var child = s.G.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == recoveryParentId);
+        var runtime = s.G.GetRuntimeModule<CharacterDaQiaoLeRuntime>();
+        s.Need(root.ZixiPlacement is { Paid: true, Stage: ZixiPlacementStage.MovementChildren, TailSealed: true, TargetSeat: 1 } payment &&
+            payment.BatchId == sealedTail.BatchId && payment.Entities.SequenceEqual([new ZixiPlacementEntity(lion, CardKind.SilverLion, CardLocation.Equipment(0), CardKind.Indulgence)]) &&
+            child.Change is { Kind: HpChangeKind.Recovery, SourceSeat: 0, TargetSeat: 0, Amount: 1 } &&
+            child.Change.ParentFrameId == recoveryParentId &&
+            child.Continuation == (replacement is null ? PostEventContinuation.Program : PostEventContinuation.RecoveryReplacement) &&
+            s.V().Hp == hp + 1 &&
+            s.V(1).Judgment.Any(card => card.Id == lion && card.QinJudgmentSlot == CardKind.Indulgence),
+            "The live recovery child belongs to the original paid equipment placement and heals the Lion's owner.");
+        if (replacement is null)
+            s.Need(runtime.ZixiPlacementFirstChild(root, child) &&
+                !runtime.ZixiPlacementFirstChild(root, child with { Continuation = PostEventContinuation.AwaitedProgramMovement }) &&
+                !runtime.ZixiPlacementFirstChild(root, child with { Change = child.Change with { ParentFrameId = child.Id } }),
+                "The placement accepts only the original health parent and the Program continuation.");
+        else
+            s.Need(!runtime.ZixiPlacementFirstChild(root, child), "The replacement owns its own health child.");
+        s.Cold(); s.Continue(); s.Reach(() => s.E<ZixiPlacementCompletedEvent>().Any(fact => fact.FrameId == root.Id));
+        s.Need(s.E<ZixiPlacementTailSealedEvent>().SequenceEqual([sealedTail]) && s.E<ZixiPlacementCompletedEvent>().Count(fact => fact.FrameId == root.Id && fact.Paid && fact.EntityCount == 1) == 1 &&
+            s.E<SilverLionRemovedRecoveryEvent>().Count(fact => fact.PlayerSeat == 0 && fact.Reason.Value == ZdPlace && fact.RecoveredAmount == 1) == 1 && s.V().Hp == hp + 1 &&
+            s.G.CardMovements.Count(move => move.CardId == lion && move.From == CardLocation.Equipment(0) && move.To == CardLocation.Judgment(1) && move.Reason.Value == ZdPlace) == 1,
+            "Cold return completes the same placement without repeating the Lion move or recovery.");
+    }
 
     public static void ZixiFinalTargetsResponsesSourceRightsAndInputPrivacyCold()
     {
@@ -255,7 +324,7 @@ internal static partial class LeDaQiaoZixiChecks
         public void RejectOld(PendingDecision p) => Reject(new AnswerPromptCommand(0, p.PromptId, p.Choices[0].Id, G.Revision));
         public static ZdScenario Start(string scene)
         {
-            var r = ContentRegistry.Build(new StandardContentPackage(), new ZdFixture(scene)); var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = scene == "paid-death" ? Role.Renegade : Role.Lord, ModeId = ZdMode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12, AiPolicyVersion = AiDecisionPolicy.CurrentVersion }, r);
+            var r = ContentRegistry.Build(new StandardContentPackage(), new ZdFixture(scene)); var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = scene is "paid-death" or "placement-lion-replacement" ? Role.Renegade : Role.Lord, ModeId = ZdMode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12, AiPolicyVersion = AiDecisionPolicy.CurrentVersion }, r);
             var s = new ZdScenario(scene, g, r); s.Accept(new StartGameCommand()); s.Reach(() => s.P is { Kind: DecisionKind.SelectGeneral, PlayerSeat: 0 }); s.Accept(new SelectGeneralCommand(0, ZdOwner, g.Revision, s.P!.PromptId)); s.Reach(() => s.Optional("start-place-qin")); return s;
         }
     }
@@ -323,21 +392,34 @@ internal static partial class LeDaQiaoZixiChecks
             foreach (var zone in new[] { "hand", "equipment" }) watch.Add(N("{\"id\":\"placement-" + zone + "\",\"window\":\"cardsMoved\",\"subject\":\"owner\",\"sourceZones\":[\"" + zone + "\"],\"movementOccurrence\":\"perOwnerBatch\",\"movementReasons\":[\"" + ZdPlace + "\"],\"optional\":false,\"effects\":[" + Choice("placed") + "]}"));
             watch.Add(N("{\"id\":\"zixi-draw\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"" + ZdDraw + "\"],\"optional\":false,\"effects\":[" + Choice("draw") + (scene is "paid-loss" or "paid-death" ? ",{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":" + (scene == "paid-death" ? 20 : 1) + "}" : "") + "]}"));
             watch.Add(N("{\"id\":\"whole-obtain\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"" + ZdObtain + "\"],\"optional\":false,\"effects\":[" + Choice("obtained") + "]}"));
-            if (scene is "three" or "placement-lion") watch.Add(N("{\"id\":\"lion-recovery\",\"window\":\"afterHpRecovered\",\"subject\":\"owner\",\"optional\":false,\"effects\":[" + Choice("recovered") + "]}"));
+            if (scene is "three" or "placement-lion" or "placement-lion-replacement") watch.Add(N("{\"id\":\"lion-recovery\",\"window\":\"afterHpRecovered\",\"subject\":\"owner\",\"optional\":false,\"effects\":[" + Choice("recovered") + "]}"));
             if (scene == "replacement") watch.Add(N("{\"id\":\"replacement-obtain\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"skill-program.sun-hong.zenrun.obtain\"],\"optional\":false,\"effects\":[" + Choice("replacement") + "]}"));
             if (scene == "placement-ox") watch.Add(N("{\"id\":\"placement-native-grain\",\"window\":\"cardsMoved\",\"subject\":\"owner\",\"sourceZones\":[\"woodenOxGrain\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"equipment.wooden-ox.grain-discard\"],\"optional\":false,\"effects\":[" + Choice("placement-spill") + "]}"));
             if (scene == "repeat-Peach") watch.Add(N("{\"id\":\"same-peach-three-recovery-children\",\"window\":\"afterHpRecovered\",\"subject\":\"owner\",\"optional\":false,\"effects\":[" + Choice("repeat-recovery") + "]}"));
+            const string lionRedirect = "fixture:ldz-lion-recovery-redirect";
+            if (scene == "placement-lion-replacement")
+                defs.Add(N($$"""{"id":"{{lionRedirect}}","revision":1,"cardPolicies":[{"id":"lion-recovery-redirect","kind":"redirectOwnTurnFactionRecovery","factionId":"wu","ownerRole":"lord","value":1,"providerDrawCount":1}]}"""));
             defs.Add(new JsonObject { ["id"] = ZdWatch, ["revision"] = 1, ["triggers"] = watch });
             var labels = defs.ToDictionary(n => n!["id"]!.GetValue<string>(), n => new { name = n!["id"]!.GetValue<string>(), description = "Real dated full Zixi native fixture", optionLabels = new[] { "activations", "triggers" }.SelectMany(k => n[k]?.AsArray() ?? new JsonArray()).SelectMany(t => t!["effects"]!.AsArray()).SelectMany(e => e!["options"]?.AsArray() ?? new JsonArray()).Select(o => o!["id"]!.GetValue<string>()).Distinct().ToDictionary(x => x, x => x) });
             var c = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = defs }), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels })); foreach (var (id, p) in c.Programs) b.AddSkill(new(id, id, "Actual Qin and whole native Use children") { Program = p, ProgramPresentation = c.Presentations[id] });
             const string pick = "fixture:ldz-pick"; b.AddSkill(new(pick, "Owner", "Fixed human") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(r => r, _ => -100000000d) }); b.AddGeneral(new(ZdOwner, "Real current Le Da Qiao", "supporter", pick, "wu", 12, own));
-            var peers = Enumerable.Range(1, 3).Select(i => "fixture:ldz-peer-" + i).ToArray(); for (var i = 1; i <= 3; i++) { var key = "fixture:ldz-peer-pick-" + i; b.AddSkill(new(key, "Peer", "Fixed public peer") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(r => r, _ => 1000000d * (4 - i)) }); b.AddGeneral(new(peers[i - 1], "Real other character", "supporter", key, "shu", 12, (scene is "redirect" or "late-redirect") && i == 1 ? [ZdQuiet, ZdSkill] : [ZdQuiet])); }
+            var peers = Enumerable.Range(1, 3).Select(i => "fixture:ldz-peer-" + i).ToArray();
+            for (var i = 1; i <= 3; i++)
+            {
+                var key = "fixture:ldz-peer-pick-" + i;
+                b.AddSkill(new(key, "Peer", "Fixed public peer") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(r => r, _ => 1000000d * (4 - i)) });
+                var peerSkills = new List<string> { ZdQuiet };
+                if ((scene is "redirect" or "late-redirect") && i == 1) peerSkills.Add(ZdSkill);
+                if (scene == "placement-lion-replacement") peerSkills.Add(lionRedirect);
+                b.AddGeneral(new(peers[i - 1], "Real other character", "supporter", key, "shu", 12, peerSkills));
+            }
             foreach (var kind in Kinds) { var card = CardCatalog.Get(kind); b.AddCard(new("fixture:ldz-" + kind, card.DisplayName, card.CategoryName, "Original printed entity", kind)); }
             var suits = new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond }; var cards = Kinds.SelectMany(kind => suits.Select(suit => new ContentDeckPhysicalCard("fixture:ldz-" + kind, suit, 7))).ToArray();
             if (scene == "delayed-subslots") cards = Enumerable.Range(0, 56).Select(_ => new ContentDeckPhysicalCard("fixture:ldz-Indulgence", Suit.Diamond, 7)).ToArray();
-            if (scene is "placement-lion" or "placement-ox") cards = Enumerable.Range(0, 56).Select(_ => new ContentDeckPhysicalCard(scene == "placement-lion" ? "fixture:ldz-SilverLion" : "fixture:ldz-WoodenOx", Suit.Heart, 7)).ToArray();
+            if (scene is "placement-lion" or "placement-lion-replacement" or "placement-ox")
+                cards = Enumerable.Range(0, 56).Select(_ => new ContentDeckPhysicalCard(scene == "placement-ox" ? "fixture:ldz-WoodenOx" : "fixture:ldz-SilverLion", Suit.Heart, 7)).ToArray();
             b.AddDeck(new("fixture:ldz-deck", "Fifty-six original native entities", 4, 0, []) { PhysicalCards = cards });
-            var roles = scene == "paid-death" ? new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1 } : new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 };
+            var roles = scene is "paid-death" or "placement-lion-replacement" ? new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1 } : new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 };
             b.AddMode(new(ZdMode, "Real dated full Le Da Qiao", 4, 4, roles, "fixture:ldz-deck", GeneralCandidateCount: 4, GeneralPoolIds: [ZdOwner, .. peers]));
         }
     }

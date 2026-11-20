@@ -393,6 +393,7 @@ var tests = new (string Name, Action Body)[]
     ("Xie Ling Yu: paid children replacement source loss death and privacy cold", XieLingYuChecks.XinyouPaidChildrenReplacementSourceLossDeathAndInputPrivacyCold),
     ("Tao Qian: per recipient native draw replacement paid rights cold", CardGame.Core.Tests.TaoQianChecks.WenrenPerRecipientNativeDrawReplacementPaidRightsCold),
     ("Le Da Qiao Zixi: final targets responses source rights and input privacy cold", CardGame.Core.Tests.LeDaQiaoZixiChecks.ZixiFinalTargetsResponsesSourceRightsAndInputPrivacyCold),
+    ("Le Da Qiao Zixi: equipped Qin Lion returns original recovery cold", CardGame.Core.Tests.LeDaQiaoZixiChecks.ZixiPlacementOriginalSilverLionRecoveryCold),
     ("Wu Guan Yu Wuyou: later phase names native responses and supplied use cold", CardGame.Core.Tests.WuGuanYuWuyouChecks.WuyouLaterPhaseNamesNativeResponsesAndProvidedUseCold),
     ("Wu Guan Yu Juewu: original Wooden Ox grain pays native Slash cold", WuGuanYuJuewuWoodenOxChecks.JuewuUsesTheOriginalRankTwoGrainCold),
     ("Le Diao Chan: retained show native basic trick delayed equipment cold", CardGame.Core.Tests.LeDiaoChanChecks.DiouRetainedShowNativeBasicTrickDelayedAndEquipmentCold),
