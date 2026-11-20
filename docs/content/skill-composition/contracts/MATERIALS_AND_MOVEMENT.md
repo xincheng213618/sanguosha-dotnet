@@ -40,6 +40,7 @@ Required when changing these mechanisms or their consumers. See the
 - Native producers capture the exact outcome for common Slash payments, 吴景's real trick payment, selected foreign cards, 管亥's non-response public-pile payment and actual destruction of general cards, chariots, soul cards and ephemeral entities. The common completion, sequential trick, group, Amazing Grace, delayed-placement and material-eligibility paths read those facts. Issuance qualification, payment child windows and typed business returns stay with their producers.
 - A resolved global attack's discard claim reads only real `UseFinished` entries produced by that group's native cleanup. Check the original discard entry before delivering each material. Earlier native deliveries and later discards leave the original cleanup claim empty for those entities.
 - First-category completed placement checks relinquishment on the native use whose frame and action match the opportunity. A completed response can use a different card's frame as its parent. Equipment eligibility follows its actual placement receipt.
+- A paid equipment use whose slot is abolished before installation still owns the exit of its original Processing material. A native return checks the accepted use and entry at that exit. Equipment already installed follows the usual equipment-loss rules.
 
 The shared receipt covers actual CardUse payment and destruction. Pure response
 materials and delayed Judgment destruction keep their own scopes. Rule-specific
@@ -63,6 +64,8 @@ dependency direction in the rest of native card-use scheduling.
 - True-discard batch claims can use a completed logical discard receipt with the same card, physical destination and movement sequence when the physical reason classifier has no source. Synchronous movement capture uses the facts already available at that point. The claim window can read the completed receipt after the native producer returns.
 
 - A discard-phase color count prefers the effective suit recorded on the actual discard entry. For a movement without that receipt, read the card identity in the classified original owned zone.
+
+- A self-discard reward identifies the actual executor on the completed logical discard invoice. Each counted movement belongs to the original batch and the required source zone.
 
 - A red owned-loss receipt resolves the effective suit in the actual source zone during physical movement recording. The card snapshot keeps the printed face and the receipt carries the effective suit used for eligibility.
 

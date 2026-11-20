@@ -859,6 +859,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Mingzhe: original Dismantlement hand suit cold", MobileZhugeJinMingzheDiscardSuitChecks.DismantlementUsesTheOriginalHandSuitForMingzheCold),
     ("OL Tanbei: issued target ban bars its actor native dying Peach cold", OlGuoSiTanbeiDyingPeachChecks.TanbeiTargetProhibitionBlocksOnlyGuoSiDyingPeachCold),
     ("OL Yaner: each actual draw pair owns its independent benefit cold", OlPanShuYanerChecks.YanerGrantsEachRealDrawPairItsOwnBenefitCold),
+    ("Happy Renjie: actual self discard executor cold", HappySimaYiRenjieDiscardExecutorChecks.RenjieCountsOnlyTheActualSelfDiscardExecutorCold),
+    ("Wumiao Zhizhe: paid equipment returns when its slot is abolished cold", WumiaoZhizheEquipmentReturnChecks.ZhizheReturnsPaidEquipmentWhenSlotIsAbolishedBeforePlacementCold),
+    ("OL Luochong: paid option and target stay reserved during nested Dying cold", OlTengFangLanLuochongChecks.LuochongReservesItsPaidOptionAndTargetDuringNestedDyingCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

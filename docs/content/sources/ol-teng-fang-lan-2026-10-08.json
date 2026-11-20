@@ -41,7 +41,7 @@
         "Trigger luochong-preparation: turnStartBeforeNormalFlow, subject owner（默认 own，即自己回合的准备阶段边界），optional；Trigger luochong-damage: afterDamageApplied, subject owner, damageOccurrence perDamage, optional, condition compare(damageInstancesTakenThisTurn, equal, 1)（石壁同款“每回合首次受到伤害”现成口径，任何回合内的第一次伤害都算，含自己的回合）。",
         "Bespoke op luochongResolve (7276)：一个合并提示同时给出所有可用的（选项 × 目标）组合与“不发动”退出项（“选择一名角色并选择一项”合并为一次公开选择，语义等价）；目标为全部存活角色（含自己，“一名角色”未排除自己）。",
         "选项合法性：回复 1 点体力要求目标已受伤（满体力回复为无操作，不进入候选）；弃置两张牌要求目标手牌+装备区至少有一张牌；失去体力与摸牌恒可选。哀尘已移除的选项不再出现。",
-        "每轮账本：从已提交事件史按 OwnerSeat+RoundNumber 推导（同诗怨/择才的 committed-history 口径），每轮每个选项限一次且每名角色限一次，两项账本相互独立；轮次号取事件提交时的 _roundNumber，冷恢复重放接受的选择命令得到同一账本。",
+        "每轮每个选项限一次，每名角色另限一次。接受选择时按原技能帧冻结当轮、选项和目标；真实濒死与弃牌子窗未返回时，两个名额已经占用。原帧收到结算返回后记录一次实际完成，同轮后续入口继续读取该完成事实。重放接受的选择命令会恢复同一资格。",
         "证据 ProgramLuochongResolvedEvent 记录选项 id（recover/loseHp/discardTwo/drawTwo）、目标座位、回复/失去体力值或弃置牌 id/摸牌张数；落宠不产生暗手牌 id（摸的牌进目标手牌，事件只记张数）。",
         "“令其弃置两张牌”由目标自己选牌弃置：逐张提示目标从其手牌与装备区选择（闭境惩罚同款逐张提示；不足两张时全弃）。弃置区口径为手牌+装备区，不含判定区（见 versionBoundary）。",
         "AI 策略：描述符 AiPolicy = GainCards 语义按约 2 张摸牌计价使可选触发通过通用 EstimateCompositionForAi 路径；挂起选择 SelectAiLuochongPickChoice 优先给己方/自己摸牌、受伤己方回复，敌方优先弃牌其次失去体力，其余按座位序稳定排序；弃牌阶段 SelectAiLuochongDiscardChoice 按选择 id 稳定取第一张。"

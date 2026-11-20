@@ -1,11 +1,10 @@
 namespace CardGame.Core;
 
 // 落宠 evidence: one scalar record per accepted (option, target) invocation. The
-// per-round ledgers (one use per option, one target per round) and the removed
-// options are both derived from the committed ledger, so cold recovery replays
-// the accepted commands into the same availability state. Drawn cards enter the
-// target's hand, so only the count is recorded (hidden card ids stay out of the
-// ordinary snapshot); the discarded card ids are public discard-pile movements.
+// per-round limits read completed facts and accepted choices on live frames.
+// Cold recovery replays the accepted commands into the same availability state.
+// Drawn cards enter the target's hand, so only their count is recorded.
+// Discarded card ids are public discard-pile movements.
 public sealed record ProgramLuochongResolvedEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int RoundNumber, string OptionId, int TargetSeat,
     int RecoveredHp, int LostHp, IReadOnlyList<int> DiscardedCardIds, int DrawCount) : IGameEvent;
@@ -24,7 +23,7 @@ public sealed partial record ProgramSkillFrame
 // The suspension receipt of one accepted 落宠 invocation. A nonzero remaining
 // discard count marks the target's own discard prompts; a zero count on op
 // re-entry marks the resume after a losing-hp dying child.
-public sealed record LuochongPendingState(string OptionId, int TargetSeat, int RemainingDiscards)
+public sealed record LuochongPendingState(string OptionId, int TargetSeat, int RemainingDiscards, int RoundNumber)
 {
     private IReadOnlyList<int> _discardedCardIds = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> DiscardedCardIds

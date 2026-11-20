@@ -5,7 +5,27 @@ internal sealed partial class CharacterTengFangLanOlRuntime
 {
     internal static string LuochongOptionDisplayName(string optionId) => RuntimeSkills.RuntimeRules_teng_fang_lan_ol_Luochong_Programs.LuochongOptionDisplayName(optionId);
     internal static bool IsLuochongOptionId(string optionId) => CharacterTengFangLanOlDefinitions.LuochongOptionIds.Contains(optionId);
-    internal (IReadOnlySet<string> Options, IReadOnlySet<int> Targets) LuochongRoundLedger(int ownerSeat) => (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLuochongResolvedEvent>().Where(fact => fact.OwnerSeat == ownerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(fact => fact.OptionId).ToHashSet(StringComparer.Ordinal), _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLuochongResolvedEvent>().Where(fact => fact.OwnerSeat == ownerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(fact => fact.TargetSeat).ToHashSet());
+    internal (IReadOnlySet<string> Options, IReadOnlySet<int> Targets) LuochongRoundLedger(int ownerSeat)
+    {
+        var round = _coreActualRoundProgressRoundNumberAccess._roundNumber;
+        var resolved = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLuochongResolvedEvent>()
+            .Where(fact => fact.OwnerSeat == ownerSeat && fact.RoundNumber == round)
+            .Select(fact => (fact.OptionId, fact.TargetSeat));
+        var pending = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>()
+            .Where(frame => frame.OwnerSeat == ownerSeat)
+            .Select(frame => frame.LuochongPending).OfType<LuochongPendingState>()
+            .Where(choice => choice.RoundNumber == round)
+            .Select(choice => (choice.OptionId, choice.TargetSeat));
+
+        var options = new HashSet<string>(StringComparer.Ordinal);
+        var targets = new HashSet<int>();
+        foreach (var (option, target) in resolved.Concat(pending))
+        {
+            options.Add(option);
+            targets.Add(target);
+        }
+        return (options, targets);
+    }
     internal IReadOnlyList<(Card Card, CardLocation Location)> LuochongDiscardPool(int targetSeat)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
@@ -80,18 +100,20 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         if (paused.Effect is not { Op: SkillProgramEffectOp.LuochongResolve } || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))
             throw new InvalidOperationException("The Luochong choice does not match its suspended instruction.");
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters.GetValueOrDefault("program-action") == "luochong-decline")
         {
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
             return;
         }
 
         if (!int.TryParse(selected.Parameters.GetValueOrDefault("target-seat"), System.Globalization.CultureInfo.InvariantCulture, out var targetSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || selected.Parameters.GetValueOrDefault("option")is not { } option || !IsLuochongOptionId(option))
             throw new InvalidOperationException("The Luochong choice lost its option or target.");
-        if (!CanRunLuochongResolve(active.OwnerSeat))
-            throw new InvalidOperationException("The Luochong choice has no remaining available pair.");
-        var pending = new LuochongPendingState(option, targetSeat, 0);
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive ||
+            !CollectLuochongAvailablePairs(active.OwnerSeat, out _).Contains((option, targetSeat)))
+            throw new InvalidOperationException("The Luochong option and target are no longer available together.");
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        var pending = new LuochongPendingState(option, targetSeat, 0, _coreActualRoundProgressRoundNumberAccess._roundNumber);
         switch (option)
         {
             case "recover":
@@ -133,7 +155,7 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         }
     }
 
-    internal ProgramLuochongResolvedEvent LuochongResolvedEvent(ProgramSkillFrame active, LuochongPendingState pending) => new(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, pending.OptionId, pending.TargetSeat, pending.OptionId == "recover" ? 1 : 0, pending.OptionId == "loseHp" ? 1 : 0, pending.DiscardedCardIds, pending.OptionId == "drawTwo" ? 2 : 0);
+    internal ProgramLuochongResolvedEvent LuochongResolvedEvent(ProgramSkillFrame active, LuochongPendingState pending) => new(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.RoundNumber, pending.OptionId, pending.TargetSeat, pending.OptionId == "recover" ? 1 : 0, pending.OptionId == "loseHp" ? 1 : 0, pending.DiscardedCardIds, pending.OptionId == "drawTwo" ? 2 : 0);
     internal SkillProgramStepOutcome FinalizeLuochongResolution(ProgramSkillFrame frame, LuochongPendingState pending)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

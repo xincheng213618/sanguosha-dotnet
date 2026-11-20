@@ -12,13 +12,15 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     }
 
     internal static bool WuZglNativeInputReason(CardMoveReason r) => RuntimeSkills.RuntimeRules_zhuge_liang_wumiao_WuZhugeLiang_Copies.WuZglNativeInputReason(r);
-    internal CardMovementRecord? WuZglCopyReturnEntry(Card card, CardLocation from, CardMoveReason reason)
+    internal CardMovementRecord? WuZglCopyReturnEntry(Card card, CardLocation from, CardMoveReason reason, int? departureSequence = null)
     {
         if (WuZglCopyFact(card.Id)is not { } copy || !_coreMatchParticipantsPlayersAccess._players[copy.Source.OwnerSeat].IsAlive)
             return null;
         var owner = copy.Source.OwnerSeat;
         if (from == CardLocation.Processing)
         {
+            if (reason.Value == "area.abolished.equipment")
+                return WuZglAbolishedEquipmentEntry(card, owner, departureSequence);
             if (!(reason == CardMoveReasons.UseFinished || reason == CardMoveReasons.ResponseFinished || reason == CardMoveReasons.NullificationFinished || reason == CardMoveReasons.IronChainFinished || reason == CardMoveReasons.FireAttackFinished || reason == CardMoveReasons.DismantlementFinished || reason == CardMoveReasons.SnatchFinished))
                 return null;
             var entered = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card.Id && m.To == CardLocation.Processing);
@@ -41,10 +43,36 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
         return null;
     }
 
+    private CardMovementRecord? WuZglAbolishedEquipmentEntry(Card card, int owner, int? departureSequence)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not CardUseFrame
+            { Action: { Type: CardActionType.Use, PhysicalCards: [var cost] } action } use ||
+            use.CardId != card.Id || use.CardKind != card.Kind || use.SourceSeat != owner ||
+            action.ActorSeat != owner || action.ProviderSeat != owner || action.EffectiveKind != card.Kind ||
+            cost.CardId != card.Id || cost.CardKind != card.Kind || cost.From.OwnerSeat != owner)
+            return null;
+
+        // The only move of this material since the native use was issued must be
+        // its equipment payment. During receipt recording the exit is already in the journal.
+        var journal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements;
+        CardMovementRecord? entry = null;
+        for (var index = journal.Count - 1; index >= 0 && journal[index].Sequence > use.NativeRepresentationIssuedAfterMovementSequence; index--)
+        {
+            var move = journal[index];
+            if (move.CardId != card.Id || move.Sequence == departureSequence)
+                continue;
+            if (entry is not null || move.From != cost.From || move.To != CardLocation.Processing ||
+                move.CardKind != cost.CardKind || move.Reason != CardMoveReasons.EquipmentUse)
+                return null;
+            entry = move;
+        }
+        return entry;
+    }
+
     internal CardLocation NormalizeWuZglCopyDestination(Card card, CardLocation from, CardLocation to, CardMoveReason reason) => to == CardLocation.DiscardPile && WuZglCopyReturnEntry(card, from, reason)is not null && WuZglCopyFact(card.Id)is { } copy ? CardLocation.Hand(copy.Source.OwnerSeat) : to;
     internal void RecordWuZglCopyMovement(CardMovementRecord move)
     {
-        if (move.To.Zone != CardZoneKind.Hand || WuZglCopyFact(move.CardId)is not { } copy || move.To.OwnerSeat != copy.Source.OwnerSeat || WuZglCopyReturnEntry(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId), move.From, move.Reason)is not { } entry)
+        if (move.To.Zone != CardZoneKind.Hand || WuZglCopyFact(move.CardId)is not { } copy || move.To.OwnerSeat != copy.Source.OwnerSeat || WuZglCopyReturnEntry(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId), move.From, move.Reason, move.Sequence)is not { } entry)
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuZhugeLiangCopyReturnedEvent(copy.Source.OwnerSeat, move.CardId, entry.Sequence, move.Sequence, move.Reason, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat));
     }

@@ -10,7 +10,21 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     {
         if (context is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { MovementTiming: { Phase: TurnPhase.Discard } timing } batch } || timing.PhaseActorSeat != owner || batch.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)
             return 0;
-        return batch.Movements.Where(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == CardLocation.Hand(owner)).Select(m => m.CardId).Distinct().Count();
+
+        var invocations = _history.Read<NativeLogicalDiscardInvocationRecordedEvent>()
+            .Where(invoice => invoice.TurnNumber == batch.TurnNumber && invoice.ExecutorSeat == owner && invoice.HandCount > 0)
+            .ToDictionary(invoice => invoice.InvocationId);
+        if (invocations.Count == 0)
+            return 0;
+
+        var hand = CardLocation.Hand(owner);
+        var materials = _history.Read<NativeLogicalDiscardMaterialCompletedEvent>()
+            .Where(material => material.From == hand && invocations.TryGetValue(material.InvocationId, out var invoice) &&
+                material.CompletionSequence > invoice.SequenceBefore && material.CompletionSequence <= invoice.SequenceAfter)
+            .ToLookup(material => material.CompletionSequence);
+        return batch.Movements.Where(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) &&
+            materials[move.Sequence].Any(material => material.CardId == move.CardId && material.To == move.To))
+            .Select(move => move.CardId).Distinct().Count();
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41840)]
