@@ -27,6 +27,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Seat distance and attack range read effective printed equipment through `CoreGameEngineFieldEquipmentRuntime`. Suppressed horses and weapons stay in their slots, with their printed terms restored at the original restriction's expiry. The attack-range query still applies card and slot exclusions to the eligible weapons before selecting the range base. Keep physical slot occupancy separate from the active printed effects.
 
+- Native weapon abilities start with the same effective physical equipment. Equipment rule queries apply the occupied-slot exclusion before expanding copied abilities from those entities, and then combine the existing inherited and virtual abilities. The Slash limit applies its separate physical card ID exclusion.
+
 - Mobile Shi Xiahou Ba's Libing contributes its existing finite increase through `ProgramDistanceStage.AttackRangeContributions`. The shared range query retains the equipped weapon base and exclusions. Libing owns its accepted count and the original damage-card completion resets it. Poxi retains its separately issued distance permission.
 
 ## Native Slash requests

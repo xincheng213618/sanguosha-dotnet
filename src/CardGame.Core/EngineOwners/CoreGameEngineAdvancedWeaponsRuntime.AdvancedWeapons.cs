@@ -101,10 +101,10 @@ internal sealed partial class CoreGameEngineAdvancedWeaponsRuntime
     {
         card.Kind
     }.Concat(_coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._copiedWeaponAbilities.GetValueOrDefault(card.Id) ?? []);
-    internal bool HasWeaponAbility(CharacterState player, CardKind kind) => _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => !card.IsGeneralWeapon && GetWeaponAbilityKinds(card).Contains(kind)) || (_coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._inheritedWeaponAbilities.GetValueOrDefault(player.Seat) ?? []).Contains(kind) || kind == CardKind.StoneAxe && _characterLiYiOlOperations.HasLiYiVirtualStoneAxe(player) || _coreProgramPipelineHooksOperations.ProgramVirtualEquipment(player.Seat, EquipmentSlot.Weapon) == kind;
+    internal bool HasWeaponAbility(CharacterState player, CardKind kind) => _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player).Any(card => !card.IsGeneralWeapon && GetWeaponAbilityKinds(card).Contains(kind)) || (_coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._inheritedWeaponAbilities.GetValueOrDefault(player.Seat) ?? []).Contains(kind) || kind == CardKind.StoneAxe && _characterLiYiOlOperations.HasLiYiVirtualStoneAxe(player) || _coreProgramPipelineHooksOperations.ProgramVirtualEquipment(player.Seat, EquipmentSlot.Weapon) == kind;
     internal IReadOnlyList<Card> GetEquipmentRuleCards(CharacterState player, EquipmentSlot? excludedEquipmentSlot = null)
     {
-        IReadOnlyList<Card> physical = _characterHuCheErMouOperations.KongwuEffectiveEquipment(player);
+        IReadOnlyList<Card> physical = _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
         if (excludedEquipmentSlot is not null)
             physical = physical.Where(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) != excludedEquipmentSlot).ToArray();
         var kinds = physical.Where(card => !card.IsGeneralWeapon).SelectMany(GetWeaponAbilityKinds).Concat(_coreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._inheritedWeaponAbilities.GetValueOrDefault(player.Seat) ?? []).Concat(_coreProgramPipelineHooksOperations.ProgramVirtualEquipment(player.Seat, EquipmentSlot.Weapon)is { } virtualWeapon ? new[] { virtualWeapon } : []).Distinct().ToArray();
