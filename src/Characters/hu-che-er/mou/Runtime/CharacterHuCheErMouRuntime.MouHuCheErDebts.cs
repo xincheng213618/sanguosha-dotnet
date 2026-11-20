@@ -5,7 +5,8 @@ internal sealed partial class CharacterHuCheErMouRuntime
 {
     internal bool MouHuCheErEquipmentDisabled(int target) =>
         MouHuCheErRuntime.ActiveDebtOrigins(_coreMatchParticipantsPlayersAccess._players[target]).Any();
-    internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetEquipment(player).Where(card => !_characterWeiYanHappyGodOperations.IsHappyWeiYanBone(card.Id)).ToArray();
+    internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) =>
+        MouHuCheErEquipmentDisabled(player.Seat) ? [] : _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player);
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
     internal IReadOnlyList<Card> KongwuUsableWoodenOxGrain(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(player);
     internal int MouHuCheErDrawPenalty(CharacterState player)

@@ -137,7 +137,6 @@ hou-cheng/anniversary	CardGame.Core.EngineOwners.CharacterHouChengAnniversaryRun
 hou-cheng/anniversary	CardGame.Core.EngineOwners.CharacterHouChengAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 hou-cheng/anniversary	CardGame.Core.EngineOwners.CharacterHouChengAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterZhugeLiangMouEntries	zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime
 hu-che-er/anniversary	CardGame.Core.EngineOwners.CharacterHuCheErAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
-hu-che-er/mou	CardGame.Core.EngineOwners.CharacterHuCheErMouRuntime	CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries	wei-yan/happy-god	CardGame.Core.EngineOwners.CharacterWeiYanHappyGodRuntime
 hu-che-er/mou	CardGame.Core.EngineOwners.CharacterHuCheErMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 hu-lie/mou	CardGame.Core.EngineOwners.CharacterHuLieMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 hua-man/ol	CardGame.Core.EngineOwners.CharacterHuaManOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries	guo-jia/mobile-god	CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime

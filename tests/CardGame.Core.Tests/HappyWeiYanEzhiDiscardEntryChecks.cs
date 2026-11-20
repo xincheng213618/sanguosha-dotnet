@@ -22,13 +22,16 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
         Accept(game, new UseProgramSkillCommand(0, Gujing, "bone-path", [], [1], game.Revision, play.PromptId));
         GujingChoice(game, "card:" + bone);
         GujingChoice(game, "slot:Weapon");
+        Require(Next(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Gujing } &&
+            game.CreateSnapshot(0).Players[1].Equipment.Any(card => card.Id == bone) && game.GetAttackRange(1) == 1,
+            "The Qinggang Sword occupies a weapon slot as a bone without granting its printed range of two.");
         GujingChoice(game, "abolish:" + bone);
         GujingChoice(game, "finish");
 
         var placed = game.CardMovements.Single(move => move.CardId == bone && move.From == CardLocation.Hand(0) && move.To == CardLocation.Equipment(1));
         var discarded = game.CardMovements.Single(move => move.CardId == bone && move.Reason.Value == DiscardBone);
         play = Next(game);
-        Require(play is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } && placed.CardKind == CardKind.Crossbow &&
+        Require(play is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } && placed.CardKind == CardKind.QinggangSword &&
             discarded.From == placed.To && discarded.To == CardLocation.DiscardPile && discarded.Sequence > placed.Sequence &&
             Zone(game, bone) == CardLocation.DiscardPile &&
             Facts<HappyWeiYanBonePlacedEvent>(game).Single() is { Holder: 1, Slot: EquipmentSlot.Weapon } placement && placement.After == placed.Sequence &&
@@ -51,9 +54,9 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
         Require(Next(control) is { PlayerSeat: 1, Kind: DecisionKind.PlayCard } &&
             Facts<HappyWeiYanBoneUseIssuedEvent>(control).Single() is { Ordinal: 0 } issue && issue.CardId == bone && issue.DiscardSequence == discarded.Sequence &&
             Facts<HappyWeiYanBoneUseReturnedEvent>(control).Single().UseId == issue.UseId &&
-            Facts<CardUseFinishedEvent>(control).Single(fact => fact.ResolutionId == issue.UseId) is { CardKind: CardKind.Crossbow } use && use.CardId == bone &&
-            Zone(control, bone) == CardLocation.Equipment(0),
-            "The real original Crossbow is used, equipped and returned to the same Ezhi instruction once.");
+            Facts<CardUseFinishedEvent>(control).Single(fact => fact.ResolutionId == issue.UseId) is { CardKind: CardKind.QinggangSword } use && use.CardId == bone &&
+            Zone(control, bone) == CardLocation.Equipment(0) && control.GetAttackRange(0) == 2,
+            "Ezhi uses and equips the same sword once, now granting its printed range of two.");
 
         Activate(game);
         var rethrow = Next(game);
@@ -138,9 +141,9 @@ internal static class HappyWeiYanEzhiDiscardEntryChecks
             builder.AddGeneral(new(Generals[0], "恶峙与骨径", "supporter", Ezhi, "shu", 6, [Gujing, Watch]));
             foreach (var general in Generals.Skip(1))
                 builder.AddGeneral(new(general, "同桌", "supporter", "standard:none", "wei", 5));
-            builder.AddDeck(new(Deck, "四张真实诸葛连弩", InitialHandSize: 1, DrawPerTurn: 0, [])
+            builder.AddDeck(new(Deck, "四张真实青釭剑", InitialHandSize: 1, DrawPerTurn: 0, [])
             {
-                PhysicalCards = Enumerable.Range(2, 4).Select(rank => new ContentDeckPhysicalCard("standard:crossbow", Suit.Club, rank)).ToArray()
+                PhysicalCards = Enumerable.Range(2, 4).Select(rank => new ContentDeckPhysicalCard("standard:qinggang_sword", Suit.Club, rank)).ToArray()
             });
             builder.AddMode(new(Mode, "欢乐恶峙原弃骨", 4, 4, new Dictionary<string, int>
             {

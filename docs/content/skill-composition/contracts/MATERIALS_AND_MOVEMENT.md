@@ -7,6 +7,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native card representations use `INativeCardRepresentations` and the original `CardUseFrame`: freeze the issued zero-entity face, retain physical printed faces separately from effective action appearance, and declare real carriers explicitly. Actual destruction/payment owners capture exact material departures from the physical journal; representation reads never reconstruct character proofs or authorize material movement. Existing claim and native-return protocols remain separate owners. A Card value without a registered zone has no physical-entity relation: `ICardZoneQueries.TryGetLocation` returns false, never an `OutsideGame` fallback; `GetLocation`, writes and payments remain strict.
 
+- `CoreGameEngineFieldEquipmentRuntime.GetEquipmentWithPrintedEffects` reads the equipped entities whose printed effects apply. A current bone occupies its equipment slot as a bone. The same physical card contributes its printed effect when later equipped as an ordinary card. Kongwu's issued restriction independently gates the holder's equipment effects.
+
 ## Claims, deliveries and retirement
 
 - Actual damage-card claims are captured once on the original CardUseFrame by CardUseMaterialClaimRuntime from physical movement delivery. Extra-effect episodes do not copy claim ledgers; separate the persistent claim fact from current material-retirement destinations, and retain non-CardUse damage owners' own protocols.
