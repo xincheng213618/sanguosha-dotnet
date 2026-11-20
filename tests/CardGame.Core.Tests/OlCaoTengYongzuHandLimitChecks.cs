@@ -1,25 +1,23 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class OlCaoTengYongzuHandLimitChecks
 {
     private const string CaoTeng = "ol:cao-teng";
     private const string Qingliu = "ol:qingliu";
     private const string Yongzu = "ol:yongzu";
+    private const string Jianxiong = "ol:caoteng-jianxiong";
     private const string Recipient = "fixture:yongzu-recipient";
+    private const string GrantOwner = "fixture:yongzu-grant-owner", GrantWatch = "fixture:yongzu-grant-watch";
     private const string Mode = "identity:classic-fixture-yongzu-hand-limit";
     private const string Deck = "fixture:yongzu-fixed-dodges";
 
     internal static void OtherChooserKeepsTheIssuedCardInActualDiscardCold()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-        var game = GameEngine.CreateStandard(new GameOptions
-        {
-            Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanSeats = [0, 1], HumanRole = Role.Lord, ModeId = Mode,
-            UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 6
-        }, registry);
-        Submit(game, new StartGameCommand());
+        var game = Start(registry);
 
         var faction = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Qingliu });
         Answer(game, faction, choice => choice.Parameters.GetValueOrDefault("branch") == "wei");
@@ -93,10 +91,80 @@ internal static class OlCaoTengYongzuHandLimitChecks
             "The accepted native command discards the chosen original card exactly once and keeps the original other two.");
     }
 
+    internal static void FirstSkillGrantReturnsOriginalSkillsChangedChildCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(watchGrant: true));
+        var game = Start(registry);
+        var faction = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Qingliu }, GrantOwner);
+        Answer(game, faction, choice => choice.Parameters.GetValueOrDefault("branch") == "wei");
+        var offer = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Yongzu } &&
+            p.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"));
+        Answer(game, offer, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        var target = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Yongzu } && HasBranch(p, "target"));
+        Answer(game, target, choice => choice.Parameters.GetValueOrDefault("branch") == "target" && choice.Targets.SequenceEqual([1]));
+        var first = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: Yongzu } && HasBranch(p, "skill"));
+        Require(game.CreateSnapshot(0).Players[0].Skills!.All(skill => skill.ContentId != Jianxiong),
+            "The original owner begins the first benefit without Jianxiong.");
+        Answer(game, first, choice => choice.Parameters.GetValueOrDefault("branch") == "skill");
+
+        var watch = Reach(game, p => p is { PlayerSeat: 0, SkillPrompt.SkillId: GrantWatch });
+        var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Yongzu);
+        var window = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
+            .Single(frame => frame.Window == SkillProgramTriggerWindow.SkillsChanged);
+        var watcher = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == GrantWatch);
+        var grant = Facts<CaoTengSkillGrantedEvent>(game).Single();
+        Require(root.CaoTeng is { Stage: CaoTengStage.YongzuChildren, Cursor: 0, TargetSeat: 1, SameFaction: true, Option: "skill" } &&
+            grant is { Index: 0, RecipientSeat: 0, SkillId: Jianxiong } && grant.FrameId == root.Id &&
+            game.CreateSnapshot(0).Players[0].Skills!.Any(skill => skill.ContentId == Jianxiong) &&
+            window is { OwnerSeat: 0, Continuation: ProgramLifecycleContinuation.ResumeParentProgram } &&
+            window.ResumeProgramFrameId == root.Id && watcher.WindowContext?.ParentFrameId == window.Id &&
+            Facts<ProgramBindingStartedEvent>(game).Count(fact => fact.FrameId == watcher.Id && fact.Window == SkillProgramTriggerWindow.SkillsChanged) == 1,
+            "The real Jianxiong grant opens one native SkillsChanged watcher before the original second chooser.");
+
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredRoot = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id);
+        var restoredWindow = game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == window.Id);
+        var runtime = game.GetRuntimeModule<CharacterCaoTengOlRuntime>();
+        Require(Facts<CaoTengSkillGrantedEvent>(game).SequenceEqual([grant]) &&
+            runtime.CaoTengFirstChild(restoredRoot, restoredWindow) &&
+            !runtime.CaoTengFirstChild(restoredRoot, restoredWindow with { ResumeProgramFrameId = restoredWindow.Id }) &&
+            !runtime.CaoTengFirstChild(restoredRoot, restoredWindow with { Continuation = ProgramLifecycleContinuation.NormalTurnStart }),
+            "Cold recovery accepts the original skill-change child and rejects another parent or return continuation.");
+        var restoredWatch = game.CreateSnapshot(0).PendingDecision!;
+        Require(restoredWatch.PromptId == watch.PromptId && restoredWatch.SkillPrompt?.SkillId == GrantWatch,
+            "The original private watcher returns to the same pending choice after cold restore.");
+        Answer(game, restoredWatch, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+
+        var second = Reach(game, p => p is { PlayerSeat: 1, SkillPrompt.SkillId: Yongzu } && HasBranch(p, "limit"));
+        Require(!HasBranch(second, "skill") && game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id).CaoTeng is
+            { Stage: CaoTengStage.YongzuChoice, Cursor: 1, TargetSeat: 1, FirstOption: "skill" },
+            "The original return advances to the other chooser with the first option already spent.");
+        Answer(game, second, choice => choice.Parameters.GetValueOrDefault("branch") == "limit");
+        _ = Reach(game, p => p is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+        Require(Facts<CaoTengBenefitIssuedEvent>(game) is
+            [{ Index: 0, RecipientSeat: 0, Option: "skill" } firstBenefit, { Index: 1, RecipientSeat: 1, Option: "limit" } secondBenefit] &&
+            firstBenefit.FrameId == root.Id && secondBenefit.FrameId == root.Id &&
+            Facts<CaoTengBenefitAppliedEvent>(game).Select(fact => (fact.FrameId, fact.Index)).SequenceEqual([(root.Id, 0), (root.Id, 1)]) &&
+            Facts<CaoTengSkillGrantedEvent>(game).SequenceEqual([grant]) &&
+            Facts<CaoTengCompletedEvent>(game).Count(fact => fact.FrameId == root.Id) == 1,
+            "Both benefits complete once on the original cursor and the cold return cannot grant the skill again.");
+    }
+
+    private static GameEngine Start(ContentRegistry registry)
+    {
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanSeats = [0, 1], HumanRole = Role.Lord, ModeId = Mode,
+            UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 6
+        }, registry);
+        Submit(game, new StartGameCommand());
+        return game;
+    }
+
     private static bool HasBranch(PendingDecision prompt, string branch) =>
         prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("branch") == branch);
 
-    private static PendingDecision Reach(GameEngine game, Func<PendingDecision, bool> predicate)
+    private static PendingDecision Reach(GameEngine game, Func<PendingDecision, bool> predicate, string owner = CaoTeng)
     {
         for (var step = 0; step < 140; step++)
         {
@@ -106,7 +174,7 @@ internal static class OlCaoTengYongzuHandLimitChecks
                 return prompt;
             if (prompt is { Kind: DecisionKind.SelectGeneral })
             {
-                var general = prompt.PlayerSeat == 0 ? CaoTeng : Recipient;
+                var general = prompt.PlayerSeat == 0 ? owner : Recipient;
                 Submit(game, new SelectGeneralCommand(prompt.PlayerSeat, general, game.Revision, prompt.PromptId));
             }
             else
@@ -136,13 +204,34 @@ internal static class OlCaoTengYongzuHandLimitChecks
             throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool watchGrant = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-cao-teng-yongzu-hand-limit", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, CaoTeng, "ol:liu-xie");
+            if (watchGrant)
+            {
+                var catalog = SkillProgramCatalog.Load($$"""
+                    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
+                      {"id":"{{GrantWatch}}","revision":1,"triggers":[
+                        {"id":"first-native-grant","window":"skillsChanged","subject":"owner","usageScope":"game",
+                          "usageLimit":1,"optional":false,"effects":[
+                            {"op":"chooseOption","target":"owner","resultBind":"grant","options":[{"id":"continue"}]}]}]}]}
+                    """, JsonSerializer.Serialize(new
+                    {
+                        schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                        skills = new Dictionary<string, object>
+                        {
+                            [GrantWatch] = new { name = "观察授予技能", description = "在原技能变化窗口暂停。",
+                                optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } }
+                        }
+                    }));
+                builder.AddSkill(new(GrantWatch, catalog.Presentations[GrantWatch].Name, catalog.Presentations[GrantWatch].Description)
+                    { Program = catalog.Programs[GrantWatch], ProgramPresentation = catalog.Presentations[GrantWatch] });
+                builder.AddGeneral(new(GrantOwner, "拥族授予验证", "supporter", Qingliu, "qun", 3, [Yongzu, GrantWatch]));
+            }
             string[] otherGenerals = ["fixture:yongzu-peer-2", "fixture:yongzu-peer-3"];
             builder.AddGeneral(new(Recipient, "原拥族受益者", "supporter", "standard:none", "wei", 1));
             foreach (var general in otherGenerals)
@@ -155,7 +244,7 @@ internal static class OlCaoTengYongzuHandLimitChecks
             builder.AddMode(new(Mode, "拥族真实弃牌", 4, 4, new Dictionary<string, int>
             {
                 [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1
-            }, Deck, GeneralCandidateCount: 4, GeneralPoolIds: [CaoTeng, Recipient, .. otherGenerals]));
+            }, Deck, GeneralCandidateCount: 4, GeneralPoolIds: [watchGrant ? GrantOwner : CaoTeng, Recipient, .. otherGenerals]));
         }
     }
 }

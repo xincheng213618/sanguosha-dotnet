@@ -36,7 +36,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             return HuZhaoRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == HuZhaoMiduStage.CostChildren && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1;
-        return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && r.Paid;
+        return child is ProgramLifecycleTriggerWindowFrame skills && ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, skills) && r.Paid;
     }
 
     internal ProgramSkillFrame? HuZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HuZhaoFirstChild(f, c), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
