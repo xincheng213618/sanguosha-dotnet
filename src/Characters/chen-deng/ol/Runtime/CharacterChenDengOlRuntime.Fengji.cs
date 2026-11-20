@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDengOlRuntime
 {
-    internal bool TracksFengjiRoundLedger => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.FengjiRoundChoice) == true;
+    private bool TracksFengjiRoundLedger => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.FengjiRoundChoice) == true;
 
     internal IReadOnlyList<ProgramFengjiOptionChosenEvent> CurrentRoundFengjiOptions(int ownerSeat)
     {

@@ -33,8 +33,6 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 
 internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 {
-    bool TracksFengjiRoundLedger { get; }
-    int FengjiRoundAdjustment { get; }
     bool HasZhuangshiQuota { get; }
     int SequentialDeckShortfallBonus { get; }
     bool HasZhajiangPreUsePrivilege { get; }
@@ -124,9 +122,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
             query.AdditiveTurnBonus);
         if (query.HasUnlimitedTurnBonus)
             contributions.Add(new UnlimitedRuleQueryContribution($"turn:{query.Seat}:slash-limit:unlimited"));
-        if (query.TracksFengjiRoundLedger)
-            AddFiniteContribution(contributions, $"state:{query.Seat}:olfengji:round-slash",
-                query.FengjiRoundAdjustment);
         return query.Project(RuleQueryService.Evaluate(
             SkillRuleQuery.SlashLimit,
             new RuleQueryBounds(0, int.MaxValue),

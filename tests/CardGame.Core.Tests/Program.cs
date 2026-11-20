@@ -541,6 +541,7 @@ var tests = new (string Name, Action Body)[]
     ("prepared snapshot rejects observer collection mutation", CommandSessionChecks.ObserverMutationCannotChangePreparedSnapshot),
     ("committed event collections reject observer mutation", CommandSessionChecks.EventCollectionObserversCannotRewriteCommittedHistory),
     ("round-start programs include foreign owners and cold returns", RoundStartingParticipantChecks.ForeignOwnerReceivesRoundStartAndColdReturns),
+    ("OL Chen Deng Fengji: two paid Slashes in the foreign-started round", RoundStartingParticipantChecks.FengjiAdmitsTwoPhysicalSlashesInTheSameRound),
     ("selected gift continues after recipient death", CardMovementProgramChecks.SelectedGiftContinuesAfterRecipientDeathAndReplays),
     ("internal failure stops the session and preserves its trusted prefix", EngineFaultChecks.InternalFailureStopsTheSessionAndPreservesTheLastPrefix),
     ("commands share prepared projection across result and reentry", PreparedCommandProjectionChecks.PublishedResultAndReentrantRejectionSharePreparedView),
