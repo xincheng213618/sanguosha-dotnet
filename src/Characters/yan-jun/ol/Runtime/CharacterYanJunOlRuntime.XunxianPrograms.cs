@@ -10,7 +10,7 @@ internal sealed partial class CharacterYanJunOlRuntime
         if (XunxianSettledMovement(active) is not { } movement ||
             _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive ||
             !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) ||
-            _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
+            !IsXunxianDiscardEntryCurrent(movement))
             return SkillProgramStepOutcome.Continue;
         var recipients = _coreMatchParticipantsPlayersAccess._players.Where(player => IsXunxianRecipient(owner, player)).Select(player => player.Seat).ToArray();
         if (recipients.Length == 0)
@@ -52,6 +52,7 @@ internal sealed partial class CharacterYanJunOlRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive ||
             !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) ||
             !IsXunxianRecipient(owner, _coreMatchParticipantsPlayersAccess._players[recipient]) ||
+            !IsXunxianDiscardEntryCurrent(movement) ||
             _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).SingleOrDefault(item => item.Id == movement.CardId) is not { } card)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "逊贤的目标或弃牌堆中的牌已失效，剩余结算取消。");
@@ -70,6 +71,10 @@ internal sealed partial class CharacterYanJunOlRuntime
     private static CardMovementRecord? XunxianSettledMovement(ProgramSkillFrame frame) =>
         frame.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } &&
         index >= 0 && index < batch.Movements.Count ? batch.Movements[index] : null;
+
+    private bool IsXunxianDiscardEntryCurrent(CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile &&
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence;
 
     private bool IsXunxianRecipient(CharacterState owner, CharacterState recipient) =>
         recipient.IsAlive && recipient.Seat != owner.Seat &&

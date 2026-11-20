@@ -801,6 +801,8 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Chiying: same physical card pays once for each different victim cold", AnniversaryGaoXiangChecks.ChiyingAcceptsTwoPaymentsOfTheSameCardFromDifferentVictimsCold),
     ("OL Boundary Liu Feng Qinling preserves the original discard cost entry cold", BoundaryLiuFengDiscardEntryChecks.QinlingCannotStoreTheLaterEntryOfItsDiscardedCostCold),
     ("Shi Wei Yan Yinzhan: Chengshi returns only the original discard entry", ShiWeiYanChecks.YinzhanChengshiReturnsOnlyTheOriginalDiscardEntry),
+    ("OL Xunxian preserves its original settled-use discard entry cold", OlXunxianChecks.XunxianCannotGiveANewerEntryOfItsSettledUseCold),
+    ("Shi Xiahou Ba Poxi: only the original discard entry pays for the Slash cold", ShiXiahouBaDiscardEntryChecks.PoxiCannotUseTheSameSlashFromALaterNativeCleanupCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

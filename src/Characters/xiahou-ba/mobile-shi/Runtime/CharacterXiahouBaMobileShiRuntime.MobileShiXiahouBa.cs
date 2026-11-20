@@ -79,12 +79,30 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         };
     }
 
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 68000, SkillProgramEffectOp.ResolveShiXbPoxi)]
+    internal bool CanOfferShiXbPoxi(ProgramTriggerLegalityContext gate) => CurrentShiXbPoxiDiscard(gate.WindowContext) is not null;
+
+    private (CardMovementBatchContext Batch, CardMovementRecord Movement)? CurrentShiXbPoxiDiscard(ProgramSkillWindowContext? context)
+    {
+        if (context is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } ||
+            index < 0 || index >= batch.Movements.Count)
+            return null;
+        var move = batch.Movements[index];
+        if (move.To != CardLocation.DiscardPile || !HasShiXbPoxiDiscardEntry(move.CardId, move.Sequence) ||
+            !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) ||
+            !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId).Kind))
+            return null;
+
+        return (batch, move);
+    }
+
+    private bool HasShiXbPoxiDiscardEntry(int cardId, int sequence) =>
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cardId) == sequence;
+
     internal ShiXiahouBaReceipt StartShiXbPoxi(ProgramSkillFrame f)
     {
-        var(batch, index) = f.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } movementBatch, MovementIndex: { } movementIndex } && movementIndex >= 0 && movementIndex < movementBatch.Movements.Count ? (movementBatch, movementIndex) : throw new InvalidOperationException("Poxi lost its exact discarded-slash movement.");
-        var move = batch.Movements[index];
-        if (move.To != CardLocation.DiscardPile || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile || !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId).Kind))
-            throw new InvalidOperationException("Poxi lost its discarded original Slash.");
+        var (batch, move) = CurrentShiXbPoxiDiscard(f.WindowContext) ??
+            throw new InvalidOperationException("Poxi lost its exact discarded-slash movement.");
         return new("poxi", _coreActualTurnProgressTurnNumberAccess._turnNumber)
         {
             Source = ShiXbSource(f),
@@ -161,7 +179,9 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     internal Card ShiXbPoxiCard(ProgramSkillFrame f)
     {
         var r = f.ShiXiahouBa!;
-        return _cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.DiscardPile ? _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId) : throw new InvalidOperationException("Poxi lost its discarded original Slash.");
+        return HasShiXbPoxiDiscardEntry(r.CardId, r.DiscardMovementSequence)
+            ? _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId)
+            : throw new InvalidOperationException("Poxi lost its discarded original Slash.");
     }
 
     internal IReadOnlyList<int> ShiXbPoxiTargets(ProgramSkillFrame f)

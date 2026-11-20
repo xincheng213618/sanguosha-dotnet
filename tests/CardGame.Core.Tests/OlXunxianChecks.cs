@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -8,22 +9,12 @@ internal static class OlXunxianChecks
     private const string Owner = "fixture:xunxian-owner";
     private const string Recipient = "fixture:xunxian-recipient";
     private const string Peer = "fixture:xunxian-peer";
+    private const string Watch = "fixture:xunxian-reentry";
+    private const string Rediscard = "skill-program.fixture:xunxian-reentry.SelectAndMoveOwnedCard";
 
     public static void SettledEntityIsGivenOnceAfterChoiceRestore()
     {
-        var content = ContentRegistry.Build(new StandardContentPackage(),
-            new StandardActiveSkillExpansionPackage(includeJijiu: true), new StandardRescueSkillExpansionPackage(),
-            new StandardClassicGeneralPackage(), new Fixture());
-        var game = GameEngine.CreateStandard(new GameOptions
-        {
-            Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = 0, HumanSeats = [0, 1, 2, 3],
-            HumanRole = Role.Lord, UseInteractiveSetup = true, AdvanceAfterHumanCommands = false
-        }, content);
-        game.DriveStart();
-        while (Next(game) is { Kind: DecisionKind.SelectGeneral } setup)
-            Submit(game, new SelectGeneralCommand(setup.PlayerSeat,
-                setup.PlayerSeat switch { 0 => Owner, 1 => Recipient, _ => $"{Peer}-{setup.PlayerSeat}" },
-                game.Revision, setup.PromptId));
+        var (game, content) = Start();
 
         var id = PlayDrawTwo(game);
         var activation = Next(game);
@@ -70,6 +61,104 @@ internal static class OlXunxianChecks
             "The restored recipient choice must settle identically.");
     }
 
+    public static void XunxianCannotGiveANewerEntryOfItsSettledUseCold()
+    {
+        var (game, content) = Start(reentry: true);
+        var play = Next(game);
+        Require(play is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.CreateSnapshot(0) is
+            { DrawPileCount: 0, DiscardPileCount: 0 }, "The real first draw exhausts the fixed deck before Duel.");
+        var use = game.GetHumanLegalActions().First(action => action.Kind == LegalActionKind.Duel && action.TargetSeats.SequenceEqual([2]));
+        var card = use.CardId!.Value;
+        Submit(game, new PlayCardCommand(0, card, use.TargetSeats, game.Revision, play.PromptId));
+
+        var watcher = Next(game);
+        var original = game.CardMovements.Single(move => move.CardId == card && move.Reason == CardMoveReasons.UseFinished);
+        var settled = Facts<SettledActionCardDiscardEvent>(game).Single();
+        Require(watcher is { PlayerSeat: 0, SkillPrompt.SkillId: Watch } && original.From == CardLocation.Processing &&
+            original.To == CardLocation.DiscardPile && settled.ActorSeat == 0 && settled.CardId == card &&
+            settled.BatchId == original.BatchId && settled.MovementSequence == original.Sequence &&
+            Facts<CardUseFinishedEvent>(game).Single() is { CardKind: CardKind.Duel } finished && finished.CardId == card,
+            "The exact true Duel has finished and its settled-use discard remains pending behind the completed-use child.");
+
+        var control = Cold(game, content);
+        AnswerAction(control, "skip");
+        Give(control);
+        var gift = Facts<ProgramXunxianGiftEvent>(control).Single();
+        Require(gift.CardId == card && gift.DiscardMovementSequence == original.Sequence &&
+            control.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location == CardLocation.Hand(1),
+            "The untouched original Duel can still be given to the eligible recipient.");
+
+        AnswerAction(game, "activate");
+        var choose = Next(game);
+        var returning = game.CardMovements.Where(move => move.CardId == card && move.Sequence > original.Sequence).ToArray();
+        Require(choose is { PlayerSeat: 0, SkillPrompt.SkillId: Watch } && returning is [var shuffled, var drawn] &&
+            shuffled.From == CardLocation.DiscardPile && shuffled.To == CardLocation.DrawPile && shuffled.Reason == CardMoveReasons.Reshuffle &&
+            drawn.From == CardLocation.DrawPile && drawn.To == CardLocation.Hand(0),
+            "The real completed-use child reshuffles and draws the settled Duel before the next public discard choice.");
+        game = Cold(game, content);
+        choose = Next(game);
+        Answer(game, choose, choose.Choices.Single(choice => choice.Cards.SequenceEqual([card])));
+        var fresh = game.CardMovements.Single(move => move.CardId == card && move.Reason.Value == Rediscard);
+        Require(fresh.Sequence > original.Sequence && fresh.BatchId != original.BatchId && fresh.From == CardLocation.Hand(0) &&
+            fresh.To == CardLocation.DiscardPile && Facts<SettledActionCardDiscardEvent>(game).SequenceEqual([settled]),
+            "The same physical Duel reenters in a hand discard with no second settled-use fact.");
+        if (Next(game).SkillPrompt?.SkillId == Skill)
+            Give(game);
+        Require(Next(game) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } && !Facts<ProgramXunxianGiftEvent>(game).Any() &&
+            game.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location == CardLocation.DiscardPile,
+            $"Xunxian may not give discard entry {fresh.Sequence} using the old Duel settlement at entry {original.Sequence}.");
+        BoundaryLiDianChecks.ReplayFourViews(game, content);
+    }
+
+    private static GameEngine Cold(GameEngine game, ContentRegistry content)
+    {
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        Require(game.CardMovements.SequenceEqual(restored.CardMovements) && Enumerable.Range(0, 4).All(seat =>
+            SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(restored.CreateSnapshot(seat))),
+            "Cold replay must preserve the complete Use, exact movements and every seat's visible prompt.");
+        return restored;
+    }
+
+    private static void AnswerAction(GameEngine game, string action)
+    {
+        var prompt = Next(game);
+        Answer(game, prompt, prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == action));
+    }
+
+    private static void Give(GameEngine game)
+    {
+        Require(Next(game).SkillPrompt?.SkillId == Skill, "The original settlement must offer Xunxian before its recipient choice.");
+        var players = game.CreateSnapshot(0).Players;
+        Require(players[1].IsAlive && players[1].Hp > players[0].Hp,
+            "The untouched high-HP peer qualifies as Xunxian's recipient after another peer takes Duel damage.");
+        AnswerAction(game, "activate");
+        var prompt = Next(game);
+        var give = prompt.Choices.SingleOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action") == "xunxian-gift" &&
+            choice.Targets.SequenceEqual([1]));
+        Require(give is not null, $"Xunxian must offer its eligible recipient after activation, but opened {prompt.Kind}/{prompt.SkillPrompt?.SkillId}.");
+        Answer(game, prompt, give!);
+    }
+
+    private static IEnumerable<T> Facts<T>(GameEngine game) => game.Events.Select(entry => entry.Payload).OfType<T>();
+
+    private static (GameEngine Game, ContentRegistry Content) Start(bool reentry = false)
+    {
+        var content = ContentRegistry.Build(new StandardContentPackage(),
+            new StandardActiveSkillExpansionPackage(includeJijiu: true), new StandardRescueSkillExpansionPackage(),
+            new StandardClassicGeneralPackage(), new Fixture(reentry));
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = 0, HumanSeats = [0, 1, 2, 3],
+            HumanRole = Role.Lord, UseInteractiveSetup = true, AdvanceAfterHumanCommands = false
+        }, content);
+        Submit(game, new StartGameCommand());
+        while (Next(game) is { Kind: DecisionKind.SelectGeneral } setup)
+            Submit(game, new SelectGeneralCommand(setup.PlayerSeat,
+                setup.PlayerSeat switch { 0 => Owner, 1 => Recipient, _ => $"{Peer}-{setup.PlayerSeat}" },
+                game.Revision, setup.PromptId));
+        return (game, content);
+    }
+
     private static int PlayDrawTwo(GameEngine game)
     {
         var play = Next(game);
@@ -107,25 +196,44 @@ internal static class OlXunxianChecks
             throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool reentry) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-xunxian", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
             var generals = new[] { Owner, Recipient, $"{Peer}-2", $"{Peer}-3" };
-            builder.AddGeneral(new(Owner, "逊贤使用者", "supporter", Skill, "wu", 3));
+            if (reentry)
+                RegisterWatch(builder);
+            builder.AddGeneral(new(Owner, "逊贤使用者", "supporter", Skill, "wu", 3, reentry ? [Watch] : []));
             builder.AddGeneral(new(Recipient, "高体力角色", "supporter", "standard:none", "wu", 5));
             foreach (var id in generals.Skip(2))
                 builder.AddGeneral(new(id, "其他角色", "supporter", "standard:none", "wu", 2));
             const string deck = "fixture:xunxian-deck";
-            builder.AddDeck(new(deck, "无中生有牌堆", 4, 2, [])
+            builder.AddDeck(new(deck, reentry ? "六张实体决斗" : "无中生有牌堆", reentry ? 1 : 4, 2, [])
             {
-                PhysicalCards = Enumerable.Range(0, 48).Select(_ => new ContentDeckPhysicalCard("standard:draw_two", Suit.Heart, 7)).ToArray()
+                PhysicalCards = Enumerable.Range(0, reentry ? 6 : 48)
+                    .Select(_ => new ContentDeckPhysicalCard(reentry ? "standard:duel" : "standard:draw_two", Suit.Heart, 7)).ToArray()
             });
             builder.AddMode(new(Mode, "逊贤规则场景", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, deck,
                 GeneralCandidateCount: 4, GeneralPoolIds: generals));
+        }
+
+        private static void RegisterWatch(IContentRegistryBuilder builder)
+        {
+            var rules = $$$"""
+                {"skills":[{"id":"{{{Watch}}}","revision":1,"triggers":[{"id":"draw-then-rediscard","window":"cardUseCompleted",
+                    "ownerRelation":"actor","cardKinds":["duel"],"singleActionInstance":true,"optional":true,"effects":[
+                      {"op":"draw","target":"owner","amount":1},
+                      {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
+                        "zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]}]}]}
+                """;
+            var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { [Watch] = new { name = "结算后摸回重弃", description = "摸一张牌，再弃置一张手牌。" } } });
+            var catalog = SkillProgramCatalog.LoadCurrent(rules, presentation);
+            builder.AddSkill(new(Watch, catalog.Presentations[Watch].Name, catalog.Presentations[Watch].Description)
+                { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
         }
     }
 }

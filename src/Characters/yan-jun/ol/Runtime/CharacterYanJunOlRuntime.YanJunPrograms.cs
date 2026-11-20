@@ -37,7 +37,9 @@ internal sealed partial class CharacterYanJunOlRuntime
         if (!TracksSettledActionCards)
             return[];
         var settled = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SettledActionCardDiscardEvent>().Where(e => e.BatchId == batch.Id && e.ActorSeat == candidate.OwnerSeat).Select(e => e.MovementSequence).ToHashSet();
-        return batch.Movements.Select((movement, index) => (movement, index)).Where(item => settled.Contains(item.movement.Sequence) && item.movement.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(item.movement.CardId) == CardLocation.DiscardPile).Select(item => item.index).Order().ToArray();
+        return batch.Movements.Select((movement, index) => (movement, index))
+            .Where(item => settled.Contains(item.movement.Sequence) && IsXunxianDiscardEntryCurrent(item.movement))
+            .Select(item => item.index).Order().ToArray();
     }
 
     internal int CurrentPlayPhaseEventIndex(int ownerSeat)
