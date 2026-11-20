@@ -17,6 +17,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Actual native material deliveries use `INativeMaterialClaims` and the original use or delayed Judgment frame's `MaterialClaims`. Capture real journal deliveries once; distinguish representation residency from the original owner's retirement right, which is relinquished after delivery even if that entity later reenters Processing. Keep accepted promises, child handoffs and producer retention separate from delivered acquisition; no character proof scan may replace this shared delivery fact.
 
+- Once physical Lightning starts resolving damage, the original Judgment frame records its first departure from the judgment zone. A completion claim can use the original native finish or death-cleanup discard entry while that entry survives. An earlier move to hand ends that Judgment's residency even if the same card later returns to the discard pile.
+
 - A pair Pindian retains the source's original draw-pile reservation sequence on its own frame. Its unrevealed source and any replacement that returns the reserved card must still refer to that Processing entry. A read of the opponent's draw-pile top leaves it in the draw pile until payment. Simultaneous Pindian keeps its own reservation receipts, and paid reveal and result claims retain their own lifetimes.
 
 - A pair Pindian returns the discard-pile entries actually delivered by its own cleanup with the native result binding. Each side has a separate receipt. A card obtained during an earlier window has no cleanup receipt even if a later discard moves the same physical card into the pile. A consumer rechecks the exact entry before acquiring it.

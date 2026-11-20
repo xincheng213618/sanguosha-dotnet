@@ -32,6 +32,9 @@ public sealed partial record JudgmentFrame
         Array.AsReadOnly(Array.Empty<NativeMaterialClaim>());
     public IReadOnlyList<NativeMaterialClaim> MaterialClaims
     { get => _materialClaims; init => _materialClaims = Array.AsReadOnly(value.ToArray()); }
+
+    [JsonInclude, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    internal CardMovementRecord? NativeDelayedMaterialDeparture { get; init; }
 }
 
 internal interface INativeMaterialClaims : IProgramRuntimeOperations
@@ -40,6 +43,7 @@ internal interface INativeMaterialClaims : IProgramRuntimeOperations
         NativeMaterialClaimResidency residency = NativeMaterialClaimResidency.Any);
     void CaptureRetirement(long ownerId, IReadOnlyList<CardMovementRecord> departures);
     void CaptureRetirement(CardMovementRecord departure);
+    void CaptureDelayedMaterialDeparture(CardMovementRecord departure);
     bool AcceptClaim(long ownerId, long producerFrameId, int instructionIndex, IReadOnlyList<int> cardIds);
     void TransferToNativeUse(long ownerId, long childUseId, IReadOnlyList<int> cardIds, NativeMaterialHandoffMode mode);
     void DeclareRetainedMaterial(long ownerId, int cardId);
@@ -149,6 +153,21 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
                 CaptureRetirement(use.Id, [departure]);
             return;
         }
+    }
+
+    public void CaptureDelayedMaterialDeparture(CardMovementRecord departure)
+    {
+        if (departure.From.Zone != CardZoneKind.Judgment || departure.From == departure.To)
+            return;
+
+        // The first departure ends this judgment's physical residency, even if
+        // another effect later moves the same card back into the same zone.
+        var judgment = frames.OfType<JudgmentFrame>().LastOrDefault(frame =>
+            frame.TargetSeat == departure.From.OwnerSeat && frame.DelayedCardId == departure.CardId &&
+            frame.CardAttack is { IsDelayedJudgmentDamage: true, EffectiveCardKind: CardKind.Lightning } attack &&
+            attack.PhysicalCardIds.Contains(departure.CardId));
+        if (judgment is { NativeDelayedMaterialDeparture: null })
+            frames.Replace(judgment.Id, judgment with { NativeDelayedMaterialDeparture = departure });
     }
 
     private static long? RetirementEntry(CardUseFrame owner, CardMovementRecord departure,

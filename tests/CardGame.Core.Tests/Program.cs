@@ -803,6 +803,10 @@ var tests = new (string Name, Action Body)[]
     ("Shi Wei Yan Yinzhan: Chengshi returns only the original discard entry", ShiWeiYanChecks.YinzhanChengshiReturnsOnlyTheOriginalDiscardEntry),
     ("OL Xunxian preserves its original settled-use discard entry cold", OlXunxianChecks.XunxianCannotGiveANewerEntryOfItsSettledUseCold),
     ("Shi Xiahou Ba Poxi: only the original discard entry pays for the Slash cold", ShiXiahouBaDiscardEntryChecks.PoxiCannotUseTheSameSlashFromALaterNativeCleanupCold),
+    ("Mou Dong Cheng Baojia: claims only the original Lightning finish entry", MouDongChengBaojiaDiscardEntryChecks.BaojiaClaimsOnlyTheOriginalLightningFinishEntry),
+    ("Mou Dong Cheng Baojia: claims the original death discard after chained Lightning", MouDongChengBaojiaDiscardEntryChecks.BaojiaClaimsTheOriginalDeathDiscardAfterChainedLightning),
+    ("OL Tongxie: completed Slash follows up after Xunxian gives its card cold", OlTongxieChecks.TongxieFollowsCompletedSlashAfterXunxianGivesItsMaterialCold),
+    ("Shi Zhang Yan Xiaoge preserves its original Feijing discard entry cold", ShiZhangYanDiscardEntryChecks.XiaogeCannotObtainANewerEntryOfTheFeijingPaymentCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

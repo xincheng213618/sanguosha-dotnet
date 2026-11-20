@@ -76,12 +76,10 @@ internal sealed partial class CharacterDongChengMouRuntime
         if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.ClaimChildren } r || f.MouDongChengSettlement is not { Reward: false } s || _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == s.JudgmentId)is not { NativeDelayedAttackCompletion: not null, MouDongChengClaims: { } claims } j || claims.SingleOrDefault(p => p.ProtectionFrameId == s.ProtectionId)is not { Settled: false } claim)
             throw new InvalidOperationException("Baojia requires its one paid delayed card claim after native resolution.");
         var card = j.DelayedCardId;
-        var ids = card is { } id && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile ? new[]
-        {
-            id
-        }
-
-        : Array.Empty<int>();
+        int[] ids = card is { } id && j.NativeDelayedMaterialDeparture is { } departure && departure.CardId == id &&
+            departure.To == CardLocation.DiscardPile &&
+            (departure.Reason == CardMoveReasons.DelayedCardFinish || departure.Reason == CardMoveReasons.DeathDiscard) &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, id) == departure.Sequence ? [id] : [];
         _coreRuntimeOperations.ReplaceRuntimeFrame(j.Id, j with { MouDongChengClaims = claims.Select(p => p.ProtectionFrameId == claim.ProtectionFrameId ? p with { Settled = true } : p).ToArray() });
         if (ids.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new("skill-program.mou:baojia.delayed-claim"), (_, moves) =>

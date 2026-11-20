@@ -312,7 +312,8 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
         if (r.Stage == ShiZyStage.RecoverChildren)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiZhangYan = r with { Stage = ShiZyStage.ObtainChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.CardId > 0 && _cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.DiscardPile)
+            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.CardId > 0 && r.PaymentSequence > 0 &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, r.CardId) == r.PaymentSequence)
                 _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.CardId], CardLocation.Hand(f.OwnerSeat), new(ShiZyObtain));
             SealShiZy(id);
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(id).ShiZhangYan!;

@@ -3,7 +3,8 @@ namespace CardGame.Core;
 /// <summary>Owns movement journal issuance and the ordered native receipt, observer and output boundaries.</summary>
 [ProgramRuntimeModule]
 internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovementRecordMetadata metadata,
-    IMovementRecordJournal journal, IMovementRecordMaterials materials, IMovementRecordObservers observers,
+    IMovementRecordJournal journal, IMovementRecordMaterials materials, INativeMaterialClaims nativeMaterialClaims,
+    IMovementRecordObservers observers,
     IMovementRecordOrigins origins, IMovementRecordNotifications notifications, IProgramRuntimeEvents events,
     ICardMovementEventSuppression suppression, ICardMovementBatchLifecycle batches,
     RuntimeEntries.DeferredRuntime<GeneratedEquipmentRuntime> equipmentLifetime, ICardMovementTimingQueries timing)
@@ -36,6 +37,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
                 NativeDiscard = nativeDiscard is { } material && material.CardId == card.Id && material.From == from &&
                     to == CardLocation.DiscardPile && batches.ActiveBatchId is > 0 ? material : null };
         journal.Append(movement);
+        nativeMaterialClaims.CaptureDelayedMaterialDeparture(movement);
         equipmentLifetime.Value.CaptureNativeMaterialDeparture(movement);
         materials.ValidateHappyWeiYanGainDestinationRecord(movement);
         materials.ValidateHappyZuoCiPhantomMovement(movement);

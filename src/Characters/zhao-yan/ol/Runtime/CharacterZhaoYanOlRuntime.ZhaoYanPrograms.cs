@@ -101,7 +101,9 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         if (!_characterYanJunOlOperations.TracksSettledActionCards)
             return[];
         var settled = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TongxieSettledSlashUseEvent>().Where(entry => entry.BatchId == batch.Id).Select(entry => entry.MovementSequence).ToHashSet();
-        return batch.Movements.Select((movement, index) => (movement, index)).Where(item => settled.Contains(item.movement.Sequence) && item.movement.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(item.movement.CardId) == CardLocation.DiscardPile).Select(item => item.index).Order().ToArray();
+        return batch.Movements.Select((movement, index) => (movement, index))
+            .Where(item => settled.Contains(item.movement.Sequence) && item.movement.To == CardLocation.DiscardPile)
+            .Select(item => item.index).Order().ToArray();
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 170, SkillProgramEffectOp.TongxieGuard)]
