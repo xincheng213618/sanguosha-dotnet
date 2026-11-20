@@ -7,7 +7,6 @@ internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 140)]
     internal bool CanPayEquipmentSlotGroup(CharacterState owner, SkillProgramActivation activation) => ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.AbolishEquipmentSlotGroup).All(e => e.EquipmentSlots.Any(slot => owner.EquipmentSlotCapacity(slot) > 0));
-    internal bool CanSelectProgramPindianOpponent(ProgramSkillFrame frame, int targetSeat) => _programTargetSelectionOperations.Get().CanSelectPindianOpponent(frame, targetSeat);
     void IEquipmentSlotGroupProgramHost.AbolishEquipmentSlotGroup(ProgramSkillFrame frame, IReadOnlyList<EquipmentSlot> slots) => AbolishProgramEquipmentSlotGroup(frame, slots);
     void IEquipmentSlotGroupProgramHost.RecastSelectedEquipment(ProgramSkillFrame frame) => RecastProgramSelectedEquipment(frame);
     void IEquipmentSlotGroupProgramHost.ReplaceSkillsOnPreparation(ProgramSkillFrame frame, IReadOnlyList<string> lost, string acquired) => ReplaceProgramPreparationSkills(frame, lost, acquired);

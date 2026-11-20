@@ -643,6 +643,8 @@ var tests = new (string Name, Action Body)[]
     ("active programs suspend into Pindian and branch from the frozen result", PindianModuleChecks.ActiveProgramPindianSuspendsConditionsAndReplays),
     ("mobile Lieren exchanges the original tied Pindian cards and resumes", MobileLierenChecks.TiedPindianExchangesOriginalCardsAndResumes),
     ("Boundary Zhu Rong Lieren: direct damage opens original Pindian cold", MobileLierenChecks.DirectDamageOpensOriginalPindianCold),
+    ("Mobile Xuanfeng: equipment loss offers only available branches cold", MobileXuanfengRequiredTargetChecks.EquipmentLossOffersOnlyAvailableBranchesCold),
+    ("OL Wei Guan Zhongyun: hand loss offers equipment-only discard target", OlZhongyunRequiredTargetChecks.HandLossKeepsEquipmentOnlyDiscardOption),
     ("program pindian runtime preserves native sources and exact phase frames", ProgramPindianRuntimeChecks.NativeEntryPreservesEventSourcesAndExactPhaseFrames),
     ("foreign turn contest preserves original result paid child and typed Slash return cold", ForeignTurnContestRuntimeChecks.OriginalResultPaidChildAndTypedSlashReturnStayExactCold),
     ("program random acquisition preserves shared generator and ordered physical areas", ProgramRandomCardAcquisitionChecks.SharedRandomOwnerAndOrderedPhysicalAcquisitions),

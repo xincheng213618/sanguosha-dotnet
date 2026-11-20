@@ -6,8 +6,3 @@ internal interface ICoreEquipmentSlotGroupProgramsCoreEquipmentContentOperations
 {
     EquipmentContentRegistry EquipmentRules { get; }
 }
-
-internal interface ICoreEquipmentSlotGroupProgramsProgramTargetSelectionOperations : IProgramRuntimeOperations
-{
-    ProgramTargetSelectionRuntime Get();
-}

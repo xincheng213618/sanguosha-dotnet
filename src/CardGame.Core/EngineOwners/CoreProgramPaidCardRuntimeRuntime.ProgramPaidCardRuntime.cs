@@ -43,7 +43,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     Suit IProgramPaidCardFacts.EffectiveSuit(int seat, Card card) => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card);
     int IProgramPaidCardFacts.CountLivingInAttackRange(int seat) => _coreProgramCardPaymentsOperations.CountLivingInAttackRange(seat);
     IReadOnlyList<int> IProgramPaidCardFacts.TargetSeats(int owner, SkillProgramTargetKind kind, ProgramSkillWindowContext? context) => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, kind, context);
-    bool IProgramPaidCardFacts.CanSelectPindianOpponent(ProgramSkillFrame frame, int seat) => _coreEquipmentSlotGroupProgramsOperations.CanSelectProgramPindianOpponent(frame, seat);
+    bool IProgramPaidCardFacts.CanSelectPindianOpponent(ProgramSkillFrame frame, int seat) => _programTargetSelection.Value.CanSelectPindianOpponent(frame, seat);
     Card[] IProgramPaidCardFacts.ClaimableDamageCards(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(frame);
     bool IProgramPaidCardFacts.FrozenSuitMatchesChoice(ProgramSkillFrame frame, string cardBind, string choiceBind) => _coreProgramRandomTransfersOperations.Value.DoesProgramFrozenSuitMatchChoice(frame, cardBind, choiceBind);
     bool IProgramPaidCardFacts.BoundCardsMatchCategories(ProgramSkillFrame frame, string bind, IReadOnlyList<SkillProgramCardCategory> categories) => _coreProgramCategoryChallengesOperations.DoProgramBoundCardsMatchCategories(frame, bind, categories);
