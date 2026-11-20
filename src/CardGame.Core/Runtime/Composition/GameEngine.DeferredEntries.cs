@@ -1853,7 +1853,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTianYuMouMobileRuntime> TianYuMouMobileEntries => GetDeferredModule<EngineOwners.CharacterTianYuMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTianYuOlRuntime> TianYuOlEntries => GetDeferredModule<EngineOwners.CharacterTianYuOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries TieredRoundZeroResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries, EngineOwners.CoreGameEngineTieredRoundZeroResponsesRuntime>(Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries.Create);
 

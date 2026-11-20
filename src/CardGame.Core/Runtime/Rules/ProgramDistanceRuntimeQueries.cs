@@ -12,8 +12,4 @@ internal interface IDistanceRuleRuntimeQueries : IProgramSelectionQuery
     IReadOnlyList<T> History<T>() where T : IGameEvent;
     IEnumerable<int> OwnedCardIds(int seat);
     CardLocation Location(int cardId);
-    IEnumerable<ProgramDirectedDistanceLedgerEntry> DirectedDistanceLedger();
 }
-
-internal readonly record struct ProgramDirectedDistanceLedgerEntry(
-    int OwnerSeat, int TargetSeat, ProgramDirectedDistanceGrantedEvent? Grant);

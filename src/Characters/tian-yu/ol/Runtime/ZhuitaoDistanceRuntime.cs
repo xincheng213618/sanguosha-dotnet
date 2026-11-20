@@ -3,16 +3,22 @@ namespace CardGame.Core;
 // History, including the pending tail, remains owned by the command session.
 // This runtime derives the directed grants anew and retains no policy map.
 [ProgramRuntimeModule]
-internal sealed class ZhuitaoDistanceRuntime(IDistanceRuleRuntimeQueries queries)
+internal sealed class ZhuitaoDistanceRuntime(IDistanceRuleRuntimeQueries queries, IProgramEventJournalQueries journal)
 {
     internal IReadOnlyList<ProgramDirectedDistanceGrantedEvent> ActiveGrants(int ownerSeat, int targetSeat)
     {
         var active = new List<ProgramDirectedDistanceGrantedEvent>();
-        foreach (var entry in queries.DirectedDistanceLedger())
+        foreach (var fact in journal.Complete())
         {
-            if (entry.OwnerSeat != ownerSeat || entry.TargetSeat != targetSeat) continue;
-            if (entry.Grant is { } grant) active.Add(grant);
-            else active.Clear();
+            switch (fact)
+            {
+                case ProgramDirectedDistanceGrantedEvent grant when grant.OwnerSeat == ownerSeat && grant.TargetSeat == targetSeat:
+                    active.Add(grant);
+                    break;
+                case ProgramDirectedDistanceRevokedEvent revoked when revoked.OwnerSeat == ownerSeat && revoked.TargetSeat == targetSeat:
+                    active.Clear();
+                    break;
+            }
         }
         return active;
     }

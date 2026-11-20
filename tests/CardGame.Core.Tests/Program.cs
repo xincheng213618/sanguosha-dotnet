@@ -599,6 +599,7 @@ var tests = new (string Name, Action Body)[]
     ("program card-use payments preserve ordered proofs and match isolation", ProgramCardUsePaymentChecks.OrderedPaymentProofsAndMatchIsolation),
     ("program damage hooks preserve actual order side effects and short circuits", ProgramDamageHookChecks.ActualDamagePhasesKeepOrderAndShortCircuit),
     ("module distance rules preserve ordered arithmetic and native query boundaries", ProgramDistanceRuleChecks.OrderedArithmeticAndNativeDistanceQueries),
+    ("Le Cai Wen Ji Shuangjia: marked equipment contributes only while owned cold", LeCaiWenJiShuangjiaDistanceOwnerChecks.MarkedEquipmentContributesOnlyWhileOwnedCold),
     ("program target rules preserve ordered boundaries and live queries", ProgramTargetRuleChecks.OrderedBoundariesAndLiveQueries),
     ("program target windows preserve ordered subscriptions and exact target identity", ProgramTargetWindowProtocolChecks.OrderedWindowSubscriptionsAndExactTargetIdentity),
     ("program view contributors preserve ordered visibility and Processing privacy", ProgramViewContributorChecks.OrderedVisibilityContributionsAndProcessingPrivacy),
