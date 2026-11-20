@@ -8,6 +8,7 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Dujiang = "mou-mobile:dujiang", Duojing = "mou-mobile:duojing";
     private const string Fanxiang = "ol:fanxiang", Liangzhu = "ol:liangzhu", Xiaoji = "classic:xiaoji";
     private const string Moucuan = "ol:moucuan", Binghuo = "ol:binghuo";
+    private const string Jianghuo = "anniversary:jianghuo", Lishi = "anniversary:lishi";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string WatchMaximum = """
@@ -218,6 +219,51 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
         match.Need(match.Owner.MaxHp == reducedMaximum - 1 && match.Owner.Skills?.Count(skill => skill.ContentId == Binghuo) == 1 &&
             match.Facts<MoucuanMaximumPaidEvent>().SequenceEqual([paid]) && match.Facts<MoucuanSkillGrantedEvent>().SequenceEqual([new(paid.FrameId, 0)]),
             "The original expense grants exactly one Binghuo to the recipient after the health child.");
+    }
+
+    internal static void PaidHuishiWaivesJianghuoDamageBeforeNextActualTurnCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("anniversary:shen-zhong-hui", [Jianghuo], WatchMaximum));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        var initialMaximum = match.Owner.MaxHp;
+        match.Need(match.Facts<DamageAppliedEvent>().Length == 0 && match.Facts<ShenZhongHuiStartedEvent>().Length == 0,
+            "None of the original living participants has taken damage, so Jianghuo does not awaken before the first turn.");
+        match.GrantToSelf(Jianghuo);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var reducedMaximum = initialMaximum - 2;
+        match.Need(grant is { Recipient: 0, SkillId: Jianghuo } && match.Owner.MaxHp == reducedMaximum &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId,
+            "The real Huishi pays first and awards the original Jianghuo instance.");
+
+        match.EndPlay();
+        match.Reach(() => match.Prompt?.SkillPrompt?.SkillId == Watch);
+        var started = match.Facts<ShenZhongHuiStartedEvent>().Single(fact => fact.Operation == SkillProgramEffectOp.AwakenJianghuo);
+        var root = match.Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == started.FrameId);
+        var window = match.Game.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(frame => frame.Id == started.ParentId);
+        var prelude = match.Game.ResolutionStack.OfType<BeiMiHuTurnPreludeFrame>().Single(frame => frame.WindowId == window.Id);
+        var health = match.Game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single(frame => frame.ResumeFrameId == root.Id);
+        match.Need(grant.FrameId < root.Id && started.Source.SkillInstanceId == grant.InstanceId && started.GameplayHash == grant.GameplayHash &&
+            started.Source is { OwnerSeat: 0, BindingId: "all-living-damaged" } &&
+            root.WindowContext is { Window: SkillProgramTriggerWindow.TurnBeforeStart } context && context.ParentFrameId == window.Id &&
+            context.BeforeTurnPreludeProof == prelude.Proof && prelude.Proof.UpcomingOwnerSeat == 0 &&
+            match.Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn]) &&
+            match.Facts<DamageAppliedEvent>().Length == 0 && health.Change is { Kind: HpChangeKind.MaximumHp, Amount: 1, TargetSeat: 0 } &&
+            health.Change.ParentFrameId == root.Id && match.Owner.MaxHp == reducedMaximum + 1,
+            "The paid override starts Jianghuo on the original pre-turn frame before the actual next turn, even with no damage.");
+
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            match.Facts<ShenZhongHuiStartedEvent>().Count(fact => fact == started) == 1 &&
+            JsonSerializer.Serialize(match.Game.ResolutionStack.OfType<BeiMiHuTurnPreludeFrame>().Single(frame => frame.Id == prelude.Id)) == JsonSerializer.Serialize(prelude),
+            "Cold replay keeps the same original pre-turn frame and the single accepted Jianghuo.");
+        match.Continue();
+        match.Reach(() => match.Facts<TurnStartedEvent>().Any(fact => fact.ActorSeat == 0 && fact.TurnNumber == prelude.Proof.UpcomingTurnNumber));
+        match.Need(match.Owner.MaxHp == reducedMaximum + 1 && match.Owner.Skills?.Count(skill => skill.ContentId == Lishi) == 1 &&
+            match.Facts<MaximumHpChangedEvent>().Count(fact => fact is { PlayerSeat: 0, SkillId: Jianghuo, Delta: 1 }) == 1 &&
+            match.Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Jianghuo && fact.SkillIds.SequenceEqual([Lishi])) == 1,
+            "The recorded turn starts after exactly one maximum-HP increase and one Lishi grant.");
     }
 
     private sealed class HuishiMatch(ContentRegistry registry)
