@@ -28,7 +28,6 @@ internal sealed partial class CharacterDuFuRenOlEntries
     internal bool DuFuRenFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().DuFuRenFirstChild(root, child);
     internal bool DuFuRenGrantConsumed(long id, ActualDiscardRecoveryPhaseKind kind) => _resolve().DuFuRenGrantConsumed(id, kind);
     internal ProgramSkillFrame? DuFuRenObserverRoot() => _resolve().DuFuRenObserverRoot();
-    internal int DuFuRenPhaseBonus(int ownerSeat, SkillRuleQuery query) => _resolve().DuFuRenPhaseBonus(ownerSeat, query);
     internal int DuFuRenYiseDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().DuFuRenYiseDamageBonus(attack);
     internal bool ExcludeOrdinaryMovement_IsDuFuRenYiseTrigger(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsDuFuRenYiseTrigger(candidate, trigger);
     internal bool IsDuFuRenGiftContext(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsDuFuRenGiftContext(c, context);

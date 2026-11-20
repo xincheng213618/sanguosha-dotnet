@@ -12,7 +12,6 @@ internal interface IMatchTurnNumericQuery : IProgramSelectionQuery
     IEnumerable<RuleQueryContribution> Contributions { get; }
     int MarketBonus { get; }
     int SharedRankBonus { get; }
-    int ShunshiBonus { get; }
     int HengyeGrowth { get; }
     int AdditiveTurnBonus { get; }
     bool TracksFengjiRoundLedger { get; }
@@ -77,7 +76,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shanhe-luanxin:draw", query.LuanxinNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:alternating-next-draw", query.AlternatingNextDrawBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.DrawCount, contributions);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:shunshi:draw", query.ShunshiBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:kuangxiang:draw", -query.KuangxiangDrawPenalty);
         AddFiniteContribution(contributions, $"state:{query.Seat}:hengye:growth", query.HengyeGrowth);
         AddFiniteContribution(contributions, $"state:{query.Seat}:anniversary-fuzhong:draw", query.FuzhongDrawBonus);
@@ -112,7 +110,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         AddFiniteContribution(contributions, $"issued:{query.Seat}:yang-feng:qujia:slash-limit", query.QujiaSlashBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:boundary:juzhan-mobile:slash-limit", query.JuzhanSlashBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.SlashLimit, contributions);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:shunshi:slash-limit", query.ShunshiBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-mobile:yangwei:slash-limit", query.HasYangweiBonus ? 1 : 0);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-mobile:duojing:slash-limit", query.DuojingSlashBonus);
         if (query.NeifaSlashBonus is > 0 and var neifaBonus)

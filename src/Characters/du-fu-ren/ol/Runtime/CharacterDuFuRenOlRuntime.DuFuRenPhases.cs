@@ -18,7 +18,22 @@ internal sealed partial class CharacterDuFuRenOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenPhaseIssuedEvent(gift.FrameId, phase));
     }
 
-    internal int DuFuRenPhaseBonus(int ownerSeat, SkillRuleQuery query)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 50)]
+    internal void AddShunshiPhaseContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        var sourceSuffix = query switch
+        {
+            SkillRuleQuery.DrawCount => "draw",
+            SkillRuleQuery.SlashLimit => "slash-limit",
+            SkillRuleQuery.HandLimit => "hand-limit",
+            _ => null
+        };
+        if (sourceSuffix is not null)
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions,
+                $"issued:{seat}:shunshi:{sourceSuffix}", DuFuRenPhaseBonus(seat, query));
+    }
+
+    private int DuFuRenPhaseBonus(int ownerSeat, SkillRuleQuery query)
     {
         if (!HasDuFuRenShunshi || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || phase.ActorSeat != ownerSeat || DuFuRenPhaseQuery(phase.Kind) != query)
             return 0;

@@ -893,6 +893,7 @@ var tests = new (string Name, Action Body)[]
     ("Shi Zhong Hui Sizi: both paid activations stop at the next owner turn cold", ShiZhongHuiSiziExpiryChecks.BothPaidSiziActivationsStopAtTheOwnersNextActualTurnCold),
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
+    ("OL Du Fu Ren Shunshi: paid preparation gift funds three actual phases cold", OlDuFuRenShunshiNumericChecks.PreparationGiftFundsThreeActualPhasesCold),
     ("OL Cao Xi Gangshu: draw expires on actual Draw or prior Dodge cold", OlCaoXiGangshuDrawChecks.GangshuDrawExpiresOnActualDrawOrPriorDodgeCold),
     ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),
     ("OL Cao Xi Gangshu: finite Slash limit admits one additional payment cold", OlCaoXiGangshuDrawChecks.GangshuSlashLimitAdmitsOneMoreNativeSlashCold),
