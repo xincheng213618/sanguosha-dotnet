@@ -4,13 +4,20 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengGongYingOlRuntime
 {
     internal bool KuangxiangDrawGrantConsumed(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangRedDrawConsumedEvent>().Any(e => e.GrantFrameId == id);
-    internal int ChengGongYingDrawPenalty(int actorSeat)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 120)]
+    internal void AddKuangxiangDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (!HasChengGongYingCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive)
-            return 0;
-        if (_coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase && phase.ActorSeat == actorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangDrawConfirmedEvent>().Any(e => e.Phase == phase))
-            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangRedDrawConsumedEvent>().Where(e => e.Phase == phase).Sum(e => e.Count);
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangRedDrawIssuedEvent>().Where(e => e.Recipient == actorSeat && !KuangxiangDrawGrantConsumed(e.FrameId)).Sum(e => e.Count);
+        if (query != SkillRuleQuery.DrawCount || !HasChengGongYingCapability ||
+            !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
+            return;
+
+        var currentPhase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
+        var history = _coreProgramEventHistoryOperations.Value;
+        var penalty = currentPhase is { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase && phase.ActorSeat == seat &&
+            history.ProgramEventHistory<KuangxiangDrawConfirmedEvent>().Any(e => e.Phase == phase)
+            ? history.ProgramEventHistory<KuangxiangRedDrawConsumedEvent>().Where(e => e.Phase == phase).Sum(e => e.Count)
+            : history.ProgramEventHistory<KuangxiangRedDrawIssuedEvent>().Where(e => e.Recipient == seat && !KuangxiangDrawGrantConsumed(e.FrameId)).Sum(e => e.Count);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:kuangxiang:draw", -penalty);
     }
 
     internal void ConsumeChengGongYingDraw(int actorSeat)

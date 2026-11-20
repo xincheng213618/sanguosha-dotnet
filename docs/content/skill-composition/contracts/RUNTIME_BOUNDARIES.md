@@ -45,6 +45,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - OL Gao Gan's Juguan settles retaliation from the original damaged targets at the start of the issuer's next actual turn. The qualified reward adds two to the first bound actual Draw phase for that living participant, including after loss of the skill. A Draw skip can expire that reward before it binds.
 
+- OL Cheng Gong Ying's Kuangxiang reduces the living recipient's next actual Draw count by one per issued red card. Before confirmation the query reads pending grants. A confirmed Draw reads only the grants consumed on its original phase key. Skipped phases leave the grants pending.
+
 - Accepted card-action and movement trigger continuations use `ProgramInvocations` on the original native window and candidate cursor. Acceptance-scoped rights begin only after the actual binding starts; preserve earlier source-frozen permissions as distinct declarations. Keep source-loss invocation rights separate from owner-death rights; never refresh accepted qualification from later use history or recreate character payment-proof ledgers.
 
 - Accepted materials are commitments on their original frame, separately from chosen inputs and physical payment results. Acceptance freezes eligibility; execution drops materials that left their frozen source without requalifying the promise. Declare source-loss continuation separately from owner-death draining, and never use draining to issue future effects.

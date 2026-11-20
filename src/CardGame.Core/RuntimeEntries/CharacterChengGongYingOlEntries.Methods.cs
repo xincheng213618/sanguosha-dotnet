@@ -11,7 +11,6 @@ internal sealed partial class CharacterChengGongYingOlEntries
     internal bool ChengGongYingCanDiscard(int payer, int id) => _resolve().ChengGongYingCanDiscard(payer, id);
     internal IReadOnlyList<PromptChoice> ChengGongYingChoices(ProgramSkillFrame f) => _resolve().ChengGongYingChoices(f);
     internal int ChengGongYingChooser(ProgramSkillFrame f) => _resolve().ChengGongYingChooser(f);
-    internal int ChengGongYingDrawPenalty(int actorSeat) => _resolve().ChengGongYingDrawPenalty(actorSeat);
     internal bool ChengGongYingFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ChengGongYingFirstChild(f, child);
     internal int ChengGongYingKuangxiangDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().ChengGongYingKuangxiangDamageBonus(attack);
     internal ProgramSkillFrame? ChengGongYingObserverRoot() => _resolve().ChengGongYingObserverRoot();

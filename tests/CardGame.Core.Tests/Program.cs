@@ -913,6 +913,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Du Xi Quxi: issued holders modify actual Draw cold", OlDuXiQuxiDrawChecks.IssuedFengAndQianModifyTheirActualHoldersNormalDrawCold),
     ("OL Gao Gan Juguan: native Duel grants the next actual Draw once cold", OlGaoGanJuguanDrawChecks.NativeDuelGrantsTheNextActualDrawOnceCold),
     ("OL Du Fu Ren Shunshi: paid preparation gift funds three actual phases cold", OlDuFuRenShunshiNumericChecks.PreparationGiftFundsThreeActualPhasesCold),
+    ("OL Cheng Gong Ying Kuangxiang: issued red card reduces next actual Draw cold", OlChengGongYingKuangxiangDrawChecks.OneRedGrantAffectsOnlyRecipientsNextActualDrawCold),
     ("OL Cao Xi Gangshu: draw expires on actual Draw or prior Dodge cold", OlCaoXiGangshuDrawChecks.GangshuDrawExpiresOnActualDrawOrPriorDodgeCold),
     ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),
     ("OL Cao Xi Gangshu: finite Slash limit admits one additional payment cold", OlCaoXiGangshuDrawChecks.GangshuSlashLimitAdmitsOneMoreNativeSlashCold),
