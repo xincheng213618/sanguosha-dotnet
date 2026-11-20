@@ -110,6 +110,96 @@ internal static class OlXunxianChecks
         BoundaryLiDianChecks.ReplayFourViews(game, content);
     }
 
+    public static void XunxianKeepsTurnUseWhenNoRecipientCanReceiveCold()
+    {
+        var (game, content) = Start(emptyRecipients: true);
+        var firstCard = PlayDuel(game, 1);
+        var first = Next(game);
+        var players = game.CreateSnapshot(0).Players;
+        var owner = players[0];
+        var eligible = players.Where(player => player.Seat != 0 && player.IsAlive &&
+            (player.Hp > owner.Hp || player.HandCount > owner.HandCount)).Select(player => player.Seat).ToArray();
+        var finishes = Facts<CardUseFinishedEvent>(game).ToArray();
+        var settlements = Facts<SettledActionCardDiscardEvent>(game).ToArray();
+        var firstDiscard = game.CardMovements.SingleOrDefault(move => move.CardId == firstCard && move.Reason == CardMoveReasons.UseFinished);
+        var visibleStats = string.Join(", ", players.Select(player => $"{player.Seat}={player.Hp}/{player.HandCount}"));
+        var details = $"Card {firstCard}, prompt {first.Kind}/{first.SkillPrompt?.SkillId}, HP/hand [{visibleStats}], eligible [{string.Join(", ", eligible)}], completion [{string.Join(", ", finishes.AsEnumerable())}], original movement {firstDiscard}, settlements [{string.Join(", ", settlements.AsEnumerable())}].";
+        Require(players.Select(player => (player.Hp, player.HandCount)).SequenceEqual([(4, 2), (4, 1), (2, 1), (2, 1)]) &&
+            eligible.Length == 0, $"The four actual seats have the reproduced zero-recipient values. {details}");
+        Require(finishes is [{ CardKind: CardKind.Duel } finish] && finish.CardId == firstCard &&
+            firstDiscard is { From: { Zone: CardZoneKind.Processing }, To: { Zone: CardZoneKind.DiscardPile } } &&
+            settlements is [{ ActorSeat: 0 } settled] && settled.BatchId == firstDiscard.BatchId &&
+            settled.CardId == firstCard && settled.MovementSequence == firstDiscard.Sequence,
+            $"The first Duel completes with one original settled-use entry from Processing to the discard pile. {details}");
+
+        var control = Cold(game, content);
+        if (Next(control).SkillPrompt?.SkillId == Skill)
+            AnswerAction(control, "skip");
+        var controlCard = PlayToHandRecipient(control);
+        GiveToHandRecipient(control, controlCard);
+
+        var offered = first.SkillPrompt?.SkillId == Skill;
+        if (offered)
+            AnswerAction(game, "activate");
+        var firstUsage = TurnUsage(game).ToArray();
+        Require(Next(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
+            game.CreateCardZoneDiagnostics().Single(card => card.CardId == firstCard).Location == CardLocation.DiscardPile &&
+            !Facts<ProgramXunxianGiftEvent>(game).Any(),
+            "The first Duel stays in the discard pile, and the same turn resumes with no gift.");
+        game = Cold(game, content);
+
+        var laterCard = PlayToHandRecipient(game);
+        var laterOffered = Next(game).SkillPrompt?.SkillId == Skill;
+        if (laterOffered)
+            GiveToHandRecipient(game, laterCard);
+        Require(!offered && firstUsage.Length == 0 && laterOffered,
+            $"Xunxian must suppress the zero-recipient offer, preserve the turn use, and offer the later real gift. First offer {offered}, first usage [{string.Join(", ", firstUsage.Select(use => use.Count))}], eligible later offer {laterOffered}.");
+        BoundaryLiDianChecks.ReplayFourViews(game, content);
+    }
+
+    private static int PlayToHandRecipient(GameEngine game)
+    {
+        PlayDuel(game, 2);
+        if (Next(game).SkillPrompt?.SkillId == Skill)
+            AnswerAction(game, "skip");
+        var card = PlayDuel(game, 3);
+        _ = Next(game);
+        var players = game.CreateSnapshot(0).Players;
+        Require(players[1].IsAlive && players[1].Hp == players[0].Hp && players[1].HandCount > players[0].HandCount &&
+            Facts<SettledActionCardDiscardEvent>(game).Count() == 3 && !Facts<TurnEndedEvent>(game).Any(),
+            "A third real Duel in the same turn makes seat 1 eligible through hand count while HP stays equal.");
+        return card;
+    }
+
+    private static void GiveToHandRecipient(GameEngine game, int card)
+    {
+        Require(Next(game).SkillPrompt?.SkillId == Skill && !TurnUsage(game).Any(),
+            "The later real Duel offers the still-unspent use of Xunxian.");
+        AnswerAction(game, "activate");
+        var prompt = Next(game);
+        Answer(game, prompt, prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == "xunxian-gift" &&
+            choice.Targets.SequenceEqual([1])));
+        Require(Next(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
+            TurnUsage(game).Single().Count == 1 &&
+            Facts<ProgramXunxianGiftEvent>(game).Single() is { RecipientSeat: 1 } gift && gift.CardId == card &&
+            game.CardMovements.Count(move => move.CardId == card && move.From == CardLocation.DiscardPile &&
+                move.To == CardLocation.Hand(1) && move.Reason.Value == "skill-program.ol:xunxian.xunxian-gift") == 1,
+            "The original third Duel is physically given to the newly eligible recipient and spends exactly one turn use.");
+    }
+
+    private static IEnumerable<SkillUsageConsumedEvent> TurnUsage(GameEngine game) =>
+        Facts<SkillUsageConsumedEvent>(game).Where(use => use.SkillOwnerSeat == 0 && use.SkillId == Skill && use.Scope == SkillUsageScope.Turn);
+
+    private static int PlayDuel(GameEngine game, int target)
+    {
+        var play = Next(game);
+        Require(play is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }, "The same Xunxian owner is still in their actual Play phase.");
+        var action = game.GetHumanLegalActions().First(item => item.Kind == LegalActionKind.Duel && item.TargetSeats.SequenceEqual([target]));
+        var id = action.CardId!.Value;
+        Submit(game, new PlayCardCommand(0, id, action.TargetSeats, game.Revision, play.PromptId));
+        return id;
+    }
+
     private static GameEngine Cold(GameEngine game, ContentRegistry content)
     {
         var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
@@ -141,11 +231,11 @@ internal static class OlXunxianChecks
 
     private static IEnumerable<T> Facts<T>(GameEngine game) => game.Events.Select(entry => entry.Payload).OfType<T>();
 
-    private static (GameEngine Game, ContentRegistry Content) Start(bool reentry = false)
+    private static (GameEngine Game, ContentRegistry Content) Start(bool reentry = false, bool emptyRecipients = false)
     {
         var content = ContentRegistry.Build(new StandardContentPackage(),
             new StandardActiveSkillExpansionPackage(includeJijiu: true), new StandardRescueSkillExpansionPackage(),
-            new StandardClassicGeneralPackage(), new Fixture(reentry));
+            new StandardClassicGeneralPackage(), new Fixture(reentry, emptyRecipients));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = 0, HumanSeats = [0, 1, 2, 3],
@@ -196,7 +286,7 @@ internal static class OlXunxianChecks
             throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture(bool reentry) : IGameContentPackage
+    private sealed class Fixture(bool reentry, bool emptyRecipients) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-xunxian", new(1, 0));
 
@@ -210,10 +300,11 @@ internal static class OlXunxianChecks
             foreach (var id in generals.Skip(2))
                 builder.AddGeneral(new(id, "其他角色", "supporter", "standard:none", "wu", 2));
             const string deck = "fixture:xunxian-deck";
-            builder.AddDeck(new(deck, reentry ? "六张实体决斗" : "无中生有牌堆", reentry ? 1 : 4, 2, [])
+            var duelDeck = reentry || emptyRecipients;
+            builder.AddDeck(new(deck, duelDeck ? "六张实体决斗" : "无中生有牌堆", duelDeck ? 1 : 4, 2, [])
             {
-                PhysicalCards = Enumerable.Range(0, reentry ? 6 : 48)
-                    .Select(_ => new ContentDeckPhysicalCard(reentry ? "standard:duel" : "standard:draw_two", Suit.Heart, 7)).ToArray()
+                PhysicalCards = Enumerable.Range(0, duelDeck ? 6 : 48)
+                    .Select(_ => new ContentDeckPhysicalCard(duelDeck ? "standard:duel" : "standard:draw_two", Suit.Heart, 7)).ToArray()
             });
             builder.AddMode(new(Mode, "逊贤规则场景", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, deck,

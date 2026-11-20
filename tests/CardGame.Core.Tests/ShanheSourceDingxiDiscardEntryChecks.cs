@@ -163,11 +163,50 @@ internal static class ShanheSourceDingxiDiscardEntryChecks
         }
     }
 
-    private static (GameEngine Game, ContentRegistry Content) Start(bool rediscard, bool optionalDriver = false)
+    internal static void DingxiStoresOriginalGroupFinishesCold()
+    {
+        foreach (var kind in new[] { CardKind.BarbarianAssault, CardKind.ArrowBarrage })
+        {
+            var (game, content) = Start(rediscard: false, openingKind: kind);
+            var play = Next(game);
+            var card = game.CreateSnapshot(0).Players[0].Hand.Single(candidate => candidate.Kind == kind);
+            var action = game.GetHumanLegalActions().Single(option => option.CardId == card.Id && option.ConversionSource is null);
+            Submit(game, new PlayCardCommand(0, card.Id, action.TargetSeats, game.Revision, play.PromptId, action.PlayedCardKind, action.TargetCardId));
+
+            var offer = Next(game);
+            var original = Facts<SourceDingxiDiscardQualifiedEvent>(game).Single();
+            Need(offer.SkillPrompt?.SkillId == Dingxi && original.CardId == card.Id &&
+                Facts<CardUseFinishedEvent>(game).Count(fact => fact.ResolutionId == original.OriginalUseId) == 1,
+                $"The original native {kind} finishes and offers Dingxi on its actual discard.");
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+            offer = Next(game);
+            if (offer.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"))
+            {
+                AnswerProgramChoice(game, offer, "activate");
+                offer = Next(game);
+            }
+            Answer(game, offer, offer.Choices.Single(choice => choice.Cards.SequenceEqual([card.Id]) && choice.Targets.SequenceEqual([2])));
+            Need(Next(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }, $"Dingxi's second {kind} returns to the original play phase.");
+
+            var issued = Facts<SourceDingxiIssuedEvent>(game).Single().Origin;
+            var finishes = game.CardMovements.Where(move => move.CardId == card.Id && move.Reason == CardMoveReasons.UseFinished &&
+                move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile).ToArray();
+            Need(issued.OriginalUseId == original.OriginalUseId && issued.UseId != original.OriginalUseId && issued.LeftSeat == 2 &&
+                Facts<SourceDingxiReturnedEvent>(game).Single().UseId == issued.UseId && finishes.Length == 2 &&
+                finishes[0].Sequence == original.DiscardSequence && finishes[1].Sequence > issued.EntrySequence,
+                $"Both uses of the real {kind} finish, and Dingxi receives its exact second native use.");
+            Need(Facts<SourceDingxiStoredEvent>(game).ToArray() is [var stored] && stored.ProgramFrameId == issued.ProgramFrameId &&
+                game.CardMovements.Where(move => move.CardId == card.Id && move.Sequence > finishes[1].Sequence).ToArray() is [var placement] &&
+                placement.Sequence == stored.MovementSequence && placement.From == CardLocation.DiscardPile && placement.To.Zone == CardZoneKind.PublicPersistentPile,
+                $"Dingxi must store the unchanged second {kind} discard at entry {finishes[1].Sequence} exactly once.");
+        }
+    }
+
+    private static (GameEngine Game, ContentRegistry Content) Start(bool rediscard, bool optionalDriver = false, CardKind openingKind = CardKind.Duel)
     {
         const string enemy = "classic:guan-yu";
         var setup = new ShanheBattleSetup(211, 1, "source-dingxi-discard-entry", StandardShanheSourceBeigongDuoPackage.BeigongBaseId,
-            4, 0, 0, 0, 0, rediscard ? [Driver] : [], [new(CardKind.Duel, Suit.Club, 7)], [],
+            4, 0, 0, 0, 0, rediscard ? [Driver] : [], [new(openingKind, Suit.Club, 7)], [],
             [new(enemy) { StartingHand = [] }, new(enemy) { StartingHand = [] }], [], new string('d', 64));
         var content = StandardShanheCampaignCatalog.CreateBattleRegistry(setup).WithExtension(new Fixture(optionalDriver), mode =>
             mode.Id == ShanheBattleSetup.BattleModeId ? mode with { DeckId = Deck } : mode);

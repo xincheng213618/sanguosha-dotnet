@@ -3,6 +3,10 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanJunOlRuntime
 {
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 7198, SkillProgramEffectOp.XunxianGiftUsedCard)]
+    internal bool CanOfferXunxian(CharacterState owner) =>
+        _coreMatchParticipantsPlayersAccess._players.Any(player => IsXunxianRecipient(owner, player));
+
     SkillProgramStepOutcome IYanJunProgramHost.XunxianGiftUsedCard(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -14,11 +18,7 @@ internal sealed partial class CharacterYanJunOlRuntime
             return SkillProgramStepOutcome.Continue;
         var recipients = _coreMatchParticipantsPlayersAccess._players.Where(player => IsXunxianRecipient(owner, player)).Select(player => player.Seat).ToArray();
         if (recipients.Length == 0)
-        {
-            _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 逊贤：没有手牌数或体力值大于你的角色，牌留在弃牌堆。", active.OwnerSeat);
-            _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
             return SkillProgramStepOutcome.Continue;
-        }
 
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
         var choices = recipients.Select(seat => new PromptChoice(new ChoiceId($"xunxian-gift.frame-{(frame.Id)}.seat-{(seat)}"), $"交给 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)}。", [], [seat], new Dictionary<string, string> { ["program-action"] = "xunxian-gift", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["recipient"] = seat.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray();

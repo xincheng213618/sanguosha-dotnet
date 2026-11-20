@@ -22,7 +22,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             return;
         }
 
-        List<(Card Card, long EntrySequence)>? finished = null;
+        List<NativeUseDiscardEntry>? finished = null;
         foreach (var physicalCard in group.PhysicalCards)
         {
             if (_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, physicalCard.Id))
@@ -30,11 +30,8 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             var cardLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (cardLocation == CardLocation.Processing)
             {
-                _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished, beforeFact: movement =>
-                {
-                    if (movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.UseFinished)
-                        (finished ??= []).Add((physicalCard, movement.Sequence));
-                });
+                if (_coreNativeCardUseCompletionOperations.DiscardFinishedUseMaterial(physicalCard) is { } entry)
+                    (finished ??= []).Add(entry);
             }
             else if (!RuntimeSkills.RuntimeRules_Core_CommonRules.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
             {
@@ -42,13 +39,15 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             }
         }
 
+        _coreNativeCardUseCompletionOperations.StoreFinishedUseDiscards(group.ResolutionId, finished);
         if (finished is not null && _coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && player.Seat != group.SourceSeat && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ClaimResolvedGlobalCard, group.Card.Kind)) is { } claimant)
         {
             var claimed = new List<int>();
-            foreach (var (card, entrySequence) in finished)
+            foreach (var entry in finished)
             {
-                if (_zoneEntries.CurrentEntry(CardLocation.DiscardPile, card.Id) != entrySequence)
+                if (_zoneEntries.CurrentEntry(CardLocation.DiscardPile, entry.CardId) != entry.Sequence)
                     continue;
+                var card = group.PhysicalCards.Single(material => material.Id == entry.CardId);
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(claimant.Seat), CardMoveReasons.JuxiangGain);
                 claimed.Add(card.Id);
             }

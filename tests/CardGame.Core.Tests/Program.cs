@@ -885,6 +885,10 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Qizheng: regular accepts a real Bagua played Dodge cold", MobileQizhengBaguaResponseChecks.QizhengRegularAllowsActualBaguaPlayedDodgeCold),
     ("OL Pan Jun Guanwei: counts effective suit of an equipment conversion cold", OlPanJunGuanweiSuitChecks.GuanweiCountsTheEffectiveSuitOfAnEquipmentConversionCold),
     ("OL Qinghe Changji respects Jilei on the ending player's physical discard cold", OlQingheChangjiDiscardRestrictionChecks.ChangjiDoesNotDiscardTheTurnOwnersJileiHandCardCold),
+    ("Shanhe Source Dingxi: stores original Barbarian and Arrow finishes cold", ShanheSourceDingxiDiscardEntryChecks.DingxiStoresOriginalGroupFinishesCold),
+    ("OL SP Ma Chao Zhuiji: directly discards Guandu Chariot as destroyed payment cold", OlSpMaChaoZhuijiGuanduChariotChecks.ZhuijiDiscardsGuanduChariotAsItsRealDestroyedPaymentCold),
+    ("OL SP Ma Chao Zhuiji: recasts Guandu Chariot as destroyed payment cold", OlSpMaChaoZhuijiGuanduChariotChecks.ZhuijiRecastsGuanduChariotAsItsRealDestroyedPaymentCold),
+    ("OL Xunxian preserves the turn use with no recipient cold", OlXunxianChecks.XunxianKeepsTurnUseWhenNoRecipientCanReceiveCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

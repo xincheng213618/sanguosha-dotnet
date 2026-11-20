@@ -179,7 +179,7 @@ internal sealed partial class CharacterDongZhaoOlRuntime
 
     private bool IsSettledXianlueGift(ProgramSkillFrame f, XianluePendingState r, IReadOnlyList<int> originalCards)
     {
-        if (r.CardIndex <= 0 || r.CardIndex > originalCards.Count || r.GiftCardId != originalCards[r.CardIndex - 1] ||
+        if (r.CardIndex <= 0 || r.CardIndex > originalCards.Count || r.GiftCardId is not { } cardId || cardId != originalCards[r.CardIndex - 1] ||
             r.GiftTargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || r.GiftBefore < 0)
             return false;
         if (target == f.OwnerSeat)
@@ -189,14 +189,14 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         var journal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements;
         if (r.GiftMovement is { } move)
             return r.RetainedGiftOrdinal is null && move.Sequence > r.GiftBefore && move.Sequence == r.GiftAfter && move.Sequence <= journal.Count &&
-                move.CardId == r.GiftCardId && move.From == from && move.To.Zone == CardZoneKind.Hand && move.Reason.Value == XianlueGiftReason &&
+                move.CardId == cardId && move.From == from && move.To.Zone == CardZoneKind.Hand && move.Reason.Value == XianlueGiftReason &&
                 journal[move.Sequence - 1] == move;
 
         return r.GiftBefore == r.GiftAfter && r.RetainedGiftOrdinal is { } ordinal && ordinal >= 0 &&
             f.HappyWeiYanRetainedGains is { } retained && ordinal < retained.Count && retained[ordinal] is { Plan: var plan } gain &&
-            gain.Ordinal == ordinal && gain.ProducerFrameId == f.Id && gain.InstructionIndex == f.InstructionIndex &&
-            plan.CardId == r.GiftCardId && plan.From == from && plan.ActualTo == from && plan.RequestedTo == CardLocation.Hand(target) &&
-            plan.Reason.Value == XianlueGiftReason && plan.SequenceBefore == r.GiftBefore;
+            gain.InstructionIndex == f.InstructionIndex && plan.From == from && plan.Reason.Value == XianlueGiftReason &&
+            plan.SequenceBefore == r.GiftBefore && _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRetainedGainSettlement(
+                gain, f.Id, cardId, CardLocation.Hand(target), r.GiftBefore);
     }
     internal bool DongZhaoFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {

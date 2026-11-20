@@ -129,7 +129,9 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyPaymentsRuntime
                 move.Reason.Value != reason || d.Recast && (!_coreEquipmentContentOperations.EquipmentRules.IsEquipment(move.CardKind) || move.From.Zone != CardZoneKind.Equipment))
                 return false;
             var card = _coreCardAttackStateOperations.GetAttackCard(move.CardId);
-            var destination = move.From.Zone == CardZoneKind.Equipment && card.IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile;
+            var destination = move.From.Zone == CardZoneKind.Equipment &&
+                (card.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, move.From, CardLocation.DiscardPile))
+                ? CardLocation.OutsideGame : CardLocation.DiscardPile;
             if (move.To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, move.From, destination))
                 return false;
             previousSequence = sequence;

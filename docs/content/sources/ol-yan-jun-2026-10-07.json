@@ -44,13 +44,13 @@
         "Trigger xunxian-gift: discardPileReceived, subject owner, movementOccurrence perCard, optional, usageScope turn + usageLimit 1 (每回合限一次 by the shared usage ledger).",
         "Matching is a bespoke branch MatchingOwnSettledActionCardIndexes keyed on SettledActionCardDiscardEvent: one scalar fact per Processing→DiscardPile movement with reason card.use-finished / card.response-finished / card.respond.nullification-finished, attributed to the acting action at batch completion (the acting use frame is still live there; the cards-moved window opens later).",
         "Bespoke op xunxianGiftUsedCard (7198) offers only other living characters with handCount > owner or hp > owner; the chosen recipient receives the exact entity card through a single DiscardPile→Hand move with reason skill-program.ol:xunxian.xunxian-gift, and the standard cards-moved window opens for the resulting movement.",
-        "ProgramXunxianGiftEvent records owner, recipient, card id and the discard movement sequence; the once-per-turn usage is consumed when the trigger binding begins, so a settlement that finds no eligible recipient still spends the turn's allowance (noted boundary)."
+        "The trigger checks current recipient eligibility before offering activation and checks it again before beginning the binding. An occurrence without a recipient does not spend the turn's allowance. The once-per-turn usage is consumed when an eligible optional binding begins. ProgramXunxianGiftEvent records the owner, recipient, card id and original discard movement sequence."
       ]
     }
   ],
   "observations": [
     "Official hero/info API (gid=473) confirms 严畯 as wu 3HP with label 过牌/辅助; BWIKI gives the title 志存补益 and gender 男, matching the coordinator-locked record.",
-    "BWIKI 现行版 逊贤 is 每回合限一次…手牌数或体力值大于你; the page also lists the historical version 每名其他角色的回合限一次…手牌数大于你 — the implemented rule is the current per-turn wording with the hand-or-hp eligibility; the older wording is recorded here only.",
+    "The project's 逊贤 wording follows BWIKI's revised per-turn text with hand-count or current-HP eligibility, also published at https://x.sanguosha.com/hero/410.html. The OL official hero page at https://www.sanguosha.com/hero/473 has the out-of-turn, hand-count-only variant. This implementation preserves the project's selected wording.",
     "观潮 BWIKI text matches the locked wording verbatim; the OL-page rendering of both skills was used only for cross-checking.",
     "New bespoke ops 7196-7198 (guanchaoChoosePattern, guanchaoRankDraw, xunxianGiftUsedCard); no new PlayerMarkerKind, condition kinds, trigger windows or schema nodes. SettledActionCardDiscardEvent and the three Program* evidence events are scalar-only records.",
     "共享口径：逊贤的置入弃牌堆窗口只认结算完成（card.use-finished / card.response-finished / card.respond.nullification-finished）的实体牌；弃置（GetProgramDiscardSource 语义）不触发。'交给' 通过 Processing 后续窗口按统一移动契约结算。"
