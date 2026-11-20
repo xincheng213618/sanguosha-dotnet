@@ -69,6 +69,81 @@ internal static class ShiHuangChongCujunClaimChecks
                 game.CreateCardZoneDiagnostics().Single(item => item.CardId == card).Location == CardLocation.Hand(1)) &&
             Facts<ShiHcCujunClaimIssuedEvent>(game).Count() == 1,
             "Resuming the first physical gain delivers the second original discard once, preserving one claim and one completed settlement.");
+
+        var grantedTurn = game.State.TurnNumber;
+        var materials = game.CreateSnapshot(1).Players[1].Hand.Where(card => card.Kind == CardKind.Slash).Take(4)
+            .Select(card => card.Id).ToArray();
+        var targetHp = game.CreateSnapshot(1).Players[2].Hp;
+        Require(grantedTurn > issued.TurnNumber && materials.Length == 4 && targetHp > 3 && game.GetCombatDistance(1, 2) == 1,
+            "The recipient's next actual Play has four physical Slashes and a living adjacent target that survives the whole quota.");
+        foreach (var material in materials.Take(3))
+            PlayOrdinarySlash(game, material);
+
+        var debits = SlashDebits(game, grantedTurn);
+        Require(debits.Length == 3 && debits.Select(debit => debit.PhaseInstanceId).Distinct().Count() == 1 &&
+            game.CreateSnapshot(1).Players[2].Hp == targetHp - 3,
+            "Both Cujun grants add to the ordinary allowance and each of the three actual Slashes spends one use in the same Play phase.");
+        RejectExhaustedSlash(game, materials[3]);
+        game = Cold(game, content);
+
+        ReachRecipientsNextPlay(game, grantedTurn);
+        var laterTurn = game.State.TurnNumber;
+        var next = game.CreateSnapshot(1).Players[1].Hand.First(card => card.Kind == CardKind.Slash && card.Id != materials[3]).Id;
+        PlayOrdinarySlash(game, next);
+        Require(Facts<ShiHcCujunSlashGrantedEvent>(game).Count() == 2 &&
+            SlashDebits(game, laterTurn) is [var ordinary] && ordinary.PhaseInstanceId > debits[0].PhaseInstanceId,
+            "The same recipient spends only the ordinary allowance in their following actual Play without a new Cujun grant.");
+        RejectExhaustedSlash(game, materials[3]);
+    }
+
+    private static CardUseDebitIdentity[] SlashDebits(GameEngine game, int turn) => Facts<CardUseDebitRecordedEvent>(game)
+        .Select(entry => entry.Debit).Where(debit => debit.ActorSeat == 1 && debit.Query == SkillRuleQuery.SlashLimit && debit.TurnNumber == turn).ToArray();
+
+    private static void PlayOrdinarySlash(GameEngine game, int card)
+    {
+        var action = game.GetLegalActions(1).SingleOrDefault(item => item.Kind == LegalActionKind.Slash &&
+            item.CardId == card && item.ConversionSource is null && item.TargetSeats.SequenceEqual([2]))
+            ?? throw new InvalidOperationException($"The finite allowance did not publish ordinary Slash {card} against the adjacent target.");
+        Accept(game, new PlayCardCommand(1, card, action.TargetSeats, game.Revision, P(game)!.PromptId, action.PlayedCardKind));
+        Reach(game, prompt => prompt is { PlayerSeat: 1, Kind: DecisionKind.PlayCard });
+        Require(game.CardMovements.Count(move => move.CardId == card && move.From == CardLocation.Hand(1) &&
+                move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use) == 1 &&
+            Facts<CardUseFinishedEvent>(game).Count(entry => entry.CardId == card && entry.CardKind == CardKind.Slash) == 1,
+            "The public command pays its exact held Slash and finishes it once.");
+    }
+
+    private static void RejectExhaustedSlash(GameEngine game, int card)
+    {
+        Require(game.CreateSnapshot(1).Players[1].Hand.Any(item => item.Id == card && item.Kind == CardKind.Slash) &&
+            !game.GetLegalActions(1).Any(action => action.Kind == LegalActionKind.Slash && action.CardId == card),
+            "An actual unspent Slash remains in hand but is no longer offered after the counted quota is exhausted.");
+        var revision = game.Revision;
+        var movements = game.CardMovements.Count;
+        var result = game.Submit(new PlayCardCommand(1, card, [2], revision, P(game)!.PromptId, CardKind.Slash));
+        Require(!result.Accepted && game.Revision == revision && game.CardMovements.Count == movements,
+            "Direct submission of the still-held Slash above the quota rejects without payment.");
+    }
+
+    private static void ReachRecipientsNextPlay(GameEngine game, int grantedTurn)
+    {
+        for (var step = 0; step < 100; step++)
+        {
+            var prompt = P(game);
+            if (prompt is { PlayerSeat: 1, Kind: DecisionKind.PlayCard } && game.State.TurnNumber > grantedTurn)
+                return;
+            if (prompt is { Kind: DecisionKind.PlayCard })
+                Accept(game, new EndPlayPhaseCommand(prompt.PlayerSeat, game.Revision, prompt.PromptId));
+            else if (prompt is { Kind: DecisionKind.DiscardCards })
+                Accept(game, new DiscardCardsCommand(prompt.PlayerSeat, prompt.ValidCardIds.Take(prompt.RequiredCardCount).ToArray(),
+                    prompt.PromptId, game.Revision));
+            else if (prompt is { SkillPrompt.SkillId: Cujun })
+                Skip(game);
+            else if (prompt is null)
+                Accept(game, new AdvanceOneStepCommand(game.Revision));
+            else
+                throw new InvalidOperationException($"Unexpected prompt before the recipient's next Play: {prompt.Prompt}");
+        }
+        throw new InvalidOperationException("The recipient did not reach the following actual Play phase.");
     }
 
     private static string? Branch(PromptChoice choice) => choice.Parameters.GetValueOrDefault("branch");

@@ -388,7 +388,17 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
         return _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCache;
     }
 
-    internal int ShiHcCujunSlashBonus(int seat)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 30)]
+    internal void AddCujunSlashLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.SlashLimit)
+            return;
+
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:mobile:shi-cujun:slash-limit",
+            ShiHcCujunSlashBonus(seat));
+    }
+
+    private int ShiHcCujunSlashBonus(int seat)
     {
         if (!HasShiHcCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != seat)
             return 0;

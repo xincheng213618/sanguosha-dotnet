@@ -13,7 +13,7 @@ Required when changing these mechanisms or their consumers. See the
 
 ## Quotas, directed rights and attack range
 
-- `MatchTurnNumericQueries` combines finite Slash-limit terms from declared turn modifiers and registered runtime contributors. OL Jiangchi grants a finite `+1` for the current turn separately from its unrestricted distance. Cao Xi's Gangshu adds a finite term while its own grant remains eligible. Directed quota exemptions qualify against the original target and use their own actual-debit rules.
+- `MatchTurnNumericQueries` combines finite Slash-limit terms from declared turn modifiers and registered runtime contributors. OL Jiangchi grants a finite `+1` for the current turn separately from its unrestricted distance. Cao Xi's Gangshu adds a finite term while its own grant remains eligible. Mobile Shi Huang Chong's Cujun contributes during the recipient's first actual Play phase after the original grant. Directed quota exemptions qualify against the original target and use their own actual-debit rules.
 
 - Target card-use quotas use `IProgramTargetQuotaQueries` for the aggregate answer, including general allowances that also permit Slash. Issue independent allowances through directed-policy data; keep native recipient slots on the original instruction and keep quota permission separate from actual use history. Native Slash queries retain their outer use/target guards and ignore-count, out-of-Play, other-actor and HappyQiao Shutu permissions, then check ordinary quota before extra pure allowances. Keep the router's internal BeforeLimit/AfterLimit binding order and the separate actual-debit owner.
 

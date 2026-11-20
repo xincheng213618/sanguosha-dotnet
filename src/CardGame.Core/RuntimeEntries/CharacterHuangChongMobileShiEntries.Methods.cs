@@ -30,7 +30,6 @@ internal sealed partial class CharacterHuangChongMobileShiEntries
     internal void SettleShiHcCujun(ProgramSkillFrame f) => _resolve().SettleShiHcCujun(f);
     internal SkillProgramStepOutcome SettleShiHcSiliDraw(ProgramSkillFrame f) => _resolve().SettleShiHcSiliDraw(f);
     internal IReadOnlyList<PromptChoice> ShiHcChooserChoices(ProgramSkillFrame f, int chooser) => _resolve().ShiHcChooserChoices(f, chooser);
-    internal int ShiHcCujunSlashBonus(int seat) => _resolve().ShiHcCujunSlashBonus(seat);
     internal IReadOnlyList<PromptChoice> ShiHcCurrentChoices(ProgramSkillFrame f) => _resolve().ShiHcCurrentChoices(f);
     internal int ShiHcHandCount(int seat) => _resolve().ShiHcHandCount(seat);
     internal NativeOwners.ShiHcLedgerView ShiHcLedger() => _resolve().ShiHcLedger();
