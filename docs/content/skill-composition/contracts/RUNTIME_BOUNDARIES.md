@@ -39,6 +39,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineProgramAttackRangeAidRuntime` owns `requestAttackRangeAid` from the original responder list through weapon payment or the beneficiary's typed native Draw. It advances the current responder only after the original paid children return. Accepted payment and its recovery, damage, movement and skill-change children keep the original parent frame.
 
+- Dingpan's native activation limit and public progress both read the same count of living Rebels through `IMatchRoleQueries`. The public progress retains the zero-limit entry. Target equipment eligibility and the accepted equipment choice still belong to Dingpan.
+
 - Use a skill's `modifiers` declaration for ordinary additive values and conditions that its existing queries can express. For example, OL Huo Jun's Qiongshou declares `handLimit` with `operation: add` and `value: 4`. The native Discard phase uses the resulting limit when it requests real card payments.
 
 - OL Du Fu Ren's Shunshi contributes to the shared Draw count, Slash limit and hand limit through the same registration. Each paid gift is consumed separately at the participant's next actual phase of the corresponding kind. Skipped phases leave that grant pending. A Draw-start instruction may read the pending Draw term before confirmation; confirmed queries read the terms issued for the original phase key.

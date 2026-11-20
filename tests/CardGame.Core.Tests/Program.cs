@@ -586,6 +586,7 @@ var tests = new (string Name, Action Body)[]
     ("skill availability separates possession from effective sources", CharacterSkillSetChecks.AvailabilitySeparatesPossessionFromEffectiveSources),
     ("Conditional skill grants: sources instances usage and cold", ConditionalSkillGrantChecks.ConditionalGrantsKeepInstancesAndIndependentSourcesThroughCommandBoundaries),
     ("Conditional skill grants: HP authority equipment and public piles cold", ConditionalSkillGrantChecks.ConditionalGrantFactsReadEquipmentPilesAndHpAuthority),
+    ("OL Bu Zhi Dingpan: two living Rebels fund two native equipment choices cold", OlBuZhiDingpanRoleQuotaChecks.TwoLivingRebelsFundTwoNativeEquipmentChoicesCold),
     ("Mou Hu Che Er: accepted debt later equipment source loss and exact expiry cold", MouHuCheErChecks.AcceptedDebtSuppressesLaterEquipmentUntilItsExactTurnEndCold),
     ("Skill state: ownership choices instances and expiry cold", SkillStateChecks.StateChangesPreserveOwnershipChoicesInstancesAndExpiryCold),
     ("Skill state events: native turn and dying declarations cold", SkillStateEventChecks.NativeTurnAndDyingDeclarationsFollowOriginalWindowsCold),

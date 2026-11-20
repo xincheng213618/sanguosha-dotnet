@@ -8,9 +8,12 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
     internal IEnumerable<IGameEvent> HandComparisonHistory() => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents);
     internal int? HandComparisonPhaseLimit(CharacterState owner, SkillProgram program, SkillProgramActivation activation, string? instanceId = null)
     {
-        var op = ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.CompareSelectedHandWithHpHand).SingleOrDefault(e => e.Op == SkillProgramEffectOp.CompareSelectedHandWithHpHand);
+        var features = ProgramInstructionResolver.Default.Features(activation);
+        var op = features.ForOperation(SkillProgramEffectOp.CompareSelectedHandWithHpHand).SingleOrDefault(e => e.Op == SkillProgramEffectOp.CompareSelectedHandWithHpHand);
         if (op is null)
-            return _characterBuZhiOlOperations.BuZhiPhaseLimit(owner, activation);
+            return features.HasOperation(SkillProgramEffectOp.ResolveRebelCountEquipmentChoice)
+                ? _roles.CountLiving(Role.Rebel)
+                : activation.UsesPerPhase;
         var instance = instanceId ?? _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, program.Id);
         return HandComparisonHistory().OfType<ProgramHandComparisonResolvedEvent>().Any(e => e.OwnerSeat == owner.Seat && e.SkillId == program.Id && e.SkillInstanceId == instance && e.StateId == op.StateId && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.RankMatched) ? 2 : 1;
     }
@@ -29,7 +32,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
             {
                 var activation = instance.Program.Activations[i];
                 var features = ProgramInstructionResolver.Default.Features(activation);
-                if (features.HasOperation(SkillProgramEffectOp.CompareSelectedHandWithHpHand) || _characterBuZhiOlOperations.IsBuZhiActivation(activation))
+                if (features.HasOperation(SkillProgramEffectOp.CompareSelectedHandWithHpHand) || features.HasOperation(SkillProgramEffectOp.ResolveRebelCountEquipmentChoice))
                     (result ??= []).Add(new(instance.SkillInstanceId, activation.Id, ProgramPublicRuleStateKind.ActivationLimit, HandComparisonPhaseLimit(owner, instance.Program, activation, instance.SkillInstanceId)!.Value, _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((owner.Seat, skillId, activation.UsageGroup)), SkillUsageScope.Phase));
                 hasPublicState |= features.HasOperation(SkillProgramEffectOp.CompareSelectedHandWithHpHand) || features.HasOperation(SkillProgramEffectOp.AdjustPersistentHandLimit) || features.HasOperation(SkillProgramEffectOp.ProhibitSelfCardTargetsForTurn);
             }

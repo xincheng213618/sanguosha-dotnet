@@ -48,5 +48,5 @@ internal sealed partial class CoreGameEngineProgramSelectionPredicatesRuntime
     string IProgramSelectionPhaseLimitState.SkillInstanceId(int ownerSeat, string skillId) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
     IEnumerable<ProgramHandComparisonResolvedEvent> IProgramSelectionPhaseLimitState.HandComparisonResults => _coreHandComparisonOperations.HandComparisonHistory().OfType<ProgramHandComparisonResolvedEvent>();
 
-    int IProgramSelectionPhaseLimitState.CountLiving(Role role) => _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Role == role);
+    int IProgramSelectionPhaseLimitState.CountLiving(Role role) => _roles.CountLiving(role);
 }

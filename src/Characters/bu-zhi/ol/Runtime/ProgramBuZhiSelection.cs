@@ -1,8 +1,5 @@
 namespace CardGame.Core;
 
-internal interface ISelectionRoleQueries : IProgramSelectionQuery
-{ Role Role(int seat); }
-
 internal static class DingpanRuntime
 {
     internal static bool IsActivation(SkillProgramActivation activation) =>
@@ -13,14 +10,6 @@ internal static class DingpanRuntime
 
     internal static bool HasEquippedLivingTarget(int targetSeat, ISelectionParticipantQueries players) =>
         players.IsAlive(targetSeat) && players.EquipmentCount(targetSeat) > 0;
-
-    internal static int? PhaseLimit(SkillProgramActivation activation, IProgramSelectionQueries queries)
-    {
-        if (!IsActivation(activation)) return activation.UsesPerPhase;
-        var players = queries.Get<ISelectionParticipantQueries>();
-        var roles = queries.Get<ISelectionRoleQueries>();
-        return players.Seats.Count(seat => players.IsAlive(seat) && roles.Role(seat) == Role.Rebel);
-    }
 }
 
 [ProgramSelectionModule(ProgramSelectionStage.AfterTargets, 12)]

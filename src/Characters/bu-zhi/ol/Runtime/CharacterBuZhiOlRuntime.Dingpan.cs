@@ -4,8 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBuZhiOlRuntime
 {
     internal bool IsBuZhiActivation(SkillProgramActivation a) => DingpanRuntime.IsActivation(a);
-    internal int? BuZhiPhaseLimit(CharacterState owner, SkillProgramActivation a) => DingpanRuntime.PhaseLimit(a, _coreProgramSelectionModulesOperations.ProgramSelectionQueries);
-    internal bool BuZhiActivationTargetAllowed(CharacterState target, SkillProgramActivation a) => DingpanRuntime.AllowsTarget(target.Seat, a, _coreProgramSelectionModulesOperations.ProgramSelectionQueries);
     internal bool BuZhiPaidEquipmentEntitlement(ProgramSkillFrame f) => f.BuZhi is { BatchId: null, Target: { } target } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ValidBuZhi(f) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BuZhiMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.Target == target && e.ReturnStage == "branch" && e.CardIds.Count == 0) == 1;
     internal void PayBuZhiEquipment(ProgramSkillFrame f, IReadOnlyList<int> ids, CardLocation destination, string next)
     {
