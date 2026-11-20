@@ -43,6 +43,18 @@ internal static class RoundStartingParticipantChecks
             choices.Select(choice => choice.Option).Distinct().Count() == 2 &&
             Facts<ProgramBindingStartedEvent>(game).Count(binding => binding.SkillId == Fengji && binding.OwnerSeat == 1) == 1,
             "Later turns in the same round must not re-open the completed two-option opportunity.");
+
+        var turn = game.State.TurnNumber;
+        var start = game.Events.Single(entry => entry.Payload is TurnStartedEvent { ActorSeat: 1 } started && started.TurnNumber == turn);
+        var play = game.Events.Single(entry => entry.Sequence > start.Sequence &&
+            entry.Payload is PhaseChangedEvent { ActorSeat: 1, Phase: TurnPhase.Play });
+        var draws = game.Events.Where(entry => entry.Sequence > start.Sequence && entry.Sequence < play.Sequence)
+            .Select(entry => entry.Payload).OfType<CardMovedEvent>().Where(move => move.From == CardLocation.DrawPile &&
+                move.To == CardLocation.Hand(1) && move.Reason == CardMoveReasons.Draw).ToArray();
+        Require(Facts<RoundStartedEvent>(game).SequenceEqual([round]) && draws is [var drawn] &&
+            game.CardMovements.Count(move => move.CardId == drawn.CardId && move.TurnNumber == turn && move.From == drawn.From &&
+                move.To == drawn.To && move.Reason == drawn.Reason) == 1,
+            "The original round's declined draw reduction adds one actual card during Chen Deng's own normal Draw before Play.");
         _ = Cold(game, registry);
     }
 

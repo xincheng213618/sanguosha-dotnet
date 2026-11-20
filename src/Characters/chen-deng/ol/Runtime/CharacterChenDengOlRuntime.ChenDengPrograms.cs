@@ -3,6 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDengOlRuntime
 {
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 80)]
+    internal void AddFengjiDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query == SkillRuleQuery.DrawCount && TracksFengjiRoundLedger)
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions,
+                $"state:{seat}:olfengji:round-draw", GetFengjiRoundAdjustment(seat, query));
+    }
+
     internal int GetFengjiRoundAdjustment(int seat, SkillRuleQuery query)
     {
         if (_coreActualRoundProgressRoundNumberAccess._roundNumber == 0)

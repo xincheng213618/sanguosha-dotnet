@@ -14,8 +14,6 @@ internal interface IMatchTurnNumericQuery : IProgramSelectionQuery
     int SharedRankBonus { get; }
     int HengyeGrowth { get; }
     int AdditiveTurnBonus { get; }
-    bool TracksFengjiRoundLedger { get; }
-    int FengjiRoundAdjustment { get; }
     EquipmentDefinition EquipmentDefinition(CardKind kind);
     RuleQueryEvaluation Project(RuleQueryEvaluation evaluation);
 }
@@ -35,6 +33,8 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 
 internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 {
+    bool TracksFengjiRoundLedger { get; }
+    int FengjiRoundAdjustment { get; }
     bool HasZhuangshiQuota { get; }
     int SequentialDeckShortfallBonus { get; }
     bool HasZhajiangPreUsePrivilege { get; }
@@ -80,9 +80,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         AddFiniteContribution(contributions, $"turn:{query.Seat}:draw-count", query.AdditiveTurnBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:juguan:draw", query.JuguanDrawAdjustment);
         AddFiniteContribution(contributions, $"state:{query.Seat}:quxi:draw", query.QuxiDrawAdjustment);
-        if (query.TracksFengjiRoundLedger)
-            AddFiniteContribution(contributions, $"state:{query.Seat}:olfengji:round-draw",
-                query.FengjiRoundAdjustment);
         return query.Project(RuleQueryService.Evaluate(
             SkillRuleQuery.DrawCount,
             new RuleQueryBounds(0, int.MaxValue),

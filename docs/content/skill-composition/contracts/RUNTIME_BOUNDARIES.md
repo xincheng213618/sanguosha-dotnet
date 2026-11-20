@@ -33,6 +33,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - OL Du Fu Ren's Shunshi contributes to the shared Draw count, Slash limit and hand limit through the same registration. Each paid gift is consumed separately at the participant's next actual phase of the corresponding kind. Skipped phases leave that grant pending. A Draw-start instruction may read the pending Draw term before confirmation; confirmed queries read the terms issued for the original phase key.
 
+- OL Chen Deng's Fengji contributes to the actual Draw count through the same numeric entry. Its current-round term reads the original choices and applies the accepted Xuanhui swaps for that round.
+
 - Accepted card-action and movement trigger continuations use `ProgramInvocations` on the original native window and candidate cursor. Acceptance-scoped rights begin only after the actual binding starts; preserve earlier source-frozen permissions as distinct declarations. Keep source-loss invocation rights separate from owner-death rights; never refresh accepted qualification from later use history or recreate character payment-proof ledgers.
 
 - Accepted materials are commitments on their original frame, separately from chosen inputs and physical payment results. Acceptance freezes eligibility; execution drops materials that left their frozen source without requalifying the promise. Declare source-loss continuation separately from owner-death draining, and never use draining to issue future effects.
