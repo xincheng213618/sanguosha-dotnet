@@ -341,6 +341,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe battle: invalid recipes external collection isolation", ShanheBattleChecks.RejectInvalidRecipesAndFreezeExternalCollections),
     ("Shenwu activity: real shared draft private rotated seats and replay", ShenwuActivityChecks.RealSharedDraftPrivacyRotatedSeatsEquipmentAndColdReplay),
     ("Shanhe Gouxiang: actual equipped armor and Qinggang bypass cold", ShanheGouXiangFieldEquipmentChecks.MatchingDodgeUsesEffectiveArmorAndHonoursQinggangCold),
+    ("Shanhe Sanshou armor: original equipped grant and actual damage cold", ShanheSanshouFieldEquipmentChecks.OriginalEquippedGrantPreventsOnlyWhileArmorIsEffectiveCold),
     ("Shenwu activity: leader victory waits for death children and extinction", ShenwuActivityChecks.LeaderVictoryWaitsForDeathChildrenAndAlliedExtinctionLoses),
     ("Shenwu NPC: Luanchang actual turn start end native AOE parents", ShenwuNpcChecks.LuanchangOwnStartAndActualEndKeepNativeAoeParents),
     ("Nian activity: real package rotated draft tier five death children and replay", NianPackageChecks.RealPackageRotatedDraftTierFiveDeathChildrenAndColdReplay),

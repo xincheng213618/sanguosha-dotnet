@@ -60,6 +60,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 - The native damage application records the target's HP on the original `DamageFrame` immediately after its armor and HP changes. A dying observer such as Shajue reads this value through the original dying parent. Its card causes and non-damage dying eligibility retain their own rules.
 
+- Shanhe Sanshou armor admits its damage-prevention candidate through the effective field equipment and its original equipment skill instance. Armor suppression and bypass qualify against the actual damage attempt. The issued skill finishes its reveal and cleanup on the original frame.
+
 - Fixed effects already issued for a card use use `CardUseFrame.CardDamageAdjustments` and `CoreGameEngineCardUseLifecycleRuntime`; current-occurrence damage changes stay on the actual damage attempt. Preserve whole-use versus target scope and card-damage versus additional-damage layers. Do not rebuild character boost ledgers or requalify paid effects when their source disappears.
 
 - Barbarian Assault keeps its original card user and assigned damage source on the group continuation. A living assigned source remains responsible after skill loss. If that replacement source dies, a later failed response starts a source-less damage attempt while the original use continues with its assigned seats.
