@@ -909,6 +909,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
+    ("Native pre-Discard entry: accepted mobile Keji survives actual source loss cold", NativePreDiscardEntryOwnerChecks.AcceptedKejiSkipsFromOriginalEntryAfterRealSkillLossCold),
     ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),
     ("Anniversary Hu Che Er Fuzhong: three foreign batches retain seven after actual discard cold", AnniversaryHuCheErFuzhongDrawChecks.ThreeForeignBatchesRetainSevenAfterActualDiscardCold),
     ("OL Huo Jun Qiongshou: declared additions set actual Discard quota cold", OlHuoJunQiongshouDeclaredHandLimitChecks.DeclaredAdditionsSetActualDiscardQuotaCold),

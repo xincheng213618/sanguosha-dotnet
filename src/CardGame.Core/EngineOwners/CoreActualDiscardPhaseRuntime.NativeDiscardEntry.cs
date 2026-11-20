@@ -1,9 +1,9 @@
 #nullable enable
 
 namespace CardGame.Core.EngineOwners;
-internal sealed partial class CharacterLuMengMobileRuntime
+internal sealed partial class CoreActualDiscardPhaseRuntime
 {
-    internal bool TryBeginPreEntryDiscardPolicy(CharacterState current)
+    private bool TryBeginPreEntryDiscardPolicy(CharacterState current)
     {
         if (_coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess._usedOrPlayedSlashDuringPlayPhase || _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDiscardPhase) || !current.IsAlive)
             return false;
@@ -24,13 +24,13 @@ internal sealed partial class CharacterLuMengMobileRuntime
         return true;
     }
 
-    internal PromptChoice DiscardEntryPolicyChoice(NativeDiscardEntryFrame frame, bool apply)
+    private PromptChoice DiscardEntryPolicyChoice(NativeDiscardEntryFrame frame, bool apply)
     {
         var action = apply ? "discard-policy-use" : "discard-policy-skip";
         return new(new($"discard-entry.{(frame.Id)}.{((apply ? "use" : "skip"))}"), apply ? $"发动【{(_contentRegistryOperations._contentRegistry.GetSkill(frame.Source.SkillId).Name)}】，跳过弃牌阶段。" : "不发动，进入弃牌阶段。", [], [], new Dictionary<string, string> { ["action"] = action, ["skill-id"] = frame.Source.SkillId, ["policy-id"] = frame.Source.BindingId });
     }
 
-    internal void AssertNativeDiscardEntry(NativeDiscardEntryFrame frame)
+    private void AssertNativeDiscardEntry(NativeDiscardEntryFrame frame)
     {
         if (_resolutionStackOperations._resolutionStack.FirstOrDefault()?.Id != frame.Id || frame.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || frame.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || frame.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || frame.Source.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || frame.BeforePhase is not (TurnPhase.Draw or TurnPhase.Play) || frame.BeforePhase != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase || frame.PlayPhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || !frame.PromptId.IsValid || _contentRegistryOperations._contentRegistry.GetSkill(frame.Source.SkillId).Program?.GameplayHash != frame.GameplayHash)
             throw new InvalidOperationException("A discard entry lost its original phase, actual turn or content hash.");
@@ -45,7 +45,7 @@ internal sealed partial class CharacterLuMengMobileRuntime
             throw new InvalidOperationException("A discard entry lost its singular accepted native choice.");
     }
 
-    internal bool AssertPreEntryDiscardPolicyChoice(PendingDecision pending)
+    private bool AssertPreEntryDiscardPolicyChoice(PendingDecision pending)
     {
         if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not NativeDiscardEntryFrame frame)
             return false;
@@ -55,7 +55,7 @@ internal sealed partial class CharacterLuMengMobileRuntime
         return true;
     }
 
-    internal bool TryResolvePreEntryDiscardPolicy(bool useSkill)
+    private bool TryResolvePreEntryDiscardPolicy(bool useSkill)
     {
         if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not NativeDiscardEntryFrame frame)
             return false;
@@ -83,11 +83,8 @@ internal sealed partial class CharacterLuMengMobileRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
         if (frame.Stage == NativeDiscardEntryStage.Skipping)
-        {
-            _actualPhases.RecordSkipped(ActualDiscardRecoveryPhaseKind.Discard, frame.Source.OwnerSeat);
-            _coreActualTurnsOperations.EndTurn();
-        }
+            EndTurnAfterDiscardSkip(frame.Source.OwnerSeat);
         else
-            _coreActualDiscardPhaseOperations.BeginDiscardPhase(beforeEntryPolicyCompleted: true);
+            BeginDiscardPhase(beforeEntryPolicyCompleted: true);
     }
 }

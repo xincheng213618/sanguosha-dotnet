@@ -5,28 +5,28 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
 {
     internal void BeginDiscardPhase(bool beforeEntryPolicyCompleted = false)
     {
-        if ((_corePhaseHandSeizureOperations.HasCurrentIssuedPhaseHandDebt() || _characterLvQianOlOperations.HasCurrentIssuedWeiluDebt(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat])) && _coreProgramLifecycleOperations.TryBeginPlayEndingProgramWindow(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]))
+        if ((_corePhaseHandSeizureOperations.HasCurrentIssuedPhaseHandDebt() || _characterLvQianOlOperations.HasCurrentIssuedWeiluDebt(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat])) && _coreProgramLifecycleOperations.TryBeginPlayEndingProgramWindow(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat]))
             return;
-        _characterCaoChunOlOperations.ExpireCaoChunPlayDebt(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        if (_characterQiaoZhouOlOperations.TrySkipQiaoZhouDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]) ||
-            _characterDuXiOlOperations.TrySkipDuXiDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]))
+        _characterCaoChunOlOperations.ExpireCaoChunPlayDebt(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+        if (_characterQiaoZhouOlOperations.TrySkipQiaoZhouDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat]) ||
+            _characterDuXiOlOperations.TrySkipDuXiDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat]))
         {
-            EndTurnAfterDiscardSkip(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
+            EndTurnAfterDiscardSkip(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
             return;
         }
 
-        if (!beforeEntryPolicyCompleted && _characterLuMengMobileOperations.TryBeginPreEntryDiscardPolicy(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]))
+        if (!beforeEntryPolicyCompleted && TryBeginPreEntryDiscardPolicy(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat]))
             return;
-        _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase = TurnPhase.Discard;
-        _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Discard, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
+        _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase = TurnPhase.Discard;
+        _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Discard, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
         _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuitTurn = -1;
         _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Clear();
         _coreActualDiscardLedgerDiscardPhaseHandDiscardIdsDiscardPhaseHandDiscardTurnNumberAccess._discardPhaseHandDiscardTurnNumber = -1;
         _coreActualDiscardLedgerDiscardPhaseHandDiscardIdsDiscardPhaseHandDiscardTurnNumberAccess._discardPhaseHandDiscardIds.Clear();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
-        var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat];
-        _coreMatchLogOperations.AddLog("PhaseChanged", $"{(current.Name)} 进入弃牌阶段。", _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PhaseChangedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat));
+        var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat];
+        _coreMatchLogOperations.AddLog("PhaseChanged", $"{(current.Name)} 进入弃牌阶段。", _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PhaseChangedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat));
         if (_coreProgramLifecycleOperations.TryBeginDiscardPhaseProgramWindow(current))
             return;
         CompleteDiscardPhaseAfterProgramWindow(current);
@@ -41,7 +41,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDiscardPhase))
         {
             _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Discard, current.Seat);
-            if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Discard, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects)))
+            if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Discard, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects)))
                 return;
             _coreMatchLogOperations.AddLog("DelayedCardEffect", $"{(current.Name)} 跳过弃牌阶段。", current.Seat);
             _coreActualTurnsOperations.EndTurn();
@@ -70,9 +70,9 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
 
     internal void ResolveSkipDiscardPolicyChoice(bool useSkill)
     {
-        if (_characterLuMengMobileOperations.TryResolvePreEntryDiscardPolicy(useSkill))
+        if (TryResolvePreEntryDiscardPolicy(useSkill))
             return;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.SkipDiscardPolicy, PlayerSeat: var playerSeat } || playerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Discard)
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.SkipDiscardPolicy, PlayerSeat: var playerSeat } || playerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Discard)
         {
             throw new InvalidOperationException("There is no discard-phase policy choice to resolve.");
         }
@@ -88,7 +88,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         _coreMatchLogOperations.AddLog(useSkill ? "SkillTriggered" : "SkillSkipped", useSkill ? $"{(current.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(skillId).Name)}】，跳过弃牌阶段。" : $"{(current.Name)} 未发动【{(_contentRegistryOperations._contentRegistry.GetSkill(skillId).Name)}】。", current.Seat);
         if (useSkill)
         {
-            if (_characterHuaTuoAnniversaryGodOperations.TryBeginSkillInvocation(0, current.Seat, skillId, $"discard-policy:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)}:{(policyId)}", returnKind: SkillInvocationReturnKind.SkipDiscard))
+            if (_characterHuaTuoAnniversaryGodOperations.TryBeginSkillInvocation(0, current.Seat, skillId, $"discard-policy:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber)}:{(policyId)}", returnKind: SkillInvocationReturnKind.SkipDiscard))
                 return;
             EndTurnAfterDiscardSkip(current.Seat);
         }
