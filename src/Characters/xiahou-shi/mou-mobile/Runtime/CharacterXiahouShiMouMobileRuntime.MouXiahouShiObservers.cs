@@ -36,7 +36,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && MouXiahouShiMovementSigned(f, m));
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return ProgramChildWindowRuntime.MatchesStateChangeChild(f.Id, child, _coreProgramEventHistoryOperations.Value.ProgramHistory);
     }
 
     internal bool IsMouXiahouShiDirectRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.MouXiahouShiQiaoshi is { Stage: MouXiahouShiQiaoshiStage.RecoveryChildren, Branch: "recover-and-draw", RecoveryReturned: false } q && ValidMouXiahouShiQiaoshi(f) && recovery.Attempt.SourceSeat == q.DamageSourceSeat && recovery.Attempt.TargetSeat == f.OwnerSeat && recovery.Attempt.HpBefore == q.RecoveryHpBefore && _healthChildren.ProgramRecoveryChild(f, recovery);
