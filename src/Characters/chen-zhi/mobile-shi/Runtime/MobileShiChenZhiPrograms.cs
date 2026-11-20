@@ -32,21 +32,23 @@ public sealed partial record ProgramSkillFrame
 }
 
 internal interface IMobileShiChenZhiHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation); }
-internal abstract class MobileShiChenZhiDescriptor(SkillProgramEffectOp op) : ProgramOperationDescriptorBase
+internal abstract class MobileShiChenZhiDescriptor(SkillProgramEffectOp op, ProgramTrackedFact extraFacts = ProgramTrackedFact.None) : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => op;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override ISkillProgramEffectHandler Handler => new MobileShiChenZhiHandler(op);
     public override ProgramOperationInteraction Interaction => op == SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong ? ProgramOperationInteraction.Automatic : ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(2));
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered:
+        ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard | extraFacts);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         op == SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong
             ? [new RequireTriggerWindows([SkillProgramTriggerWindow.TurnEnding, SkillProgramTriggerWindow.TurnBeforeStart])]
             : [new RequireTriggerWindow(SkillProgramTriggerWindow.DiscardPileReceived)];
 }
 internal sealed class ResolveMobileShiChenZhiQuanchongDescriptor() : MobileShiChenZhiDescriptor(SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong);
-internal sealed class ResolveMobileShiChenZhiRenxingDescriptor() : MobileShiChenZhiDescriptor(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing);
+internal sealed class ResolveMobileShiChenZhiRenxingDescriptor() : MobileShiChenZhiDescriptor(
+    SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing, ProgramTrackedFact.NativeProgramDiscardSource);
 internal sealed class MobileShiChenZhiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => op;

@@ -63,7 +63,7 @@ dependency direction in the rest of native card-use scheduling.
 
 - `claimMovedCards` with `discardPileReceived`, `movementDiscardOnly` and `perBatch` claims the matching entries of the original discard batch in one physical movement. Selection retains the original batch window, and execution rechecks each original entry at the discard pile after earlier effects such as HP payment.
 
-- True-discard batch claims can use a completed logical discard receipt with the same card, physical destination and movement sequence when the physical reason classifier has no source. Synchronous movement capture uses the facts already available at that point. The claim window can read the completed receipt after the native producer returns.
+- Synchronous true-discard capture can read the original typed movement source and fall back to the physical reason classifier. After the native producer returns, a claim window can also use a completed logical discard receipt with the same card, destination and movement sequence.
 
 - A discard-phase color count prefers the effective suit recorded on the actual discard entry. For a movement without that receipt, read the card identity in the classified original owned zone.
 
@@ -71,7 +71,7 @@ dependency direction in the rest of native card-use scheduling.
 
 - A red owned-loss receipt resolves the effective suit in the actual source zone during physical movement recording. The card snapshot keeps the printed face and the receipt carries the effective suit used for eligibility.
 
-- An atomic native program discard can carry its executor, original owned source and effective suit sampled before movement onto the actual discard-pile entry. The atomic writer verifies the original producer, reason and selected owned materials. Discard provenance, neighbor first-discard capture and full discard-phase totals can read that entry before the native invoice closes. The phase totals count each qualifying discard occurrence by the current player. Redirected movements and separately staged discards follow their own settlement rules.
+- An atomic native program discard can carry its executor, original owned source and effective suit sampled before movement onto the actual discard-pile entry. The atomic writer verifies the original producer, reason and selected owned materials. `NativeProgramDiscardSource` requests the original source for synchronous consumers such as the turn's first outside-phase discard. Effective suit is captured only when a suit consumer requires it. Discard provenance, neighbor first-discard capture and full discard-phase totals can read that entry before the native invoice closes. The phase totals count each qualifying discard occurrence by the current player. Redirected movements and separately staged discards follow their own settlement rules.
 
 - Neighbor discard placement retains the original batch's first-discard fact and previous living seat. Offer and placement eligibility require a surviving original discard-pile entry. A later discard of the same card leaves the earlier batch recorded as the first.
 

@@ -4,13 +4,17 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
 {
     internal IReadOnlyList<HappyWeiYanDiscardedBone> DiscardedHappyBones(int actualTurn) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.TurnNumber == actualTurn && m.From.Zone == CardZoneKind.Equipment && m.To == CardLocation.DiscardPile).Select(m => HappyBoneAt(m.CardId, m.From, m.Sequence - 1)is { } bone ? new HappyWeiYanDiscardedBone(m.CardId, bone.PrintedKind, m.From.OwnerSeat!.Value, bone.Slot, m.Sequence) : null).OfType<HappyWeiYanDiscardedBone>().OrderBy(b => b.Sequence).ToArray();
+
+    private bool IsCurrentHappyBoneDiscard(HappyWeiYanDiscardedBone bone) =>
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, bone.CardId) == bone.Sequence;
+
     internal bool IsHappyWeiYanBoneReturnQuery(CharacterState actor, int? id)
     {
         if (id is not { } cardId || cardId <= 0 || !actor.IsAlive)
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyWeiYan: { Operation: SkillProgramEffectOp.ResolveHappyWeiYanBoneReturn } receipt } frame && actor.Seat == frame.OwnerSeat && receipt.Cursor >= 0 && receipt.Cursor < receipt.Discarded.Count && receipt.Discarded[receipt.Cursor].CardId == cardId)
-            return (receipt.Stage is HappyWeiYanStage.ReturnChoice or HappyWeiYanStage.IssuingUse) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, cardId);
-        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { HappyWeiYanReturn: { } native } use && use.SourceSeat == actor.Seat && native.Bone.CardId == cardId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == native.FrameId)is { } parent && HappyBoneUseRidesOn(use, parent) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, cardId);
+            return (receipt.Stage is HappyWeiYanStage.ReturnChoice or HappyWeiYanStage.IssuingUse) && IsCurrentHappyBoneDiscard(receipt.Discarded[receipt.Cursor]);
+        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { HappyWeiYanReturn: { } native } use && use.SourceSeat == actor.Seat && native.Bone.CardId == cardId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == native.FrameId)is { } parent && HappyBoneUseRidesOn(use, parent) && IsCurrentHappyBoneDiscard(native.Bone);
     }
 
     internal Card? HappyWeiYanBoneReturnCard(CharacterState actor, int? id) => IsHappyWeiYanBoneReturnQuery(actor, id) ? _coreAdvancedLifecycleOperations.GetAdvancedCard(id!.Value) : null;
@@ -78,7 +82,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { HappyWeiYan: { Stage: HappyWeiYanStage.IssuingUse, NativeUse: { UseId: 0, ActionId: 0 } native } receipt } frame)
             return;
-        if (use.SourceSeat != frame.OwnerSeat || action.ActorSeat != frame.OwnerSeat || action.ProviderSeat != frame.OwnerSeat || action.RequesterSeat is not null || action.ConversionChain.Count != 0 || use.CardId != native.Bone.CardId || use.CardKind != (native.Action.PlayedCardKind ?? native.Bone.PrintedKind) || action.PhysicalCards is not [{ CardId: var cardId, From: var from }] || cardId != native.Bone.CardId || from != CardLocation.DiscardPile || use.PhysicalCardIds is not [var physical] || physical != cardId || _cardZonesOperations._cardZones.GetLocation(cardId) != from || !use.TargetSeats.SequenceEqual(HappyBoneExpectedTargets(native)))
+        if (use.SourceSeat != frame.OwnerSeat || action.ActorSeat != frame.OwnerSeat || action.ProviderSeat != frame.OwnerSeat || action.RequesterSeat is not null || action.ConversionChain.Count != 0 || use.CardId != native.Bone.CardId || use.CardKind != (native.Action.PlayedCardKind ?? native.Bone.PrintedKind) || action.PhysicalCards is not [{ CardId: var cardId, From: var from }] || cardId != native.Bone.CardId || from != CardLocation.DiscardPile || use.PhysicalCardIds is not [var physical] || physical != cardId || !IsCurrentHappyBoneDiscard(native.Bone) || !use.TargetSeats.SequenceEqual(HappyBoneExpectedTargets(native)))
             throw new InvalidOperationException("Ezhi must issue the original discarded bone as one genuine legal native Use.");
         var bound = native with
         {

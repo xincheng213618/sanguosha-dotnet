@@ -101,7 +101,8 @@ internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, 
             content.HasTriggerOperation(SkillProgramEffectOp.ResolveDiscardBudgetParticipants);
         var captureSuit = recordPhaseSuits || content.HasTriggerOperation(SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance);
         if (!facts.SetupComplete || turn.TurnNumber <= 0 || frames.Top?.Id != frameId ||
-            !captureSuit && !recordPhaseBudget && !content.HasTriggerOperation(SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop))
+            !captureSuit && !recordPhaseBudget && !content.RequiresFact(ProgramTrackedFact.NativeProgramDiscardSource) &&
+            !content.HasTriggerOperation(SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop))
             return null;
 
         var materials = new List<NativeLogicalDiscardMaterial>(ids.Count);

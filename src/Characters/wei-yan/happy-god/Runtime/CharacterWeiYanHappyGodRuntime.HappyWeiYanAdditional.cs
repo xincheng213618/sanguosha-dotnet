@@ -28,7 +28,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 42301, SkillProgramEffectOp.ResolveHappyWeiYanEzhi, SkillProgramEffectOp.ResolveHappyWeiYanBoneReturn)]
-    internal bool HappyEzhiEligible(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => trigger.Id == "bone-use" ? TryHappyEzhiAction(context, out var action, out _) && action.ActorSeat != candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive && HappyBones(action.ActorSeat).Count > 0 : DiscardedHappyBones(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber).Count > 0;
+    internal bool HappyEzhiEligible(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => trigger.Id == "bone-use" ? TryHappyEzhiAction(context, out var action, out _) && action.ActorSeat != candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive && HappyBones(action.ActorSeat).Count > 0 : DiscardedHappyBones(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber).Any(IsCurrentHappyBoneDiscard);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 42303, SkillProgramEffectOp.ResolveHappyWeiYanGujing)]
     internal bool HappyGujingCanActivate(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner.Seat && HappyBoneAvailableSlots(p.Seat).Any());
     internal SkillProgramStepOutcome BeginHappyWeiYanAdditional(ProgramSkillFrame frame, SkillProgramEffectOp operation)

@@ -153,7 +153,9 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         }
 
-        if (!d.ClaimIssued && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && d.Receipt.IsMount && d.Receipt.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(d.Receipt.CardId) == d.Receipt.To)
+        if (!d.ClaimIssued && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive &&
+            d.Receipt.IsMount && d.Receipt.To == CardLocation.DiscardPile &&
+            _zoneEntries.CurrentEntry(d.Receipt.To, d.Receipt.CardId) == d.Receipt.MovementSequence)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { DamageTargetMount = d with { ClaimIssued = true }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             var card = _cardZonesOperations._cardZones.CardsAt(d.Receipt.To).Single(c => c.Id == d.Receipt.CardId);

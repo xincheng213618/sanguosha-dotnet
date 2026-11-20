@@ -867,6 +867,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Sidi: first native Shensu Slash consumes private forecast cold", MobileBoundarySidiShensuChecks.SidiConsumesFirstActualShensuSlashCold),
     ("Classic Juxiang: skips the actual Barbarian user and reaches the next claimant cold", ClassicJuxiangOriginalBarbarianChecks.JuxiangSkipsTheActualUserAndReachesTheEligibleClaimantCold),
     ("Classic Jili: original attack range before equipment installation cold", ClassicShaMoKeJiliEquipmentTimingChecks.JiliUsesTheOriginalAttackRangeBeforeInstallingEquipmentCold),
+    ("Mobile Boundary Qiaomeng: claims the original discard of the damaged target mount cold", BoundaryMobileQiaomengDiscardEntryChecks.QiaomengClaimsOnlyTheOriginalDiscardOfTheDamagedTargetsMountCold),
+    ("Happy Wei Yan Ezhi: uses only the original discarded bone cold", HappyWeiYanEzhiDiscardEntryChecks.EzhiUsesOnlyTheOriginalDiscardedBoneCold),
+    ("Shi Chen Zhi: first typed Cao Xian discard alone offers Renxing cold", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardConsumesOnlyRenxingOpportunity),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

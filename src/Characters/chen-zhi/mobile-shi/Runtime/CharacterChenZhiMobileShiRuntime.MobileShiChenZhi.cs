@@ -14,7 +14,9 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing) || batch.TurnNumber < 1 || batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == batch.TurnNumber))
             return;
-        var first = batch.Movements.FirstOrDefault(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from));
+        var first = batch.Movements.FirstOrDefault(move =>
+            (move.NativeDiscard?.From ?? _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)) is { } from &&
+            CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from));
         if (first is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiChenZhiFirstDiscardEvent(batch.TurnNumber, batch.Id, first.Sequence));
     }
