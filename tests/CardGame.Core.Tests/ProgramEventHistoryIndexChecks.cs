@@ -110,6 +110,15 @@ internal static class ProgramEventHistoryIndexChecks
         Require(!history.HasActualTurnStartAfter(0, 1) && !history.HasActualTurnStartAfter(1, 2) &&
                 history.HasActualTurnStartAfter(1, 1),
             "A subsequent actual start must belong to the requested seat and occur strictly after the issued turn.");
+        Require(history.FirstActualTurnStartAfterOrdinal(0, 1) is null &&
+                ReferenceEquals(history.FirstActualTurnStartAfterOrdinal(1, 1), next) &&
+                history.FirstActualTurnStartAfterOrdinal(1, 2) is null,
+            "The issuance ordinal skips already recorded starts across all seats before selecting the requested seat.");
+        history.Append(new ActualTurnCursorReturnedEvent(2, 1));
+        var later = new TurnStartedEvent(3, 0);
+        history.Append(later);
+        Require(ReferenceEquals(history.FirstActualTurnStartAfterOrdinal(0, 1), later),
+            "The originally selected seat's first later start is returned after an intervening foreign turn.");
     }
 
     private static void ActualUsesKeepAcceptedAndFinalizedOrdersSeparate()

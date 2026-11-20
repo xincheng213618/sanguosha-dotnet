@@ -178,7 +178,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
             var target = choice.Targets.Single();
             var targets = r.Targets.Append(target).ToArray();
             var promise = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanPromiseEvent>().Select(e => e.PromiseId).DefaultIfEmpty().Max() + 1;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoDiaoChanPromiseEvent(promise, f.Id, r.Source, r.GameplayHash, target, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count()));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoDiaoChanPromiseEvent(promise, f.Id, r.Source, r.GameplayHash, target, _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts()));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoDiaoChan = r with { Targets = targets } });
             if (targets.Length >= r.CostCount)
                 FinishMoDc(f);

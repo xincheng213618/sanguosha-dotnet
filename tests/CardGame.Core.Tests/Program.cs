@@ -816,6 +816,8 @@ var tests = new (string Name, Action Body)[]
     ("Qu Huang runtime: Nishou keeps the original equipment entry through re-discard cold", QuHuangRuntimeChecks.NishouCannotUseEquipmentFromANewerDiscardEntryCold),
     ("Mobile Shi Huang Zu Duanyang cannot store a newer entry through an old discard window cold", ShiHuangZuDiscardEntryChecks.DuanyangCannotStoreTheNewEntryThroughAnOldDiscardWindowCold),
     ("OL Mo Diao Chan Qingshi: original non-use discard entry survives or is relinquished", OlMoDiaoChanQingshiChecks.RecaptureUsesTheOriginalNonUseDiscardEntry),
+    ("OL Mo Diao Chan Huanhuo: paid promise waits for recipient actual Play cold", OlMoDiaoChanHuanhuoTurnChecks.PaidPromiseWaitsForRecipientActualPlayCold),
+    ("Mou Lu Bu Liyu: paid Wushuang survives foreign turn and expires on recipient return cold", MouLuBuLiyuTurnReturnChecks.PaidWushuangSurvivesForeignTurnAndExpiresOnRecipientReturnCold),
     ("Anniversary Chiying: same physical card pays once for each different victim cold", AnniversaryGaoXiangChecks.ChiyingAcceptsTwoPaymentsOfTheSameCardFromDifferentVictimsCold),
     ("OL Boundary Liu Feng Qinling preserves the original discard cost entry cold", BoundaryLiuFengDiscardEntryChecks.QinlingCannotStoreTheLaterEntryOfItsDiscardedCostCold),
     ("Shi Wei Yan Yinzhan: Chengshi returns only the original discard entry", ShiWeiYanChecks.YinzhanChengshiReturnsOnlyTheOriginalDiscardEntry),

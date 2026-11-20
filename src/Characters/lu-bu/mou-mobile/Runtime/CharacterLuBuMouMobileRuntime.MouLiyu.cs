@@ -229,7 +229,8 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         var grantId = $"mou-liyu:{(f.Id)}:{(recipient.Seat)}";
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(recipient).ActiveGrants.FirstOrDefault(g => g.SkillId == MouLuBuMobileComposition.Wushuang)?.SkillInstanceId ?? $"mou-liyu-shared:{(recipient.Seat)}:wushuang";
         recipient.SkillGrants.Grant(new SkillGrant(grantId, MouLuBuMobileComposition.Wushuang, instance, grantId));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuBuLiyuGrantEvent(f.Id, r.Source, recipient.Seat, grantId, instance, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count()));
+        var afterTurnStartOrdinal = _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts();
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuBuLiyuGrantEvent(f.Id, r.Source, recipient.Seat, grantId, instance, afterTurnStartOrdinal));
         ContinueMouLb(f.Id);
     }
 
@@ -240,7 +241,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         {
             if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuBuLiyuGrantExpiredEvent>().Any(e => e.GrantId == issued.GrantId))
                 continue;
-            var due = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Skip(issued.AfterTurnStartOrdinal).FirstOrDefault(e => e.ActorSeat == issued.RecipientSeat);
+            var due = _coreProgramEventHistoryOperations.Value.ProgramHistory.FirstActualTurnStartAfterOrdinal(issued.RecipientSeat, issued.AfterTurnStartOrdinal);
             if (due?.TurnNumber != returned.ActualTurn)
                 continue;
             _coreMatchParticipantsPlayersAccess._players[issued.RecipientSeat].SkillGrants.RemoveGrant(issued.GrantId);
