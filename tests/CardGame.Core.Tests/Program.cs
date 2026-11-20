@@ -956,6 +956,8 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Cui Lie Chibi: far native use opens original Pindian cold", AnniversaryCuiLiePindianTargetChecks.FarNativeUseOpensOriginalPindianCold),
     ("Anniversary Cui Lie Zijue: paid distance survives recipient start and expires at source start cold", AnniversaryCuiLiePindianTargetChecks.PaidZijueSurvivesRecipientStartAndExpiresAtSourceStartCold),
     ("Anniversary Cui Lie Zijue: declined gift returns original four-card native draw cold", AnniversaryCuiLiePindianTargetChecks.DeclinedGiftReturnsOriginalNativeDrawCold),
+    ("Le Cai Yong Feibai: private sample and fallback draw keep original entities cold", LeCaiYongFeibaiDrawChecks.PrivateSampleAndFallbackDrawKeepOriginalEntitiesCold),
+    ("Anniversary Cui Lie Zijue: declined gift returns actual Zenrun replacement and compensation cold", AnniversaryCuiLieZijueDrawReplacementChecks.DeclinedGiftReturnsOriginalZenrunReplacementCold),
     ("Anniversary Feng Xi Boyan: capped foreign native draw returns cold", AnniversaryFengXiBoyanDrawChecks.CappedForeignNativeDrawReturnsCold),
     ("Anniversary Guo Zhao Zunwei: capped owner native draw returns cold", AnniversaryGuoZhaoZunweiDrawChecks.CappedOwnerNativeDrawReturnsCold),
     ("Wu Lu Xun Ruxian: issued permission expires at next own actual start", WuLuXunRuxianTurnStartChecks.IssuedPermissionExpiresAtNextOwnActualStart),

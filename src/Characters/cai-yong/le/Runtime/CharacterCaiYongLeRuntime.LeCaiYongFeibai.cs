@@ -247,15 +247,26 @@ internal sealed partial class CharacterCaiYongLeRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveLeCaiYongFeibai)]
     internal void ReturnLeCaiYongFeibaiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.Drawing, ObtainedCardId: null } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.Drawing, ObtainedCardId: null } r || CompletedFeibaiDraw(f) != outcome ||
+            outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 2 ||
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Feibai cannot substitute or replay its native fallback draw.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeCaiYongFeibai = r with { Stage = FeibaiStage.DrawChildren, DrawOutcome = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeCaiYongFeibai = r with { Stage = FeibaiStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FeibaiFallbackDrawReturnedEvent(f.Id, outcome.AttemptFrameId, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         MarkFeibaiActualDrawEntities(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), outcome);
         ContinueLeCaiYongFeibai(f.Id);
     }
 
-    internal bool IsExactFeibaiFallbackDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => f.LeCaiYongFeibai is { Stage: FeibaiStage.DrawChildren, ObtainedCardId: null, DrawOutcome: { } stored } r && f.NativeDraw is null && stored.RecipientSeat == outcome.RecipientSeat && stored.RequestedCount == 2 && stored.AttemptFrameId == outcome.AttemptFrameId && stored.SequenceBefore == outcome.SequenceBefore && stored.SequenceAfter == outcome.SequenceAfter && stored.ActualDrawIds.SequenceEqual(outcome.ActualDrawIds) && stored.ReplacementGainedIds.SequenceEqual(outcome.ReplacementGainedIds) && outcome.RecipientSeat == f.OwnerSeat && outcome.RequestedCount == 2 && FeibaiRootMatches(f) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiDisabledEvent>().Count(e => e == new FeibaiDisabledEvent(f.OwnerSeat, r.Qualification.Prefix.ActualTurn, f.Id)) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawIssuedEvent>().Count(e => e == new FeibaiFallbackDrawIssuedEvent(f.Id, f.OwnerSeat, r.Qualification.Prefix.ActualTurn)) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawReturnedEvent>().Count(e => e == new FeibaiFallbackDrawReturnedEvent(f.Id, outcome.AttemptFrameId, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter)) == 1 && outcome.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == FeibaiDrawReason) == 1);
+    private static NativeDrawOutcome? CompletedFeibaiDraw(ProgramSkillFrame f) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveLeCaiYongFeibai, new(FeibaiDrawReason));
+
+    internal bool IsExactFeibaiFallbackDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) =>
+        f.LeCaiYongFeibai is { Stage: FeibaiStage.DrawChildren, ObtainedCardId: null } r && f.NativeDraw is null &&
+        CompletedFeibaiDraw(f) == outcome && outcome.RecipientSeat == f.OwnerSeat && outcome.RequestedCount == 2 && FeibaiRootMatches(f) &&
+        _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiDisabledEvent>().Count(e => e == new FeibaiDisabledEvent(f.OwnerSeat, r.Qualification.Prefix.ActualTurn, f.Id)) == 1 &&
+        _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawIssuedEvent>().Count(e => e == new FeibaiFallbackDrawIssuedEvent(f.Id, f.OwnerSeat, r.Qualification.Prefix.ActualTurn)) == 1 &&
+        _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawReturnedEvent>().Count(e => e == new FeibaiFallbackDrawReturnedEvent(f.Id, outcome.AttemptFrameId, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter)) == 1 &&
+        outcome.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == FeibaiDrawReason) == 1);
     internal void ContinueLeCaiYongFeibai(long id)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -331,7 +342,8 @@ internal sealed partial class CharacterCaiYongLeRuntime
             return false;
         if (f.LeCaiYongFeibai is { Stage: FeibaiStage.ObtainChildren, ObtainedCardId: { } id } r)
             return m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == FeibaiObtainReason;
-        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.DrawChildren, DrawOutcome: { } o } || m.Sequence <= o.SequenceBefore || m.Sequence > o.SequenceAfter)
+        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.DrawChildren } || CompletedFeibaiDraw(f) is not { } o ||
+            m.Sequence <= o.SequenceBefore || m.Sequence > o.SequenceAfter)
             return false;
         return o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == FeibaiDrawReason || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
     }
@@ -341,7 +353,8 @@ internal sealed partial class CharacterCaiYongLeRuntime
         if (!FeibaiRootMatches(f))
             return false;
         if (f.LeCaiYongFeibai is { Stage: FeibaiStage.Drawing } && f.NativeDraw is not null)
-            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return child is NativeDrawAttemptFrame draw &&
+                NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, SkillProgramEffectOp.ResolveLeCaiYongFeibai, new(FeibaiDrawReason));
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)

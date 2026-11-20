@@ -26,7 +26,6 @@ public sealed record FeibaiReceipt(FeibaiQualification Qualification, long Windo
     public int? ObtainedCardId { get; init; }
     public int Before { get; init; }
     public int After { get; init; }
-    public NativeDrawOutcome? DrawOutcome { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 {

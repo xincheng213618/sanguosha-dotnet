@@ -56,10 +56,13 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         return r.Stage != AnniversaryCuiLieStage.DrawChildren || CuiLieCompletedDraw(f, r) is not null;
     }
 
-    private NativeDrawOutcome? CuiLieCompletedDraw(ProgramSkillFrame f, AnniversaryCuiLieReceipt r) =>
-        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, r.Operation, new(CuiLieDraw)) is { } draw &&
-        draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Number && draw.SequenceBefore == r.Before &&
-        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
+    private NativeDrawOutcome? CuiLieCompletedDraw(ProgramSkillFrame f, AnniversaryCuiLieReceipt r)
+    {
+        // The native attempt can move cards before its producer captures the actual Draw range.
+        return NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, r.Operation, new(CuiLieDraw)) is { } draw &&
+            draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Number && draw.SequenceBefore >= r.Before &&
+            draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
+    }
 
     internal bool CuiLieMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.GiveChildren or AnniversaryCuiLieStage.RecoveryChildren or AnniversaryCuiLieStage.DrawChildren or AnniversaryCuiLieStage.PindianChildren or AnniversaryCuiLieStage.MutationChildren } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidCuiLie(f);
     internal bool IsAnniversaryCuiLiePindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.PindianChildren, Result: { } result } r && ValidCuiLie(f) && batch.ParentFrameId == r.PindianId && batch.AwaitingProgramFrameId is null && batch.TurnNumber == r.Turn && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && batch.Movements.Count is >= 1 and <= 2 && batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(x => x == m) == 1 && (m.CardId == result.SourceCardId || m.CardId == result.OpponentCardId) && (m.To == CardLocation.Processing && (m.Reason == CardMoveReasons.PindianReveal || m.Reason.Value == "pindian.reserve-top") || m.From == CardLocation.Processing && (m.Reason == CardMoveReasons.PindianFinish || m.Reason.Value == "program.pindian.claim")));
