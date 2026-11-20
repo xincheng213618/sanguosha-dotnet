@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using static BoundaryLiDianChecks;
@@ -8,6 +9,7 @@ internal static class MobileGuzhengReturnReplacementChecks
     private const string Mode = "identity:classic-mobile-guzheng-return", Deck = "fixture:mobile-guzheng-return-deck";
     private const string Return = "skill-program.boundary:guzheng-mobile.phase-return";
     private const string Claim = "skill-program.boundary:guzheng-mobile.phase-claim";
+    private const string ReturnWatch = "fixture:mobile-guzheng-paid-return";
     private static readonly string[] Generals = ["happy:shen-wei-yan", "fixture:guzheng-return-discarder",
         "boundary:zhang-zhao-zhang-hong-mobile", "fixture:guzheng-return-peer"];
 
@@ -67,6 +69,7 @@ internal static class MobileGuzhengReturnReplacementChecks
             $"seat 1 hand-to-discard [{string.Join(", ", handToDiscard.Select(move => $"{move.Sequence}/{move.CardId}/{move.CardKind}/{move.Reason.Value}/turn {move.TurnNumber}/{move.MovementTiming?.Phase}"))}].");
 
         game = Cold(game, content);
+        var parentId = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Guzheng).Id;
         var returned = originalDiscards[0].CardId;
         var remaining = originalDiscards.Skip(1).Select(move => move.CardId).ToArray();
         Answer(game, choice => choice.Cards.SequenceEqual([returned]));
@@ -87,11 +90,24 @@ internal static class MobileGuzhengReturnReplacementChecks
             return;
         }
 
+        var paidParent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parentId);
+        Require(next is { PlayerSeat: 1, SkillPrompt.SkillId: ReturnWatch } &&
+            paidParent is { PendingMovementContinuation: not null, BoundaryZhangZhaoPhase: { Stage: "return-children" } paid } &&
+            paid.ReturnedCardId == returned && paid.ReturnMovementSequence == delivered.Sequence &&
+            game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(frame => frame.Batch.AwaitingProgramFrameId == parentId &&
+                frame.Batch.ParentFrameId == parentId && frame.Batch.Id == delivered.BatchId),
+            "The actual gain child waits on the original paid Guzheng frame before any claim is offered.");
+        game = Cold(game, content);
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        next = Next(game);
         Require(next is { PlayerSeat: 2, SkillPrompt.SkillId: Guzheng } &&
+            game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.Id == parentId &&
+                frame is { PendingMovementContinuation: null, BoundaryZhangZhaoPhase.Stage: "claim" }) &&
             next.Choices.Any(choice => choice.Parameters.GetValueOrDefault("branch") == "claim"),
-            "An actual return to the phase owner unlocks the separate optional claim.");
+            "The original gain child returns once and clears its marker before the original Guzheng frame offers the optional claim.");
         Answer(game, choice => choice.Parameters.GetValueOrDefault("branch") == "claim");
         Require(Next(game) is { PlayerSeat: 2, Kind: DecisionKind.PlayCard } &&
+            game.CardMovements.Count(record => record.Reason.Value == Return) == 1 &&
             remaining.All(card => Zone(game, card) == CardLocation.Hand(2)) &&
             game.CardMovements.Where(record => record.Reason.Value == Claim).Select(record => record.CardId).ToHashSet().SetEquals(remaining),
             "The original skill holder really receives the rest after successful return.");
@@ -118,7 +134,7 @@ internal static class MobileGuzhengReturnReplacementChecks
         var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
         Require(restored.CardMovements.SequenceEqual(game.CardMovements) && Enumerable.Range(0, game.PlayerCount).All(seat =>
             SnapshotJson.Serialize(restored.CreateSnapshot(seat)) == SnapshotJson.Serialize(game.CreateSnapshot(seat))),
-            "Cold replay preserves the original phase discards and the return selection.");
+            "Cold replay preserves the original discards, actual return movements and each seat's current choice.");
         return restored;
     }
 
@@ -146,7 +162,18 @@ internal static class MobileGuzhengReturnReplacementChecks
         {
             CharacterFixtureContent.Register(builder, Generals[0]);
             CharacterFixtureContent.Register(builder, Generals[2]);
-            builder.AddGeneral(new(Generals[1], "弃牌角色", "supporter", "standard:none", "wei", 2));
+            var catalog = SkillProgramCatalog.LoadCurrent($$"""
+                {"skills":[{"id":"{{ReturnWatch}}","revision":1,"triggers":[
+                  {"id":"wait-for-return","window":"cardsGained","subject":"owner","destinationZones":["hand"],
+                   "movementOccurrence":"perBatch","movementReasons":["{{Return}}"],"optional":false,
+                   "effects":[{"op":"chooseOption","target":"owner","resultBind":"continue","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [ReturnWatch] = new { name = "归还后继续", description = "收到固政归还的牌后等待继续。",
+                        optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+            var watch = catalog.Presentations[ReturnWatch];
+            builder.AddSkill(new(ReturnWatch, watch.Name, watch.Description)
+                { Program = catalog.Programs[ReturnWatch], ProgramPresentation = watch });
+            builder.AddGeneral(new(Generals[1], "弃牌角色", "supporter", ReturnWatch, "wei", 2));
             builder.AddGeneral(new(Generals[3], "同桌", "supporter", "standard:none", "wu", 6));
             builder.AddDeck(new(Deck, "骨径与固政的实体武器", InitialHandSize: 5, DrawPerTurn: 0, [])
             {

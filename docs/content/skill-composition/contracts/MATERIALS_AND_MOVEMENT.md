@@ -53,7 +53,7 @@ dependency direction in the rest of native card-use scheduling.
 
 ## Acquisition, Give and exact movement requests
 
-- Whole discard-phase settlement uses `IActualDiscardRecoveryPhaseQueries.CurrentPhaseDiscards` to read genuine discards from the original physical journal after the actual phase's starting movement sequence. Freeze eligible discard-pile entries on the issuing program frame and use `StillAvailable` to recheck each original entry. Mobile Guzheng selects a discard from the phase owner's hand as its return. The choice to claim remaining entries opens after the return's movement children settle, provided its actual destination was the phase owner's hand.
+- Whole discard-phase settlement uses `IActualDiscardRecoveryPhaseQueries.CurrentPhaseDiscards` to read genuine discards from the original physical journal after the actual phase's starting movement sequence. Freeze eligible discard-pile entries on the issuing program frame and use `StillAvailable` to recheck each original entry. Mobile Guzheng selects a discard from the phase owner's hand as its return. `ProgramStageRuntime` commits each paid stage on the original frame and clears its movement wait after the children settle. Mobile Guzheng drains recovery, character state, skill changes, HP changes, and then card movement. It offers the remaining entries when the return actually reached the phase owner's hand.
 
 - If a discard-phase claim delivers cards one at a time, the original program frame keeps the next entry and actual deliveries through each gain child. Advance only after checking or delivering the corresponding entry. Complete the claim once after the remaining entries have been processed.
 
