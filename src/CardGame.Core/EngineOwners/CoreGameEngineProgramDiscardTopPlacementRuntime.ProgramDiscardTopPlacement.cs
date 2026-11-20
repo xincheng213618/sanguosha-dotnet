@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
 
     private IEnumerable<int> AvailableProgramDiscardTopCards(ProgramSkillFrame frame) =>
         _coreNeighborDiscardOpportunitiesOperations.Value.EligibleProgramDiscardTopMovements(frame)
-            .Where(movement => _cardZonesOperations._cardZones.GetLocation(movement.CardId) == CardLocation.DiscardPile)
             .Select(movement => movement.CardId).Distinct();
 
     internal SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame)

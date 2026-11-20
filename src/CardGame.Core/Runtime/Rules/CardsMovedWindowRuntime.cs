@@ -479,8 +479,6 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
             return action?.ActorSeat == candidate.OwnerSeat ? batch.Movements.Select((movement, index) => (movement, index)).Where(item => item.movement.To == CardLocation.DiscardPile).Select(item => item.index).ToArray() : [];
         }
 
-        if (features.HasOperation(SkillProgramEffectOp.ReclaimFriendXuanjian))
-            return batch.Movements.Select((movement, index) => (movement, index)).Where(item => item.movement.To == CardLocation.DiscardPile && _zones.GetLocation(item.movement.CardId) == CardLocation.DiscardPile && _facts.GetAttackCardKind(item.movement.CardId) == CardKind.Xuanjian).Select(item => item.index).ToArray();
         if (trigger.IgnoreOwnSkillMovements && batch.OriginOwnerSeat == candidate.OwnerSeat && batch.OriginSkillId == candidate.SkillId && batch.OriginSkillInstanceId == candidate.SkillInstanceId)
             return[];
         var discardPile = _zones.CardsAt(CardLocation.DiscardPile).ToDictionary(card => card.Id);

@@ -134,11 +134,17 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(native.Id, current => current with { WushuangZengouInvalidation = proof });
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WushuangZengou = r with { Stage = "gained" } });
             if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-                foreach (var cardId in r.Cards.Where(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.DiscardPile))
+            {
+                var nativeCosts = response.ResponseCompletion!.NativeCosts;
+                foreach (var cardId in r.Cards)
                 {
+                    var currentEntry = _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cardId);
+                    if (!nativeCosts.Any(move => move.CardId == cardId && move.To == CardLocation.DiscardPile && move.Sequence == currentEntry))
+                        continue;
                     _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(cardId), CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new("skill-program.wushuang-zengou.gain"));
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangZengouGainedCardEvent(f.Id, r.ActionId, f.OwnerSeat, cardId, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
                 }
+            }
 
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);
             return true;

@@ -48,6 +48,27 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
             _coreNativeEquipmentUseOperations.CompleteEquipmentUse(owner, card, id);
     }
 
+    private bool IsCurrentXuanjianDiscard(CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile &&
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence &&
+        _coreCardAttackStateOperations.GetAttackCard(movement.CardId).Kind == CardKind.Xuanjian;
+
+    [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 24520)]
+    internal int[]? SelectFriendXuanjianDiscards(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) =>
+        features.HasOperation(SkillProgramEffectOp.ReclaimFriendXuanjian)
+            ? batch.Movements.Select((movement, index) => (movement, index))
+                .Where(item => IsCurrentXuanjianDiscard(item.movement)).Select(item => item.index).ToArray()
+            : null;
+
+    private CardMovementRecord? CurrentXuanjianDiscard(ProgramSkillWindowContext? context)
+    {
+        if (context is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } ||
+            index < 0 || index >= batch.Movements.Count)
+            return null;
+        var movement = batch.Movements[index];
+        return IsCurrentXuanjianDiscard(movement) ? movement : null;
+    }
+
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 660)]
     internal bool CanOfferFriendTrio(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -58,7 +79,8 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         {
             SkillProgramEffectOp.BeginFriendPrediction => context.Window != SkillProgramTriggerWindow.RoundStarting || _coreActualRoundProgressRoundNumberAccess._roundNumber == 1,
             SkillProgramEffectOp.ObserveFriendPrediction => IsFriendActualCardUse(FriendCardAction(context)) && _coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess._friendPredictions.TryGetValue((p.Seat, candidate.SkillInstanceId), out var policy) && policy.Index < policy.Predictions.Count && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendPredictionObservedEvent>().Any(x => x.PredictionId == policy.PredictionId && x.ActionId == FriendCardAction(context)!.ActionId),
-            SkillProgramEffectOp.ReclaimFriendXuanjian => CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => p.Markers.GetValueOrDefault(m)) >= 2 && context.MovementBatch is { } b && b.Movements.Any(m => m.To == CardLocation.DiscardPile && _coreCardAttackStateOperations.GetAttackCard(m.CardId).Kind == CardKind.Xuanjian && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile),
+            SkillProgramEffectOp.ReclaimFriendXuanjian => CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => p.Markers.GetValueOrDefault(m)) >= 2 &&
+                CurrentXuanjianDiscard(context) is not null,
             SkillProgramEffectOp.GainFriendCategoryMark => IsFriendActualCardUse(FriendCardAction(context)) && !p.Markers.ContainsKey(FriendCategoryMarker(FriendCardAction(context)!.EffectiveKind)),
             _ => true
         };
@@ -125,14 +147,13 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
 
         if (op == SkillProgramEffectOp.ReclaimFriendXuanjian)
         {
-            var id = c.MovementBatch!.Movements.Where(m => m.To == CardLocation.DiscardPile && _coreCardAttackStateOperations.GetAttackCard(m.CardId).Kind == CardKind.Xuanjian).Select(m => m.CardId).FirstOrDefault(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile);
-            if (id == 0)
+            if (CurrentXuanjianDiscard(c) is not { } movement)
             {
                 FinishFriendTrio(f);
                 return SkillProgramStepOutcome.AwaitChild;
             }
 
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FriendTrio = r with { Stage = FriendTrioStage.RemoveMarks, Cards = [id], Count = 2 } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FriendTrio = r with { Stage = FriendTrioStage.RemoveMarks, Cards = [movement.CardId], Count = 2 } });
             PublishFriendTrioChoice(f);
             return SkillProgramStepOutcome.AwaitChoice;
         }
@@ -337,6 +358,14 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
                 FriendTrioMutation(f, FriendTrioStage.Complete, () => _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, cards, new("friend.yance.discard")));
                 return;
             case FriendTrioStage.RemoveMarks:
+                var reclaiming = r.Operation == SkillProgramEffectOp.ReclaimFriendXuanjian;
+                bool CanReclaimXuanjian() => r.Cards is [var cardId] && CurrentXuanjianDiscard(f.WindowContext)?.CardId == cardId;
+                if (reclaiming && !CanReclaimXuanjian())
+                {
+                    FinishFriendTrio(f);
+                    return;
+                }
+
                 var marker = Enum.Parse<PlayerMarkerKind>(value);
                 _coreStrategicProgramsOperations.SetStrategicMarker(f.OwnerSeat, marker, f.OwnerSeat, 0, f);
                 if (r.Count > 1)
@@ -345,11 +374,11 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
                     return;
                 }
 
-                if (r.Operation == SkillProgramEffectOp.ReclaimFriendXuanjian)
+                if (reclaiming)
                 {
                     FriendTrioMutation(f, FriendTrioStage.Complete, () =>
                     {
-                        if (_cardZonesOperations._cardZones.GetLocation(r.Cards.Single()) == CardLocation.DiscardPile)
+                        if (CanReclaimXuanjian())
                             _corePhysicalMovementFacadesOperations.MoveCard(_coreCardAttackStateOperations.GetAttackCard(r.Cards.Single()), CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new("friend.xiaxing.reclaim"));
                     });
                     return;

@@ -5,7 +5,16 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
 {
-    internal int[] MatchingShanheSourceChunlaoIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } o && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(o.EffectiveKind) && _coreMatchParticipantsPlayersAccess._players[o.SourceSeat].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(o.SourceSeat, candidate.OwnerSeat) <= 1).Select(x => x.index).ToArray();
+    private bool IsCurrentDiscardEntry(int cardId, int discardSequence) =>
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cardId) == discardSequence;
+
+    internal int[] MatchingShanheSourceChunlaoIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) =>
+        batch.Movements.Select((move, index) => (move, index, origin: _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(move)))
+            .Where(x => x.move.To == CardLocation.DiscardPile && IsCurrentDiscardEntry(x.move.CardId, x.move.Sequence) &&
+                x.origin is { } origin && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) &&
+                _coreMatchParticipantsPlayersAccess._players[origin.SourceSeat].IsAlive &&
+                _coreNativeRuleQueriesOperations.GetCombatDistance(origin.SourceSeat, candidate.OwnerSeat) <= 1)
+            .Select(x => x.index).ToArray();
     internal SkillProgramStepOutcome BeginShanheSourceChunlaoStorage(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -32,7 +41,9 @@ internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceChunlaoStorage: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.SourceSeat || !ShanheSourceChunlaoStorageChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Source3161 requires the original discarding player's exact choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (choice.Parameters["branch"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[r.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(r.CardId) != CardLocation.DiscardPile)
+        if (choice.Parameters["branch"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[r.SourceSeat].IsAlive ||
+            !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) ||
+            !IsCurrentDiscardEntry(r.CardId, r.DiscardSequence))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheSourceChunlaoStorage = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

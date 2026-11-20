@@ -16,7 +16,6 @@ internal interface ICardsMovedWindowFacts : IProgramTriggerQueries
     bool ContainsMovement(CardMovementRecord movement);
     PublicPersistentPileSource? RicePile(ProgramTriggerCandidate candidate);
     bool RiceProducer(PublicPersistentPileSource pile);
-    CardKind GetAttackCardKind(int cardId);
     string PlayerName(int seat);
     string SkillName(string skillId);
 }

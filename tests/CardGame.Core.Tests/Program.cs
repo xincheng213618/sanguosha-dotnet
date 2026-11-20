@@ -817,6 +817,11 @@ var tests = new (string Name, Action Body)[]
     ("OL Boundary Beige: matching rank refunds only the original payment entry cold", OlBoundaryBeigeChecks.BeigeRefundsOnlyTheOriginalMatchingRankPaymentCold),
     ("Shanhe Source Naman: claims only original native response costs cold", ShanheSourceNamanDiscardEntryChecks.NamanCannotClaimARedroppedNativeResponseCostCold),
     ("Boundary Tianxiang: gift original paid discard entry", BoundaryXiaoQiaoTianxiangDiscardEntryChecks.TianxiangGiftsOnlyTheOriginalPaidDiscard),
+    ("OL Qinghe Zengou invalidates Dodge without reclaiming a newer entry cold", OlQingheZengouDiscardEntryChecks.ZengouInvalidatesThePaidDodgeWithoutTakingANewerDiscardCold),
+    ("Classic Zongxuan: own discard requires its original pile entry cold", OwnDiscardZongxuanChecks.ClassicZongxuanOnlyPlacesItsOriginalDiscardEntryCold),
+    ("Mobile Boundary Zongxuan: own discard requires its original pile entry cold", OwnDiscardZongxuanChecks.MobileBoundaryZongxuanOnlyPlacesItsOriginalDiscardEntryCold),
+    ("Friend Xiaxing: original Xuanjian discard entry", FriendXiaxingDiscardEntryChecks.XiaxingCannotSpendMarksOnAnOldDiscardEntry),
+    ("Shanhe Source Chunlao 3161: original distance-one discard entry cold", ShanheSourceChunlao3161DiscardEntryChecks.SourceChunlao3161OffersOnlyTheDiscardersOriginalDistanceOneEntryCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
