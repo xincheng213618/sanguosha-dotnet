@@ -183,7 +183,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
 
     internal void IssueCuiLieDraw(ProgramSkillFrame f)
     {
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCuiLie = f.AnniversaryCuiLie!with { Stage = AnniversaryCuiLieStage.Drawing, Draw = null, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCuiLie = f.AnniversaryCuiLie!with { Stage = AnniversaryCuiLieStage.Drawing, Before = before, After = before } });
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, f.AnniversaryCuiLie!.Number, new(CuiLieDraw));
     }
 
@@ -192,9 +193,9 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryCuiLie!;
-        if (!ValidCuiLie(f) || r.Stage != AnniversaryCuiLieStage.Drawing || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != r.Number || draw.SequenceBefore != r.Before)
+        if (!ValidCuiLie(f) || r.Stage != AnniversaryCuiLieStage.Drawing || CuiLieCompletedDraw(f, r) != draw)
             throw new InvalidOperationException("Zijue lost its once-issued original native draw.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCuiLie = r with { Stage = AnniversaryCuiLieStage.DrawChildren, Draw = draw, After = draw.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCuiLie = r with { Stage = AnniversaryCuiLieStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCuiLieDrawReturnedEvent(f.Id, f.OwnerSeat, r.Number, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
         ContinueCuiLie(f.Id);
     }

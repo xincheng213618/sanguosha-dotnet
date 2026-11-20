@@ -44,7 +44,6 @@ public sealed record AnniversaryCuiLieReceipt(CardConversionSource Source,string
  public long After{get;init;}
  public long PindianId{get;init;}
  public PindianResult? Result{get;init;}
- public NativeDrawOutcome? Draw{get;init;}
  public long UseId{get;init;}
  public long ActionId{get;init;}
 }

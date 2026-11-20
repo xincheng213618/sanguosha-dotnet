@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core.Tests;
 
@@ -9,27 +10,67 @@ internal static class MouDongZhaoOlChecks
     private const string Hero = "mou:dong-zhao-ol", Shunji = "mou-ol:shunji", Yishi = "mou-ol:yishi",
         Driver = "fixture:mdzo-driver", Quiet = "fixture:mdzo-quiet", Owner = "fixture:mdzo-owner", Ally = "fixture:mdzo-ally",
         Enemy = "fixture:mdzo-enemy", Far = "fixture:mdzo-far", Deck = "fixture:mdzo-deck";
+    private const string GainWatch = "fixture:mdzo-shunji-gain", DrawReason = "skill-program.mou-ol:shunji.draw";
 
     public static void RealDamageGiftAndNativeSuitLossObligationCold()
     {
         var s = Scene.Start(); s.Play();
         var crossbow = s.V().Equipment.Single(c => c.Kind == CardKind.Crossbow).Id;
         var dodge = s.V().Hand.Single(c => c.Kind == CardKind.Dodge).Id;
-        var peach = s.V().Hand.Single(c => c.Kind == CardKind.Peach).Id;
+        var armor = s.V().Hand.Single(c => c.Kind == CardKind.SilverLion).Id;
+        s.Accept(new PlayCardCommand(0, armor, [], s.G.Revision, s.P!.PromptId)); s.Play();
+        s.Need(s.V().Equipment.Any(c => c.Id == armor), "The original Silver Lion enters Equipment through a real accepted Use.");
         s.UseDriver("damage-one", targets: [1]);
         s.Reach(() => s.OfferShunji()); s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
         s.Reach(() => s.Verb("draw-2")); s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "draw-2");
-        s.Reach(() => s.Verb("gift-toggle")); s.Cold();
-        foreach (var id in new[] { dodge, peach }) s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "gift-toggle" && c.Cards.SequenceEqual([id]));
-        s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "gift-confirm"); s.Play();
+        s.Reach(() => s.P is { SkillPrompt.SkillId: GainWatch } prompt && prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "continue"));
+
         var shunji = s.E<MouDongZhaoShunjiAcceptedEvent>().Single();
+        var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == shunji.FrameId);
+        var movement = s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.ParentFrameId == parent.Id);
+        var drawReceipt = parent.NativeOperationDrawReturns.Single();
+        var drawn = s.G.CardMovements.Where(move => move.Reason.Value == DrawReason).ToArray();
+        s.Need(parent.MouDongZhao is { Stage: MouDongZhaoStage.DrawChildren, TargetSeat: 1, Draw: null, RequestedDraw: 0 } && parent.NativeDraw is null &&
+            drawReceipt.Operation == SkillProgramEffectOp.ResolveMouDongZhaoShunji && drawReceipt.Reason.Value == DrawReason &&
+            drawReceipt.Outcome is { RecipientSeat: 0, RequestedCount: 2, ActualDrawIds.Count: 2, Replacement: null } &&
+            drawReceipt.Outcome.ActualDrawIds.SequenceEqual(drawn.Select(move => move.CardId)) &&
+            drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)) &&
+            s.E<MouDongZhaoGiftSignedEvent>().Length == 0 && s.E<MouDongZhaoNameSpentEvent>().Length == 0,
+            "Dong Zhao's actual gain observer suspends the original draw with its shared receipt and both cards already moved.");
+
+        var gainPromptId = s.P!.PromptId;
+        s.Cold();
+        var restoredParent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredMovement = s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Id == movement.Id);
+        var runtime = s.G.GetRuntimeModule<CharacterDongZhaoMouOlRuntime>();
+        s.Need(s.P?.PromptId == gainPromptId &&
+            JsonSerializer.Serialize(restoredParent.NativeOperationDrawReturns.Single()) == JsonSerializer.Serialize(drawReceipt) &&
+            runtime.MouDongZhaoFirstChild(restoredParent, restoredMovement) &&
+            !runtime.MouDongZhaoFirstChild(restoredParent with { NativeOperationDrawReturns = [] }, restoredMovement),
+            "Cold return preserves the real gain child and its original native outcome.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => s.Verb("gift-toggle")); s.Cold();
+        s.Need(!s.Verb("gift-confirm"), "The gift cannot confirm before paying the actual draw count.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "gift-toggle" && c.Cards.SequenceEqual([dodge]));
+        s.Need(!s.Verb("gift-confirm"), "One original Hand entity does not satisfy the two-card gift.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "gift-toggle" && c.Cards.SequenceEqual([armor]));
+        s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "gift-confirm"); s.Play();
+        var gifts = s.E<MouDongZhaoGiftSignedEvent>().Where(e => e.FrameId == shunji.FrameId).ToArray();
+        var names = s.E<MouDongZhaoNameSpentEvent>().Where(e => e.FrameId == shunji.FrameId).ToArray();
+        var history = s.G.Events.Select(item => item.Payload).ToArray();
+        var damage = s.E<DamageAppliedEvent>().Where(e => e.SourceSeat == 0 && e.TargetSeat == 1).ToArray();
         s.Need(s.E<MouDongZhaoDrawReturnedEvent>().Single(e => e.FrameId == shunji.FrameId) is { Requested: 2, Actual: 2, Replacement: 0 } &&
-            s.E<MouDongZhaoGiftSignedEvent>().Count(e => e.FrameId == shunji.FrameId) == 2 &&
-            s.E<MouDongZhaoNameSpentEvent>().Where(e => e.FrameId == shunji.FrameId).Select(e => e.Kind).Order().SequenceEqual(new[] { CardKind.Dodge, CardKind.Peach }.Order()) &&
-            new[] { dodge, peach }.All(id => s.V(1).Hand.Any(c => c.Id == id) && s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Hand(0) && m.To == CardLocation.Hand(1)) == 1) &&
-            s.V(1).Hp == 10 && s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 1) == 2 &&
+            s.G.CardMovements.Where(move => move.Reason.Value == DrawReason).SequenceEqual(drawn) &&
+            gifts.Length == 2 && gifts.Any(e => e.CardId == dodge && e.From == CardLocation.Hand(0)) &&
+            gifts.Any(e => e.CardId == armor && e.From == CardLocation.Equipment(0)) &&
+            gifts.All(gift => gift.To == CardLocation.Hand(1) && s.V(1).Hand.Any(c => c.Id == gift.CardId) &&
+                s.G.CardMovements.Count(move => move.Sequence == gift.Sequence && move.CardId == gift.CardId && move.From == gift.From && move.To == gift.To) == 1) &&
+            names.Select(e => e.Kind).Order().SequenceEqual(new[] { CardKind.Dodge, CardKind.SilverLion }.Order()) &&
+            damage.Length == 2 && s.V(1).Hp == 10 &&
+            gifts.Max(e => Array.IndexOf(history, e)) < names.Min(e => Array.IndexOf(history, e)) &&
+            names.Max(e => Array.IndexOf(history, e)) < Array.IndexOf(history, damage[1]) &&
             s.E<MouDongZhaoCompletedEvent>().Count(e => e.FrameId == shunji.FrameId) == 1,
-            "Shunji genuinely draws two, gives exactly two real HE entities, consumes both newly emptied names, then deals only one additional native damage and returns once.");
+            "After both actual gifts arrive from Hand and Equipment, Shunji spends their first lost names, deals one additional damage and completes once.");
 
         s.UseYishi(); s.KeepOnePerSuit(); s.Reach(() => s.Verb("field"));
         s.Answer(c => c.Parameters.GetValueOrDefault("verb") == "field" && c.Cards.SequenceEqual([crossbow]) && c.Targets.SequenceEqual([1])); s.Play();
@@ -100,15 +141,24 @@ internal static class MouDongZhaoOlChecks
                     new { id = "lose-yishi", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "loseOwnerSkillsAndGrant", target = "owner", skillIds = new[] { Yishi }, sourceBind = "standard:none" } } }
                 } },
                 new { id = Quiet, revision = 1, triggers = new[] { new { id = "quiet", window = "afterNormalDraw", subject = "owner", optional = false,
-                    effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } }
+                    effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } },
+                new { id = GainWatch, revision = 1, triggers = new[] { new { id = "shunji-actual-gain", window = "cardsGained", subject = "owner",
+                    optional = false, isSkillInvocation = false, usageScope = "game", usageLimit = 1, destinationZones = new[] { "hand" },
+                    movementOccurrence = "perBatch", movementReasons = new[] { DrawReason }, effects = new[] {
+                        new { op = "chooseOption", target = "owner", resultBind = "gain", options = new[] { new { id = "continue" } } } } } } }
             };
-            var labels = new Dictionary<string, object> { [Driver] = new { name = "真实原生请求", description = "公开支付和效果" }, [Quiet] = new { name = "静默", description = "跳过无关出牌阶段" } };
+            var labels = new Dictionary<string, object>
+            {
+                [Driver] = new { name = "真实原生请求", description = "公开支付和效果" },
+                [Quiet] = new { name = "静默", description = "跳过无关出牌阶段" },
+                [GainWatch] = new { name = "顺机摸牌观察", description = "在顺机实际得牌后暂停。", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } }
+            };
             var programs = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = definitions }),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in programs.Programs) b.AddSkill(new(id, id, "原生小局") { Program = program, ProgramPresentation = programs.Presentations[id] });
             foreach (var kind in new[] { CardKind.Slash, CardKind.Dodge, CardKind.Peach, CardKind.SilverLion, CardKind.Crossbow })
             { var c = CardCatalog.Get(kind); b.AddCard(new("fixture:mdzo-card-" + kind, c.DisplayName, c.CategoryName, c.Description, kind)); }
-            b.AddGeneral(new(Owner, "谋董昭真实主链", "", "standard:none", "wei", 9, [Shunji, Yishi, Driver]));
+            b.AddGeneral(new(Owner, "谋董昭真实主链", "", "standard:none", "wei", 9, [Shunji, Yishi, Driver, GainWatch]));
             foreach (var id in new[] { Ally, Enemy, Far }) b.AddGeneral(new(id, "静默同行", "", Quiet, "wei", 12));
             b.AddDeck(new(Deck, "固定四十八张真实黑杀", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 48).Select(i => new ContentDeckPhysicalCard("fixture:mdzo-card-Slash", Suit.Spade, i % 13 + 1)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "谋董昭OL原生主链", 4, 4, new Dictionary<string, int>(), Deck,

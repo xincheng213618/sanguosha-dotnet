@@ -8,8 +8,10 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     {
         if (!ValidMouDongZhao(f) || f.MouDongZhao is not { } r)
             return false;
-        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return r.Stage == MouDongZhaoStage.Drawing && f.NativeDraw is not null;
+        if (child is NativeDrawAttemptFrame draw)
+            return r.Stage == MouDongZhaoStage.Drawing && (r.Operation == SkillProgramEffectOp.ResolveMouDongZhaoShunji
+                ? NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, r.Operation, ShunjiDrawReason)
+                : CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f));
         if (_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, f))
             return r.Stage is MouDongZhaoStage.GiftChildren or MouDongZhaoStage.MoveChildren;
         if (child is HpChangedTriggerWindowFrame hp)

@@ -13,7 +13,19 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
             SkillProgramEffectOp.ResolveMouDongZhaoYishi => f.TriggerId is null && f.ActivationId == "keep-suits-and-move" && r.Phase is { } phase && phase.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Phase == phase && e.HandCount == r.Hand.Count) == 1,
             _ => f.TriggerId == "follow-suit-loss" && f.ActivationId == f.TriggerId && f.WindowContext is { MovementBatch: { } batch } context && context.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiLossDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantFrameId == r.GrantFrameId && e.BatchId == batch.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1
         };
-        return signed && (r.Draw is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoDrawReturnedEvent>().Count(e => e == new MouDongZhaoDrawReturnedEvent(f.Id, r.Draw.RequestedCount, r.Draw.ActualDrawIds.Count, r.Draw.ReplacementGainedIds.Count, r.Draw.SequenceBefore, r.Draw.SequenceAfter, r.Draw.AttemptFrameId)) == 1);
+        if (!signed)
+            return false;
+        var draw = r.Draw;
+        if (r.Operation == SkillProgramEffectOp.ResolveMouDongZhaoShunji)
+        {
+            draw = CompletedShunjiDraw(f);
+            if (r.Stage == MouDongZhaoStage.Drawing)
+                return draw is not null || NativeDrawProducerRuntime.PendingOperationDraw(f, r.Operation, ShunjiDrawReason) is not null;
+            if (draw is null && r.Stage is (MouDongZhaoStage.DrawChildren or MouDongZhaoStage.ChoosingGift or MouDongZhaoStage.GiftChildren or MouDongZhaoStage.Damage))
+                return false;
+        }
+
+        return draw is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoDrawReturnedEvent>().Count(e => e == new MouDongZhaoDrawReturnedEvent(f.Id, draw.RequestedCount, draw.ActualDrawIds.Count, draw.ReplacementGainedIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId)) == 1;
     }
 
     internal void MutateMouDongZhao(ProgramSkillFrame f, MouDongZhaoStage stage, Action mutation)
@@ -81,7 +93,8 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
 
         if (r.Stage == MouDongZhaoStage.DrawChildren)
         {
-            if (r.Operation == SkillProgramEffectOp.DrawMouDongZhaoYishiLoss || r.GiftCount == 0 || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
+            if (r.Operation == SkillProgramEffectOp.DrawMouDongZhaoYishiLoss ||
+                CompletedShunjiDraw(f) is not { ActualDrawIds.Count: > 0 } || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
             {
                 CompleteMouDongZhao(f);
                 return;

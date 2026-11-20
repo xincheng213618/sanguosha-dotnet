@@ -43,7 +43,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         }
         else
         {
-            if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi || CuiLieUse(f.WindowContext)is not { Action: { } a } u || u.Id != r.UseId || a.ActionId != r.ActionId || a.ActorSeat != r.Actor || r.PindianId <= f.Id || r.Number != 0 || r.Cards.Count != 0 || r.RewardLeases.Count != 0 || r.Draw is not null || r.Stage is AnniversaryCuiLieStage.Number or AnniversaryCuiLieStage.Payment or AnniversaryCuiLieStage.GiveChildren or AnniversaryCuiLieStage.RecoveryChildren or AnniversaryCuiLieStage.Drawing or AnniversaryCuiLieStage.DrawChildren || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLiePindianIssuedEvent>().Count(e => e == new AnniversaryCuiLiePindianIssuedEvent(f.Id, r.PindianId, r.Actor)) != 1)
+            if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi || CuiLieUse(f.WindowContext)is not { Action: { } a } u || u.Id != r.UseId || a.ActionId != r.ActionId || a.ActorSeat != r.Actor || r.PindianId <= f.Id || r.Number != 0 || r.Cards.Count != 0 || r.RewardLeases.Count != 0 || r.Stage is AnniversaryCuiLieStage.Number or AnniversaryCuiLieStage.Payment or AnniversaryCuiLieStage.GiveChildren or AnniversaryCuiLieStage.RecoveryChildren or AnniversaryCuiLieStage.Drawing or AnniversaryCuiLieStage.DrawChildren || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLiePindianIssuedEvent>().Count(e => e == new AnniversaryCuiLiePindianIssuedEvent(f.Id, r.PindianId, r.Actor)) != 1)
                 return false;
             if (r.Stage != AnniversaryCuiLieStage.Pindian && (r.Result is not { } result || result.SourceSeat != f.OwnerSeat || result.OpponentSeat != r.Actor || _resolutionStackOperations._resolutionStack.Any(x => x.Id == r.PindianId) || f.PindianResultBindings.SingleOrDefault(b => b.Name == CuiLieContest)is not { } binding || binding.SourceSeat != result.SourceSeat || binding.OpponentSeat != result.OpponentSeat || binding.SourceRank != result.SourceRank || binding.OpponentRank != result.OpponentRank || binding.SourceWon != result.SourceWon || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId && e.Result == result) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLiePindianReturnedEvent>().Count(e => e == new AnniversaryCuiLiePindianReturnedEvent(f.Id, r.PindianId, result.SourceRank, result.OpponentRank, result.SourceWon)) != 1))
                 return false;
@@ -51,10 +51,16 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
                 return false;
         }
 
-        if (r.Draw is { } d && (d.RecipientSeat != f.OwnerSeat || d.RequestedCount != r.Number || d.SequenceBefore != r.Before || d.SequenceAfter != r.After || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDrawReturnedEvent>().Any(e => e == new AnniversaryCuiLieDrawReturnedEvent(f.Id, f.OwnerSeat, r.Number, d.ActualDrawIds.Count, r.Before, r.After))))
-            return false;
-        return true;
+        // A second proved lease can be Drawing on the same instruction while
+        // the previous draw's completed receipt is still present on the frame.
+        return r.Stage != AnniversaryCuiLieStage.DrawChildren || CuiLieCompletedDraw(f, r) is not null;
     }
+
+    private NativeDrawOutcome? CuiLieCompletedDraw(ProgramSkillFrame f, AnniversaryCuiLieReceipt r) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, r.Operation, new(CuiLieDraw)) is { } draw &&
+        draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Number && draw.SequenceBefore == r.Before &&
+        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
+
     internal bool CuiLieMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.GiveChildren or AnniversaryCuiLieStage.RecoveryChildren or AnniversaryCuiLieStage.DrawChildren or AnniversaryCuiLieStage.PindianChildren or AnniversaryCuiLieStage.MutationChildren } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidCuiLie(f);
     internal bool IsAnniversaryCuiLiePindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.PindianChildren, Result: { } result } r && ValidCuiLie(f) && batch.ParentFrameId == r.PindianId && batch.AwaitingProgramFrameId is null && batch.TurnNumber == r.Turn && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && batch.Movements.Count is >= 1 and <= 2 && batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(x => x == m) == 1 && (m.CardId == result.SourceCardId || m.CardId == result.OpponentCardId) && (m.To == CardLocation.Processing && (m.Reason == CardMoveReasons.PindianReveal || m.Reason.Value == "pindian.reserve-top") || m.From == CardLocation.Processing && (m.Reason == CardMoveReasons.PindianFinish || m.Reason.Value == "program.pindian.claim")));
     internal bool CuiLieFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -64,9 +70,22 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (child is PindianFrame pair)
             return r.Stage == AnniversaryCuiLieStage.Pindian && pair.Id == r.PindianId && pair.ParentFrameId == f.Id && pair.SourceSeat == f.OwnerSeat && pair.OpponentSeat == r.Actor && pair.SkillId == f.SkillId && pair.ProgramResultBind == CuiLieContest;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryCuiLieStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Number);
+            return r.Stage == AnniversaryCuiLieStage.Drawing && NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, r.Operation, new(CuiLieDraw));
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (IsAnniversaryCuiLiePindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        {
+            if (f.PendingMovementContinuation is not { } p || !CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) ||
+                !(IsAnniversaryCuiLiePindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved)))
+                return false;
+
+            var (before, after) = (r.Before, r.After);
+            if (r.Stage == AnniversaryCuiLieStage.DrawChildren)
+            {
+                if (CuiLieCompletedDraw(f, r) is not { } outcome)
+                    return false;
+                (before, after) = (outcome.SequenceBefore, outcome.SequenceAfter);
+            }
+            return moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+        }
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == AnniversaryCuiLieStage.RecoveryChildren && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)

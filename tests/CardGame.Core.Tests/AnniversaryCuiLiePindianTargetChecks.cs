@@ -9,6 +9,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
     private const string Mode = "identity:anniversary-chibi-target", Deck = "fixture:anniversary-chibi-target-deck";
     private const string DrawWatch = "fixture:anniversary-zijue-native-draw";
     private const string RecoveryWatch = "fixture:anniversary-zijue-recovery";
+    private const string ZijueDrawReason = "skill-program.anniversary:zijue.draw";
     private static readonly string[] Generals =
         ["fixture:anniversary-chibi-user", Hero, "fixture:anniversary-chibi-far", "fixture:anniversary-chibi-near"];
 
@@ -126,17 +127,21 @@ internal static class AnniversaryCuiLiePindianTargetChecks
                         Submit(new EndPlayPhaseCommand(play.PlayerSeat, game.Revision, play.PromptId));
                         break;
                     default:
-                        throw new InvalidOperationException("The Zijue fixture encountered an unexpected decision or game end.");
+                        throw new InvalidOperationException($"Unexpected Zijue prompt {Prompt()?.Kind}/{Prompt()?.SkillPrompt?.SkillId} for seat {Prompt()?.PlayerSeat}.");
                 }
             }
             throw new InvalidOperationException("The Zijue fixture missed its expected boundary.");
         }
+        void Choose(Func<PromptChoice, bool> select)
+        {
+            var menu = Prompt()!;
+            var choice = menu.Choices.Single(select);
+            Submit(new AnswerPromptCommand(menu.PlayerSeat, menu.PromptId, choice.Id, game.Revision));
+        }
         void Answer(int seat, Func<PromptChoice, bool> select)
         {
             Reach(() => Prompt() is { } prompt && prompt.PlayerSeat == seat && prompt.SkillPrompt?.SkillId == skill);
-            var menu = Prompt()!;
-            var choice = menu.Choices.Single(select);
-            Submit(new AnswerPromptCommand(seat, menu.PromptId, choice.Id, game.Revision));
+            Choose(select);
         }
         bool InRecipientHand(int card) => game.CreateSnapshot(recipient).Players[recipient].Hand.Any(item => item.Id == card);
 
@@ -223,6 +228,59 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             game.GetCombatDistance(recipient, source) == ordinaryDistance + amount,
             "Cold restore on the recipient's turn retains the physical payment and the original active benefit.");
 
+        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: recipient });
+        var chain = game.GetLegalActions(recipient).First(action => action.Kind == LegalActionKind.IronChain &&
+            action.ConversionSource is null && action.CardId is { } id && !payment.Contains(id) && action.TargetSeats.SequenceEqual([2, 3]));
+        Submit(new PlayCardCommand(recipient, chain.CardId!.Value, chain.TargetSeats, game.Revision, Prompt()!.PromptId, chain.PlayedCardKind));
+        Reach(() => Prompt() is { PlayerSeat: source, SkillPrompt.SkillId: Chibi });
+        var use = game.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.CardId == chain.CardId);
+        Choose(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        Reach(() => Prompt() is { Kind: DecisionKind.SkillModule, PlayerSeat: source, SkillPrompt.SkillId: Chibi });
+        var pair = game.ResolutionStack.OfType<PindianFrame>().Single();
+        var sourceCard = Prompt()!.ValidCardIds.First();
+        Choose(choice => choice.Cards.SequenceEqual([sourceCard]));
+        Reach(() => Prompt() is { Kind: DecisionKind.SkillModule, PlayerSeat: recipient, SkillPrompt.SkillId: Chibi });
+        var opponentCard = Prompt()!.ValidCardIds.First(id => !payment.Contains(id));
+        Choose(choice => choice.Cards.SequenceEqual([opponentCard]));
+        Reach(() => Prompt() is { PlayerSeat: source, SkillPrompt.SkillId: RecoveryWatch });
+
+        var reveal = game.ResolutionStack.OfType<PindianRevealWindowFrame>().Single(frame => frame.ParentFrameId == pair.Id);
+        var reward = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame =>
+            frame.AnniversaryCuiLie?.Operation == SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw);
+        var gain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.ParentFrameId == reward.Id);
+        var draw = Facts<AnniversaryCuiLieDrawReturnedEvent>().Single();
+        var receipt = reward.NativeOperationDrawReturns.Single();
+        var movement = game.CardMovements.Single(move => move.Reason.Value == ZijueDrawReason);
+        Need(pair.SourceSeat == source && pair.OpponentSeat == recipient && reward.WindowContext?.ParentFrameId == reveal.Id &&
+            reveal.Cards.Any(card => card.Seat == source && card.CardId == sourceCard) &&
+            reveal.Cards.Any(card => card.Seat == recipient && card.CardId == opponentCard) &&
+            reward.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.DrawChildren, Cursor: 0 } paid && paid.RewardLeases.SequenceEqual([lease.FrameId]) &&
+            receipt.InstructionIndex == reward.InstructionIndex && receipt.Operation == SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw &&
+            receipt.Reason.Value == ZijueDrawReason && receipt.Outcome is { RecipientSeat: source, RequestedCount: 1, Replacement: null } outcome &&
+            outcome.ActualDrawIds.SequenceEqual([movement.CardId]) && movement.From == CardLocation.DrawPile && movement.To == CardLocation.Hand(source) &&
+            draw == new AnniversaryCuiLieDrawReturnedEvent(reward.Id, source, 1, 1, outcome.SequenceBefore, outcome.SequenceAfter) &&
+            Facts<PindianResultDeterminedEvent>().All(fact => fact.FrameId != pair.Id),
+            "The original paid lease delivers one physical card to Cui Lie inside the reveal of both exact Pindian inputs.");
+
+        var gainPromptId = Prompt()!.PromptId;
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredReward = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == reward.Id);
+        var restoredGain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Id == gain.Id);
+        runtime = game.GetRuntimeModule<CharacterCuiLieAnniversaryRuntime>();
+        Need(Prompt()?.PromptId == gainPromptId && restoredReward.WindowContext?.ParentFrameId == reveal.Id &&
+            game.ResolutionStack.OfType<PindianRevealWindowFrame>().Any(frame => frame.Id == reveal.Id && frame.ParentFrameId == pair.Id) &&
+            JsonSerializer.Serialize(restoredReward.NativeOperationDrawReturns.Single()) == JsonSerializer.Serialize(receipt) &&
+            runtime.CuiLieFirstChild(restoredReward, restoredGain),
+            "Cold restore preserves the original Pindian reveal and shared paid draw before comparison.");
+        Choose(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: recipient });
+        var result = Facts<PindianResultDeterminedEvent>().Single(fact => fact.FrameId == pair.Id).Result;
+        Need(result is { SourceWon: true, SourceRank: 10, OpponentRank: 8 } &&
+            Facts<AnniversaryCuiLieDrawReturnedEvent>().Single() == draw &&
+            game.CardMovements.Single(move => move.Reason.Value == ZijueDrawReason) == movement &&
+            Facts<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardId == chain.CardId) == 1,
+            "The original Iron Chain finishes after the lease adds two to the revealed rank and awards one card once.");
+
         Reach(() => Facts<TurnStartedEvent>().Last().ActorSeat == source, passPlay: true);
         Need(Facts<TurnStartedEvent>().Count(turn => turn.ActorSeat == source) == 2 &&
             Facts<TurnStartedEvent>().Last().TurnNumber > foreignStart.TurnNumber &&
@@ -234,7 +292,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
     internal static void DeclinedGiftReturnsOriginalNativeDrawCold()
     {
         const int owner = 0, declarer = 1, count = 4;
-        const string skill = "anniversary:zijue", reason = "skill-program.anniversary:zijue.draw";
+        const string skill = "anniversary:zijue", reason = ZijueDrawReason;
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(DrawWatch));
         var game = GameEngine.CreateStandard(new GameOptions
         {
@@ -310,12 +368,45 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             "Cold restore retains Zijue's original request and rejects a different parent, recipient, or count.");
         Answer(Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: DrawWatch }),
             choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
-        Reach(prompt => prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: owner });
 
+        var gainPrompt = Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: DrawWatch });
+        var paid = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var gain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.ParentFrameId == parent.Id);
         var returned = Facts<AnniversaryCuiLieDrawReturnedEvent>().Single();
         var drawn = game.CardMovements.Where(move => move.Reason.Value == reason).ToArray();
+        var receipt = paid.NativeOperationDrawReturns.Single();
+        Need(paid.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.DrawChildren } && paid.NativeDraw is null &&
+            receipt.InstructionIndex == parent.InstructionIndex && receipt.Operation == SkillProgramEffectOp.ResolveAnniversaryCuiLieZijue &&
+            receipt.Reason.Value == reason && receipt.Outcome is { RecipientSeat: owner, RequestedCount: count, Replacement: null } outcome &&
+            outcome.AttemptFrameId == attempt.Id && outcome.ActualDrawIds.SequenceEqual(drawn.Select(move => move.CardId)) &&
+            outcome.SequenceBefore == parent.AnniversaryCuiLie!.Before && outcome.SequenceBefore == returned.Before && outcome.SequenceAfter == returned.After &&
+            Facts<AnniversaryCuiLieCompletedEvent>().Length == 0,
+            "The actual gain window holds the delivered native receipt and its original issue baseline before Zijue completes.");
+
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredPaid = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredGain = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Id == gain.Id);
+        var resumedGain = Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: DrawWatch });
+        runtime = game.GetRuntimeModule<CharacterCuiLieAnniversaryRuntime>();
+        Need(resumedGain.PromptId == gainPrompt.PromptId &&
+            JsonSerializer.Serialize(restoredPaid.NativeOperationDrawReturns.Single()) == JsonSerializer.Serialize(receipt) &&
+            runtime.CuiLieFirstChild(restoredPaid, restoredGain) &&
+            !runtime.CuiLieFirstChild(restoredPaid with { NativeOperationDrawReturns = [] }, restoredGain),
+            "Cold restore keeps the paid materials on the original frame and rejects its gain child without the native receipt.");
+        Answer(resumedGain, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        for (var step = 1; step <= count; step++)
+        {
+            var next = Reach(prompt => prompt is { PlayerSeat: owner } &&
+                (prompt.Kind == DecisionKind.PlayCard || prompt.SkillPrompt?.SkillId == DrawWatch));
+            if (next.Kind == DecisionKind.PlayCard) break;
+            Answer(next, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        }
+        Reach(prompt => prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: owner });
+
         Need(returned is { Recipient: owner, Requested: count, Actual: count } &&
             returned.FrameId == parent.Id && returned.Before == attempt.Context.SequenceBefore &&
+            Facts<AnniversaryCuiLieDrawReturnedEvent>().SequenceEqual([returned]) &&
+            game.CardMovements.Where(move => move.Reason.Value == reason).SequenceEqual(drawn) &&
             drawn.Length == count && drawn.Select(move => move.CardId).Distinct().Count() == count &&
             drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(owner) &&
                 move.Sequence > returned.Before && move.Sequence <= returned.After) &&
@@ -344,16 +435,21 @@ internal static class AnniversaryCuiLiePindianTargetChecks
                 var condition = isRecovery ? """{"kind":"healthChangeKindIs","hpChangeKind":"recovery"}""" : """{"kind":"phaseIsPlay"}""";
                 var binding = isRecovery ? "recovery" : "draw";
                 var title = isRecovery ? "观察赀爵恢复" : "观察赀爵摸牌";
-                var description = isRecovery ? "暂停于原生体力变化。" : "暂停于原生摸牌请求。";
+                var description = isRecovery ? "暂停于原生恢复和租约得牌。" : "暂停于原生摸牌请求和获得牌。";
                 var activations = isRecovery ? """
                     ,"activations":[{"id":"wound","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving",
                      "usesPerTurn":1,"effects":[{"op":"loseHp","target":"owner","amount":1}]}]
                     """ : string.Empty;
+                var gainTrigger = $$"""
+                    ,{"id":"zijue-real-gain","window":"cardsGained","subject":"owner","destinationZones":["hand"],
+                      "movementOccurrence":"perBatch","movementReasons":["{{ZijueDrawReason}}"],"optional":false,"isSkillInvocation":false,
+                      "effects":[{"op":"chooseOption","target":"owner","resultBind":"gain","options":[{"id":"continue"}]}]}
+                    """;
                 var catalog = SkillProgramCatalog.Load($$"""
                     {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{watcher}}","revision":1{{activations}},"triggers":[
                       {"id":"{{trigger}}","window":"{{window}}","subject":"owner","condition":{{condition}},
                        "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"{{binding}}",
-                        "options":[{"id":"continue"}]}]}]}]}
+                        "options":[{"id":"continue"}]}]}{{gainTrigger}}]}]}
                     """, JsonSerializer.Serialize(new
                     {
                         schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
@@ -366,7 +462,7 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             CharacterFixtureContent.Register(watcher is null ? builder : new WatchedOwner(builder, watcher), Hero);
             foreach (var general in Generals.Where(id => id != Hero))
                 builder.AddGeneral(new(general, "固定同桌", "supporter", "standard:none", "wei", 4));
-            builder.AddDeck(new(Deck, "斥避固定牌堆", 2, 0, [])
+            builder.AddDeck(new(Deck, "斥避固定牌堆", watcher == RecoveryWatch ? 3 : 2, 0, [])
             {
                 PhysicalCards = Enumerable.Range(0, 24)
                     .Select(_ => new ContentDeckPhysicalCard("standard:iron_chain", Suit.Club, 8)).ToArray()

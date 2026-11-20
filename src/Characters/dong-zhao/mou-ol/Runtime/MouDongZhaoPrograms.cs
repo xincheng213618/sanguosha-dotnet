@@ -7,7 +7,7 @@ public sealed record MouDongZhaoNameCount(CardKind Kind, int Count);
 public sealed record MouDongZhaoHandEntity(int CardId, CardKind Kind, Suit Suit);
 public sealed record MouDongZhaoReceipt(CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Operation,
     MouDongZhaoStage Stage, long WindowId, int RoundNumber, int TargetSeat, ActualDiscardRecoveryPhaseKey? Phase = null,
-    int RequestedDraw = 0, int GiftCount = 0, NativeDrawOutcome? Draw = null, bool NamesFrozen = false,
+    int RequestedDraw = 0, NativeDrawOutcome? Draw = null, bool NamesFrozen = false,
     bool LostHand = false, int? MovedCardId = null, Suit? MovedSuit = null, bool FieldMoved = false,
     long Before = 0, long After = 0, long? GrantFrameId = null)
 {

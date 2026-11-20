@@ -5,6 +5,11 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMouOlRuntime
 {
+    private static CardMoveReason ShunjiDrawReason => new("skill-program.mou-ol:shunji.draw");
+
+    private static NativeDrawOutcome? CompletedShunjiDraw(ProgramSkillFrame frame) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(frame, frame.InstructionIndex, SkillProgramEffectOp.ResolveMouDongZhaoShunji, ShunjiDrawReason);
+
     internal static CardConversionSource MouDongZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasMouDongZhao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouDongZhaoShunji) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouDongZhaoYishi);
 
@@ -42,11 +47,13 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
             return Array.AsReadOnly(Enumerable.Range(0, 3).Select(n => MouDongZhaoChoice(f, "draw-" + n, $"摸{(n)}张牌，再交给{(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)}等量牌")).ToArray());
         if (r.Stage == MouDongZhaoStage.ChoosingGift)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || MouDongZhaoHE(f.OwnerSeat).Length < r.GiftCount)
+            var draw = CompletedShunjiDraw(f) ?? throw new InvalidOperationException("Shunji lost its original completed draw before choosing a gift.");
+            var count = draw.ActualDrawIds.Count;
+            if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || MouDongZhaoHE(f.OwnerSeat).Length < count)
                 return[];
-            var choices = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, canSelect: (_, card) => r.Selected.Contains(card.Id) || r.Selected.Count < r.GiftCount, destination: SkillProgramCardDestination.SelectedTargetHand, destinationSeat: r.TargetSeat).Select(c => MouDongZhaoChoice(f, "gift-toggle", c.Description, c.Cards, native: c.Parameters)).ToList();
-            if (r.Selected.Count == r.GiftCount)
-                choices.Add(MouDongZhaoChoice(f, "gift-confirm", $"交出{(r.GiftCount)}张牌"));
+            var choices = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, canSelect: (_, card) => r.Selected.Contains(card.Id) || r.Selected.Count < count, destination: SkillProgramCardDestination.SelectedTargetHand, destinationSeat: r.TargetSeat).Select(c => MouDongZhaoChoice(f, "gift-toggle", c.Description, c.Cards, native: c.Parameters)).ToList();
+            if (r.Selected.Count == count)
+                choices.Add(MouDongZhaoChoice(f, "gift-confirm", $"交出{count}张牌"));
             return Array.AsReadOnly(choices.ToArray());
         }
 
@@ -84,11 +91,11 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
         if (r.Stage == MouDongZhaoStage.ChoosingDraw)
         {
             var count = int.Parse(verb[5..], CultureInfo.InvariantCulture);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = r with { RequestedDraw = count, Stage = count == 0 ? MouDongZhaoStage.Complete : MouDongZhaoStage.Drawing } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = r with { Stage = count == 0 ? MouDongZhaoStage.Complete : MouDongZhaoStage.Drawing } });
             if (count == 0)
                 CompleteMouDongZhao(f);
             else
-                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, count, new("skill-program.mou-ol:shunji.draw"));
+                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, count, ShunjiDrawReason);
             return;
         }
 
@@ -136,9 +143,11 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     internal void ReturnMouDongZhaoDraw(ProgramSkillFrame f, NativeDrawOutcome draw)
     {
         var r = f.MouDongZhao;
-        if (r is not { Stage: MouDongZhaoStage.Drawing, Draw: null } || !ValidMouDongZhao(f) || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != r.RequestedDraw)
+        var shunji = r?.Operation == SkillProgramEffectOp.ResolveMouDongZhaoShunji;
+        if (r is not { Stage: MouDongZhaoStage.Drawing, Draw: null } || !ValidMouDongZhao(f) ||
+            (shunji ? f.NativeDraw is not null || CompletedShunjiDraw(f) != draw : draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != r.RequestedDraw))
             throw new InvalidOperationException("OL Dong Zhao's native draw must return to its single issued owner.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = r with { Stage = MouDongZhaoStage.DrawChildren, Draw = draw, GiftCount = draw.ActualDrawIds.Count, Before = draw.SequenceBefore, After = draw.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = r with { Stage = MouDongZhaoStage.DrawChildren, Draw = shunji ? null : draw, Before = draw.SequenceBefore, After = draw.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoDrawReturnedEvent(f.Id, draw.RequestedCount, draw.ActualDrawIds.Count, draw.ReplacementGainedIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId));
         SealMouDongZhaoMovements(f.Id, draw.SequenceBefore);
         ContinueMouDongZhao(f.Id);
