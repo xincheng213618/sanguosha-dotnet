@@ -22,7 +22,8 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
                 _ => false
             };
         if (g.SkillId == HappyTscPowei)
-            return !HappyTscAwakened(g.OwnerSeat) && HappyTscFieldWei() == 0;
+            return !HappyTscAwakened(g.OwnerSeat) && (HappyTscFieldWei() == 0 ||
+                _awakeningOverrides.Granted(g.OwnerSeat, g.SkillId, g.Candidate.BindingId, g.Candidate.SkillInstanceId));
         if (g.SkillId == HappyTscShenzhu)
             return g.Trigger.Id == "start-slash" || g.Context.CardUse is { } completed && completed.ActorSeat == g.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(completed.ParentCardUseFrameId)?.Action is { PhysicalCards.Count: 1, ConversionChain.Count: 0 };
         return true;
@@ -62,7 +63,10 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
         if (f.HappyTaishiCi is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context)
             throw new InvalidOperationException("Happy Taishi Ci requires its original unissued instruction.");
         var awake = op == SkillProgramEffectOp.AwakenHappyTaishiCiPowei;
-        if (awake ? f.SkillId != HappyTscPowei || context.Window != SkillProgramTriggerWindow.AfterTurnEnded || HappyTscAwakened(f.OwnerSeat) || HappyTscFieldWei() != 0 : op != SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash || f.SkillId != HappyTscShenzhu || context.Window != SkillProgramTriggerWindow.TurnBeforeStart)
+        if (awake
+            ? f.SkillId != HappyTscPowei || context.Window != SkillProgramTriggerWindow.AfterTurnEnded || HappyTscAwakened(f.OwnerSeat) ||
+                (HappyTscFieldWei() != 0 && !_awakeningOverrides.Issued(f))
+            : op != SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash || f.SkillId != HappyTscShenzhu || context.Window != SkillProgramTriggerWindow.TurnBeforeStart)
             throw new InvalidOperationException("Happy Taishi Ci lost its actual awakening or own-turn start.");
         var count = awake ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyTaishiCiWeiRemovedEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Sum(e => e.Count) : 1;
         var r = new HappyTaishiCiReceipt(CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, op, count, awake ? HappyTaishiCiStage.GrantChildren : HappyTaishiCiStage.MovementChildren, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);

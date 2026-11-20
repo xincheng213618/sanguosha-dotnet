@@ -88,7 +88,8 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         if (child is PindianFrame p)
             return r.Stage == HappyDiaoChanStage.Pindian && p.Id == r.PindianId && p.ParentFrameId == f.Id && p.SourceSeat == r.PairSource && p.OpponentSeat == r.PairOpponent && p.SkillId == f.SkillId && p.ProgramResultBind == HappyDcPindian;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return moved.ResumeProgramFrameId == f.Id && (IsHappyDiaoChanPindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) ||
+                moved.ResumeProgramFrameId == f.Id && IsHappyDiaoChanPindianSettlementBatch(f, moved.Batch);
         return false;
     }
 

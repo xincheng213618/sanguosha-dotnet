@@ -978,6 +978,8 @@ var tests = new (string Name, Action Body)[]
     ("Wu Lu Xun Ruxian: issued permission expires at next own actual start", WuLuXunRuxianTurnStartChecks.IssuedPermissionExpiresAtNextOwnActualStart),
     ("Anniversary Liu You Kannan: actual Play offers only eligible Pindian opponents cold", AnniversaryLiuYouPindianTargetChecks.ActualPlayPublishesAndRestoresOriginalPindian),
     ("Happy Diao Chan Huoxin: paid ordered private Pindian pair cold", HappyDiaoChanPindianTargetChecks.PaidHuoxinKeepsOrderedPrivatePairCold),
+    ("Happy Diao Chan Huoxin: paid cost movement keeps original pair cold", HappyDiaoChanPindianTargetChecks.PaidHuoxinCostMovementKeepsOriginalPairCold),
+    ("Happy Taishi Ci Powei: paid foreign Huishi awakens at actual ending with Wei cold", HappyTaishiCiPoweiHuishiChecks.PaidForeignHuishiAwakensAtActualEndingWithWeiCold),
     ("OL Guan Hai Youque: actual bait requires input and preserves its original entity cold", OlGuanHaiPindianInputChecks.RealBaitNeedsPindianInputAndKeepsItsOriginalEntityCold),
     ("OL Sun Ru Weimian: original recovery request and application return cold", SunRuWeimianRecoveryChecks.ActualWeimianReturnsFromReplacementAndOriginalApplicationCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
