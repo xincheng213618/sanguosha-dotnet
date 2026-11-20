@@ -8,7 +8,6 @@ public sealed record MouGuanPingReceipt(MouGuanPingUseReceipt Use, long WindowId
 {
     private readonly IReadOnlyList<int> _targets = [];
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
-    public NativeDrawOutcome? Draw { get; init; }
 }
 public sealed partial record CardUseFrame
 {

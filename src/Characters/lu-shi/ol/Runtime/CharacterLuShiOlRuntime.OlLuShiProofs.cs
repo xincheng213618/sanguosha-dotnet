@@ -3,15 +3,35 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuShiOlRuntime
 {
+    private static CardMoveReason OlLuShiDrawReason => new("skill.ol.lushi.draw");
+
+    private static NativeDrawOutcome? CompletedOlLuShiZhuyanDraw(ProgramSkillFrame f) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveOlLuShiZhuyan, OlLuShiDrawReason);
+
     internal bool HasOlLuShiJudgmentProof(ProgramSkillFrame f) => f.OlLuShi is { Operation: SkillProgramEffectOp.ResolveOlLuShiLeijie, Item: "slashes" } r && f.JudgmentOutcomeBindings is [var outcome] && outcome is { Name: "leijie-result", Suit: Suit.Spade, Rank: >= 2 and <= 9 } && outcome.TargetSeat == r.TargetSeat && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, outcome);
-    internal bool OlLuShiMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
+    private bool OlLuShiMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending, CardsMovedTriggerWindowFrame moved)
     {
         if (f.OlLuShi is not { Stage: OlLuShiStage.Children } r || effect?.Op != r.Operation || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
             return false;
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiMovementEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Before != r.Before || paid.After != r.After || paid.TargetSeat != r.TargetSeat)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiMovementEvent>().Where(e => e.FrameId == f.Id).ToArray() is not [var paid] || paid.TargetSeat != r.TargetSeat)
             return false;
-        var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
-        return paid.Draw ? r.Draw is { } draw && draw.ActualDrawIds.Count == paid.Count && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason.Value == "skill.ol.lushi.draw") == 1) : r.Cards.Count == r.RequiredCount && paid.Count == r.Cards.Count && r.Cards.Distinct().Count() == r.Cards.Count && r.Cards.All(id => moves.Count(m => m.CardId == id && (m.From == CardLocation.Hand(r.TargetSeat) || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == CardLocation.Hand(r.TargetSeat)) && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.Reason.Value == "skill.ol.zhuyan.discard") == 1);
+
+        var sharedDraw = paid.Draw && r.Operation == SkillProgramEffectOp.ResolveOlLuShiZhuyan;
+        if (!sharedDraw && (paid.Before != r.Before || paid.After != r.After))
+            return false;
+        var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > paid.Before && m.Sequence <= paid.After).ToArray();
+        if (!CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || !moved.Batch.Movements.All(m => moves.Contains(m)))
+            return false;
+
+        if (paid.Draw)
+        {
+            var draw = sharedDraw ? CompletedOlLuShiZhuyanDraw(f) : r.Draw;
+            return draw is not null && draw.ActualDrawIds.Count == paid.Count && draw.SequenceBefore == paid.Before && draw.SequenceAfter == paid.After &&
+                (!sharedDraw || draw.RecipientSeat == r.TargetSeat && draw.RequestedCount == r.Amount) &&
+                draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == OlLuShiDrawReason) == 1);
+        }
+
+        return r.Cards.Count == r.RequiredCount && paid.Count == r.Cards.Count && r.Cards.Distinct().Count() == r.Cards.Count && r.Cards.All(id => moves.Count(m => m.CardId == id && (m.From == CardLocation.Hand(r.TargetSeat) || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == CardLocation.Hand(r.TargetSeat)) && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.Reason.Value == "skill.ol.zhuyan.discard") == 1);
     }
 
     internal bool OlLuShiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -27,7 +47,7 @@ internal sealed partial class CharacterLuShiOlRuntime
         if (r.Stage != OlLuShiStage.Children)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } pending && OlLuShiMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } pending && OlLuShiMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending, moved);
         if (child is RecoveryReplacementFrame recovery)
             return r.Item == "hp" && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == r.TargetSeat && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.Program && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program;
         if (child is HpChangedTriggerWindowFrame hp)

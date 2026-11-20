@@ -53,7 +53,7 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
         if (option == 0) { Complete(f); return; }
         var mask = r.Mask | 1 << (option - 1);
         events.AdvanceFact(new MouGuanPingOptionEvent(f.Id, r.Use.UseId, r.Use.ActionId, f.OwnerSeat, r.Use.ActualTurn, r.Use.TurnOwner, r.Cursor, option));
-        frames.ReplaceTop(f = f with { MouGuanPing = r with { Cursor = r.Cursor + 1, Mask = mask, Stage = option == 1 ? MouGuanPingStage.Drawing : MouGuanPingStage.Children, Draw = null } });
+        frames.ReplaceTop(f = f with { MouGuanPing = r with { Cursor = r.Cursor + 1, Mask = mask, Stage = option == 1 ? MouGuanPingStage.Drawing : MouGuanPingStage.Children } });
         if (option == 1) { draws.BeginOperationProgramDraw(f, f.OwnerSeat, 1, new(DrawReason)); return; }
         if (option == 2) foreach (var target in r.Targets.Where(facts.Alive)) native.Suppress(f, target);
         Continue(f.Id);
@@ -77,9 +77,12 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouGuanPingWuwei)]
     private void DrawReturned(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (!Valid(f) || f.MouGuanPing is not { Stage: MouGuanPingStage.Drawing, Draw: null } r || outcome.RequestedCount != 1 || outcome.RecipientSeat != f.OwnerSeat)
+        f = frames.ActiveProgram(f.Id);
+        if (!Valid(f) || f.MouGuanPing is not { Stage: MouGuanPingStage.Drawing } r || f.NativeDraw is not null ||
+            NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveMouGuanPingWuwei, new(DrawReason)) != outcome ||
+            outcome.RequestedCount != 1 || outcome.RecipientSeat != f.OwnerSeat)
             throw new InvalidOperationException("Wuwei draw requires the exact once-issued native option draw.");
-        frames.ReplaceTop(f = f with { MouGuanPing = r with { Stage = MouGuanPingStage.Children, Draw = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        frames.ReplaceTop(f = f with { MouGuanPing = r with { Stage = MouGuanPingStage.Children }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         events.AdvanceFact(new MouGuanPingDrawReturnedEvent(f.Id, r.Cursor - 1, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.AttemptFrameId)); Continue(f.Id);
     }
     private void Complete(ProgramSkillFrame f)

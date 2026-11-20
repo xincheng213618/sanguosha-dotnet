@@ -265,7 +265,7 @@ internal sealed partial class CharacterLuShiOlRuntime
             if (count > 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OlLuShi = r with { Stage = OlLuShiStage.Drawing, Amount = count } });
-                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.TargetSeat, count, new("skill.ol.lushi.draw"));
+                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.TargetSeat, count, OlLuShiDrawReason);
                 return true;
             }
 
@@ -300,14 +300,22 @@ internal sealed partial class CharacterLuShiOlRuntime
 
     internal bool DrainOlLuShi(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOlLuShiZhuyan)]
-    internal void ReturnOlLuShiZhuyanDraw(ProgramSkillFrame f, NativeDrawOutcome o) => ReturnOlLuShiDraw(f, o);
+    internal void ReturnOlLuShiZhuyanDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
+    {
+        if (CompletedOlLuShiZhuyanDraw(f) != outcome)
+            throw new InvalidOperationException("Zhuyan draw lost its original native operation return.");
+        ReturnOlLuShiDraw(f, outcome, retainRoleReceipt: false);
+    }
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOlLuShiLeijie)]
-    internal void ReturnOlLuShiLeijieDraw(ProgramSkillFrame f, NativeDrawOutcome o) => ReturnOlLuShiDraw(f, o);
-    internal void ReturnOlLuShiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
+    internal void ReturnOlLuShiLeijieDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => ReturnOlLuShiDraw(f, outcome, retainRoleReceipt: true);
+    private void ReturnOlLuShiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome, bool retainRoleReceipt)
     {
         if (f.OlLuShi is not { Stage: OlLuShiStage.Drawing, Draw: null } r || outcome.RecipientSeat != r.TargetSeat || outcome.RequestedCount != r.Amount || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Lu Shi draw lost its original recipient, requested count or single native return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { OlLuShi = r with { Stage = OlLuShiStage.Children, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        r = r with { Stage = OlLuShiStage.Children };
+        if (retainRoleReceipt)
+            r = r with { Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter };
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { OlLuShi = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlLuShiMovementEvent(f.Id, r.TargetSeat, true, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueOlLuShi(f.Id);
     }

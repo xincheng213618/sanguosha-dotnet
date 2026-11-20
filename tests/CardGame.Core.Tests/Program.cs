@@ -208,6 +208,8 @@ var tests = new (string Name, Action Body)[]
     ("Shi Wang Chang: hidden top deck exact use turn and round name limits cold", ShiWangChangChecks.ShepanHiddenTopDeckExactUseTurnAndRoundNameLimitsCold),
     ("Shi Wang Chang Kaiji: ordered recipients and single reward cold", ShiWangChangChecks.KaijiOrderedRecipientsAndSingleRewardCold),
     ("Anniversary Liu Yong Fengxiang: Xi leader change and damage draw use original receipt cold", AnniversaryLiuYongFengxiangChecks.XiLeaderChangeAndDamageDrawUseOriginalReceiptCold),
+    ("Mou Guan Ping Wuwei: whole-color Slash options and repeated native Draw cold", MouGuanPingChecks.WholeColorSlashOptionsAndRepeatedNativeDrawCold),
+    ("OL Lu Shi Zhuyan: opening hand cap and actual Ending recovery cold", OlLuShiZhuyanDrawChecks.OpeningHandCapAndActualEndingRecoveryCold),
     ("Shi Chen Zhi: paid HE extra turn lease and dying recovery cold", ShiChenZhiChecks.ExtraTurnDiscardChildrenDyingRecoveryAndSameRoundLimitCold),
     ("Multiplayer: human seats prompts privacy and cold replay", MultiplayerChecks.MultipleHumansWaitRespondAndReplay),
     ("LAN rooms: HTTP players AI isolation retries and match completion", LanRoomChecks.HttpPlayersAiAndIsolation),
