@@ -19,6 +19,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native zero-entity attacks with the standard completion protocol declare that role on their original `CardUseFrame` at issuance; `CoreNativeSlashCompletionRuntime` owns their completion window and existing typed return. Do not add per-character completion hooks for that same protocol. Keep group-card iteration, material retirement and rule-specific post-use progression in their actual owners.
 
+- A `RequiresVirtualSlashAction` callback can request an original use action for the virtual Slash actor before its frame is issued. Mobile Sidi registers the live prediction check here and observes the first actual non-delayed use at the shared committed-use window. Full native windows independently determine alcohol and armor handling.
+
 - Native completions with distinct semantics still include Boundary Liu Feng's next-target progression, God Xun Yu's Qizheng, and producers that return an exact ending entity or a fixed kind. Preserve these outcomes when migrating common completion. Delayed placement, producer-specific qualification and paid child returns have their own owners.
 
 - Native card-use returns preserve the parent program's chosen inputs. Declare named use results on the original instruction and read their completed execution targets explicitly; do not rewrite parent selections or reconstruct primary returns through character adapters. Keep declaration, designated and executed targets distinct, and preserve real typed producer returns.

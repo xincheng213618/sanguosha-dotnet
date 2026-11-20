@@ -51,7 +51,8 @@ internal enum ProgramPipelinePhase
     CompleteMovementBatch,
     HandCardProjection,
     AppendNumericRuleContributions,
-    ReturnBaguaResponse
+    ReturnBaguaResponse,
+    RequiresVirtualSlashAction
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -148,6 +149,7 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(int)], typeof(bool)),
             [ProgramPipelinePhase.ObservesResponseUseCompletion] = (typeof(ProgramResponseUseCompletionObservation),
                 [typeof(CardActionContext)], typeof(bool)),
+            [ProgramPipelinePhase.RequiresVirtualSlashAction] = (typeof(Func<int, bool>), [typeof(int)], typeof(bool)),
             [ProgramPipelinePhase.CardEntitySkillLabel] = (typeof(ProgramCardEntitySkillLabelProvider),
                 [typeof(int)], typeof(string)),
             [ProgramPipelinePhase.CardSkillMarkProjection] = (typeof(ProgramCardSkillMarkProjection),
@@ -273,6 +275,7 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramDetachedBindingContinuation[] _continueDetachedProgramBinding;
     private readonly ProgramTurnStartObligationProbe[] _unissuedTurnStartObligation;
     private readonly ProgramResponseUseCompletionObservation[] _observesResponseUseCompletion;
+    private readonly Func<int, bool>[] _requiresVirtualSlashAction;
     private readonly ProgramCardEntitySkillLabelProvider[] _cardEntitySkillLabel;
     private readonly ProgramCardSkillMarkProjection[] _cardSkillMarkProjection;
     private readonly ProgramHandCardProjection[] _handCardProjection;
@@ -323,6 +326,7 @@ internal sealed class ProgramPipelineHooks
         _continueDetachedProgramBinding = Bind<ProgramDetachedBindingContinuation>(ProgramPipelinePhase.ContinueDetachedProgramBinding);
         _unissuedTurnStartObligation = Bind<ProgramTurnStartObligationProbe>(ProgramPipelinePhase.UnissuedTurnStartObligation);
         _observesResponseUseCompletion = Bind<ProgramResponseUseCompletionObservation>(ProgramPipelinePhase.ObservesResponseUseCompletion);
+        _requiresVirtualSlashAction = Bind<Func<int, bool>>(ProgramPipelinePhase.RequiresVirtualSlashAction);
         _cardEntitySkillLabel = Bind<ProgramCardEntitySkillLabelProvider>(ProgramPipelinePhase.CardEntitySkillLabel);
         _cardSkillMarkProjection = Bind<ProgramCardSkillMarkProjection>(ProgramPipelinePhase.CardSkillMarkProjection);
         _handCardProjection = Bind<ProgramHandCardProjection>(ProgramPipelinePhase.HandCardProjection);
@@ -471,6 +475,13 @@ internal sealed class ProgramPipelineHooks
     {
         foreach (var observation in _observesResponseUseCompletion)
             if (observation(action)) return true;
+        return false;
+    }
+
+    internal bool RequiresVirtualSlashAction(int actorSeat)
+    {
+        foreach (var observer in _requiresVirtualSlashAction)
+            if (observer(actorSeat)) return true;
         return false;
     }
 

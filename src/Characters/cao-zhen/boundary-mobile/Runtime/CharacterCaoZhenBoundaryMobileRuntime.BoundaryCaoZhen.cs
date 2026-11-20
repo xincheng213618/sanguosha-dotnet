@@ -16,6 +16,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
 
     internal int[] BoundarySidiEligibleHolders(int owner, string instance) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner && !BoundarySidiRecords(owner, instance).Any(record => record.HolderSeat == player.Seat)).Select(player => player.Seat).ToArray();
 
+    [ProgramPipelineHook(ProgramPipelinePhase.RequiresVirtualSlashAction, 53400)]
     internal bool HasLiveBoundarySidiPrediction(int actorSeat) =>
         _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryCaoZhenSidi) &&
         _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive &&
