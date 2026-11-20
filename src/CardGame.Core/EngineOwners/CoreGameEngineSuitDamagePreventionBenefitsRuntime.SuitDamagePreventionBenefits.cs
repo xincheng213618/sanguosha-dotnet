@@ -182,7 +182,8 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
         if (r.Stage == SuitPreventionBenefitStage.LosingHp)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { SuitPreventionBenefit = r with { Stage = SuitPreventionBenefitStage.Gifting }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && recipient.IsAlive && _cardZonesOperations._cardZones.GetLocation(r.CostCardId!.Value) == CardLocation.DiscardPile)
+            if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && recipient.IsAlive && r.CostMovementSequence > 0 &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, r.CostCardId!.Value) == r.CostMovementSequence)
             {
                 var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == r.CostCardId);
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(recipient.Seat), new($"skill-program.{(f.SkillId)}.suit-prevention-gift"), moved =>

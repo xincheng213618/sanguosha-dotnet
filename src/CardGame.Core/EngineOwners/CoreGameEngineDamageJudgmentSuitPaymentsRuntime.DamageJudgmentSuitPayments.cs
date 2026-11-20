@@ -228,7 +228,9 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
                     return true;
                 }
 
-                if (!draft.PaymentClaimIssued && draft.JudgmentRank == draft.PaidRank && draft.PaidCardId is { } paid && _cardZonesOperations._cardZones.GetLocation(paid) == CardLocation.DiscardPile)
+                if (!draft.PaymentClaimIssued && draft.JudgmentRank == draft.PaidRank &&
+                    draft.PaidCardId is { } paid && draft.PaidTo == CardLocation.DiscardPile &&
+                    draft.PaidMovementSequence is { } paidEntry && _zoneEntries.CurrentEntry(CardLocation.DiscardPile, paid) == paidEntry)
                 {
                     ClaimDamageJudgmentMatchingCard(frame, paid, false);
                     return true;

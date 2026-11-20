@@ -17,8 +17,11 @@ internal sealed partial class CoreGameEngineShanheSourceNamanRuntime
             return[];
         // The original completed-response receipt proves the exact final native
         // movements. Printed card kinds cannot identify a converted Slash.
-        var finished = completion.NativeCosts.Where(move => move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.ResponseFinished).Select(move => move.CardId).ToHashSet();
-        return action.PhysicalCards.Where(cost => finished.Contains(cost.CardId) && _cardZonesOperations._cardZones.GetLocation(cost.CardId) == CardLocation.DiscardPile).Select(cost => cost.CardId).Distinct().ToArray();
+        var finished = completion.NativeCosts.Where(move => move.From == CardLocation.Processing &&
+                move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.ResponseFinished &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, move.CardId) == move.Sequence)
+            .Select(move => move.CardId).ToHashSet();
+        return action.PhysicalCards.Where(cost => finished.Contains(cost.CardId)).Select(cost => cost.CardId).Distinct().ToArray();
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 23130, SkillProgramEffectOp.ClaimShanheSourceNamanResponseCards)]

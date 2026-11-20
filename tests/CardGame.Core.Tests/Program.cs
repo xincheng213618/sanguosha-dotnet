@@ -814,6 +814,9 @@ var tests = new (string Name, Action Body)[]
     ("Mou Ju Shou Muwang: later entry after missed return", MouJuShouMuwangDiscardEntryChecks.MuwangRecoversOnLaterDiscardAfterAnEarlierClaimSettles),
     ("OL Boundary Cheng Pu Chunlao preserves the original adjacent discard entry cold", OlBoundaryChengPuChunlaoDiscardEntryChecks.ChunlaoCannotStoreANewerSlashCleanupThroughAnOldAdjacentDiscardCold),
     ("Shanhe Source Dingxi: original use discard entry", ShanheSourceDingxiDiscardEntryChecks.DingxiClaimsOnlyItsOriginalUseDiscardEntry),
+    ("OL Boundary Beige: matching rank refunds only the original payment entry cold", OlBoundaryBeigeChecks.BeigeRefundsOnlyTheOriginalMatchingRankPaymentCold),
+    ("Shanhe Source Naman: claims only original native response costs cold", ShanheSourceNamanDiscardEntryChecks.NamanCannotClaimARedroppedNativeResponseCostCold),
+    ("Boundary Tianxiang: gift original paid discard entry", BoundaryXiaoQiaoTianxiangDiscardEntryChecks.TianxiangGiftsOnlyTheOriginalPaidDiscard),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
