@@ -124,7 +124,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         if (r.Stage == AnniversaryLiuLiStage.RangeTarget)
         {
             var target = c.Targets.Single();
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiRangeIssuedEvent(f.Id, r.Source, r.Hash, target, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), r.DamageDiscarded));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiRangeIssuedEvent(f.Id, r.Source, r.Hash, target, _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts(f.OwnerSeat), r.DamageDiscarded));
             FinishLiuLi(f);
             return;
         }
