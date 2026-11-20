@@ -38,6 +38,7 @@ Required when changing these mechanisms or their consumers. See the
 - `CoreGameEngineActualTurnLegacyCompletionRuntime` normalizes an original zero-entity program use when the actual-use ordinal or the content's native completion fact is required. Trigger operations, the Limu activation and the existing Leiluan conversion declaration contribute that fact at catalog compilation. The original producer frame and typed completion return still control admission and continuation.
 
 - `CountActualTurnStarts` counts a seat's actual `TurnStartedEvent` entries in the typed journal, including started extra turns. The count advances when the actual turn starts after the prelude. Jianjie reads the shared count at prelude admission, candidate collection and original binding execution.
+- `CoreActualTurnsRuntime` validates the original prelude frame, upcoming actor and round-start journal entry. Round-start children require a normal turn that advanced the round. The own-turn child returns only to its original window and stage. Zongkui, Jianjie and issued Yingjia keep their own recipient and binding checks on those native boundaries.
 
 - `CoreGameEngineTreatedWoundedRuntime` supplies current wounded status and identity concealment to conditional skill bindings and rule expressions. This uses the same match health rules as native checks, including undefined HP, the active Happy Qiao health pool and qualifying Guiming. Xingzhao reads that current status through its declared condition.
 

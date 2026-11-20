@@ -13,7 +13,7 @@ internal sealed partial class CoreProgramWindowRuntimeServicesRuntime
     bool IProgramWindowReturnQueries.IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame) => _coreShanheYongzhanOperations.IsShanheYongzhanDyingExitReturn(frame);
     bool IProgramWindowReturnQueries.MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate) => RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, candidate);
     SkillProgramTrigger IProgramWindowReturnQueries.GetProgramTrigger(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramTrigger(frame);
-    bool IProgramWindowReturnQueries.ValidBeiMiHuPreludeLifecycleWindow(ProgramLifecycleTriggerWindowFrame frame) => _characterBeiMiHuOlOperations.ValidBeiMiHuPreludeLifecycleWindow(frame);
+    bool IProgramWindowReturnQueries.ValidBeiMiHuPreludeLifecycleWindow(ProgramLifecycleTriggerWindowFrame frame) => _coreActualTurnsOperations.ValidBeforeTurnPreludeWindow(frame);
     bool IProgramWindowReturnQueries.IsMingchaNormalDrawReplacement(ProgramSkillFrame frame) => _characterRuanHuiOlOperations.Value.IsMingchaNormalDrawReplacement(frame);
     bool IProgramWindowReturnQueries.IsPhaseHandDebtResolver(ProgramTriggerCandidate candidate) => _corePhaseHandSeizureOperations.IsPhaseHandDebtResolver(candidate);
     void IProgramWindowNativeReturns.CompletePindianRevealBinding(ProgramSkillFrame frame) => _corePindianRevealWindowsOperations.CompletePindianRevealBinding(frame);

@@ -895,6 +895,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Cai Yang Xunji: uses original black color of a composite Slash cold", AnniversaryCaiYangXunjiColorChecks.XunjiUsesTheOriginalBlackColorOfACompositeSlashCold),
     ("OL Sima Hui Chenghao: continues after first gift is redirected cold", OlSimaHuiChenghaoGainReplacementChecks.ChenghaoContinuesAfterItsFirstGiftIsRedirectedCold),
     ("OL Sima Hui Jianjie: ordered seals grant before only the first actual turn cold", OlSimaHuiJianjieFirstTurnChecks.OrderedSealsGrantBeforeOnlyFirstActualTurnCold),
+    ("Shi Dong Zhao Yingjia: issued foreign extra draws before actual start cold", ShiDongZhaoYingjiaPreludeChecks.IssuedForeignExtraDrawPrecedesActualTurnCold),
     ("Anniversary Liu Li Fuli: paid range survives recipient turn and expires at source turn cold", AnniversaryLiuLiFuliTurnChecks.PaidRangeSurvivesRecipientTurnAndExpiresAtSourceTurnCold),
     ("Mobile Wu Xian Fumian: skipped own turn leaves one draw bonus", MobileFumianTurnGapChecks.SkippedOwnTurnLeavesOneDrawBonus),
     ("Shi Zhong Hui: paid Sizi settles only for its issuer cold", ShiZhongHuiSiziIssuanceChecks.OnlyThePayingSiziHolderSettlesItsFirstActualTurnCold),

@@ -48,8 +48,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool TryBeginBeiMiHuActualTurnPrelude(CharacterState owner) => _resolve().TryBeginBeiMiHuActualTurnPrelude(owner);
     internal bool TryGetBeiMiHuCardUse(int owner, ProgramSkillWindowContext context, SkillProgramEffectOp op, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().TryGetBeiMiHuCardUse(owner, context, op, out use, out window);
     internal bool ValidBeiMiHu(ProgramSkillFrame f) => _resolve().ValidBeiMiHu(f);
-    internal bool ValidBeiMiHuBeforeTurnPrelude(BeiMiHuBeforeTurnProof proof) => _resolve().ValidBeiMiHuBeforeTurnPrelude(proof);
-    internal bool ValidBeiMiHuPreludeLifecycleWindow(ProgramLifecycleTriggerWindowFrame window) => _resolve().ValidBeiMiHuPreludeLifecycleWindow(window);
     internal bool ValidBeiMiHuTargetMutation(CardUseFrame use) => _resolve().ValidBeiMiHuTargetMutation(use);
     internal int BeiMiHuRound { get => _resolve().BeiMiHuRound; }
 }

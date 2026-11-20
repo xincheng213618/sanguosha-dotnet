@@ -19,9 +19,9 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         if (op is null)
             return true;
         if (op == SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn)
-            return context.Window == SkillProgramTriggerWindow.TurnBeforeStart && context.BeforeTurnPreludeProof is { } proof && proof.UpcomingOwnerSeat == owner && ValidBeiMiHuBeforeTurnPrelude(proof) && BeiMiHuUnmarkedOthers(owner).Length > 0;
+            return context.Window == SkillProgramTriggerWindow.TurnBeforeStart && context.BeforeTurnPreludeProof is { } proof && proof.UpcomingOwnerSeat == owner && _coreActualTurnsOperations.ValidBeforeTurnPrelude(proof) && BeiMiHuUnmarkedOthers(owner).Length > 0;
         if (op == SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart)
-            return context.Window == SkillProgramTriggerWindow.RoundStarting && context.BeforeTurnPreludeProof is { } roundProof && ValidBeiMiHuBeforeTurnPrelude(roundProof) && BeiMiHuRound > 0 && BeiMiHuLowestUnmarkedOthers(owner).Length > 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BeiMiHuKuiPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Kind == "round" && e.Round == BeiMiHuRound);
+            return context.Window == SkillProgramTriggerWindow.RoundStarting && context.BeforeTurnPreludeProof is { } roundProof && _coreActualTurnsOperations.ValidBeforeTurnPrelude(roundProof) && BeiMiHuRound > 0 && BeiMiHuLowestUnmarkedOthers(owner).Length > 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BeiMiHuKuiPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Kind == "round" && e.Round == BeiMiHuRound);
         if (op == SkillProgramEffectOp.AwakenFromActualGujuCards)
             return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && owner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && (BeiMiHuActualCards(owner) >= 7 || _awakeningOverrides.Granted(owner, "ol:baijia", trigger.Id));
         return true;
@@ -30,7 +30,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     internal bool ExactBeiMiHuLifecycleParent(ProgramSkillFrame f)
     {
         var c = f.WindowContext;
-        return f.TriggerId is not null && c is not null && f.InstructionIndex == 1 && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } p && p.Window == c.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && (c.Window is not (SkillProgramTriggerWindow.TurnBeforeStart or SkillProgramTriggerWindow.RoundStarting) || c.BeforeTurnPreludeProof is { } proof && proof == p.BeforeTurnPreludeProof && (c.Window != SkillProgramTriggerWindow.TurnBeforeStart || proof.UpcomingOwnerSeat == f.OwnerSeat) && ValidBeiMiHuBeforeTurnPrelude(proof));
+        return f.TriggerId is not null && c is not null && f.InstructionIndex == 1 && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } p && p.Window == c.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && (c.Window is not (SkillProgramTriggerWindow.TurnBeforeStart or SkillProgramTriggerWindow.RoundStarting) || c.BeforeTurnPreludeProof is { } proof && proof == p.BeforeTurnPreludeProof && (c.Window != SkillProgramTriggerWindow.TurnBeforeStart || proof.UpcomingOwnerSeat == f.OwnerSeat) && _coreActualTurnsOperations.ValidBeforeTurnPrelude(proof));
     }
 
     internal BeiMiHuReceipt NewBeiMiHuReceipt(ProgramSkillFrame f, string stage) => new()
