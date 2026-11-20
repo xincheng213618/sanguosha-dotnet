@@ -15,8 +15,22 @@ internal sealed partial class CoreNativeRecoveryCardsRuntime
             throw new InvalidOperationException("This Peach target cannot currently be recovered.");
         }
 
-        var recoveryPolicies = allowDying && source.Seat != target.Seat ? _coreProgramCardPoliciesOperations.CardPolicies(target, SkillProgramCardPolicyKind.RescueRecoveryBonus, CardKind.Peach).Where(item => string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(source), item.Policy.FactionId, StringComparison.Ordinal)).ToArray() : [];
-        ResolveRecoveryCard(source, target, peach, "桃", playedCardKind: CardKind.Peach, recoveryAmount: 1 + recoveryPolicies.Sum(item => item.Policy.Value), recoveryPolicySources: recoveryPolicies.Select(item => (item.Source.SkillId, item.Policy.Id)).ToArray(), conversionSource: conversionSource, dyingResponse: dyingResponse);
+        var (amount, policies) = GetPeachRecovery(source, target, allowDying);
+        ResolveRecoveryCard(source, target, peach, "桃", playedCardKind: CardKind.Peach, recoveryAmount: amount,
+            recoveryPolicySources: policies, conversionSource: conversionSource, dyingResponse: dyingResponse);
+    }
+
+    internal (int Amount, IReadOnlyList<(string SkillId, string PolicyId)> Policies) GetPeachRecovery(
+        CharacterState source, CharacterState target, bool allowDying, bool includeNativePeachPolicies = true)
+    {
+        if (!allowDying || source.Seat == target.Seat)
+            return (1, []);
+
+        var faction = _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(source);
+        var policies = _coreProgramCardPoliciesOperations.CardPolicies(target, SkillProgramCardPolicyKind.RescueRecoveryBonus, CardKind.Peach)
+            .Where(item => (includeNativePeachPolicies || item.Policy.PeachRecoveryScope is null) &&
+                string.Equals(faction, item.Policy.FactionId, StringComparison.Ordinal)).ToArray();
+        return (1 + policies.Sum(item => item.Policy.Value), policies.Select(item => (item.Source.SkillId, item.Policy.Id)).ToArray());
     }
 
     internal void ResolveDyingAlcohol(CharacterState source, CharacterState target, Card alcohol, CardConversionSource? conversionSource = null, DyingResponseEvent? dyingResponse = null)

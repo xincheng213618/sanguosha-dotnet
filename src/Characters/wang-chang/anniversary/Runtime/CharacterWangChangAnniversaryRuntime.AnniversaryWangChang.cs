@@ -233,6 +233,13 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r = r with { Cursor = r.Cursor + 1, Stage = AnniversaryWangChangStage.ForeignCard } });
         }
 
+        if ((r.Stage is AnniversaryWangChangStage.ForeignCard or AnniversaryWangChangStage.ReturnedSlash) &&
+            (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None))
+        {
+            FinishWangChang(f);
+            return;
+        }
+
         if (r.Stage == AnniversaryWangChangStage.ForeignCard)
         {
             while (r.Cursor < r.Targets.Count && (!_coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]].IsAlive || !WangChangForeignCards(f).Any()))
@@ -252,12 +259,6 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
 
         if (r.Stage == AnniversaryWangChangStage.ReturnedSlash)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
-            {
-                FinishWangChang(f);
-                return;
-            }
-
             while (r.SlashCursor < r.Targets.Count)
             {
                 var target = r.Targets[r.SlashCursor];

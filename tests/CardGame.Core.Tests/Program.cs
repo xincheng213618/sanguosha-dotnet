@@ -843,6 +843,9 @@ var tests = new (string Name, Action Body)[]
     ("Classic Juxiang: claims only the original native Barbarian cleanup cold", ClassicJuxiangOriginalBarbarianChecks.JuxiangCannotClaimTheRediscardedOriginalBarbarianCold),
     ("Classic Huoshou: later native Barbarian damage is sourceless after Meng Huo dies cold", ClassicHuoshouDamageSourceChecks.HuoshouDeathLeavesLaterBarbarianDamageWithoutSourceCold),
     ("Mobile Yiji: first recipient death returns or finishes the match cold", MobileGuoJiaYijiGainReturnChecks.FirstYijiRecipientDeathReturnsToLiveChoicesOrFinishesTheMatchCold),
+    ("Anniversary Pingxi: first discard child returns or finishes the match cold", AnniversaryWangChangPingxiTerminalChecks.FirstPingxiDiscardDeathReturnsToTheOriginalGroupOrFinishesCold),
+    ("Classic Shicai: tops only the original completed Slash cold", ClassicShicaiOriginalSlashChecks.ShicaiCannotTopTheRediscardedOriginalSlashCold),
+    ("OL Chenqing: actual Peach user supplies the allied Jiuyuan bonus cold", OlChenqingRescueAttributionChecks.ChenqingPeachUsesActualPayerFactionForJiuyuanCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

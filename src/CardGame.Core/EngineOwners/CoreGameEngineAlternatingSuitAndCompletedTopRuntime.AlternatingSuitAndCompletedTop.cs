@@ -29,7 +29,14 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
     internal int[] AvailableCompletedTopCosts(CardActionContext a, long parentFrameId) => a.PhysicalCards.Count != 1 ? [] : a.PhysicalCards.Where(c =>
     {
         var at = _cardZonesOperations._cardZones.GetLocation(c.CardId);
-        return at.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile || at == CardLocation.Equipment(a.ActorSeat) && _coreEquipmentContentOperations.EquipmentRules.IsEquipment(a.EffectiveKind) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EquipmentChangedEvent>().Any(e => e.ResolutionId == parentFrameId && e.PlayerSeat == a.ActorSeat && e.CardId == c.CardId && e.CardKind == a.EffectiveKind);
+        if (at.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile)
+        {
+            var ownsAction = a.Type == CardActionType.Use && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>()
+                .Any(use => use.Id == parentFrameId && use.Action?.ActionId == a.ActionId);
+            return !ownsAction || !_nativeMaterialClaims.HasRelinquishedMaterial(parentFrameId, c.CardId);
+        }
+
+        return at == CardLocation.Equipment(a.ActorSeat) && _coreEquipmentContentOperations.EquipmentRules.IsEquipment(a.EffectiveKind) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EquipmentChangedEvent>().Any(e => e.ResolutionId == parentFrameId && e.PlayerSeat == a.ActorSeat && e.CardId == c.CardId && e.CardKind == a.EffectiveKind);
     }).Select(c => c.CardId).Distinct().ToArray();
     internal bool IsLiveSuitAllowance(PlayPhaseSuitAllowanceGrantedEvent e, int seat) => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && (e.Expiry == SkillProgramTurnSkillExpiry.ActualTurnEnd ? e.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == e.TurnNumber && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualTurnCursorReturnedEvent>().Any(ended => ended.ActualTurn == e.TurnNumber && ended.OwnerSeat == e.ActualTurnOwnerSeat) : _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal bool HasPhaseSuitAllowance(int seat, Suit? suit) => suit is { } s && s != Suit.None && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayPhaseSuitAllowanceGrantedEvent>().Any(e => IsLiveSuitAllowance(e, seat) && e.Suits.Contains(s));

@@ -229,6 +229,8 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
     {
         var r = f.DyingSuits!;
         var actor = r.RecipientSeat!.Value;
+        var (recovery, policies) = _coreNativeRecoveryCardsOperations.GetPeachRecovery(_coreMatchParticipantsPlayersAccess._players[actor],
+            _coreMatchParticipantsPlayersAccess._players[r.VictimSeat], allowDying: true, includeNativePeachPolicies: false);
         var useId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor, actor, null, null, null, CardKind.Peach, [r.VictimSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var ret = new DyingSuitsPeachReturn(f.Id, f.InstructionIndex, r.Source, f.GameplayHash, r.DyingFrameId, r.VictimSeat, actor, useId, action.ActionId);
@@ -242,7 +244,8 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         _characterLuMengMouOperations.RecordYingboCardUse(useId, actor, CardKind.Peach);
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(actor, CardKind.Peach);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
-        _coreCardUseLifecycleOperations.BeginSimpleCardUse(useId, new(0, SimpleCardUseEffect.Recovery));
+        _coreCardUseLifecycleOperations.BeginSimpleCardUse(useId, new(0, SimpleCardUseEffect.Recovery, recovery,
+            policies.Count == 0 ? null : Array.AsReadOnly(policies.Select(policy => new ProgramRecoveryPolicySource(policy.SkillId, policy.PolicyId)).ToArray())));
     }
 
     internal bool ContinueDyingSuitsPeach(long id, ProgramSimpleCardContinuation continuation)
@@ -254,7 +257,9 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
             throw new InvalidOperationException("Dying suits lost its genuine zero-material Peach producer.");
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[ret.ActorSeat].IsAlive)
-            _coreNativeRecoveryCardsOperations.CompleteRecoveryCardUse(_coreMatchParticipantsPlayersAccess._players[ret.ActorSeat], _coreMatchParticipantsPlayersAccess._players[ret.VictimSeat], new(0, CardKind.Peach, Suit.None, 0), id, CardKind.Peach, 1, []);
+            _coreNativeRecoveryCardsOperations.CompleteRecoveryCardUse(_coreMatchParticipantsPlayersAccess._players[ret.ActorSeat],
+                _coreMatchParticipantsPlayersAccess._players[ret.VictimSeat], new(0, CardKind.Peach, Suit.None, 0), id, CardKind.Peach,
+                continuation.RecoveryAmount, continuation.RecoveryPolicySources ?? []);
         else
             _coreNativeCardUseCompletionOperations.FinishCardUse(id, new(0, CardKind.Peach, Suit.None, 0), CardKind.Peach);
         return true;
