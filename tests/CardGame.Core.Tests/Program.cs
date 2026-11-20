@@ -910,6 +910,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),
     ("Anniversary Hu Che Er Fuzhong: three foreign batches retain seven after actual discard cold", AnniversaryHuCheErFuzhongDrawChecks.ThreeForeignBatchesRetainSevenAfterActualDiscardCold),
     ("OL Du Xi Quxi: issued holders modify actual Draw cold", OlDuXiQuxiDrawChecks.IssuedFengAndQianModifyTheirActualHoldersNormalDrawCold),
+    ("OL Gao Gan Juguan: native Duel grants the next actual Draw once cold", OlGaoGanJuguanDrawChecks.NativeDuelGrantsTheNextActualDrawOnceCold),
     ("OL Du Fu Ren Shunshi: paid preparation gift funds three actual phases cold", OlDuFuRenShunshiNumericChecks.PreparationGiftFundsThreeActualPhasesCold),
     ("OL Cao Xi Gangshu: draw expires on actual Draw or prior Dodge cold", OlCaoXiGangshuDrawChecks.GangshuDrawExpiresOnActualDrawOrPriorDodgeCold),
     ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),

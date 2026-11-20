@@ -571,7 +571,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGanNingMouMobileRuntime> GanNingMouMobileEntries => GetDeferredModule<EngineOwners.CharacterGanNingMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoGanOlRuntime> GaoGanOlEntries => GetDeferredModule<EngineOwners.CharacterGaoGanOlRuntime>();
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoLanOlRuntime> GaoLanOlEntries => GetDeferredModule<EngineOwners.CharacterGaoLanOlRuntime>();
 

@@ -63,11 +63,19 @@ internal sealed partial class CharacterGaoGanOlRuntime
     }
 
     internal JuguanDeadlineSettledEvent? CurrentJuguanDeadline(int owner) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JuguanDeadlineSettledEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
-    internal int JuguanActualDrawAdjustment(CharacterState player)
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 105)]
+    internal void AddJuguanDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (!TracksJuguanDrawObligations || !player.IsAlive || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase || phase.ActorSeat != player.Seat || CurrentJuguanDeadline(player.Seat)is not { Qualified: true } ready)
-            return 0;
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JuguanDrawPhaseBoundEvent>().Count(e => e.OwnerSeat == player.Seat && e.DeadlineTurn == ready.ActualTurn && e.Phase == phase) == 1 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JuguanSkippedDrawExpiredEvent>().Any(e => e.OwnerSeat == player.Seat && e.ActualTurn == ready.ActualTurn) ? 2 : 0;
+        if (query != SkillRuleQuery.DrawCount || !TracksJuguanDrawObligations || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive ||
+            _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase ||
+            phase.ActorSeat != seat || CurrentJuguanDeadline(seat) is not { Qualified: true } ready)
+            return;
+
+        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JuguanDrawPhaseBoundEvent>()
+                .Count(e => e.OwnerSeat == seat && e.DeadlineTurn == ready.ActualTurn && e.Phase == phase) == 1 &&
+            !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JuguanSkippedDrawExpiredEvent>()
+                .Any(e => e.OwnerSeat == seat && e.ActualTurn == ready.ActualTurn))
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:juguan:draw", 2);
     }
 
     internal void RequireJuguanUse(CardUseFrame use)
