@@ -229,9 +229,7 @@ internal sealed partial class CoreActualTurnsRuntime
         }
         else
         {
-            _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
-            _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(current.Seat);
-            _corePhysicalDrawFacadesOperations.DrawCards(current, _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(current), log: true);
+            _coreDrawPhaseObligationsOperations.Value.ResolveDrawWithoutAttempt(current.Seat);
         }
 
         CompleteTurnStartAfterDraw(current, delayedEffects);
@@ -248,11 +246,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
         if (_coreDrawPhaseAttemptsOperations.TryBeginNormalDrawAttemptPhase(current, skipPlayPhaseAfterDraw ? GameEngine.DelayedTurnEffects.SkipPlayPhase : GameEngine.DelayedTurnEffects.None, afterStartingWindow: true, normalDrawReplaced, normalDrawAdjustment, frozenBaseDrawCount))
             return;
-        _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
-        _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(current.Seat);
-        var baseDrawCount = frozenBaseDrawCount ?? _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(current, normalDrawReplaced);
-        if (!normalDrawReplaced)
-            _corePhysicalDrawFacadesOperations.DrawCards(current, Math.Max(0, checked(baseDrawCount + normalDrawAdjustment)), log: true);
+        _coreDrawPhaseObligationsOperations.Value.ResolveDrawWithoutAttempt(current.Seat, normalDrawReplaced, normalDrawAdjustment, frozenBaseDrawCount);
         CompleteTurnStartAfterDraw(current, skipPlayPhaseAfterDraw ? GameEngine.DelayedTurnEffects.SkipPlayPhase : GameEngine.DelayedTurnEffects.None);
     }
 

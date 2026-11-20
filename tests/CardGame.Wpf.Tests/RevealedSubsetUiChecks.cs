@@ -3,8 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Wpf.Controls;
 using CardGame.Wpf.Persistence;
 using CardGame.Wpf.ViewModels;
 
@@ -63,7 +66,9 @@ internal static class RevealedSubsetUiChecks
                     !model.CanCancelAction && model.CanConfirmSelected && choice.Cards.All(id =>
                         game.CreateSnapshot(0).Players[0].Hand.Any(card => card.Id == id)),
                     "Standard Xunxun obtains its two selected cards first, then orders only the remaining bottom cards.");
-                model.MoveDeckOrderCardLeftCommand.Execute(model.DeckBottomCards.Last());
+                var last = model.DeckBottomCards.Last();
+                Program.Assert(DropDeckCard(host, last, bottom: true, before: model.DeckBottomCards.First()) == DragDropEffects.Move &&
+                    model.DeckBottomCards.First() == last, "The bottom-only picker reorders by dragging to another slot.");
                 var bottom = model.DeckBottomCards.Reverse().Select(card => card.Id).ToArray();
                 var orderPrompt = game.CreateSnapshot(0).PendingDecision!;
                 host.Capture(output, "standard-xunxun-remaining-bottom-order", 1120);
@@ -103,15 +108,29 @@ internal static class RevealedSubsetUiChecks
                 "Exact Xunxun and flexible Guanxing share two private rows, preserve mandatory placement and hide raw stage choices.");
             var locked = view.TopCardIds.ToHashSet();
             var movable = model.DeckTopCards.Where(card => !locked.Contains(card.Id)).ToArray();
-            foreach (var card in movable.Take(exact ? 2 : movable.Length)) Transfer(card.Id);
+            if (exact)
+            {
+                var fixedCard = model.DeckTopCards.First();
+                Program.Assert(DropDeckCard(host, fixedCard, bottom: true) == DragDropEffects.None &&
+                    DropDeckCard(host, movable.Last(), bottom: false, before: fixedCard) == DragDropEffects.None,
+                    "Dragging a locked card or inserting before the restored prefix leaves the draft alone.");
+            }
+            var first = movable[0];
+            Program.Assert(DropDeckCard(host, first, bottom: true, verifyMotion: !exact) == DragDropEffects.Move &&
+                model.DeckBottomCards.Single() == first, "Dragging into an empty row transfers the card.");
+            Program.Assert(DropDeckCard(host, first, bottom: false) == DragDropEffects.Move &&
+                model.DeckTopCards.Last() == first, "Dragging back up inserts at the destination slot.");
+            foreach (var card in movable.Take(exact ? 2 : movable.Length))
+                Program.Assert(DropDeckCard(host, card, bottom: true) == DragDropEffects.Move,
+                    "Dragging a movable card to the bottom row transfers it.");
             Program.Assert(model.CanConfirmSelected && model.DeckBottomCards.Count == (exact ? 2 : view.Cards.Count) &&
-                locked.All(id => !model.TransferDeckOrderCardCommand.CanExecute(model.DeckTopCards.Single(card => card.Id == id))),
+                model.DeckTopCards.Take(locked.Count).Select(card => card.Id).SequenceEqual(view.TopCardIds),
                 "Exact top counts gate confirmation and accepted cards cannot be moved again after cold restore.");
-            model.MoveDeckOrderCardLeftCommand.Execute(model.DeckBottomCards.Last());
-            var moved = model.DeckBottomCards.First();
-            Program.Assert(typeof(MainViewModel).GetMethod("MoveDeckOrderCard", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .Invoke(model, [moved, true, model.DeckBottomCards.Count]) is true && model.DeckBottomCards.Last() == moved,
-                "The drag destination path supports explicit in-row insertion before confirmation.");
+            var moved = model.DeckBottomCards.Last();
+            Program.Assert(DropDeckCard(host, moved, bottom: true, before: model.DeckBottomCards.First(), verifyMotion: !exact) == DragDropEffects.Move &&
+                model.DeckBottomCards.First() == moved &&
+                DropDeckCard(host, moved, bottom: true) == DragDropEffects.Move && model.DeckBottomCards.Last() == moved,
+                "Dragging within a row supports insertion in either direction.");
             Program.Assert(game.AcceptedCommands.Count == commands, "Moving between rows and reordering remain local until confirmation.");
             Program.Render(host.Root, 1120, 820, null);
             var picker = (FrameworkElement)host.Window.FindName("DeckReorderSelection");
@@ -135,14 +154,83 @@ internal static class RevealedSubsetUiChecks
             Program.Assert(SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
                 "The two-row arrangement restores through the ordinary accepted command journal.");
 
-            void Transfer(int id)
-            {
-                Program.Render(host.Root, 1120, 820, null);
-                var button = Program.Find<Button>(pickerRoot()).Single(button => button.Command == model.TransferDeckOrderCardCommand &&
-                    button.CommandParameter is CardViewModel card && card.Id == id);
-                Program.Assert(button.IsEnabled, "The uncommitted arrangement card must be movable."); Click(button);
-            }
-            FrameworkElement pickerRoot() => (FrameworkElement)host.Window.FindName("DeckReorderSelection");
+        }
+    }
+
+    private static DragDropEffects DropDeckCard(NativeResponseStatusChecks.NativeHost host, CardViewModel card, bool bottom,
+        CardViewModel? before = null, bool verifyMotion = false)
+    {
+        var picker = (DeckReorderPicker)host.Window.FindName("DeckReorderSelection");
+        picker.UpdateLayout();
+        var row = (Border)picker.FindName(bottom ? "DeckBottomRow" : "DeckTopRow");
+        Program.Assert(row.IsVisible && row.AllowDrop && !Program.Find<Button>(picker).Any(),
+            "The deck picker uses drop targets without separate arrow or transfer buttons.");
+        var point = before is not null ? Face(before).TranslatePoint(new Point(4, 4), row) :
+            new Point(verifyMotion ? row.ActualWidth / 2 : row.ActualWidth - 4, row.ActualHeight / 2);
+        const BindingFlags privateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+        var dragType = typeof(DeckReorderPicker).GetNestedType("CardDrag", BindingFlags.NonPublic)!;
+        var drag = Activator.CreateInstance(dragType, host.Model, card)!;
+        var constructor = typeof(DragEventArgs).GetConstructor(privateInstance, null,
+            [typeof(IDataObject), typeof(DragDropKeyStates), typeof(DragDropEffects), typeof(DependencyObject), typeof(Point)], null)!;
+        var data = new DataObject(dragType, drag);
+
+        Canvas? overlay = null;
+        if (verifyMotion && SystemParameters.ClientAreaAnimation)
+        {
+            host.Model.IsMotionEnabled = true;
+            overlay = (Canvas)picker.FindName("DragOverlay");
+            var origin = Face(card).TranslatePoint(new Point(12, 16), overlay);
+            typeof(DeckReorderPicker).GetField("_pressedAt", privateInstance)!.SetValue(picker, origin);
+            typeof(DeckReorderPicker).GetMethod("BeginDragPreview", privateInstance)!.Invoke(picker, [card, origin]);
+        }
+
+        Raise(DragDrop.PreviewDragOverEvent);
+        var hover = Raise(DragDrop.DragOverEvent);
+        if (overlay is not null)
+        {
+            var pointer = row.TranslatePoint(point, overlay);
+            Program.Assert(overlay.Children.Count == 1 &&
+                overlay.Children[0].RenderTransform is TranslateTransform position &&
+                Math.Abs(position.X - (pointer.X - 12)) < .01 && Math.Abs(position.Y - (pointer.Y - 16)) < .01,
+                "The drag face follows its grabbed point in either direction.");
+            picker.UpdateLayout();
+            var bitmap = new RenderTargetBitmap((int)Math.Ceiling(overlay.ActualWidth), (int)Math.Ceiling(overlay.ActualHeight),
+                96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(overlay);
+            var pixel = new byte[4];
+            bitmap.CopyPixels(new Int32Rect((int)pointer.X, (int)pointer.Y, 1, 1), pixel, 4, 0);
+            Program.Assert(pixel[3] > 200, "The drag overlay renders the actual card face at the pointer.");
+        }
+        var drop = Raise(DragDrop.DropEvent);
+        Program.Assert(hover == drop, "The native move cursor agrees with the drop's acceptance.");
+        if (overlay is not null)
+        {
+            typeof(DeckReorderPicker).GetMethod("SettleDragPreview", privateInstance)!.Invoke(picker, [card]);
+            Program.Assert(overlay.Children.Count == 1 &&
+                overlay.Children[0].RenderTransform is TranslateTransform { HasAnimatedProperties: true } &&
+                Program.Find<ContentPresenter>(picker).Any(element => element.RenderTransform is TranslateTransform { HasAnimatedProperties: true }),
+                "The dropped face and neighboring cards all slide to their new slots.");
+            var frame = new DispatcherFrame();
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+            timer.Tick += (_, _) => frame.Continue = false;
+            try { timer.Start(); Dispatcher.PushFrame(frame); }
+            finally { timer.Stop(); }
+            Program.Assert(overlay.Children.Count == 0 &&
+                Program.Find<ContentPresenter>(picker).All(element => element.Opacity == 1 && element.RenderTransform.Value.IsIdentity),
+                "The drag overlay clears and all cards return to their layout slots after settling.");
+            host.Model.IsMotionEnabled = false;
+        }
+        return drop;
+
+        Border Face(CardViewModel item) => Program.Find<Border>(picker).Single(border =>
+            border.Name == "OrderCardFace" && ReferenceEquals(border.DataContext, item));
+
+        DragDropEffects Raise(RoutedEvent routedEvent)
+        {
+            var args = (DragEventArgs)constructor.Invoke([data, DragDropKeyStates.LeftMouseButton, DragDropEffects.Move, row, point]);
+            args.RoutedEvent = routedEvent;
+            row.RaiseEvent(args);
+            return args.Effects;
         }
     }
 

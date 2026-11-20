@@ -39,15 +39,10 @@ internal sealed class ProgramPhaseSchedulingRuntime(IProgramRuntimeFrames frames
         events.AdvanceFact(new ProgramPhaseScheduledEvent(
             frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, phase, Started: true));
         if (phase == TurnPhase.Play) entries.EnterPlayPhase(beneficiary);
-        else if (!drawPhases.Value.TryBeginScheduledDraw(beneficiary))
+        else if (!drawPhases.Value.TryBeginScheduledDraw(beneficiary) && !entries.TryBeginDrawPhaseProgramWindow(beneficiary))
         {
-            if (!entries.TryBeginDrawPhaseProgramWindow(frame.OwnerSeat))
-            {
-                entries.ConsumeDuFuRenDrawPhase(frame.OwnerSeat);
-                entries.ConsumeChengGongYingDraw(frame.OwnerSeat);
-                entries.DrawNormalCards(frame.OwnerSeat);
-                entries.CompleteTurnStartAfterDraw(frame.OwnerSeat);
-            }
+            drawPhases.Value.ResolveDrawWithoutAttempt(beneficiary);
+            entries.CompleteTurnStartAfterDraw(beneficiary);
         }
         return SkillProgramStepOutcome.AwaitChild;
     }

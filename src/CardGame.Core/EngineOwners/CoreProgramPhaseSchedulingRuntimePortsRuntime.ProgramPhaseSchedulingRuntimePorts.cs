@@ -15,9 +15,6 @@ internal sealed partial class CoreProgramPhaseSchedulingRuntimePortsRuntime
     void IProgramPhaseScheduleState.RestorePhase(TurnPhase phase) => _coreActualTurnProgressPhaseAccess._phase = phase;
     void IProgramPhaseNativeEntries.EnterPlayPhase(int seat) => _coreActualTurnsOperations.EnterPlayPhase(_coreMatchParticipantsPlayersAccess._players[seat]);
     bool IProgramPhaseNativeEntries.TryBeginDrawPhaseProgramWindow(int seat) => _coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(_coreMatchParticipantsPlayersAccess._players[seat], false);
-    void IProgramPhaseNativeEntries.ConsumeDuFuRenDrawPhase(int seat) => _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, seat);
-    void IProgramPhaseNativeEntries.ConsumeChengGongYingDraw(int seat) => _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(seat);
-    void IProgramPhaseNativeEntries.DrawNormalCards(int seat) => _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[seat], _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(_coreMatchParticipantsPlayersAccess._players[seat]), true);
     void IProgramPhaseNativeEntries.CompleteTurnStartAfterDraw(int seat) => _coreActualTurnsOperations.CompleteTurnStartAfterDraw(_coreMatchParticipantsPlayersAccess._players[seat], GameEngine.DelayedTurnEffects.None);
     bool IProgramPhaseNativeReturns.TryResumeZhangShiPingHongjiPhase() => _characterZhangShiPingOlOperations.Value.TryResumeZhangShiPingHongjiPhase();
     bool IProgramPhaseNativeReturns.TryCancelZhangShiPingHongjiPhase() => _characterZhangShiPingOlOperations.Value.TryCancelZhangShiPingHongjiPhase();

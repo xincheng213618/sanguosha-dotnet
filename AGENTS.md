@@ -14,33 +14,19 @@ Card is a .NET rules engine with a WPF desktop client. Use the SDK selected by
 
 ## Architecture essentials
 
-- Skills compose rule concepts; each concept has one owner and one answer point. The goal is to express new skills entirely in JSON. Ordinary generals using existing capabilities change content and registration only.
-- Shared capabilities must not depend on characters, and characters must not depend on other characters. Passing checks prove behavior, not architecture; assess the design using the capability map's criteria. Moving code or adding adapters is not evidence of simplification.
-- A character-specific/compound operation, duplicate rule answer or character branch in a shared query is a gap signal. Follow [the capability method](docs/content/skill-composition/CAPABILITY_MAP.md) and complete the concept with all equivalent consumers.
-- Before adding an operation or condition, check whether existing operations plus an effect-level `{"kind":"expression"}` condition express the rule. Add a missing read-only fact once in the shared owner; see [runtime expressions](docs/content/skill-composition/RUNTIME_EXPRESSIONS.md).
+- Iterate in the existing engine. Keep current code and tests as the baseline, and change one bounded part of the rules at a time.
+- Use JSON for straightforward combinations of existing shared operations and conditions. Use typed C# directly for complex rules. Keep each skill's behavior in one implementation, and avoid a skill-specific JSON instruction backed by a dedicated runtime and forwarding layer.
+- Keep shared rule concepts in their owning module. Shared capabilities must be independent of characters, and characters must be independent of each other. Extract a shared capability when the current change demonstrates a reusable rule. Migrate the consumers in scope and leave other equivalent consumers for later batches.
 - Validate at command, loader, restore and executor boundaries. Keep pending state, accepted facts, payments and typed child returns on the original owning frame; do not rebuild them with character proof events, history scans or sidecars.
 - Preserve input validation, seat-specific privacy, card movement, checkpoint, replay and content fingerprints. Keep source loss, owner death, ongoing eligibility and already-issued permission distinct.
 - Do not add a global gameplay rules epoch or checkpoint `RulesVersion`, or bump formats/package versions per character. If loading or replay fails, preserve the source save while starting a fresh game. Format changes follow [development gates](docs/DEVELOPMENT_GATES.md#formats-and-content).
 
 ## Verification
 
-- During development use relevant existing name filters; after a code/content batch run the routine scope once. Pure documentation changes need link/content review and `git diff --check`, not a game build.
-- Add focused checks for uncovered behavior or regressions, WPF checks for UI behavior, and shared checks for changed capabilities. Pure configuration reuse needs no duplicate character fixture or fixed test count.
+- The sole routine gameplay acceptance is a fixed-seed, all-AI match through the engine's public command entry point. It must reach a normal terminal state without exceptions. Replay the same accepted command record from the same initial setup and compare the winner and observable final state. A stall, exception or mismatch fails acceptance.
+- Run routine acceptance once when a gameplay batch is ready. Retain the existing test suite for targeted diagnosis when needed. For documentation changes, review content and links and run `git diff --check`.
 - **Full verification is manual only:** `-Full` and unfiltered test assemblies require an explicit user request for a manual full run. A routine failure, milestone or follow-up cycle never lifts this restriction.
-- Preserve intentional test pruning when merging older work. Do not prune checks in the same batch as a large refactor or remove compatibility boundaries to reduce test count.
-- Report the scope actually run and separate build/dependency/runner time from test-process time. The default smoke target is about one second.
-
-Run from the repository root (Windows, PowerShell 7 and Python 3.10+):
-
-```powershell
-pwsh -File .\tools\Test-Changed.ps1 -CoreFilter 'program interaction '
-pwsh -File .\tools\Test-Changed.ps1 -WpfFilter 'selection, target toggle'
-pwsh -File .\tools\Test-Changed.ps1 # Routine scope, not the full suite.
-git diff --check
-```
-
-Choose filters for the behavior being changed; examples are not a mandatory checklist.
-The scope definition and full workflow are in [development gates](docs/DEVELOPMENT_GATES.md).
+- The runner's historical default scope and architecture checks remain available for diagnosis. This file governs routine acceptance, skill implementation choices and migration scope when linked guides differ.
 
 ## Read when relevant
 
@@ -49,9 +35,9 @@ Start with the relevant code or configuration and the matching section below. Us
 | Task | Guidance |
 | --- | --- |
 | Add a general or edit skill JSON | [Character registration](docs/CHARACTER_MODULES.md#内容声明), [rule syntax](docs/content/skill-composition/RUNTIME.md) |
-| Design a shared capability or fill a gap | [Capability method](docs/content/skill-composition/CAPABILITY_MAP.md#补齐一个概念的步骤), then the affected contract |
+| Understand an existing capability | [Capability map](docs/content/skill-composition/CAPABILITY_MAP.md) and the affected contract |
 | Change a rule mechanism or any consumer of it | [Contract index](docs/content/skill-composition/contracts/README.md): select the affected topics and follow their owning-frame and lifetime contracts |
-| Change formats, tests, verification or temporary outputs | [Development gates](docs/DEVELOPMENT_GATES.md) |
+| Change formats or manage temporary outputs | [Development gates](docs/DEVELOPMENT_GATES.md) |
 | Change desktop saves or recovery | [Save and resume](docs/SAVE_AND_RESUME.md) |
 | Verify a rule edition or asset source | [Content and source locations](docs/content/CONTENT_MANIFEST.md#来源与素材) |
 | Find UI, mode, content or architecture guidance | [Documentation index](docs/README.md) |

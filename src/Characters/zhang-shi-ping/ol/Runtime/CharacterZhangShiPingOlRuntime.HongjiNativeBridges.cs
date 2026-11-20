@@ -33,9 +33,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
             if (!_coreDrawPhaseObligationsOperations.Value.TryBeginScheduledDraw(recipientSeat) &&
                 !_coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(_coreMatchParticipantsPlayersAccess._players[recipientSeat], false))
             {
-                _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, recipientSeat);
-                _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(recipientSeat);
-                _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[recipientSeat], _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(_coreMatchParticipantsPlayersAccess._players[recipientSeat]), true);
+                _coreDrawPhaseObligationsOperations.Value.ResolveDrawWithoutAttempt(recipientSeat);
                 _coreActualTurnsOperations.CompleteTurnStartAfterDraw(_coreMatchParticipantsPlayersAccess._players[recipientSeat], GameEngine.DelayedTurnEffects.None);
             }
         }

@@ -212,8 +212,11 @@ var tests = new (string Name, Action Body)[]
     ("OL Lu Shi Zhuyan: opening hand cap and actual Ending recovery cold", OlLuShiZhuyanDrawChecks.OpeningHandCapAndActualEndingRecoveryCold),
     ("Mou Cao Ang Fengmin: foreign equipment loss draws for empty slots once cold", MouCaoAngAnniversaryChecks.ForeignEquipmentLossDrawsForEmptySlotsOnceCold),
     ("Happy Shuangshu: inserted and natural Draw each open their native attempt cold", HappyShuangshuNativeDrawChecks.InsertedAndNaturalDrawEachOpenTheirNativeAttemptCold),
+    ("Happy Shuangshu: draw observers preserve inserted and natural physical cards cold", HappyShuangshuNativeDrawChecks.DrawObserversPreserveInsertedAndNaturalPhysicalCardsCold),
     ("OL Du Fu Ren Shunshi: paid off-turn gift funds the first unskipped Draw cold", OlDuFuRenShunshiDrawBoundaryChecks.OffTurnGiftFundsFirstUnskippedDrawCold),
     ("OL Zhang Shi Ping Hongji: foreign promise returns through second native Draw cold", OlZhangShiPingHongjiNativeDrawChecks.ForeignPromiseReturnsThroughSecondNativeDrawCold),
+    ("OL Zhang Shi Ping Hongji: foreign promise returns through light Draw cold", OlZhangShiPingHongjiNativeDrawChecks.ForeignPromiseReturnsThroughLightDrawCold),
+    ("Mobile Shen Zhuge Liang Qixing: initial and both actual Draw ends exchange original stars cold", MobileShenZhugeLiangQixingDrawEndChecks.InitialAndBothActualDrawEndsExchangeOriginalStarsCold),
     ("Shi Chen Zhi: paid HE extra turn lease and dying recovery cold", ShiChenZhiChecks.ExtraTurnDiscardChildrenDyingRecoveryAndSameRoundLimitCold),
     ("Multiplayer: human seats prompts privacy and cold replay", MultiplayerChecks.MultipleHumansWaitRespondAndReplay),
     ("LAN rooms: HTTP players AI isolation retries and match completion", LanRoomChecks.HttpPlayersAiAndIsolation),
@@ -1005,6 +1008,7 @@ var tests = new (string Name, Action Body)[]
     ("Delayed Nullification: held Indulgence owns original counterspell payment cold", DelayedNullificationOwnerChecks.HeldIndulgenceOwnsItsNativeCounterspellPaymentCold),
     ("Shi Xiahou Ba Libing: finite attack range lasts through the original Slash cold", ShiXiahouBaLibingRangeChecks.LibingEnablesAnOrdinaryDistantSlashUntilItCompletesCold),
     ("Program invocation entry: Luxin and Jingyu preserve the original program cold", CardGame.Core.Tests.ProgramInvocationEntryChecks.LuxinInterruptsNextTrueInvocationAndJingyuCountsEachNameOnce),
+    ("Mobile Guzheng: return a hand discard then take or leave the remaining phase discards", MobileGuzhengChecks.ReturnOneHandDiscardThenChooseRemainingCards),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

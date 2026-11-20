@@ -5,7 +5,7 @@
         "effects": [{ "op": "initializePrivatePile", "target": "owner", "amount": 7 }] },
       { "id": "initial-exchange", "isSkillInvocation": false, "window": "gameStarting", "subject": "owner", "optional": true, "priority": 0,
         "effects": [{ "op": "exchangePrivatePile", "target": "owner" }] },
-      { "id": "draw-exchange", "window": "afterNormalDraw", "subject": "owner", "optional": true, "priority": 0,
+      { "id": "draw-exchange", "window": "drawPhaseEnded", "subject": "owner", "optional": true, "priority": 0,
         "effects": [{ "op": "exchangePrivatePile", "target": "owner" }] }
     ] },
     { "id": "mobile-god:kuangfeng", "revision": 1, "triggers": [

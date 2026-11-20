@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CardGame.Core;
 
 namespace CardGame.Wpf.ViewModels;
@@ -17,19 +16,8 @@ public sealed partial class MainViewModel
         ? $"牌堆顶 · {DeckTopCards.Count}/{count} 张 · 从左到右依次先摸" : $"牌堆顶 · {DeckTopCards.Count} 张 · 从左到右依次先摸";
     public string DeckBottomLabel => $"牌堆底 · {DeckBottomCards.Count} 张 · 最右侧的牌在最底部";
     private bool CanConfirmDeckReorder => IsDeckReorderPending && (_deckReorderView!.RequiredTopCount is not { } count || DeckTopCards.Count == count);
-    private string DeckReorderHint => _deckReorderView is { BottomOnly: true } ? "拖动或点击箭头调整底牌顺序，完成后确认。" : "点击换排或拖动排序，箭头微调。" +
+    private string DeckReorderHint => _deckReorderView is { BottomOnly: true } ? "拖动调整底牌顺序，完成后确认。" : "左右拖动排序，上下拖动换排。" +
         (_deckReorderView?.RequiredTopCount is { } count ? $"牌堆顶须保留 {count} 张。" : string.Empty) + "完成后确认。";
-    public ICommand TransferDeckOrderCardCommand { get; private set; } = null!;
-    public ICommand MoveDeckOrderCardLeftCommand { get; private set; } = null!;
-    public ICommand MoveDeckOrderCardRightCommand { get; private set; } = null!;
-
-    private void InitializeDeckReorder()
-    {
-        TransferDeckOrderCardCommand = new RelayCommand<CardViewModel>(card =>
-            MoveDeckOrderCard(card, !DeckBottomCards.Contains(card)), card => CanTransferDeckOrderCard(card));
-        MoveDeckOrderCardLeftCommand = new RelayCommand<CardViewModel>(card => ShiftDeckOrderCard(card, -1), card => CanShiftDeckOrderCard(card, -1));
-        MoveDeckOrderCardRightCommand = new RelayCommand<CardViewModel>(card => ShiftDeckOrderCard(card, 1), card => CanShiftDeckOrderCard(card, 1));
-    }
 
     private void SyncDeckReorder()
     {
@@ -61,33 +49,42 @@ public sealed partial class MainViewModel
         DeckTopCards.Contains(card) ? DeckTopCards : DeckBottomCards.Contains(card) ? DeckBottomCards : null;
     private bool IsLockedDeckOrderCard(CardViewModel card) => _deckReorderView is not { } order ||
         order.TopCardIds.Contains(card.Id) || order.BottomCardIds.Contains(card.Id);
-    private bool CanTransferDeckOrderCard(CardViewModel card) => IsDeckReorderPending &&
-        _deckReorderView is { ChoosingBottom: false } && DeckOrderRow(card) is not null && !IsLockedDeckOrderCard(card);
-    private bool CanShiftDeckOrderCard(CardViewModel card, int offset) => IsDeckReorderPending &&
-        DeckOrderRow(card) is { } row && !IsLockedDeckOrderCard(card) && row.IndexOf(card) + offset is var index &&
-        index >= 0 && index < row.Count && !IsLockedDeckOrderCard(row[index]);
-    private void ShiftDeckOrderCard(CardViewModel card, int offset)
+    internal bool CanDragDeckOrderCard(CardViewModel card) =>
+        IsDeckReorderPending && DeckOrderRow(card) is not null && !IsLockedDeckOrderCard(card);
+
+    internal bool CanDropDeckOrderCard(CardViewModel card, bool bottom, int targetIndex) =>
+        ResolveDeckOrderMove(card, bottom, targetIndex) is not null;
+
+    private (ObservableCollection<CardViewModel> Source, ObservableCollection<CardViewModel> Destination, int OldIndex, int Index)?
+        ResolveDeckOrderMove(CardViewModel card, bool bottom, int targetIndex)
     {
-        if (!CanShiftDeckOrderCard(card, offset)) return;
-        var row = DeckOrderRow(card)!; row.Move(row.IndexOf(card), row.IndexOf(card) + offset);
-        NotifyDeckReorderChanged(); RefreshSelectionHint();
+        if (!IsDeckReorderPending || _deckReorderView is not { } order ||
+            DeckOrderRow(card) is not { } source || IsLockedDeckOrderCard(card)) return null;
+        var destination = bottom ? DeckBottomCards : DeckTopCards;
+        var sameRow = ReferenceEquals(source, destination);
+        if (!sameRow && order.ChoosingBottom) return null;
+        var index = Math.Clamp(targetIndex, 0, destination.Count);
+        var oldIndex = source.IndexOf(card);
+        if (sameRow && oldIndex < index) index--;
+        // A recovered native prefix has already been accepted and stays fixed.
+        var movableEnd = destination.Count - (sameRow ? 1 : 0) - order.BottomCardIds.Count;
+        if (bottom ? index > movableEnd : index < order.TopCardIds.Count) return null;
+        return (source, destination, oldIndex, index);
     }
 
-    internal bool MoveDeckOrderCard(CardViewModel card, bool bottom, int? targetIndex = null)
+    internal bool MoveDeckOrderCard(CardViewModel card, bool bottom, int targetIndex)
     {
-        if (!IsDeckReorderPending || DeckOrderRow(card) is not { } source || IsLockedDeckOrderCard(card)) return false;
-        var destination = bottom ? DeckBottomCards : DeckTopCards;
-        if (!ReferenceEquals(source, destination) && !CanTransferDeckOrderCard(card)) return false;
-        var index = Math.Clamp(targetIndex ?? destination.Count, 0, destination.Count);
-        var oldIndex = source.IndexOf(card);
-        if (ReferenceEquals(source, destination) && oldIndex < index) index--;
-        var proposed = destination.Where(item => !ReferenceEquals(item, card)).ToList();
-        proposed.Insert(index, card);
-        // A recovered native prefix has already been accepted and stays fixed.
-        if (bottom ? !proposed.TakeLast(_deckReorderView!.BottomCardIds.Count).Select(item => item.Id)
-                .SequenceEqual(_deckReorderView.BottomCardIds.Reverse())
-            : !proposed.Take(_deckReorderView!.TopCardIds.Count).Select(item => item.Id).SequenceEqual(_deckReorderView.TopCardIds)) return false;
-        source.Remove(card); destination.Insert(index, card);
+        if (ResolveDeckOrderMove(card, bottom, targetIndex) is not { } move) return false;
+        if (ReferenceEquals(move.Source, move.Destination))
+        {
+            if (move.OldIndex == move.Index) return true;
+            move.Source.Move(move.OldIndex, move.Index);
+        }
+        else
+        {
+            move.Source.RemoveAt(move.OldIndex);
+            move.Destination.Insert(move.Index, card);
+        }
         NotifyDeckReorderChanged(); RefreshSelectionHint();
         return true;
     }
@@ -95,9 +92,6 @@ public sealed partial class MainViewModel
     private void NotifyDeckReorderChanged()
     {
         RaisePropertyChanged(nameof(DeckTopLabel)); RaisePropertyChanged(nameof(DeckBottomLabel)); RaisePropertyChanged(nameof(HasDeckTopRow));
-        (TransferDeckOrderCardCommand as RelayCommand<CardViewModel>)?.NotifyCanExecuteChanged();
-        (MoveDeckOrderCardLeftCommand as RelayCommand<CardViewModel>)?.NotifyCanExecuteChanged();
-        (MoveDeckOrderCardRightCommand as RelayCommand<CardViewModel>)?.NotifyCanExecuteChanged();
     }
 
     private void ConfirmDeckReorder()

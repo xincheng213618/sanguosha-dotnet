@@ -9,10 +9,20 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
     private const string Issuer = "fixture:hongji-issuer", Beneficiary = "fixture:hongji-recipient", Peer = "fixture:hongji-peer";
     private const string Hongji = "ol:hongji", Watch = "fixture:hongji-native-draw", Deck = "fixture:hongji-draw-deck";
 
-    internal static void ForeignPromiseReturnsThroughSecondNativeDrawCold()
+    internal static void ForeignPromiseReturnsThroughSecondNativeDrawCold() => Run(watchNative: true);
+
+    internal static void ForeignPromiseReturnsThroughLightDrawCold()
+    {
+        var light = Run(watchNative: false);
+        var watched = Run(watchNative: true);
+        if (!light.Phases.SequenceEqual(watched.Phases) || !light.Moves.SequenceEqual(watched.Moves) || !light.Hand.SequenceEqual(watched.Hand))
+            throw new InvalidOperationException("The same foreign promise must deal the same four entities in the same two actual Draw phases with and without a native listener.");
+    }
+
+    private static DrawProjection Run(bool watchNative)
     {
         const int issuer = 0, recipient = 1;
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(watchNative));
         var peer = new ShanheCombatantDefinition(Peer) { StartingHand = [] };
         var setup = new ShanheBattleSetup(47, 1, "hongji-foreign-native-draw", Issuer, 4, 0, 0, 0, 0,
             [], [], [], [peer, peer], [new(Beneficiary) { StartingHand = [] }], new string('b', 64));
@@ -31,6 +41,8 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
             throw new InvalidOperationException("Hongji lost its original detached phase schedule.");
         CardMovementRecord[] Draws(int turn) => game.CardMovements.Where(move => move.TurnNumber == turn &&
             move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient) && move.Reason == CardMoveReasons.Draw).ToArray();
+        ActualDiscardRecoveryPhaseStartedEvent[] DrawPhases(int turn) => Facts<ActualDiscardRecoveryPhaseStartedEvent>().Where(fact =>
+            fact.Phase is { ActorSeat: recipient, Kind: ActualDiscardRecoveryPhaseKind.Draw } && fact.Phase.TurnNumber == turn).ToArray();
         void Need(bool condition, string message)
         {
             if (!condition)
@@ -75,6 +87,8 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
             return attempt;
         }
 
+        Need(registry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.NativeDrawStarting) == watchNative,
+            "Only the watched version installs a native Draw listener.");
         Submit(new StartGameCommand());
         Reach(() => Prompt() is { Kind: DecisionKind.PlayCard, PlayerSeat: issuer }, skipOwnOffer: true);
         Need(game.CreateSnapshot(recipient).Players[recipient] is { GeneralId: Beneficiary, HandCount: 0 },
@@ -86,14 +100,28 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
         Need(Prompt()!.Choices.Single(choice => choice.Parameters.GetValueOrDefault("branch") == "draw").Targets.SequenceEqual([recipient]),
             "The human issuer explicitly commits to the original foreign recipient's next Draw end.");
         Choose("branch", "draw");
-        Reach(Watching);
+        if (watchNative)
+            Reach(Watching);
+        else
+            Reach(() => game.State is { CurrentSeat: recipient, Phase: TurnPhase.Play });
         var promise = Facts<ZhangShiPingHongjiGrantedEvent>().Single();
-        var natural = CurrentAttempt();
         var preparation = Facts<ProgramBindingStartedEvent>().Single(e => e.FrameId == promise.FrameId);
         Need(promise is { Source: { OwnerSeat: issuer, SkillId: Hongji, BindingId: "lifecycle" }, RecipientSeat: recipient, Phase: TurnPhase.Draw } &&
             preparation is { OwnerSeat: issuer, SkillId: Hongji, BindingId: "foreign-preparation-promise", Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } &&
             preparation.SkillInstanceId == promise.Source.SkillInstanceId,
             $"The original foreign preparation binding issues the recipient's Draw promise. Promise {promise}, binding {preparation}.");
+
+        if (!watchNative)
+        {
+            var before = Enumerable.Range(0, game.PlayerCount).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray();
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            Need(before.SequenceEqual(Enumerable.Range(0, game.PlayerCount).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)))),
+                "Cold replay retains the same completed foreign state and its first Play opportunity without native requests.");
+            VerifyLightDraw(promise);
+            return Project(promise.ActualTurn);
+        }
+
+        var natural = CurrentAttempt();
         var drawnBeforeReturn = Draws(promise.ActualTurn).Length;
         var consumedBeforeReturn = Facts<ZhangShiPingHongjiConsumedEvent>().Length;
         var scheduledBeforeReturn = Schedules().Length;
@@ -137,7 +165,8 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
         var draws = Draws(promise.ActualTurn);
         Need(returned == new ZhangShiPingHongjiReturnedEvent(promise.FrameId, consumed.FrameId, promise.ActualTurn, recipient, TurnPhase.Draw) &&
             restoration.Phase == natural.Context.ActualPhase && binding is { OwnerSeat: issuer, Window: SkillProgramTriggerWindow.DrawPhaseEnded, Completed: true } &&
-            Facts<ActualDrawPhaseCompletedEvent>().Any(e => e.FrameId == natural.Context.ParentFrameId && e is { Skipped: false, DrawCount: 2 }) &&
+            Facts<ActualDrawPhaseCompletedEvent>().Count(e => e.FrameId == natural.Context.ParentFrameId && e is { IsExtra: false, Skipped: false, DrawCount: 2 }) == 1 &&
+            Facts<ActualDrawPhaseCompletedEvent>().Count(e => e.FrameId == inserted.Context.ParentFrameId && e is { IsExtra: true, Skipped: false, DrawCount: 2 }) == 1 &&
             Schedules() is [var opened, { Started: false } closed] && opened == schedule[0] && closed.FrameId == opened.FrameId,
             "The inserted Draw returns to the exact original foreign DrawEnded window and completes the consumed grant once.");
         Need(draws.Length == 4 && draws.Take(2).SequenceEqual(naturalCards) && draws.Select(move => move.CardId).Distinct().Count() == 4 &&
@@ -146,16 +175,67 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
                 new(natural.Id, natural.Context.ParentFrameId, recipient, 2, false),
                 new(inserted.Id, inserted.Context.ParentFrameId, recipient, 2, false)]),
             "The original and inserted Draw each deliver two separate real entities before the recipient enters Play.");
+        return Project(promise.ActualTurn);
+
+        DrawProjection Project(int turn) => new(DrawPhases(turn), Draws(turn).Select(move =>
+            (move.CardId, move.CardKind, move.From, move.To, move.Reason)).ToArray(),
+            game.CreateSnapshot(recipient).Players[recipient].Hand.Select(card => card.Id).ToArray());
+
+        void VerifyLightDraw(ZhangShiPingHongjiGrantedEvent grant)
+        {
+            var turn = grant.ActualTurn;
+            var history = game.Events.Select(entry => entry.Payload).ToArray();
+            var paid = Facts<ZhangShiPingHongjiConsumedEvent>().Single();
+            var returned = Facts<ZhangShiPingHongjiReturnedEvent>().Single();
+            var restore = Facts<ActualDiscardRecoveryPhaseRestoredEvent>().Single(entry => entry.ProducerFrameId == paid.FrameId);
+            var binding = Facts<ProgramBindingResolvedEvent>().Single(entry => entry.FrameId == paid.FrameId && entry.SkillId == Hongji);
+            var phases = DrawPhases(turn);
+            var cards = Draws(turn);
+            var scheduled = Schedules();
+            Need(paid.PromiseFrameId == grant.FrameId && paid.Source == grant.Source && paid.RecipientSeat == recipient && paid.ActualTurn == turn &&
+                paid.Phase == TurnPhase.Draw && returned == new ZhangShiPingHongjiReturnedEvent(grant.FrameId, paid.FrameId, turn, recipient, TurnPhase.Draw) &&
+                binding is { OwnerSeat: issuer, Window: SkillProgramTriggerWindow.DrawPhaseEnded, BindingId: "issued-draw-phase", Completed: true } &&
+                scheduled is [{ OwnerSeat: issuer, Phase: TurnPhase.Draw, Started: true } open, { Started: false } close] &&
+                open.FrameId == paid.FrameId && close.FrameId == paid.FrameId && phases is [var ordinary, var extra] &&
+                ordinary.Phase.Token != extra.Phase.Token && restore.Phase == ordinary.Phase &&
+                Array.IndexOf(history, ordinary) < Array.IndexOf(history, open) && Array.IndexOf(history, open) < Array.IndexOf(history, extra) &&
+                Array.IndexOf(history, close) < Array.IndexOf(history, restore) && Array.IndexOf(history, restore) < Array.IndexOf(history, returned) &&
+                cards.Length == 4 && cards.Select(move => move.CardId).Distinct().Count() == 4 &&
+                cards.Take(2).All(move => move.Sequence > ordinary.MovementSequenceBefore && move.Sequence <= extra.MovementSequenceBefore) &&
+                cards.Skip(2).All(move => move.Sequence > extra.MovementSequenceBefore) && game.State.TurnNumber == turn,
+                "The foreign recipient gets two physical cards per actual phase and the consumed schedule restores the original natural Draw token.");
+
+            var completed = Facts<ActualDrawPhaseCompletedEvent>().Where(entry => entry.OwnerSeat == recipient && entry.ActualTurnNumber == turn).ToArray();
+            var ends = Facts<ActualPhaseEndedEvent>();
+            var naturalEnd = ends.Single(entry => entry.Phase == phases[0].Phase);
+            var insertedEnd = ends.Single(entry => entry.Phase == phases[1].Phase);
+            Need(completed.Length == 2 && completed.All(entry => !entry.Skipped && entry.DrawCount == 2) &&
+                completed.SingleOrDefault(entry => entry.IsExtra) is { } insertedCompletion &&
+                completed.SingleOrDefault(entry => !entry.IsExtra) is { } naturalCompletion &&
+                Array.IndexOf(history, insertedEnd) < Array.IndexOf(history, insertedCompletion) &&
+                Array.IndexOf(history, insertedCompletion) < Array.IndexOf(history, scheduled[1]) &&
+                Array.IndexOf(history, restore) < Array.IndexOf(history, naturalEnd) && Array.IndexOf(history, naturalEnd) < Array.IndexOf(history, naturalCompletion) &&
+                !Facts<NativeDrawAttemptStartedEvent>().Any() && !Facts<NativeDrawAttemptDecidedEvent>().Any() &&
+                Facts<ProgramBindingStartedEvent>().All(entry => entry.Window != SkillProgramTriggerWindow.DrawPhaseStarting),
+                "The extra completion closes its own token before the schedule restores the ordinary token, which finishes afterward without any draw listener.");
+        }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed record DrawProjection(ActualDiscardRecoveryPhaseStartedEvent[] Phases,
+        (int CardId, CardKind Kind, CardLocation From, CardLocation To, CardMoveReason Reason)[] Moves, int[] Hand);
+
+    private sealed class Fixture(bool watchNative) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-hongji-native-draw", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, "ol:zhang-shi-ping");
-            var catalog = SkillProgramCatalog.Load($$"""
+            if (!watchNative)
+                CharacterFixtureContent.Register(builder, "ol:qu-huang");
+            if (watchNative)
+            {
+                var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Watch}}","revision":1,"triggers":[
                   {"id":"actual-native-draw","window":"nativeDrawStarting","subject":"owner","optional":false,"isSkillInvocation":false,
                    "effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]}]}
@@ -165,10 +245,11 @@ internal static class OlZhangShiPingHongjiNativeDrawChecks
                     skills = new Dictionary<string, object> { [Watch] = new { name = "观察鸿济摸牌", description = "在真实摸牌前暂停。",
                         optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } }
                 }));
-            builder.AddSkill(new(Watch, "观察鸿济摸牌", "在真实摸牌前暂停。")
-                { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
+                builder.AddSkill(new(Watch, "观察鸿济摸牌", "在真实摸牌前暂停。")
+                    { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
+            }
             builder.AddGeneral(new(Issuer, "鸿济拥有者", "supporter", Hongji, "shu", 4));
-            builder.AddGeneral(new(Beneficiary, "鸿济受领者", "supporter", Watch, "wei", 4));
+            builder.AddGeneral(new(Beneficiary, "鸿济受领者", "supporter", watchNative ? Watch : "standard:none", "wei", 4));
             builder.AddGeneral(new(Peer, "固定同桌", "supporter", "standard:none", "wei", 4));
             builder.AddDeck(new(Deck, "鸿济固定闪牌堆", 0, 2, [new("standard:dodge", 24)]));
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "异席鸿济实际摸牌", 4, 4, new Dictionary<string, int>(), Deck,

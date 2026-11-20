@@ -16,18 +16,14 @@ public sealed partial record ProgramSkillFrame
     public BoundaryZhangZhaoPhaseReceipt? BoundaryZhangZhaoPhase { get; init; }
 }
 internal interface IBoundaryZhangZhaoMobileHost { SkillProgramStepOutcome Restore(ProgramSkillFrame f); }
-internal sealed class CaptureBoundaryZhangZhaoPhaseDiscardsDescriptor : ProgramOperationDescriptorBase
+internal sealed class CaptureBoundaryZhangZhaoPhaseDiscardsDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards;
     public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
-    public override ISkillProgramEffectHandler Handler { get; } = new BoundaryZhangZhaoPhaseHandler();
+    public override ISkillProgramEffectHandler Handler => this;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(2));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.DiscardPhaseEnded)];
-}
-internal sealed class BoundaryZhangZhaoPhaseHandler : ISkillProgramEffectHandler
-{
-    public SkillProgramEffectOp Op => SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host) => host.GetCapability<IBoundaryZhangZhaoMobileHost>().Restore(f);
 }

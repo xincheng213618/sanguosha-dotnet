@@ -79,6 +79,23 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
         program.Id == occurrence && parent.OwnerSeat == frame.OwnerSeat &&
         program.WindowContext?.ParentFrameId == parent.Id && frame.ActualTurnNumber == turn.TurnNumber;
 
+    internal void ResolveDrawWithoutAttempt(int ownerSeat, bool normalDrawReplaced = false,
+        int adjustment = 0, int? frozenBase = null)
+    {
+        var owner = participants.Players[ownerSeat];
+        var count = ConfirmDrawCount(owner, normalDrawReplaced, adjustment, frozenBase);
+        if (!normalDrawReplaced)
+            draws.DrawCards(owner, count, true, CardMoveReasons.Draw);
+    }
+
+    private int ConfirmDrawCount(CharacterState owner, bool normalDrawReplaced, int adjustment, int? frozenBase)
+    {
+        native.ConsumeDuFuRenDrawPhase(owner.Seat);
+        native.ConsumeChengGongYingDraw(owner.Seat);
+        var baseCount = frozenBase ?? native.FreezeNativeDrawBase(owner, normalDrawReplaced);
+        return normalDrawReplaced ? 0 : Math.Max(0, checked(baseCount + adjustment));
+    }
+
     internal bool TryBeginActualDrawCompletion(CharacterState owner, int delayedEffects)
     {
         var skipped = (delayedEffects & facts.SkipDrawPhaseMask) != 0;
@@ -90,10 +107,11 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
             batch.TurnNumber == turn.TurnNumber && batch.Movements.Count > 0 && batch.Movements.All(m =>
                 m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(owner.Seat) && m.Reason == CardMoveReasons.Draw))
             .Select(batch => batch.Id).ToArray());
-        var frame = new DrawPhaseObligationFrame(frames.NextId(), owner.Seat, turn.TurnNumber, false,
+        var occurrence = schedules.Current is { Phase: TurnPhase.Draw } schedule ? schedule.Frame.Id : (long?)null;
+        var frame = new DrawPhaseObligationFrame(frames.NextId(), owner.Seat, turn.TurnNumber, occurrence.HasValue,
             delayedEffects, skipped ? DrawPhaseObligationStage.SkipObservers : DrawPhaseObligationStage.EndObservers,
             Skipped: skipped, DrawCount: PendingBatches().Where(batch => inherited.Contains(batch.Id)).Sum(batch => batch.Movements.Count))
-        { InheritedMovementBatchIds = inherited, DiscardRecoveryPhase = actualPhases.Current() };
+        { PhaseOccurrenceFrameId = occurrence, InheritedMovementBatchIds = inherited, DiscardRecoveryPhase = actualPhases.Current() };
         frames.Push(frame); frames.Advance(frame.Id); return true;
     }
 
@@ -122,16 +140,14 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                 case DrawPhaseObligationStage.Drawing:
                     if (frame.Skipped)
                     { frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.SkipObservers }); break; }
-                    native.ConsumeDuFuRenDrawPhase(frame.OwnerSeat);
-                    native.ConsumeChengGongYingDraw(frame.OwnerSeat);
-                    var baseDrawCount = frame.FrozenBaseDrawCount ?? native.FreezeNativeDrawBase(participants.Players[frame.OwnerSeat], frame.NormalDrawReplaced);
-                    var count = frame.NormalDrawReplaced ? 0 : Math.Max(0, checked(baseDrawCount + frame.DrawAdjustment));
+                    var owner = participants.Players[frame.OwnerSeat];
+                    var count = ConfirmDrawCount(owner, frame.NormalDrawReplaced, frame.DrawAdjustment, frame.FrozenBaseDrawCount);
                     if (facts.HasAttemptCapability && !frame.NormalDrawReplaced)
                     { BeginOwnedDrawAttempt(frame, count); break; }
                     frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.DrawChildren, DrawCount = 0 });
                     if (!frame.NormalDrawReplaced)
                     {
-                        var actual = draws.DrawCards(participants.Players[frame.OwnerSeat], count, true, new("program.extra-draw-phase.draw"));
+                        var actual = draws.DrawCards(owner, count, true, OwnedDrawReason(frame));
                         var paidDraw = (DrawPhaseObligationFrame)frames.Top!;
                         frames.ReplaceTop(paidDraw with { DrawCount = actual.Count });
                     }

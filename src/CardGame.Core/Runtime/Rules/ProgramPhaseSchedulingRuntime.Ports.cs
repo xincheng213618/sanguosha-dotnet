@@ -21,15 +21,11 @@ internal interface IProgramPhaseScheduleState : IProgramRuntimeOperations
     void RestorePhase(TurnPhase phase);
 }
 
-// The scheduler controls the order. Native phase entry, draw replacement,
-// draw-base capture and character-specific consumption stay with their owners.
+// The scheduler controls insertion and return. The Draw owner settles phase data.
 internal interface IProgramPhaseNativeEntries : IProgramRuntimeOperations
 {
     void EnterPlayPhase(int seat);
     bool TryBeginDrawPhaseProgramWindow(int seat);
-    void ConsumeDuFuRenDrawPhase(int seat);
-    void ConsumeChengGongYingDraw(int seat);
-    void DrawNormalCards(int seat);
     void CompleteTurnStartAfterDraw(int seat);
 }
 

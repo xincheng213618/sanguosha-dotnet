@@ -594,7 +594,6 @@ public sealed partial class MainViewModel
 
     private void InitializePresentation(bool autoAdvance)
     {
-        InitializeDeckReorder();
         InitializeCardExchange();
         InitializeBattleLogFilters();
         InitializePlayback();
