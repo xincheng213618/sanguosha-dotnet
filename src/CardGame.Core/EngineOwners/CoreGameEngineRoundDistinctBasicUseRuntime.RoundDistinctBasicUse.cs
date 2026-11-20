@@ -18,7 +18,9 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
     internal bool IsRoundDistinctBasicMaterial(CharacterState owner, Card card)
     {
         var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
-        return location == CardLocation.Hand(owner.Seat) || location == CardLocation.WoodenOxGrain(owner.Seat) && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && _characterHuCheErMouOperations.KongwuEffectiveEquipment(owner).Any(e => e.Kind == CardKind.WoodenOx);
+        return location == CardLocation.Hand(owner.Seat) ||
+            location == CardLocation.WoodenOxGrain(owner.Seat) && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx &&
+            _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(owner).Any(card => card.Kind == CardKind.WoodenOx);
     }
 
     internal bool MatchesRoundDistinctBasicMaterials(CharacterState owner, SkillProgramViewAs rule, IReadOnlyList<Card> cards)
