@@ -40,7 +40,7 @@ internal abstract class WenYangDescriptor(SkillProgramEffectOp op):ProgramOperat
     public override ProgramOperationInteraction Interaction=>op==SkillProgramEffectOp.ResolveLvliActualDamageChoice?ProgramOperationInteraction.Choice:ProgramOperationInteraction.Automatic;
     public override ProgramOperationAiPolicy AiPolicy { get; }=new(ProgramOperationAiSemantic.GainCards,static(_,c)=>c.PublicControlValue(3));
 }
-internal sealed class ResolveWenYangAwakeningDescriptor():WenYangDescriptor(SkillProgramEffectOp.ResolveWenYangAwakening)
+internal sealed class ResolveWenYangAwakeningDescriptor():WenYangDescriptor(SkillProgramEffectOp.ResolveWenYangAwakening), IAwakeningBindingOperation
 { public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[]; }
 internal sealed class WenYangHandler(SkillProgramEffectOp op):ISkillProgramEffectHandler
 {

@@ -166,7 +166,7 @@ internal sealed class InheritOriginalHandBonusesDescriptor : OriginalHandEntityD
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.InheritOriginalHandBonuses;
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.WindowContext?.Window == SkillProgramTriggerWindow.OwnerDied;
 }
-internal sealed class AwakenWhenOriginalHandEmptyDescriptor : OriginalHandEntityDescriptorBase
+internal sealed class AwakenWhenOriginalHandEmptyDescriptor : OriginalHandEntityDescriptorBase, IAwakeningBindingOperation
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenWhenOriginalHandEmpty; }
 public abstract class OriginalHandEntityHandler : ISkillProgramEffectHandler
 {

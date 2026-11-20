@@ -26,7 +26,7 @@ internal sealed class PreventDamageForHighestRankGiftDescriptor : SpZhangLiaoDes
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.PreventDamageForHighestRankGift;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
 }
-internal sealed class AwakenMubingDescriptor : SpZhangLiaoDescriptor
+internal sealed class AwakenMubingDescriptor : SpZhangLiaoDescriptor, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenMubing;
 }

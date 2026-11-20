@@ -63,7 +63,7 @@ internal sealed class AlterEquipmentSlotsOperationDescriptor : AdvancedLifecycle
 internal sealed class AbolishRandomEquipmentSlotOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AbolishRandomEquipmentSlot; }
 internal sealed class SampleFactionSkillsOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.SampleFactionSkills; }
 internal sealed class ExpireSampledSkillsOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExpireSampledSkills; }
-internal sealed class ReplaceSkillsOnAwakeningOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ReplaceSkillsOnAwakening; }
+internal sealed class ReplaceSkillsOnAwakeningOperationDescriptor : AdvancedLifecycleOperationDescriptor, IAwakeningBindingOperation { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ReplaceSkillsOnAwakening; }
 internal sealed class AccumulateCardRankOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AccumulateCardRank; }
 internal sealed class ObtainDeckRankSumOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ObtainDeckRankSum; }
 internal sealed class DamageAfterDeckShuffleOperationDescriptor : AdvancedLifecycleOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DamageAfterDeckShuffle; }

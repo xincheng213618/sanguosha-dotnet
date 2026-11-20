@@ -49,7 +49,7 @@ internal abstract class ShenZhongHuiDescriptor(SkillProgramEffectOp op) : Progra
 internal sealed class ResolveLinjieRoundDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.ResolveLinjieRound);
 internal sealed class ResolveLinjieDamageDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.ResolveLinjieDamage);
 internal sealed class ResolveDuzhangDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.ResolveDuzhang);
-internal sealed class AwakenJianghuoDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.AwakenJianghuo);
+internal sealed class AwakenJianghuoDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.AwakenJianghuo), IAwakeningBindingOperation;
 internal sealed class ChooseLishiPunishmentsDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.ChooseLishiPunishments);
 internal sealed class ResolveLishiPhaseDescriptor() : ShenZhongHuiDescriptor(SkillProgramEffectOp.ResolveLishiPhase);
 internal sealed class ShenZhongHuiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler

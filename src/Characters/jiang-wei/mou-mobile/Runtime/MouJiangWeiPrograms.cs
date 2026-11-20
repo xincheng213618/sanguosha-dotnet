@@ -64,6 +64,6 @@ internal abstract class MouJiangWeiDescriptor : ProgramOperationDescriptorBase
 }
 internal sealed class InitializeMouJiangWeiDescriptor : MouJiangWeiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.InitializeMouJiangWei; }
 internal sealed class ResolveMouJiangWeiTiaoxinDescriptor : MouJiangWeiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouJiangWeiTiaoxin; }
-internal sealed class ResolveMouJiangWeiZhijiDescriptor : MouJiangWeiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouJiangWeiZhiji; }
+internal sealed class ResolveMouJiangWeiZhijiDescriptor : MouJiangWeiDescriptor, IAwakeningBindingOperation { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouJiangWeiZhiji; }
 internal sealed class MouJiangWeiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost h) => h.GetCapability<IMouJiangWeiHost>().Resolve(f, op); }

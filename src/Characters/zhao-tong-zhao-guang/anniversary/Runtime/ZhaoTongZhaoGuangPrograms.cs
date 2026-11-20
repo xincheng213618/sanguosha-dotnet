@@ -16,7 +16,7 @@ internal abstract class AnniversaryZhaoTongZhaoGuangDescriptor : ProgramOperatio
 }
 internal sealed class DrawAnniversaryZhaoTongZhaoGuangQingrenDescriptor : AnniversaryZhaoTongZhaoGuangDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawAnniversaryZhaoTongZhaoGuangQingren; }
-internal sealed class AwakenAnniversaryZhaoTongZhaoGuangLongyuanDescriptor : AnniversaryZhaoTongZhaoGuangDescriptor
+internal sealed class AwakenAnniversaryZhaoTongZhaoGuangLongyuanDescriptor : AnniversaryZhaoTongZhaoGuangDescriptor, IAwakeningBindingOperation
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenAnniversaryZhaoTongZhaoGuangLongyuan; }
 internal sealed class AnniversaryZhaoTongZhaoGuangHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

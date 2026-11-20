@@ -66,7 +66,7 @@ internal sealed class PindianProgramOperationDescriptor : ProgramOperationDescri
         [new ReadSelectedTarget(), new ConsumeSelectedCards(1), new CreatePindianResult("__active-pindian-result")];
 }
 
-internal sealed class ChangeMaximumHpProgramOperationDescriptor : ProgramOperationDescriptorBase
+internal sealed class ChangeMaximumHpProgramOperationDescriptor : ProgramOperationDescriptorBase, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ChangeMaximumHp;
     public override ISkillProgramEffectHandler Handler { get; } = new ChangeMaximumHpSkillProgramEffectHandler();
@@ -86,7 +86,7 @@ internal sealed class ChangeMaximumHpProgramOperationDescriptor : ProgramOperati
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
 }
 
-internal sealed class GrantSkillsProgramOperationDescriptor : ProgramOperationDescriptorBase
+internal sealed class GrantSkillsProgramOperationDescriptor : ProgramOperationDescriptorBase, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GrantSkills;
     public override ISkillProgramEffectHandler Handler { get; } = new GrantSkillsSkillProgramEffectHandler();

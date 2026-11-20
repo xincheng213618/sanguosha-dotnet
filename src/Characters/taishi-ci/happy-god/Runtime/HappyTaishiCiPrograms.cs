@@ -23,7 +23,7 @@ internal sealed class HappyTaishiCiRecoverDescriptor : HappyTaishiCiDescriptor
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RecoverHappyTaishiCiDulie;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.DyingEntering)];
 }
-internal sealed class HappyTaishiCiAwakenDescriptor : HappyTaishiCiDescriptor
+internal sealed class HappyTaishiCiAwakenDescriptor : HappyTaishiCiDescriptor, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenHappyTaishiCiPowei;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterTurnEnded)];

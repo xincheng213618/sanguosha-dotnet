@@ -34,8 +34,8 @@ internal abstract class OlShenCaoPiDescriptor(SkillProgramEffectOp op) : Program
         ? SkillProgramTriggerWindow.AfterDamageApplied : SkillProgramTriggerWindow.TurnStartBeforeNormalFlow)];
 }
 internal sealed class StoreOlChuyuanAfterDamageDescriptor() : OlShenCaoPiDescriptor(SkillProgramEffectOp.StoreOlChuyuanAfterDamage);
-internal sealed class AwakenOlDengjiDescriptor() : OlShenCaoPiDescriptor(SkillProgramEffectOp.AwakenOlDengji);
-internal sealed class AwakenOlTianxingDescriptor() : OlShenCaoPiDescriptor(SkillProgramEffectOp.AwakenOlTianxing);
+internal sealed class AwakenOlDengjiDescriptor() : OlShenCaoPiDescriptor(SkillProgramEffectOp.AwakenOlDengji), IAwakeningBindingOperation;
+internal sealed class AwakenOlTianxingDescriptor() : OlShenCaoPiDescriptor(SkillProgramEffectOp.AwakenOlTianxing), IAwakeningBindingOperation;
 internal sealed class OlShenCaoPiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 { public SkillProgramEffectOp Op => op; public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host) => host.GetCapability<IOlShenCaoPiHost>().Resolve(f, e); }
 internal static class OlShenCaoPiComposition

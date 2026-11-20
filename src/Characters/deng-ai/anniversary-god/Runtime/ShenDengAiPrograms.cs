@@ -61,7 +61,7 @@ internal abstract class ShenDengAiDescriptor : ProgramOperationDescriptorBase
 internal sealed class InitializeShenDengAiDescriptor : ShenDengAiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.InitializeShenDengAiTuoYu; }
 internal sealed class AllocateShenDengAiDescriptor : ShenDengAiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AllocateShenDengAiTuoYu; }
 internal sealed class DevelopShenDengAiDescriptor : ShenDengAiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DevelopShenDengAiXianjin; }
-internal sealed class AwakenShenDengAiDescriptor : ShenDengAiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenShenDengAiQijing; }
+internal sealed class AwakenShenDengAiDescriptor : ShenDengAiDescriptor, IAwakeningBindingOperation { public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenShenDengAiQijing; }
 internal sealed class RepeatShenDengAiDescriptor : ShenDengAiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RepeatShenDengAiCuixin; }
 internal sealed class ShenDengAiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

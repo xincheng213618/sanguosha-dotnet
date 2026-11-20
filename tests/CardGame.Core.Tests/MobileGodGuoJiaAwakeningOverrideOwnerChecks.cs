@@ -13,6 +13,8 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
     private const string Diaoling = "ol:diaoling";
     private const string Choujue = "ol:choujue", Beishui = "ol:beishui";
     private const string Dili = "ol:dili", Shengzhi = "ol:shengzhi";
+    private const string Chengzhang = "boundary:chengzhang-mobile", ChengzhangBinding = "seven-damage-awakening";
+    private const string Jiushi = "boundary:jiushi-mobile", JiushiUpgraded = "boundary:jiushi-mobile-upgraded";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
     private const string DrawReason = "skill-program.mobile:huishi-gift.draw";
@@ -527,6 +529,68 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             "Dili completes the original payment once using its durable game key.");
     }
 
+    internal static void PaidHuishiWaivesChengzhangDamageForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("boundary:cao-zhi-mobile", [Chengzhang, Jiushi], WatchSkillGrant));
+        var match = new HuishiMatch(registry);
+        match.Start();
+        var firstTurn = match.Game.State.TurnNumber;
+        match.Need(match.Owner.MaxHp == 7 && match.Owner.Skills?.Any(skill => skill.ContentId == Jiushi) == true &&
+            match.Facts<DamageAppliedEvent>().Length == 0 && match.Facts<BoundaryCaoZhiJiushiUpgradedEvent>().Length == 0,
+            "The first actual Preparation ends with the original Jiushi and zero game damage.");
+
+        match.GrantToSelf(Chengzhang);
+        var grant = match.Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        var payment = match.Facts<ShenGuoJiaMaximumPaidEvent>().Single();
+        match.Need(grant is { Recipient: 0, SkillId: Chengzhang, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+            payment is { Seat: 0, Before: 7, After: 5, Purpose: "huishi-gift" } && payment.FrameId == grant.FrameId &&
+            match.Owner.MaxHp == 5 && match.Facts<BoundaryCaoZhiJiushiUpgradedEvent>().Length == 0,
+            "Huishi pays two maximum HP to grant the original Chengzhang instance for a later Preparation.");
+        match.Restore();
+        match.Need(match.Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]),
+            "Cold replay retains the paid Chengzhang override.");
+        match.EndPlay();
+        match.ReachPlay();
+
+        var upgrade = match.Facts<BoundaryCaoZhiJiushiUpgradedEvent>().SingleOrDefault();
+        match.Need(match.Facts<TurnStartedEvent>().Where(entry => entry.ActorSeat == 0).Select(entry => entry.TurnNumber)
+                .SequenceEqual([firstTurn, match.Game.State.TurnNumber]) &&
+            match.Facts<DamageAppliedEvent>().Length == 0 &&
+            upgrade is { GameDamageTotal: 0, Source: { OwnerSeat: 0, SkillId: Chengzhang, BindingId: ChengzhangBinding } } &&
+            upgrade.FrameId > grant.FrameId && upgrade.Source.SkillInstanceId == grant.InstanceId &&
+            match.Owner.Skills?.Count(skill => skill.ContentId == JiushiUpgraded) == 1 &&
+            match.Owner.Skills?.All(skill => skill.ContentId != Jiushi) == true,
+            "The granted Chengzhang must upgrade Jiushi at the next actual Preparation with zero game damage.");
+        match.Need(match.Facts<ProgramBindingStartedEvent>().Count(entry => entry.FrameId == upgrade!.FrameId &&
+                entry.SkillId == Chengzhang && entry.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) == 1 &&
+            match.Facts<ProgramBindingResolvedEvent>().Count(entry => entry.FrameId == upgrade!.FrameId && entry.Completed) == 1 &&
+            match.Facts<SkillAwakenedEvent>().Count(entry => entry.PlayerSeat == 0 && entry.SkillId == Chengzhang &&
+                entry.AcquiredSkillIds.SequenceEqual([JiushiUpgraded])) == 1 &&
+            match.Game.CardMovements.Count(move => move.Reason.Value == $"skill-program.{Chengzhang}.Draw" &&
+                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)) == 1 &&
+            match.Facts<ShenGuoJiaMaximumPaidEvent>().SequenceEqual([payment]) && match.Owner.MaxHp == 5,
+            "Granted Chengzhang completes the original native draw and permanent upgrade once.");
+
+        foreach (var amount in new[] { 6, 7 })
+        {
+            var control = new HuishiMatch(registry);
+            control.Start();
+            BoundaryLiDianChecks.Accept(control.Game, new UseProgramSkillCommand(0, Watch, amount == 6 ? "deal-six" : "deal-seven",
+                [], [1], control.Game.Revision, control.Prompt!.PromptId));
+            control.ReachPlay();
+            control.Need(control.Facts<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1, SourceLess: false, Amount: var damage }] &&
+                damage == amount && control.Facts<ShenGuoJiaAwakeningOverrideEvent>().Length == 0,
+                "The ungranted control deals the intended amount of real native damage.");
+            control.EndPlay();
+            control.ReachPlay();
+            var upgrades = control.Facts<BoundaryCaoZhiJiushiUpgradedEvent>();
+            control.Need(amount == 6
+                    ? upgrades.Length == 0 && control.Owner.Skills?.Any(skill => skill.ContentId == Jiushi) == true
+                    : upgrades is [{ GameDamageTotal: 7 }] && control.Owner.Skills?.Any(skill => skill.ContentId == JiushiUpgraded) == true,
+                $"Without Huishi, Chengzhang must awaken only at the seven-damage threshold. Actual damage: {amount}.");
+        }
+    }
+
     private sealed class HuishiMatch(ContentRegistry registry)
     {
         internal GameEngine Game { get; private set; } = CreateMatch(registry);
@@ -619,9 +683,16 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
                 ,"states":[{"id":"waiting-for-grants","initialValue":false,"visibility":"private","resetScope":"game",
                             "reacquirePolicy":"preserveUntilGameEnd"}]
                 """ : string.Empty;
+            var watchActivations = recipientSkills.Contains(Chengzhang) ? """
+                ,"activations":[
+                  {"id":"deal-six","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":1,
+                   "effects":[{"op":"damage","target":"selectedTarget","amount":6}]},
+                  {"id":"deal-seven","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":1,
+                   "effects":[{"op":"damage","target":"selectedTarget","amount":7}]}]
+                """ : string.Empty;
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-                  {"id":"{{Watch}}","revision":1{{watchStates}},"triggers":[{{watchTrigger}}]}
+                  {"id":"{{Watch}}","revision":1{{watchStates}}{{watchActivations}},"triggers":[{{watchTrigger}}]}
                 ]}
                 """, $$"""
                 {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{Watch}}":{

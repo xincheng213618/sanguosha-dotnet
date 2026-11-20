@@ -5,8 +5,21 @@ public sealed record ShenGuoJiaAwakeningOverrideEvent(long FrameId, CardConversi
 
 internal interface IProgramAwakeningOverrideQuery : IProgramSelectionQuery
 {
-    bool Granted(int owner, string skill, string? binding = null);
+    bool Granted(int owner, string skill, string? binding = null, string? instanceId = null);
     bool Issued(ProgramSkillFrame frame);
+}
+
+// An operation can identify the awakening itself within a tagged skill's
+// trigger. Other bindings on the same skill retain their normal conditions.
+internal interface IAwakeningBindingOperation { }
+
+internal static class ProgramAwakeningBindings
+{
+    internal static IEnumerable<SkillProgramTrigger> For(ContentSkillDefinition definition) =>
+        definition.Tags.HasFlag(SkillTag.Awakening) && definition.Program is { } program
+            ? program.Triggers.Where(trigger => trigger.Effects.Any(effect =>
+                ProgramOperationCatalog.Default.Resolve(effect.Op) is IAwakeningBindingOperation))
+            : [];
 }
 
 internal interface IProgramAwakeningDamageQuery : IProgramSelectionQuery
@@ -62,7 +75,7 @@ internal interface IGameActivationAwakeningProgramHost
 {
     SkillProgramStepOutcome BeginGameActivationAwakening(ProgramSkillFrame frame, SkillProgramEffect effect);
 }
-internal sealed class AwakenAfterGameActivationsDescriptor : ProgramOperationDescriptorBase
+internal sealed class AwakenAfterGameActivationsDescriptor : ProgramOperationDescriptorBase, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.AwakenAfterGameActivations;
     public override ISkillProgramEffectHandler Handler { get; } = new AwakenAfterGameActivationsHandler();

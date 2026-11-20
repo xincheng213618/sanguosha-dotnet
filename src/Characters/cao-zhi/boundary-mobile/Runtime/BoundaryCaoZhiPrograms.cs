@@ -51,7 +51,7 @@ internal sealed class SelectBoundaryCaoZhiTrickDescriptor : ProgramOperationDesc
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
         [new RequireTriggerWindows([SkillProgramTriggerWindow.AfterDamageApplied, SkillProgramTriggerWindow.CharacterTurnedOver]), new CaptureSourceCard(e.ResultBind!, 1)];
 }
-internal sealed class UpgradeBoundaryCaoZhiJiushiDescriptor : ProgramOperationDescriptorBase
+internal sealed class UpgradeBoundaryCaoZhiJiushiDescriptor : ProgramOperationDescriptorBase, IAwakeningBindingOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.UpgradeBoundaryCaoZhiJiushi;
     public override ISkillProgramEffectHandler Handler { get; } = new BoundaryCaoZhiHandler(SkillProgramEffectOp.UpgradeBoundaryCaoZhiJiushi);

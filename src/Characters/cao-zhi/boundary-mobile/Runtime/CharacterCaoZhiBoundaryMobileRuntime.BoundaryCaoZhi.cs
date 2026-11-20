@@ -23,7 +23,12 @@ internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
 
     internal int BoundaryCaoZhiGameDamage(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Sum(e => (e.TargetSeat == owner ? e.Amount : 0) + (!e.SourceLess && e.SourceSeat == owner ? e.Amount : 0));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 56701, SkillProgramEffectOp.UpgradeBoundaryCaoZhiJiushi)]
-    internal bool QualifyBoundaryCaoZhiChengzhang(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == BoundaryCaoZhiComposition.Chengzhang && context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatAccess._currentSeat == c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && BoundaryCaoZhiGameDamage(c.OwnerSeat) >= 7;
+    internal bool QualifyBoundaryCaoZhiChengzhang(ProgramTriggerCandidate c, ProgramSkillWindowContext context) =>
+        c.SkillId == BoundaryCaoZhiComposition.Chengzhang && context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow &&
+        context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatAccess._currentSeat == c.OwnerSeat &&
+        _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive &&
+        (BoundaryCaoZhiGameDamage(c.OwnerSeat) >= 7 ||
+         _awakeningOverrides.Granted(c.OwnerSeat, c.SkillId, c.BindingId, c.SkillInstanceId));
     void IBoundaryCaoZhiHost.SelectTrick(ProgramSkillFrame frame, string bind) => SelectBoundaryCaoZhiTrick(frame, bind);
     void IBoundaryCaoZhiHost.Upgrade(ProgramSkillFrame frame) => UpgradeBoundaryCaoZhiJiushi(frame);
     internal void SelectBoundaryCaoZhiTrick(ProgramSkillFrame supplied, string bind)

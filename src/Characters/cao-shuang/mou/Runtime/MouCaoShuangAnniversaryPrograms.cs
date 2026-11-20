@@ -59,7 +59,7 @@ internal abstract class MouCaoShuangAnniversaryDescriptor : ProgramOperationDesc
 }
 internal sealed class ResolveMouCaoShuangJianzhuanDescriptor : MouCaoShuangAnniversaryDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouCaoShuangJianzhuan; }
 internal sealed class DeleteMouCaoShuangJianzhuanOptionDescriptor : MouCaoShuangAnniversaryDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DeleteMouCaoShuangJianzhuanOption; }
-internal sealed class ResolveMouCaoShuangFanshiDescriptor : MouCaoShuangAnniversaryDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouCaoShuangFanshi; }
+internal sealed class ResolveMouCaoShuangFanshiDescriptor : MouCaoShuangAnniversaryDescriptor, IAwakeningBindingOperation { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouCaoShuangFanshi; }
 internal sealed class ResolveMouCaoShuangFudouDescriptor : MouCaoShuangAnniversaryDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouCaoShuangFudou; }
 internal sealed class MouCaoShuangAnniversaryHandler(SkillProgramEffectOp operation) : ISkillProgramEffectHandler
 {
