@@ -4,7 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
 {
     internal bool ResolveEnteringChain(CharacterState player, bool requested) => requested && !player.IsChained && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.PreventEnteringChain) ? false : requested;
-    internal ProgramLegalityParticipant CreateProgramLegalityParticipant(int seat) => _pindianPolicyQueries.CreateLegalityParticipant(seat);
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 140)]
     internal bool CanPayEquipmentSlotGroup(CharacterState owner, SkillProgramActivation activation) => ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.AbolishEquipmentSlotGroup).All(e => e.EquipmentSlots.Any(slot => owner.EquipmentSlotCapacity(slot) > 0));

@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
                 };
                 if (!ProgramLegality.CanActivate(ProgramActivationLegalityPhase.BeforeOwnerFacts, legality))
                     continue;
-                var ownerLegality = _coreEquipmentSlotGroupProgramsOperations.CreateProgramLegalityParticipant(owner.Seat);
+                var ownerLegality = _pindianPolicyQueries.CreateLegalityParticipant(owner.Seat);
                 if (!ProgramLegality.CanActivate(ProgramActivationLegalityPhase.BeforeCardCount, legality))
                     continue;
                 var requiredCards = GetProgramActivationMinimumCards(owner.Seat, program.Id, activation);
@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
                 if (!_coreProgramSelectionModulesOperations.ProgramSelections.Apply(ProgramSelectionStage.AfterCards, selection, candidates))
                     continue;
                 if (!_coreProgramSelectionModulesOperations.ProgramSelections.TryBuildSourceTargets(selection, candidates))
-                    candidates.Targets = activation.MaxTargets == 0 ? [] : _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && _coreProgramSelectionModulesOperations.ProgramSelections.AllowsTarget(selection, target.Seat) && features.Legality.CanSelectTarget(ownerLegality, _coreEquipmentSlotGroupProgramsOperations.CreateProgramLegalityParticipant(target.Seat)) && (activation.TargetKind is SkillProgramTargetKind.AnyLiving or SkillProgramTargetKind.AnyWounded or SkillProgramTargetKind.AnyLivingHighestHp or SkillProgramTargetKind.AnyLivingHighestHand or SkillProgramTargetKind.AnyLivingLeastHandCount or SkillProgramTargetKind.AnyLivingMale || target.Seat != owner.Seat) && (activation.TargetKind switch
+                    candidates.Targets = activation.MaxTargets == 0 ? [] : _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && _coreProgramSelectionModulesOperations.ProgramSelections.AllowsTarget(selection, target.Seat) && features.Legality.CanSelectTarget(ownerLegality, _pindianPolicyQueries.CreateLegalityParticipant(target.Seat)) && (activation.TargetKind is SkillProgramTargetKind.AnyLiving or SkillProgramTargetKind.AnyWounded or SkillProgramTargetKind.AnyLivingHighestHp or SkillProgramTargetKind.AnyLivingHighestHand or SkillProgramTargetKind.AnyLivingLeastHandCount or SkillProgramTargetKind.AnyLivingMale || target.Seat != owner.Seat) && (activation.TargetKind switch
                     {
                         SkillProgramTargetKind.ExclusiveRendeBeneficiary or SkillProgramTargetKind.ExclusiveQingnangBeneficiary => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner.Seat, activation.TargetKind).Contains(target.Seat),
                         SkillProgramTargetKind.OtherLiving => target.Seat != owner.Seat,
@@ -237,10 +237,10 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         {
             if (_coreProgramSelectionValidationOperations.ProgramSelectionValidators.Validate(ProgramSelectionValidationStage.BeforePublicPrerequisites, new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, program!, plan), action, cards, targets)is { } prerequisiteError)
                 return prerequisiteError;
-            var owner = _coreEquipmentSlotGroupProgramsOperations.CreateProgramLegalityParticipant(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
+            var owner = _pindianPolicyQueries.CreateLegalityParticipant(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
             if (!plan.Features.Legality.CanStart(owner))
                 return new CommandError(CommandErrorCode.IllegalAction, "The program's public prerequisites are no longer satisfied.");
-            if (targets.Any(seat => !plan.Features.Legality.CanSelectTarget(owner, _coreEquipmentSlotGroupProgramsOperations.CreateProgramLegalityParticipant(seat))))
+            if (targets.Any(seat => !plan.Features.Legality.CanSelectTarget(owner, _pindianPolicyQueries.CreateLegalityParticipant(seat))))
                 return new CommandError(CommandErrorCode.InvalidTarget, "The program's target prerequisites are no longer satisfied.");
         }
 

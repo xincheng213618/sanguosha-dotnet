@@ -642,6 +642,7 @@ var tests = new (string Name, Action Body)[]
     ("turn card-use effects union order consume and expire by action semantics", CardUseModuleEffectChecks.TurnStateUsesActionSemanticsStableOrderAndExpiration),
     ("active programs suspend into Pindian and branch from the frozen result", PindianModuleChecks.ActiveProgramPindianSuspendsConditionsAndReplays),
     ("mobile Lieren exchanges the original tied Pindian cards and resumes", MobileLierenChecks.TiedPindianExchangesOriginalCardsAndResumes),
+    ("Boundary Zhu Rong Lieren: direct damage opens original Pindian cold", MobileLierenChecks.DirectDamageOpensOriginalPindianCold),
     ("program pindian runtime preserves native sources and exact phase frames", ProgramPindianRuntimeChecks.NativeEntryPreservesEventSourcesAndExactPhaseFrames),
     ("foreign turn contest preserves original result paid child and typed Slash return cold", ForeignTurnContestRuntimeChecks.OriginalResultPaidChildAndTypedSlashReturnStayExactCold),
     ("program random acquisition preserves shared generator and ordered physical areas", ProgramRandomCardAcquisitionChecks.SharedRandomOwnerAndOrderedPhysicalAcquisitions),
