@@ -62,6 +62,8 @@ issuance. Those rules and their receipts stay with their producers.
 
 - Shanhe Sanshou armor admits its damage-prevention candidate through the effective field equipment and its original equipment skill instance. Armor suppression and bypass qualify against the actual damage attempt. The issued skill finishes its reveal and cleanup on the original frame.
 
+- Huxin Mirror uses effective field equipment and its exact skill instance for the offer and the unpaid admission. Once the mirror actually leaves equipment as payment, the original damage owner reads that movement receipt to finish prevention through any movement children.
+
 - Fixed effects already issued for a card use use `CardUseFrame.CardDamageAdjustments` and `CoreGameEngineCardUseLifecycleRuntime`; current-occurrence damage changes stay on the actual damage attempt. Preserve whole-use versus target scope and card-damage versus additional-damage layers. Do not rebuild character boost ledgers or requalify paid effects when their source disappears.
 
 - Barbarian Assault keeps its original card user and assigned damage source on the group continuation. A living assigned source remains responsible after skill loss. If that replacement source dies, a later failed response starts a source-less damage attempt while the original use continues with its assigned seats.
