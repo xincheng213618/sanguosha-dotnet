@@ -21,6 +21,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Attack-range membership uses IAttackRangeQueries and declared relations. Keep issued relations independent of continuing-source declarations, and keep membership separate from numeric range, card-distance exemptions, target prohibitions and quota. Preserve excluded-equipment arithmetic and rule-specific formulas; do not rebuild character range ledgers or route the answer through a response module. Resolve the existing positive-rank replacement or shared membership before distance extensions: a known rank under that policy cannot borrow weapon range, while unknown/nonpositive ranks retain the ordinary fallback. Native virtual Slash directly reads the existing complete rank-aware owner after quota qualification, then queries the VirtualSlash stage only for extra allowances; do not re-register its ordinary range in that extension chain. Keep the physical stage's complete range answer, the remaining bindings' relative order and all outer material/use/target guards. Virtual Slash uses its supplied EffectiveRank; keep physical appearance/use/excluded-equipment reads and Provided/Borrowed ordering at their existing boundaries. Issued relations, existing ordinary-range exceptions and SpecificSlashExemption remain independent allowances with their original use and equipment-exclusion arguments.
 
+- An HP-ordered distance projection checks for an active policy before reading scalar health. An ordinary distance query with independent health pools can use the usual distance contributions without selecting a pool.
+
 ## Native Slash requests
 
 - Issued native Slash requests use `INativeProgramSlashRequests` on the original `ProgramSkillFrame.SlashRequest`. Keep the issued opportunity, selected target, accepted payment attempt and actual `CardUseFrame.ProgramSlashRequestExecution` distinct. Loop issuance uses the real original cursor; retries get a new attempt ordinal. Material selectors and unpaid slot choices do not accept a use. Preserve the original private decision explicitly through paid children; do not fabricate a Play prompt or borrow an unrelated active request.
@@ -32,6 +34,8 @@ Required when changing these mechanisms or their consumers. See the
 - `CoreGameEngineAssistedPhysicalCardsRuntime` still initializes fixed-target requests through 移动姜维 and 复掠. Once issued, `GetOffer` answers continuing eligibility. The cardless request menu still includes 谋 OL 小乔's material entry. Preserve actual material and distance rules as their own boundaries when replacing the remaining producer wiring. Directed rights also retain separate 郭汜 Pact and 移动惴恐 distance contributions.
 
 ## Response materials and action-query snapshots
+
+- The native physical Peach rescue uses the same live response legality for its published options and submitted payment. The category restriction reads the actual responder and the effective Peach identity.
 
 - Faction-supplied Slash target eligibility uses `IProvidedSlashPaymentTargets`; do not gate actual-material validation on a character or distance/color privilege. Candidate conversion and final-kind issuance query the same actual materials separately.
 

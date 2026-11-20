@@ -11,6 +11,24 @@ public static class HappyShenDaXiaoQiaoChecks
         NoDraw = "fixture:happy-qiao-no-draw", Quiet = "fixture:happy-qiao-quiet", Deck = "fixture:happy-qiao-deck", GainHold = "fixture:happy-qiao-gain",
         MaximumCounter = "fixture:happy-qiao-maximum-counter", MaximumHold = "fixture:happy-qiao-maximum-hold";
 
+    public static void OrdinaryDistanceIgnoresUnusedHealthComparisonsCold()
+    {
+        var scene = Scene.Start();
+        scene.Play();
+        var outbound = scene.G.GetCombatDistance(0, 1);
+        var inbound = scene.G.GetCombatDistance(1, 0);
+
+        scene.Use("damage", [0]);
+        scene.PoolBoundary();
+        scene.Pool(HappyQiaoPool.XiaoQiao);
+        scene.Play();
+        scene.Cold();
+
+        scene.Need(scene.Health == new HappyQiaoDualHealth(3, 2, 3) &&
+            scene.G.GetCombatDistance(0, 1) == outbound && scene.G.GetCombatDistance(1, 0) == inbound,
+            "With no active HP-ordered distance policy, either direction keeps its ordinary distance across unequal pools.");
+    }
+
     public static void WushuangFactsPreserveUndefinedSisterHpAndRejectScalarLimitCold()
     {
         var s = Scene.Start(); s.Play();

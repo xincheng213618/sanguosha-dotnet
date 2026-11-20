@@ -852,6 +852,10 @@ var tests = new (string Name, Action Body)[]
     ("Happy Feifu: stores only its original paid Dodge entry cold", HappyZhenJiFeifuDiscardEntryChecks.FeifuStoresOnlyTheOriginalPaidDodgeEntry),
     ("Mobile Shi Sun Shao Zhuji: actual recovery applies Shanhe Yaoli cold", MobileShiSunShaoRecoveryChecks.ZhujiRecoveryAllowsOneActualShanheYaoliBonusCold),
     ("OL Xili: Wooden Ox equipment but not stored grain is discardable cold", OlHuaManXiliWoodenOxChecks.XiliCanDiscardTreasureButCannotDirectlyDiscardItsGrainCold),
+    ("OL Jingzhong: actual hand discard color cold", OlJingzhongChecks.JingzhongCountsTheEffectiveColorOfActualHandDiscardsCold),
+    ("Mobile Youyi: paid group recovery reaches unequal Qiao pools cold", MobileYouyiGroupRecoveryChecks.YouyiKeepsItsPaidGroupRecoveryAcrossUnequalQiaoPoolsCold),
+    ("OL Shoufu: basic talisman bars its holder native dying Peach cold", OlZhangLingShoufuDyingPeachChecks.BasicShoufuBlocksOnlyItsHoldersNativeDyingPeachCold),
+    ("Happy Qiao: ordinary distance needs no scalar HP cold", CardGame.Core.Tests.HappyShenDaXiaoQiaoChecks.OrdinaryDistanceIgnoresUnusedHealthComparisonsCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

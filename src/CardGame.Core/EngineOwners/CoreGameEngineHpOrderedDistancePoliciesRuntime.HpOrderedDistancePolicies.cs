@@ -6,10 +6,10 @@ internal sealed partial class CoreGameEngineHpOrderedDistancePoliciesRuntime
     [ProgramDistanceRule(ProgramDistanceStage.DistanceProjection, 20)]
     internal RuleQueryEvaluation ApplyHpOrderedDistance(CharacterState source, CharacterState target, RuleQueryEvaluation original)
     {
-        if (!source.HasHpValue || !target.HasHpValue || source.Seat == target.Seat || target.Hp > source.Hp)
+        if (!source.HasHpValue || !target.HasHpValue || source.Seat == target.Seat)
             return original;
         var policies = _coreProgramCardPoliciesOperations.CardPolicies(source, SkillProgramCardPolicyKind.DistanceOneToNotHigherHp).ToArray();
-        if (policies.Length == 0)
+        if (policies.Length == 0 || target.Hp > source.Hp)
             return original;
         // A final, directed Set deliberately follows both horses and additive
         // distance contributions: the printed current rule says 'treated as 1'.

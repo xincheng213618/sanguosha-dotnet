@@ -105,9 +105,19 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         if (!HasRuanHuiCapability)
             return;
         if (batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } discard)
-            foreach (var m in batch.Movements.Where(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)?.OwnerSeat == discard.ActorSeat && CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[discard.ActorSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))) == false))
-                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongDiscardEvent>().Any(e => e.MovementSequence == m.Sequence))
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongDiscardEvent(discard.Token, discard.ActorSeat, m.Sequence, m.CardId));
+        {
+            var owner = _coreMatchParticipantsPlayersAccess._players[discard.ActorSeat];
+            foreach (var move in batch.Movements)
+            {
+                if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move) is not { } source || source.OwnerSeat != discard.ActorSeat)
+                    continue;
+                var suit = move.NativeDiscard?.EffectiveSuitAtPayment ?? _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(
+                    owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId), source);
+                if (CoreGameEnginePublicPileColorsRuntime.SuitColor(suit) == false &&
+                    !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongDiscardEvent>().Any(e => e.MovementSequence == move.Sequence))
+                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongDiscardEvent(discard.Token, discard.ActorSeat, move.Sequence, move.CardId));
+            }
+        }
         if (batch.DiscardRecoveryPhase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase)
             return;
         foreach (var lease in JingzhongPhaseLeases(phase.Token))

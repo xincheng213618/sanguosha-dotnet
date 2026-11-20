@@ -286,7 +286,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     internal void MobileHtRecoverOne(ProgramSkillFrame f, int seat)
     {
         var p = _coreMatchParticipantsPlayersAccess._players[seat];
-        if (!p.IsAlive || !p.HasHpValue || p.Hp >= p.MaxHp)
+        if (!p.IsAlive || !p.HasHpValue || !(p.HappyQiaoHealth?.AnyWounded ?? p.Hp < p.MaxHp))
             return;
         if (!_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(f.Id, f.OwnerSeat, seat, 1, new(RecoveryAttemptProducer.Program, f.InstructionIndex)))
         {

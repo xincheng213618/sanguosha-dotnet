@@ -8,6 +8,12 @@ internal sealed partial class CharacterZhangLingOlRuntime
 
     internal CategoryTalismanPlacedEvent? LiveCategoryTalisman(int seat) => !TracksCategoryTalismans ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CategoryTalismanPlacedEvent>().LastOrDefault(e => e.HolderSeat == seat && _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.Pile.Location && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CategoryTalismanReleasedEvent>().Any(release => release.PlacementFrameId == e.FrameId));
     internal bool IsCategoryTalismanUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType type) => type is CardActionType.Use or CardActionType.Response && LiveCategoryTalisman(actorSeat)is { } talisman && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind) == talisman.Category;
+
+    [ProgramCardLegality(ProgramCardLegalityStage.NativeResponseBan, 1270)]
+    internal bool IsCategoryTalismanDyingPeachForbidden(ProgramNativeResponseQuery query) =>
+        query.DyingUse && query.Kind == CardKind.Peach && query.CardIds.Count == 1 &&
+        IsCategoryTalismanUseForbidden(query.Provider.Seat, query.Kind, CardActionType.Use);
+
     SkillProgramStepOutcome IZhangLingProgramHost.PlaceCategoryTalisman(ProgramSkillFrame frame, string bind) => PlaceCategoryTalisman(frame, bind);
     SkillProgramStepOutcome IZhangLingProgramHost.ReleaseCategoryTalisman(ProgramSkillFrame frame) => ReleaseCategoryTalisman(frame);
     SkillProgramStepOutcome IZhangLingProgramHost.UseHuqiSlash(ProgramSkillFrame frame, string bind) => UseHuqiSlash(frame, bind);
