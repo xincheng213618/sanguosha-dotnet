@@ -47,6 +47,33 @@ internal static class ShiSunChenChecks
         zero.End(); zero.Play(); zero.Use("damage", [3]); zero.Play();
         zero.Need(zero.E<DamageAppliedEvent>().Last(e => e.TargetSeat == 3).Amount == 1 && zero.E<ShiScDamageConsumedEvent>().Length == 0, "Unspent charges expire with their original actual turn rather than following the next Play."); zero.Replay();
     }
+    public static void LulianDuelDrawAndMomentumReturnCold()
+    {
+        var s = Scene.Start("duel");
+        s.Play();
+        var material = s.V(0).Hand.Single().Id;
+        s.Native(CardKind.Duel, 3);
+        s.Watch("draw");
+        var root = s.Root!;
+        var original = root.ShiSunChen!;
+        s.Need(s.E<CardUseFinishedEvent>().Any(fact => fact.ResolutionId == original.UseId && fact.CardId == material) &&
+            s.E<ShiScLulianBoundEvent>().Single() is { Chain: true, Draw: true, TargetCount: 1 } &&
+            s.V(3).IsChained && s.E<ShiScDrawPaidEvent>().Single().Count == 1 &&
+            s.E<NativeDrawInvocationRecordedEvent>().Count(fact => fact.ParentFrameId == root.Id) == 1 &&
+            s.E<ShiScMomentumIssuedEvent>().Length == 0,
+            "The finished Duel binds its original Lulian, chains the target and pays one native draw before momentum.");
+
+        s.Cold();
+        s.Continue("draw");
+        s.Reach(() => s.Root is { ShiSunChen.Stage: ShiScStage.Momentum } resumed && resumed.Id == root.Id);
+        var hp = s.V(0).Hp;
+        s.Answer(choice => choice.Targets.SequenceEqual([0]));
+        s.Play();
+        s.Need(s.V(0).Hp == hp - 1 && s.E<ShiScMomentumIssuedEvent>().Length == 1 &&
+            s.E<ShiScDrawPaidEvent>().Length == 1 && s.E<ShiScCompletedEvent>().Count(fact => fact.FrameId == root.Id) == 1,
+            "The original Lulian resumes after its paid draw, resolves one momentum choice and completes once.");
+    }
+
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

@@ -28,6 +28,35 @@ internal static class ShiXiaoQiaoChecks
         s.Cold(); s.Replay();
     }
 
+    public static void HeyunSelfLossRetainsOriginalTwoCardDrawCold()
+    {
+        var s = Scene.Start(true); s.Play(0);
+        var hand = s.V(0).HandCount;
+        s.HeyunSelf(Heyun); s.AtWatch();
+        var root = s.Root!;
+        var paid = s.E<ShiXqHeyunPaidEvent>().Single();
+        var draw = s.E<ShiXqDrawPaidEvent>().Single();
+        CardMovementRecord[] Draws() => s.G.CardMovements.Where(move => move.Reason.Value == "skill.mobile-shi-xiao-qiao.heyun.draw").ToArray();
+        var moves = Draws();
+        s.Need(!s.Has(Heyun) && paid is { Target: 0, LostSkillId: Heyun } && paid.FrameId == root.Id &&
+            root is { SkillId: Heyun, OwnerSeat: 0, ShiXiaoQiao: { Paid: true, Stage: ShiXqStage.DrawChildren } },
+            "Losing Heyun itself preserves the original paid frame through its draw.");
+        s.Need(draw is { Recipient: 0, ActualCount: 2, Replaced: false } && draw.FrameId == root.Id &&
+            s.V(0).HandCount == hand + 2 && moves.Length == 2 &&
+            root.ShiXiaoQiao!.Draw!.ActualDrawIds.SequenceEqual(moves.Select(move => move.CardId)) &&
+            moves.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)),
+            "Both physical cards enter the original recipient's hand and are recorded on that paid frame.");
+        s.Need(s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(child =>
+            child.Batch.ParentFrameId == root.Id && child.Batch.Movements.Count > 0 &&
+            child.Batch.Movements.All(entry => moves.Any(move => move.Sequence == entry.Sequence && move.CardId == entry.CardId))),
+            "The real CardsGained child belongs to the original paid draw.");
+        s.Cold(); s.ContinueWatch(); s.Play(0);
+        s.Need(!s.Has(Heyun) && s.V(0).HandCount == hand + 2 && Draws().SequenceEqual(moves) &&
+            s.E<ShiXqHeyunPaidEvent>().SequenceEqual([paid]) && s.E<ShiXqDrawPaidEvent>().SequenceEqual([draw]) &&
+            s.E<ShiXqCompletedEvent>().Count(fact => fact.FrameId == root.Id) == 1,
+            "Cold return completes the original Heyun frame once without repeating its skill loss or draw.");
+    }
+
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

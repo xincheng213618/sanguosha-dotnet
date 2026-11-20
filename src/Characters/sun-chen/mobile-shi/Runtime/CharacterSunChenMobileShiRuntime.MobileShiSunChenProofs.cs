@@ -10,7 +10,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
         if (!ValidShiSc(f) || f.ShiSunChen is not { } r)
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiScStage.Drawing && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiScStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, 1);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && ShiScMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)

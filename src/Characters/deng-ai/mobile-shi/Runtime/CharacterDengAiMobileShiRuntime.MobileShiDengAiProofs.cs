@@ -35,7 +35,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         if (f.ShiDengAi is not { Paid: true } r || !ValidShiDa(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiDaStage.Drawing && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiDaStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, 1);
         if (child is CardUseFrame use)
             return r.Stage == ShiDaStage.NativeUse && use.Id == r.NativeUseId && ValidShiDaVirtualSnatchUse(use);
         if (child is CardsMovedTriggerWindowFrame moved)

@@ -10,7 +10,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
         if (!ValidShiXq(f) || f.ShiXiaoQiao is not { Paid: true } r)
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiXqStage.Drawing && draw.Context.RecipientSeat == r.Target && draw.Context.RequestedCount == 2 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiXqStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Target, 2);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && ShiXqMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
