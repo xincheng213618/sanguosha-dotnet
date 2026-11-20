@@ -12,7 +12,8 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     IPhysicalCardDrawOperations draws, INativeDrawAttemptRuntime attempts,
     IProgramMovementWindows movementWindows, IOwnedDrawPhaseFacts facts, IOwnedDrawPhaseNativeOperations native,
     IActualDiscardRecoveryPhaseQueries actualPhases, IActualDiscardRecoveryPhaseOperations phaseOperations,
-    IActualPhaseEndQueries phaseEnds, IActualPhaseEndOperations phaseEndOperations)
+    IActualPhaseEndQueries phaseEnds, IActualPhaseEndOperations phaseEndOperations,
+    IProgramPhaseScheduleState schedules, RuntimeEntries.DeferredRuntime<ProgramPhaseSchedulingRuntime> scheduler)
 {
     internal bool HasDrawPhaseObligationBoundaryFrame()
     {
@@ -25,7 +26,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                 frame.DrawCount < 0 || frame.InheritedMovementBatchIds is { } inherited &&
                     (inherited.Distinct().Count() != inherited.Count || inherited is not System.Collections.IList { IsReadOnly: true }))
                 throw new InvalidOperationException("An actual draw boundary lost its turn or frozen movement provenance.");
-            if (index == 0 ? frame.ParentFrameId is not null || frame.IsExtra :
+            if (index == 0 ? frame.ParentFrameId is not null || frame.IsExtra && !OwnsScheduledDrawSkip(frame) :
                 !frame.IsExtra || frameFacts.FrameAt(index - 1) is not DrawPhaseObligationFrame parent ||
                 parent.Id != frame.ParentFrameId || parent.Stage != DrawPhaseObligationStage.Finished)
                 throw new InvalidOperationException("An extra draw boundary lost its exact finished parent phase.");
@@ -48,6 +49,27 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
         frames.OfType<DrawPhaseObligationFrame>().SingleOrDefault(f => f.Id == ownerId) is
             { Stage: DrawPhaseObligationStage.Finished, Skipped: true } parent && parent.ActiveWindowFrameId == child.Id &&
         parent.OwnerSeat == turn.CurrentSeat && parent.ActualTurnNumber == turn.TurnNumber;
+
+    internal bool TryBeginScheduledDrawSkip()
+    {
+        if (schedules.Current is not { Phase: TurnPhase.Draw, Frame: var program } || frames.Top is not null ||
+            prompts.Current is not null || program.OwnerSeat != turn.CurrentSeat || phase.Phase != TurnPhase.Draw)
+            throw new InvalidOperationException("A scheduled Draw must enter at its original turn boundary.");
+        if (!NextDrawSkip.Consume(participants.Players[program.OwnerSeat])) return false;
+
+        phaseOperations.Clear();
+        var frame = new DrawPhaseObligationFrame(frames.NextId(), program.OwnerSeat, turn.TurnNumber, true,
+            0, DrawPhaseObligationStage.SkipObservers, Skipped: true) { PhaseOccurrenceFrameId = program.Id };
+        frames.Push(frame);
+        frames.Advance(frame.Id);
+        return true;
+    }
+
+    private bool OwnsScheduledDrawSkip(DrawPhaseObligationFrame frame) =>
+        frame is { IsExtra: true, Skipped: true, ParentFrameId: null, PhaseOccurrenceFrameId: { } occurrence } &&
+        schedules.Current is { Phase: TurnPhase.Draw, Frame: var program, ParentFrame: { } parent } &&
+        program.Id == occurrence && program.OwnerSeat == frame.OwnerSeat && parent.OwnerSeat == frame.OwnerSeat &&
+        program.WindowContext?.ParentFrameId == parent.Id && frame.ActualTurnNumber == turn.TurnNumber;
 
     internal bool TryBeginActualDrawCompletion(CharacterState owner, int delayedEffects)
     {
@@ -116,7 +138,9 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                     break;
                 case DrawPhaseObligationStage.SkipObservers:
                     frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.Finished });
-                    phaseOperations.RecordSkipped(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat, frame.PhaseOccurrenceFrameId ?? (frame.IsExtra ? frame.Id : null), frame.IsExtra);
+                    // A detached schedule supplies its original instruction as well as its frame ID.
+                    phaseOperations.RecordSkipped(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat,
+                        OwnsScheduledDrawSkip(frame) ? null : frame.PhaseOccurrenceFrameId ?? (frame.IsExtra ? frame.Id : null), frame.IsExtra);
                     if (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase))
                     {
                         events.AdvanceFact(new DrawPhaseSkippedEvent(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber, frame.IsExtra));
@@ -129,10 +153,12 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                     var policy = native.ConsumeIssuedExtraDrawMarker(frame);
                     if (policy is null)
                     { frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.Finished }); break; }
-                    phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat);
+                    var skipped = NextDrawSkip.Consume(participants.Players[frame.OwnerSeat]);
+                    if (!skipped) phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat);
                     var child = new DrawPhaseObligationFrame(frames.NextId(), frame.OwnerSeat, frame.ActualTurnNumber,
-                        true, 0, DrawPhaseObligationStage.Starting, ParentFrameId: frame.Id)
-                    { DiscardRecoveryPhase = actualPhases.Current() };
+                        true, 0, skipped ? DrawPhaseObligationStage.SkipObservers : DrawPhaseObligationStage.Starting,
+                        ParentFrameId: frame.Id, Skipped: skipped)
+                    { DiscardRecoveryPhase = skipped ? null : actualPhases.Current() };
                     // This phase's ended boundary has consumed its obligation. A
                     // marker issued inside the child cannot borrow this old boundary.
                     frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.Finished });
@@ -227,6 +253,9 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     private void CompleteOwnedDrawPhase(DrawPhaseObligationFrame frame)
     {
         if (frame.ActiveWindowFrameId is not null) throw new InvalidOperationException("A draw phase cannot finish before its observer returns.");
+        var scheduled = frame.IsExtra && frame.ParentFrameId is null;
+        if (scheduled && !OwnsScheduledDrawSkip(frame))
+            throw new InvalidOperationException("A skipped scheduled Draw lost its original program and lifecycle return.");
         events.AdvanceFact(new ActualDrawPhaseCompletedEvent(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber,
             frame.IsExtra, frame.Skipped, frame.DrawCount));
         frames.Pop(frame.Id, ResolutionFrameKind.DrawPhaseObligation);
@@ -241,6 +270,12 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
         }
         if (facts.Winner != Winner.None) { native.AdvanceRulesAndPublishState(); return; }
         if (!participants.Players[frame.OwnerSeat].IsAlive) { native.EndTurn(); return; }
+        if (scheduled)
+        {
+            if (!scheduler.Value.ResumeScheduledProgramPhase())
+                throw new InvalidOperationException("A skipped scheduled Draw could not return to its original program.");
+            return;
+        }
         if (native.CompleteShanheSourceChunlaoJudgmentDraw(frame)) return;
         native.CompleteTurnStartAfterDraw(participants.Players[frame.OwnerSeat], frame.DelayedEffects);
     }

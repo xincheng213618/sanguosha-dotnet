@@ -10,7 +10,8 @@ internal sealed class ProgramPhaseSchedulingRuntime(IProgramRuntimeFrames frames
     IProgramWindowCursors cursors, IProgramTurnQueries turn, IProgramPhaseQueries phaseQueries, ISelectionParticipantQueries participants,
     IProgramPhaseSchedulingFacts facts, IProgramPhaseScheduleState state, IProgramPhaseNativeEntries entries,
     IProgramPhaseNativeReturns returns, IProgramPhasePipelineHooks hooks,
-    IActualDiscardRecoveryPhaseQueries actualPhases, IActualDiscardRecoveryPhaseOperations phaseOperations)
+    IActualDiscardRecoveryPhaseQueries actualPhases, IActualDiscardRecoveryPhaseOperations phaseOperations,
+    RuntimeEntries.DeferredRuntime<OwnedDrawPhaseRuntime> drawPhases)
 {
     internal SkillProgramStepOutcome ScheduleProgramPhase(ProgramSkillFrame frame, TurnPhase phase,
         SkillProgramPhaseContinuation continuation, int? beneficiarySeat = null)
@@ -38,7 +39,7 @@ internal sealed class ProgramPhaseSchedulingRuntime(IProgramRuntimeFrames frames
         events.AdvanceFact(new ProgramPhaseScheduledEvent(
             frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, phase, Started: true));
         if (phase == TurnPhase.Play) entries.EnterPlayPhase(beneficiary);
-        else
+        else if (!drawPhases.Value.TryBeginScheduledDrawSkip())
         {
             phaseOperations.Start(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat);
             if (!entries.TryBeginDrawPhaseProgramWindow(frame.OwnerSeat))

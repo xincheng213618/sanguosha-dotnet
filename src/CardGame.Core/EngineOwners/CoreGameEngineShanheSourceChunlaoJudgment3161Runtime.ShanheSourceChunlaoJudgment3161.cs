@@ -18,9 +18,15 @@ internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runti
             return true;
         var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat];
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase = TurnPhase.Draw;
-        _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
+        var skipped = NextDrawSkip.Consume(current);
+        if (skipped)
+            _coreActualDiscardRecoveryPhasesOperations.ClearActualDiscardRecoveryPhase();
+        else
+            _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
         var frameId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var frame = new DrawPhaseObligationFrame(frameId, current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, false, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects, DrawPhaseObligationStage.Starting)
+        var frame = new DrawPhaseObligationFrame(frameId, current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber,
+            false, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects,
+            skipped ? DrawPhaseObligationStage.SkipObservers : DrawPhaseObligationStage.Starting, Skipped: skipped)
         {
             DiscardRecoveryPhase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase(),
             PhaseOccurrenceFrameId = frameId,

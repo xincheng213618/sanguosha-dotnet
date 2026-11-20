@@ -40,7 +40,7 @@ internal sealed class ProgramDeckCardsRuntime(IProgramRuntimeFrames frames, IPro
             throw new InvalidOperationException("A deck gain requires its active unpaid program instruction.");
         if (!facts.Alive(frame.OwnerSeat) || !operations.EnsureDrawPile()) return SkillProgramStepOutcome.Continue;
         var cards = facts.DrawPile.Reverse().Where(card =>
-            effect.CardKinds.Count > 0 ? effect.CardKinds.Contains(card.Kind) :
+            effect.CardKinds.Count > 0 ? ProgramCardKindMatch.Contains(effect.CardKinds, card.Kind) :
                 RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(card.Kind, effect.CardCategories)).Take(effect.Amount).ToArray();
         if (cards.Length == 0) return SkillProgramStepOutcome.Continue;
         var receipt = new DeckCardGainReceipt(frame.InstructionIndex, Source(frame), frame.GameplayHash,
@@ -82,7 +82,7 @@ internal sealed class ProgramDeckCardsRuntime(IProgramRuntimeFrames frames, IPro
                   requested == CardLocation.Hand(frame.OwnerSeat) && facts.IsDestroyedMaterial(move)) ||
                 (receipt.Category is { } category
                     ? !RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(move.CardKind, [category])
-                    : !receipt.FilterKinds.Contains(move.CardKind)))) return false;
+                    : !ProgramCardKindMatch.Contains(receipt.FilterKinds, move.CardKind)))) return false;
         return facts.ObtainedEvents.Count(fact => fact.ProgramFrameId == frame.Id &&
             fact.InstructionIndex == receipt.InstructionIndex && fact.OwnerSeat == frame.OwnerSeat && fact.BatchId == receipt.BatchId &&
             fact.Count == moves.Count(move => move.To == CardLocation.Hand(frame.OwnerSeat)) &&

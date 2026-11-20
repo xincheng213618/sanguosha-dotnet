@@ -16,6 +16,13 @@ internal sealed class NextDrawSkip(IMatchParticipantStateAccess participants, IP
             throw new InvalidOperationException("A draw skip requires a living opponent on the original activation.");
         participants.At(targetSeat).SkipNextDrawPhase = true;
     }
+
+    internal static bool Consume(CharacterState owner)
+    {
+        var pending = owner.SkipNextDrawPhase;
+        owner.SkipNextDrawPhase = false;
+        return pending;
+    }
 }
 
 internal sealed class ScheduleNextDrawSkipDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler

@@ -255,6 +255,10 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
     internal void ContinueDeathOutcome(long deathFrameId)
     {
         var death = GetCurrentDeathFrame(deathFrameId);
+        var killer = death.KillerSeat is { } killerSeat ? _coreMatchParticipantsPlayersAccess._players[killerSeat] : null;
+        if (killer is { } killerState && killerState.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play)
+            _coreCurrentTurnStatisticsPlayPhaseKillCountByCurrentPlayerAccess._playPhaseKillCountByCurrentPlayer++;
+        _characterLuMengMouOperations.ResetHengyeAfterKill(killer);
         if (death.WillRest)
         {
             ContinueDeathResolution(deathFrameId);
@@ -262,10 +266,6 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         }
 
         var victim = _coreMatchParticipantsPlayersAccess._players[death.VictimSeat];
-        var killer = death.KillerSeat is { } killerSeat ? _coreMatchParticipantsPlayersAccess._players[killerSeat] : null;
-        if (killer is { } killerState && killerState.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play)
-            _coreCurrentTurnStatisticsPlayPhaseKillCountByCurrentPlayerAccess._playPhaseKillCountByCurrentPlayer++;
-        _characterLuMengMouOperations.ResetHengyeAfterKill(killer);
         if (_modeRulesOperations._modeRules.Death.NotifyAiOnDeath)
         {
             _coreNativeAiDecisionsOperations.NotifyAiOfDeath(killer, victim);

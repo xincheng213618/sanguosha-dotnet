@@ -72,6 +72,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Mobile Li Yan's Duliang contributes the original grants assigned to the beneficiary's current actual Draw phase. Separate grants can stack on the first actual Draw, including an inserted phase, and survive loss of the issuing skill. The next Draw phase reads its own assignments.
 
+- A pending next-Draw skip is consumed at the recipient's next actual Draw boundary. A skipped scheduled Draw keeps the original schedule and instruction through its skip observers, then resumes its interrupted phase. It issues no Draw entry or cards. For Shuangshu, Preparation and the later ordinary Draw are still due.
+
 - Anniversary Hu Che Er's Fuzhong reads the effective skill holder's current Zhong count. At least one Zhong adds one card to the actual Draw count, and at least three Zhong add three to the hand limit checked in Discard. A fixed amount from a separate native draw producer uses its own amount.
 
 - OL Du Xi's Quxi contributes to the actual Draw count of each living marker holder. Each current Feng adds one and each current Qian subtracts one. Drawing leaves the issued marks in place for subsequent Draw phases and for their original transfer windows.

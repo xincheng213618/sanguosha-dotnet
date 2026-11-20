@@ -206,8 +206,7 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (!skippedActualJudgment && _coreActualPhaseEndsOperations.TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Judgment, ActualPhaseEndContinuation.Judgment, (int)delayedEffects))
             return;
-        var hasScheduledDrawSkip = current.SkipNextDrawPhase;
-        current.SkipNextDrawPhase = false;
+        var hasScheduledDrawSkip = NextDrawSkip.Consume(current);
         if (_characterKanZeOlOperations.ConsumeKuanshiDrawSkip(current.Seat) || hasScheduledDrawSkip)
         {
             delayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
