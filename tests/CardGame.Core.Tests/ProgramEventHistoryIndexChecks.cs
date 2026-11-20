@@ -98,13 +98,14 @@ internal static class ProgramEventHistoryIndexChecks
             "A turn that emitted TurnEnded still owns its original cursor during a late phase.");
 
         history.Append(new ActualTurnCursorReturnedEvent(1, 0));
-        Require(history.FindOpenActualTurn(1, 0) is null,
-            "A pending native cursor return closes the previous turn immediately.");
+        Require(history.FindOpenActualTurn(1, 0) is null && history.CountActualTurnStarts() == 1,
+            "A pending native cursor return closes the previous turn immediately and preserves the count of starts.");
 
         var next = new TurnStartedEvent(2, 1);
         history.Append(next);
         Require(history.FindOpenActualTurn(2, 1) is { Ordinal: 2 } started && ReferenceEquals(started.Start, next) &&
-                history.FindOpenActualTurn(1, 0) is null && history.FindOpenActualTurn(2, 0) is null,
+                history.FindOpenActualTurn(1, 0) is null && history.FindOpenActualTurn(2, 0) is null &&
+                history.CountActualTurnStarts() == 2 && history.CountActualTurnStarts(1) == 1,
             "The latest pending start uses the whole-table ordinal and requires the original turn and actor.");
     }
 

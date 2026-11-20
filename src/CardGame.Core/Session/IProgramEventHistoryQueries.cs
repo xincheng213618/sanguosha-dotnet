@@ -8,6 +8,9 @@ internal interface IProgramEventHistoryQueries : IProgramSelectionQuery
 
 internal static class ProgramEventHistoryQueries
 {
+    internal static int CountActualTurnStarts(this IProgramEventHistoryQueries history) =>
+        history.Read<TurnStartedEvent>().Count;
+
     internal static int CountActualTurnStarts(this IProgramEventHistoryQueries history, int actorSeat) =>
         history.Read<TurnStartedEvent>().Count(entry => entry.ActorSeat == actorSeat);
 }

@@ -117,6 +117,12 @@ internal static class WuLuKangKegouOpponentChecks
             returned[1].Result == new PindianResult(0, 3, high, second, 13, 9) && complete.FrameId == start.FrameId && complete.Iterations == 2,
             "Two native results return to the same Kegou frame in accepted opponent order and complete it once.");
 
+        var turn = Facts<TurnStartedEvent>().Single();
+        Need(turn.ActorSeat == 0 && turn.TurnNumber == start.Qualification.ActualTurn && start.Qualification.TurnOrdinal == 1 &&
+            Facts<WuLuKangContestStartedEvent>().SequenceEqual(native.Select(fact => new WuLuKangContestStartedEvent(
+                fact.FrameId, false, fact.Result.SourceSeat, 2, turn.TurnNumber, turn.ActorSeat, 1))),
+            "Both native Pindian receipts and Kegou identify the same first actual turn.");
+
         var revealMoves = game.CardMovements.Where(move => move.Reason == CardMoveReasons.PindianReveal).ToArray();
         var gains = Facts<WuLuKangKegouGainPaidEvent>();
         Need(revealMoves.Select(move => (move.CardId, move.From, move.To)).SequenceEqual(new[]

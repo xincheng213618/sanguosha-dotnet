@@ -50,8 +50,9 @@ internal static class MouZhuRongMobileChecks
             g.CreateSnapshot(0).Players[0].Hand.Single(c => c.Id == generated.CardId).Kind == CardKind.BarbarianAssault,
             "An Ending without an own Assault use creates a distinct real outside entity and gifts it once, even when the fixed mode stock has no Assault.");
         PlayPhysical(g, generated.CardId); Play(g);
-        Need(g.Events.Select(e => e.Payload).OfType<MouZhuRongAssaultUsedEvent>().Any(e => e.ActorSeat == 0),
-            "The gifted entity enters a genuine native Barbarian Assault use.");
+        Need(g.Events.Select(e => e.Payload).OfType<MouZhuRongAssaultUsedEvent>().Where(e => e.ActorSeat == 0).ToArray()
+                is [{ TurnOrdinal: var ordinal }] && ordinal == g.Events.Count(e => e.Payload is TurnStartedEvent),
+            "The gifted entity's genuine Barbarian Assault use records a single own declaration with the full actual-turn ordinal.");
         Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId)); Play(g);
         Need(g.Events.Select(e => e.Payload).OfType<MouZhuRongAssaultGeneratedEvent>().Count() == 1 &&
             g.Events.Select(e => e.Payload).OfType<CardUseFinishedEvent>().Count(e => e.CardId == generated.CardId) == 1,

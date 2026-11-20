@@ -18,7 +18,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
             player.Markers[PlayerMarkerKind.MouJiangWeiBeifa] = before + 1;
             player.MarkerSourceCounts[key] = player.MarkerSourceCounts.GetValueOrDefault(key) + 1;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(f.Id, seat, PlayerMarkerKind.MouJiangWeiBeifa, 1, before + 1, f.OwnerSeat, f.SkillId));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiBeifaGrantedEvent(f.Id, r.Source, r.GameplayHash, seat, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count()));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiBeifaGrantedEvent(f.Id, r.Source, r.GameplayHash, seat, _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts()));
         }
     }
 
@@ -26,7 +26,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 33200)]
     internal void ExpireMouJwBeifa(TurnStartedEvent turn)
     {
-        var ordinal = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count();
+        var ordinal = _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts();
         foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaGrantedEvent>().Where(e => e.Source.OwnerSeat == turn.ActorSeat && e.TurnOrdinal < ordinal && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.HolderSeat == e.HolderSeat)).ToArray())
         {
             var p = _coreMatchParticipantsPlayersAccess._players[grant.HolderSeat];

@@ -61,10 +61,21 @@ internal static class MouJiangWeiMobileChecks
         s.Choose("target", 0); s.Choose("target", 2); s.Choose("confirm"); s.Play();
         s.Need(s.Beifa(0) == 1 && s.Beifa(2) == 1 && s.V().Hand.Any(c => c.Kind == CardKind.Slash) && !s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
             "Any number includes the issuer itself: public Beifa marks are issued to zero and two, and a self-marked issuer cannot select another character with its real Hand Slash.");
+        var awakening = s.E<MouJiangWeiAwakenedEvent>().Single();
+        var issuedTurns = s.E<TurnStartedEvent>();
+        var grants = s.E<MouJiangWeiBeifaGrantedEvent>();
+        s.Need(issuedTurns.Last().ActorSeat == awakening.OwnerSeat && grants.Select(e => e.HolderSeat).SequenceEqual([0, 2]) &&
+            grants.All(e => e.FrameId == awakening.FrameId && e.Source == awakening.Source && e.GameplayHash == awakening.GameplayHash && e.TurnOrdinal == issuedTurns.Length),
+            "Both original recipients get Beifa from the same awakening frame at its global actual-turn ordinal.");
         var before = s.Charge(); s.Taunt(); s.Choose("confirm"); s.Play();
         s.Need(s.Charge() == before && s.E<MouJiangWeiSelectionClosedEvent>().Last().Count == 0, "Selecting zero is a genuine once-per-Play activation and spends zero charge.");
         s.End(); s.Reach(() => s.G.State.TurnNumber >= 13 && s.IsPlay());
-        s.Need(s.Beifa(0) == 0 && s.Beifa(2) == 0 && s.E<MouJiangWeiBeifaExpiredEvent>().Length == 2 && s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash) && s.E<MouJiangWeiAwakenedEvent>().Length == 1,
+        var laterTurns = s.E<TurnStartedEvent>();
+        var expiries = s.E<MouJiangWeiBeifaExpiredEvent>();
+        s.Need(laterTurns.Last().ActorSeat == awakening.OwnerSeat && laterTurns.Skip(issuedTurns.Length).Count(e => e.ActorSeat == awakening.OwnerSeat) == 1 &&
+            expiries.Select(e => (e.FrameId, e.HolderSeat)).SequenceEqual(grants.Select(e => (e.FrameId, e.HolderSeat))) && expiries.All(e => e.TurnOrdinal == laterTurns.Length),
+            "Both original grants expire at the issuer's next actual-turn ordinal, including that new start.");
+        s.Need(s.Beifa(0) == 0 && s.Beifa(2) == 0 && s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash) && s.E<MouJiangWeiAwakenedEvent>().Length == 1,
             "Both paid marks expire at their issuer's next actual TurnStarted, restoring actual target legality without awakening again.");
         VerifyOtherGameStartingOwner();
     }

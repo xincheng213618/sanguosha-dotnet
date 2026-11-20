@@ -27,7 +27,7 @@ internal sealed partial class ProgramEventHistoryIndex(IReadOnlyList<EventEnvelo
             start.TurnNumber != turnNumber || start.ActorSeat != ownerSeat)
             return null;
 
-        return (start, Read<TurnStartedEvent>().Count);
+        return (start, this.CountActualTurnStarts());
     }
 
     public IEnumerable<IGameEvent> SinceLastBoundary(Func<IGameEvent, bool> boundary)

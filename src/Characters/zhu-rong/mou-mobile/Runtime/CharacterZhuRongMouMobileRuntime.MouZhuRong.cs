@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuRongMouMobileRuntime
 {
     internal bool HasMouZhuRong => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GiftMouZhuRongOutsideAssault);
-    internal int MouZhuRongTurnOrdinal => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count();
+    internal int MouZhuRongTurnOrdinal => _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts();
 
     internal static CardConversionSource MouZhuRongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhu_rong_mou_mobile_MouZhuRong.MouZhuRongSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30400, SkillProgramEffectOp.RecordMouZhuRongLieren, SkillProgramEffectOp.SelectMouZhuRongLierenTarget, SkillProgramEffectOp.GiftMouZhuRongOutsideAssault)]

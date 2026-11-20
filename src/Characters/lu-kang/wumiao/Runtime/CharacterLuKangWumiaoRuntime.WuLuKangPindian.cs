@@ -10,7 +10,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal static CardConversionSource WuLuKangSource(ProgramTriggerCandidate c) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindian.WuLuKangSource(c);
     internal ResolutionFrame WuLuKangParent(long id) => _resolutionStackOperations._resolutionStack.Single(f => f.Id == id && (f is PindianFrame || f is ProgramSkillFrame { SimultaneousPindian: not null }));
     internal IReadOnlyList<ProgramTriggerCandidate> WuLuKangSources(int? onlySeat = null) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && (onlySeat is null || p.Seat == onlySeat)).SelectMany(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.SelectMany(i => i.Program.Triggers.Where(t => t.Window == SkillProgramTriggerWindow.WuLuKangPindian && t.Effects is [{ Op: SkillProgramEffectOp.ResolveWuLuKangShenduan }]).Select(t => new ProgramTriggerCandidate(p.Seat, i.SkillId, t.Id, i.SkillInstanceId, i.Program.GameplayHash, t.Priority)))).OrderBy(c => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, c.OwnerSeat)).ThenByDescending(c => c.Priority).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ToArray());
-    internal int WuLuKangTurnOrdinal => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count();
+    internal int WuLuKangTurnOrdinal => _coreProgramEventHistoryOperations.Value.ProgramHistory.CountActualTurnStarts();
 
     internal void CaptureWuLuKangContest(ResolutionFrame parent, bool group, int source, IReadOnlyList<WuLuKangPindianInput> inputs)
     {
