@@ -812,6 +812,8 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Boundary Shuangxiong collects both native Zhangba response entries without completion observer cold", BoundaryMobileShuangxiongDiscardEntryChecks.ShuangxiongCollectsBothNativeZhangbaDiscardEntriesWithoutCompletionObserverCold),
     ("OL SP Liu Bei Jinglei: give only the original adjustment entry cold", OlSpLiuBei664Checks.JingleiCannotGiveTheSameCardAtANewerDiscardEntryCold),
     ("Mou Ju Shou Muwang: later entry after missed return", MouJuShouMuwangDiscardEntryChecks.MuwangRecoversOnLaterDiscardAfterAnEarlierClaimSettles),
+    ("OL Boundary Cheng Pu Chunlao preserves the original adjacent discard entry cold", OlBoundaryChengPuChunlaoDiscardEntryChecks.ChunlaoCannotStoreANewerSlashCleanupThroughAnOldAdjacentDiscardCold),
+    ("Shanhe Source Dingxi: original use discard entry", ShanheSourceDingxiDiscardEntryChecks.DingxiClaimsOnlyItsOriginalUseDiscardEntry),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

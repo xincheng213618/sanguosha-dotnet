@@ -31,7 +31,12 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
     {
         if (context is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { ParentFrameId: { } parent } batch })
             return[];
-        return batch.Movements.Where(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && SourceDingxiDamageCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.OriginalUseId == parent && e.OwnerSeat == owner && e.CardId == m.CardId && e.DiscardSequence == m.Sequence) == 1).Select(m => m.CardId).Distinct().ToArray();
+        return batch.Movements.Where(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile &&
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && SourceDingxiDamageCard(m.CardKind) &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, m.CardId) == m.Sequence &&
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e =>
+                    e.BatchId == batch.Id && e.OriginalUseId == parent && e.OwnerSeat == owner && e.CardId == m.CardId && e.DiscardSequence == m.Sequence) == 1)
+            .Select(m => m.CardId).Distinct().ToArray();
     }
 
     internal GameEngine.SourceDingxiUsePlan? SourceDingxiPlan(int owner, int id, int target)
