@@ -27,8 +27,17 @@ internal static class ShiLuSuChecks
         s.Need(s.V(1).HandCount == 3 && s.E<ShiLsRefillIssuedEvent>().Length == 2, "The second authorized empty-Hand payment refills exactly once.");
         s.Cold(); foreach (var next in s.V(1).Hand.Select(c => c.Id).ToArray()) { s.Native(next); s.Play(); }
         s.Need(s.V(1).HandCount == 0 && s.E<ShiLsRefillIssuedEvent>().Length == 2, "A third empty-Hand payment cannot mint a third refill.");
-        s.End(); s.Reach(() => s.E<ShiLsHandGrantExpiredEvent>().Any(e => e.GrantId == grant.GrantId));
-        s.Need(s.G.CreateSnapshot(0).Players.Single(p => p.Seat == 1).Hand.Count == 0, "The original grant expires at Lu Su's next actual turn prelude."); s.Cold(); s.Replay();
+        bool IsNextGrantOwnerTurn(EventEnvelope entry) => entry.Payload is TurnStartedEvent turn &&
+            turn.ActorSeat == grant.Source.OwnerSeat && turn.TurnNumber > grant.Turn;
+        s.End();
+        s.Reach(() => s.G.Events.Any(IsNextGrantOwnerTurn));
+        var expiry = s.G.Events.Single(entry => entry.Payload is ShiLsHandGrantExpiredEvent expired && expired.GrantId == grant.GrantId);
+        var ownerTurn = s.G.Events.First(IsNextGrantOwnerTurn);
+        var turnAfterExpiry = s.G.Events.FirstOrDefault(entry => entry.Sequence > expiry.Sequence && entry.Payload is TurnStartedEvent);
+        s.Need(expiry.Payload is ShiLsHandGrantExpiredEvent { PreludeId: > 0 } && expiry.Sequence < ownerTurn.Sequence &&
+            turnAfterExpiry == ownerTurn && s.G.CreateSnapshot(0).Players.Single(p => p.Seat == 1).Hand.Count == 0,
+            "The original grant expires once on its prelude before the next actual turn starts for Lu Su.");
+        s.Cold(); s.Replay();
 
         var converted = Scene.Start(shared: true, wusheng: true); converted.Play(); converted.End(); converted.Play();
         var red = converted.V(1).Hand.Single().Id; converted.Cold(); converted.ConvertedSlash(red); converted.Play();

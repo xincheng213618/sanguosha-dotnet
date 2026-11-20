@@ -8,13 +8,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     {
         if (!NeedsBeforeTurnPrelude(owner))
             return false;
-        var oldRound = _coreActualRoundProgressRoundNumberAccess._roundNumber;
-        _coreMouLuMengOperations.Value.BeginRoundForTurn(owner);
-        var events = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var roundIndex = Array.FindLastIndex(events, item => item is RoundStartedEvent round && round.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
-        var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var proof = new BeiMiHuBeforeTurnProof(id, checked(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber + 1), _coreActualRoundProgressRoundNumberAccess._roundNumber, owner.Seat, roundIndex + 1L);
-        _coreRuntimeOperations.PushRuntimeFrame(new BeiMiHuTurnPreludeFrame(id, proof, _coreActualRoundProgressRoundNumberAccess._roundNumber != oldRound));
+        var id = _coreActualTurnsOperations.OpenBeforeTurnPrelude(owner);
         _characterLuSuMobileShiOperations.ExpireShiLsHandGrants(owner.Seat, id);
         _coreRuntimeOperations.AdvanceRuntimeFrame(id);
         return true;

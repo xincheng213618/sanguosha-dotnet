@@ -4,6 +4,20 @@ namespace CardGame.Core.EngineOwners;
 
 internal sealed partial class CoreActualTurnsRuntime
 {
+    internal long OpenBeforeTurnPrelude(CharacterState owner)
+    {
+        var oldRound = _coreActualRoundProgressRoundNumberAccess._roundNumber;
+        _coreMouLuMengOperations.Value.BeginRoundForTurn(owner);
+        var events = _journal.Complete().ToArray();
+        var roundNumber = _coreActualRoundProgressRoundNumberAccess._roundNumber;
+        var roundIndex = Array.FindLastIndex(events, item => item is RoundStartedEvent round && round.RoundNumber == roundNumber);
+        var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
+        var nextTurn = checked(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber + 1);
+        var proof = new BeiMiHuBeforeTurnProof(id, nextTurn, roundNumber, owner.Seat, roundIndex + 1L);
+        _coreRuntimeOperations.PushRuntimeFrame(new BeiMiHuTurnPreludeFrame(id, proof, roundNumber != oldRound));
+        return id;
+    }
+
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 30, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
     [NativeFrameRoute(typeof(BeiMiHuTurnPreludeFrame), 70)]
     internal void ContinueBeforeTurnPrelude()
