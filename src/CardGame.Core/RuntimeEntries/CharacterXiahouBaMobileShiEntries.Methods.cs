@@ -19,7 +19,6 @@ internal sealed partial class CharacterXiahouBaMobileShiEntries
     internal bool ShiXbExemptDebit(long useId, int actor) => _resolve().ShiXbExemptDebit(useId, actor);
     internal int ShiXbLibbingDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().ShiXbLibbingDamageBonus(attack);
     internal bool ShiXbLibbingIsDamageUse(ProgramCardUseContext use) => _resolve().ShiXbLibbingIsDamageUse(use);
-    internal int ShiXbLibbingRangeBonus(int seat) => _resolve().ShiXbLibbingRangeBonus(seat);
     internal (int Last, int Count1, int Count2, int Count3) ShiXbLibbingState(int ownerSeat) => _resolve().ShiXbLibbingState(ownerSeat);
     internal bool ShiXbNativeMaterialBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().ShiXbNativeMaterialBatch(use, batch);
     internal Card ShiXbPoxiCard(ProgramSkillFrame f) => _resolve().ShiXbPoxiCard(f);

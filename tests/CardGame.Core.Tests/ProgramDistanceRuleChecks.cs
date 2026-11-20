@@ -147,7 +147,7 @@ internal static partial class ProgramDistanceRuleChecks
         var range = queries.CalculateAttackRange(facts, excludedEquipmentId: 52);
         Need(Value(range) == 0 && range.BaseTerms.Single() is { SourceId: "equipment:51:printed-attack-range", Value: 0 } &&
             facts.Exclusions == (52, null) && facts.Trace.SequenceEqual(["range-equipment", "range-base", "assigned-range",
-                "range-contributions", "libing", "yinxian", "base-zero", "range-extra", "turn-range", "range-project"]),
+                "range-contributions", "yinxian", "base-zero", "range-extra", "turn-range", "range-project"]),
             "After excluding the stronger weapon, RedBloodBlade keeps its real zero range and each later stage reads its facts in order.");
         facts.Trace.Clear(); facts.Assigned = 4;
         Need(Value(queries.CalculateAttackRange(facts, excludedEquipmentSlot: EquipmentSlot.Weapon)) == 4 &&
@@ -194,7 +194,6 @@ internal static partial class ProgramDistanceRuleChecks
         { Trace.Add("range-base"); Exclusions = (excludedEquipmentId, excludedEquipmentSlot); }
         public int? AssignedRange { get { Trace.Add("assigned-range"); return Assigned; } }
         public IEnumerable<RuleQueryContribution> Contributions { get { Trace.Add("range-contributions"); return []; } }
-        public int LibbingRangeBonus { get { Trace.Add("libing"); return 0; } }
         public int YinXianRangeBonus { get { Trace.Add("yinxian"); return 0; } }
         public bool FuanBaseZeroed { get { Trace.Add("base-zero"); return ZeroBase; } }
         public void AddContributions(List<RuleQueryContribution> contributions) => Trace.Add("range-extra");

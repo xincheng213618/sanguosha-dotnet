@@ -25,6 +25,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - An HP-ordered distance projection checks for an active policy before reading scalar health. An ordinary distance query with independent health pools can use the usual distance contributions without selecting a pool.
 
+- Mobile Shi Xiahou Ba's Libing contributes its existing finite increase through `ProgramDistanceStage.AttackRangeContributions`. The shared range query retains the equipped weapon base and exclusions. Libing owns its accepted count and the original damage-card completion resets it. Poxi retains its separately issued distance permission.
+
 ## Native Slash requests
 
 - Issued native Slash requests use `INativeProgramSlashRequests` on the original `ProgramSkillFrame.SlashRequest`. Keep the issued opportunity, selected target, accepted payment attempt and actual `CardUseFrame.ProgramSlashRequestExecution` distinct. Loop issuance uses the real original cursor; retries get a new attempt ordinal. Material selectors and unpaid slot choices do not accept a use. Preserve the original private decision explicitly through paid children; do not fabricate a Play prompt or borrow an unrelated active request.

@@ -47,7 +47,10 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         return (last, count1, count2, count3);
     }
 
-    internal int ShiXbLibbingRangeBonus(int seat) => !HasShiXbCapability ? 0 : ShiXbLibbingState(seat).Count1;
+    [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 1)]
+    internal void AddShiXbLibingAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) =>
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{player.Seat}:{ShiXbLibbing}:attack-range",
+            HasShiXbCapability ? ShiXbLibbingState(player.Seat).Count1 : 0);
     internal bool ShiXbLibbingIsDamageUse(ProgramCardUseContext use) => ShiXiahouBaComposition.IsDamageCardKind(use.EffectiveKind);
     SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolveLibbing(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbLibbing);
     SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolvePoxi(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbPoxi);

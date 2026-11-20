@@ -31,7 +31,6 @@ internal interface IMatchAttackRangeQuery : IProgramSelectionQuery
     void AddBaseTerms(int? excludedEquipmentId, EquipmentSlot? excludedEquipmentSlot, List<RuleQueryBaseTerm> terms);
     int? AssignedRange { get; }
     IEnumerable<RuleQueryContribution> Contributions { get; }
-    int LibbingRangeBonus { get; }
     int YinXianRangeBonus { get; }
     bool FuanBaseZeroed { get; }
     void AddContributions(List<RuleQueryContribution> contributions);
@@ -94,8 +93,6 @@ internal sealed class MatchDistanceQueries
                 Math.Max(0, assignedRange - baseTerms[0].Value)));
 
         var contributions = query.Contributions.ToList();
-        RuntimeSkills.RuntimeRules_Core_RuleQueries.AddFiniteContribution(contributions,
-            $"issued:{query.Seat}:mobile:shi-libing:attack-range", query.LibbingRangeBonus);
         RuntimeSkills.RuntimeRules_Core_RuleQueries.AddFiniteContribution(contributions,
             $"issued:{query.Seat}:mobile:shi-yinxian:range", query.YinXianRangeBonus);
         if (query.FuanBaseZeroed)

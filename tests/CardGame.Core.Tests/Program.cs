@@ -898,6 +898,7 @@ var tests = new (string Name, Action Body)[]
     ("Classic Wusheng: red equipment Play and Duel preserve original conversion cold", ClassicWushengResponseChecks.RedEquipmentKeepsItsClassicSourceInPlayAndDuelCold),
     ("OL Xingbu: two red skips the next actual discard cold", XingbuRevealChecks.TwoRedForecastSkipsTheNextDiscardWithoutAnActualPhaseEndCold),
     ("Delayed Nullification: held Indulgence owns original counterspell payment cold", DelayedNullificationOwnerChecks.HeldIndulgenceOwnsItsNativeCounterspellPaymentCold),
+    ("Shi Xiahou Ba Libing: finite attack range lasts through the original Slash cold", ShiXiahouBaLibingRangeChecks.LibingEnablesAnOrdinaryDistantSlashUntilItCompletesCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
