@@ -10,6 +10,7 @@ internal static class NativeDrawAttemptChecks
         PhaseWatch = "fixture:native-draw-phase-watch", Skip = "fixture:native-draw-skip",
         Extra = "fixture:native-draw-extra";
     private const string DrawReason = "skill-program." + Driver + ".Draw";
+    private const string BoundaryYingzi = "boundary:yingzi";
     private static string _scene = "";
 
     public static void ProgramDrawWaitsForPrivateDecisionAndBindsOnlyActualCardsCold()
@@ -324,6 +325,97 @@ internal static class NativeDrawAttemptChecks
         DeliveredReplacementKeepsZeroDrawResultCold();
     }
 
+    public static void BoundaryYingziAddsOnlyToEachActualDrawPhaseCold()
+    {
+        var (normal, normalContent) = Start("phase-normal", withBoundaryYingzi: true);
+        (normal, var normalId) = DrawYingziPhase(normal, normalContent, recipient: 0, extra: false);
+        Play(normal);
+        Need(E<ActualDrawPhaseCompletedEvent>(normal).Single(entry => entry.FrameId == normalId) is
+            { IsExtra: false, Skipped: false, DrawCount: 3 },
+            "The original normal phase completes with two base cards and one from the real boundary Yingzi.");
+        CheckFixedDrawsDuringPlay(normal, normalContent);
+
+        var (game, content) = Start("phase-extra", withBoundaryYingzi: true);
+        var skipped = game.ResolutionStack.OfType<DrawPhaseObligationFrame>().Single();
+        game = Cold(game, content);
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "skipped");
+        Drive(game, () => P(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Extra } prompt &&
+            prompt.Choices.Any(choice => choice.Targets.SequenceEqual([1])));
+        Answer(game, choice => choice.Targets.SequenceEqual([1]));
+        Play(game);
+        Need(game.CreateSnapshot(0).Players[0].Skills?.Any(skill => skill.ContentId == BoundaryYingzi) == true &&
+            E<ActualDrawPhaseCompletedEvent>(game).Single(entry => entry.FrameId == skipped.Id) is
+                { IsExtra: false, Skipped: true, DrawCount: 0 } &&
+            !E<NativeDrawAttemptStartedEvent>(game).Any() && !PhaseDraws(game, 0, skipped.ActualTurnNumber, false).Any(),
+            "A real Yingzi holder's skipped phase still requests and draws zero cards.");
+
+        Accept(game, new EndPlayPhaseCommand(0, game.Revision, P(game)!.PromptId));
+        Drive(game, () => Option(game, Watch, "before", 1));
+        (game, var peerNormalId) = DrawYingziPhase(game, content, recipient: 1, extra: false);
+        Drive(game, () => Option(game, Watch, "before", 1));
+        (game, var extraId) = DrawYingziPhase(game, content, recipient: 1, extra: true);
+        Drive(game, () => E<ActualDrawPhaseCompletedEvent>(game).Any(entry => entry.FrameId == peerNormalId));
+        Need(E<ExtraDrawPhaseStartedEvent>(game).Single() is { } extra && extra.FrameId == extraId &&
+            extra.ParentFrameId == peerNormalId &&
+            E<ActualDrawPhaseCompletedEvent>(game).Single(entry => entry.FrameId == peerNormalId) is
+                { IsExtra: false, Skipped: false, DrawCount: 3 } &&
+            E<ActualDrawPhaseCompletedEvent>(game).Single(entry => entry.FrameId == extraId) is
+                { IsExtra: true, Skipped: false, DrawCount: 3 },
+            "The same Yingzi holder draws three cards in each of their separate normal and extra actual phases.");
+        _ = Cold(game, content);
+    }
+
+    private static (GameEngine Game, long PhaseId) DrawYingziPhase(GameEngine game, ContentRegistry content, int recipient, bool extra)
+    {
+        var phase = game.ResolutionStack.OfType<DrawPhaseObligationFrame>().Single(frame => frame.IsExtra == extra);
+        var attempt = game.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single();
+        Need(game.CreateSnapshot(recipient).Players[recipient].Skills?.Any(skill => skill.ContentId == BoundaryYingzi) == true &&
+            phase.OwnerSeat == recipient && attempt.Context.ParentFrameId == phase.Id &&
+            attempt.Context.RecipientSeat == recipient && attempt.Context.RequestedCount == 3 &&
+            !PhaseDraws(game, recipient, phase.ActualTurnNumber, extra).Any(),
+            "The exact actual Draw request samples the real Yingzi before any physical cards move. " + Diagnostic(game));
+        game = Cold(game, content);
+        AdvanceRecipient(game, recipient, "before");
+        Drive(game, () => Option(game, Gain, "gained", recipient));
+        var drawn = PhaseDraws(game, recipient, phase.ActualTurnNumber, extra);
+        Need(drawn.Length == 3, "The phase pays its one extra physical card with the two base cards.");
+        game = CompletePhaseGainObservers(game, content, phase.Id, recipient, drawn);
+        AdvanceRecipient(game, recipient, "ended");
+        return (game, phase.Id);
+    }
+
+    private static void CheckFixedDrawsDuringPlay(GameEngine game, ContentRegistry content)
+    {
+        var play = P(game)!;
+        var drawTwo = game.GetHumanLegalActions().First(action => action.Kind == LegalActionKind.DrawTwo);
+        var card = drawTwo.CardId!.Value;
+        var before = game.CardMovements.Count;
+        Accept(game, new PlayCardCommand(0, card, drawTwo.TargetSeats, game.Revision, play.PromptId, drawTwo.PlayedCardKind));
+        for (var gain = 0; gain < 6; gain++)
+        {
+            Drive(game, () => Option(game, Gain, "gained") || P(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
+            if (!Option(game, Gain, "gained")) break;
+            AdvanceRecipient(game, 0, "gained");
+        }
+        Play(game);
+        var effect = E<NativeCardEffectDrawStartedEvent>(game).Single(entry => entry.EffectCardId == card);
+        Need(effect.RequestedCount == 2 &&
+            E<NativeCardEffectDrawAppliedEvent>(game).Single(entry => entry.UseFrameId == effect.UseFrameId).ActualDrawCount == 2 &&
+            game.CardMovements.Skip(before).Count(move => move.From == CardLocation.DrawPile &&
+                move.To == CardLocation.Hand(0) && move.Reason == CardMoveReasons.Draw) == 2,
+            "The same Yingzi owner uses a real DrawTwo and gets exactly its two cards.");
+
+        Use(game, "draw");
+        Drive(game, () => Option(game, Driver, "after"));
+        var producer = Producer(game);
+        Need(E<ProgramDrawCompletedEvent>(game).Single(entry => entry.FrameId == producer.Id) is
+            { RequestedCount: 2, ActualDrawCount: 2 } && PaidDraws(game).Length == 2,
+            "The same Yingzi owner executes an ordinary configured Draw with exactly its requested two cards.");
+        game = Cold(game, content);
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "after");
+        Play(game);
+    }
+
     private static void DeliveredReplacementKeepsZeroDrawResultCold()
     {
         const string zenrun = "ol:zenrun";
@@ -520,10 +612,10 @@ internal static class NativeDrawAttemptChecks
             Draw = (f as ProgramSkillFrame)?.NativeDraw }),
         Attempts = E<NativeDrawAttemptStartedEvent>(g), Draws = PaidDraws(g)
     });
-    private static (GameEngine, ContentRegistry) Start(string scene)
+    private static (GameEngine, ContentRegistry) Start(string scene, bool withBoundaryYingzi = false)
     {
-        _scene = scene;
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scene));
+        _scene = withBoundaryYingzi ? scene + "-boundary-yingzi" : scene;
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scene, withBoundaryYingzi));
         var g = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = scene == "delivered-death" ? Role.Renegade : Role.Lord, ModeId = Mode,
@@ -545,11 +637,12 @@ internal static class NativeDrawAttemptChecks
         return (g, registry);
     }
 
-    private sealed class Fixture(string scene) : IGameContentPackage
+    private sealed class Fixture(string scene, bool withBoundaryYingzi) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-native-draw-attempt", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
+            if (withBoundaryYingzi) CharacterFixtureContent.Register(b, "boundary:zhou-yu");
             var definitions = new List<Dictionary<string, object>>();
             var presentation = new Dictionary<string, object>();
             void Add(string id, string property, object value, params string[] options)
@@ -657,6 +750,7 @@ internal static class NativeDrawAttemptChecks
             if (native) shared.Add(Watch);
             if (scene == "recipients" || phase || delivered) shared.Add(Gain);
             if (phase) shared.Add(PhaseWatch);
+            if (withBoundaryYingzi) shared.Add(BoundaryYingzi);
             var ownerSkills = new List<string>(shared);
             if (scene == "delivered-replacement")
             {
@@ -672,7 +766,7 @@ internal static class NativeDrawAttemptChecks
             foreach (var peer in peers) b.AddGeneral(new(peer, "真实摸牌同桌", "supporter", Quiet, "wei", 8, shared));
             b.AddDeck(new("fixture:native-draw-deck", "固定真实实体", 4, 2, [])
             { PhysicalCards = Enumerable.Range(0, scene == "partial" ? 19 : scene == "empty" ? 18 : 72)
-                .Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Club, 7)).ToArray() });
+                .Select(_ => new ContentDeckPhysicalCard(withBoundaryYingzi ? "standard:draw_two" : "standard:crossbow", Suit.Club, 7)).ToArray() });
             b.AddMode(new(Mode, "原生摸牌请求", 4, 4,
                 scene == "delivered-death"
                     ? new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1 }

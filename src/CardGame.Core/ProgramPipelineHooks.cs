@@ -49,7 +49,8 @@ internal enum ProgramPipelinePhase
     ObserveCommittedMovement,
     CaptureMovementBatchFacts,
     CompleteMovementBatch,
-    HandCardProjection
+    HandCardProjection,
+    AppendNumericRuleContributions
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -173,6 +174,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(NullificationWindowFrame)], typeof(bool)),
             [ProgramPipelinePhase.AppendTurnEndingItems] = (typeof(Action<List<TurnEndingBoundaryItem>>),
                 [typeof(List<TurnEndingBoundaryItem>)], typeof(void)),
+            [ProgramPipelinePhase.AppendNumericRuleContributions] = (typeof(Action<int, SkillRuleQuery, List<RuleQueryContribution>>),
+                [typeof(int), typeof(SkillRuleQuery), typeof(List<RuleQueryContribution>)], typeof(void)),
             [ProgramPipelinePhase.ResumeScheduledPhase] = (typeof(Func<bool>), [], typeof(bool)),
             [ProgramPipelinePhase.CancelScheduledPhase] = (typeof(Func<bool>), [], typeof(bool)),
             [ProgramPipelinePhase.RumoEntry] = (typeof(ProgramRumoEntryClaim),
@@ -284,6 +287,7 @@ internal sealed class ProgramPipelineHooks
     private readonly Func<ProgramLifecycleTriggerWindowFrame, bool>[] _lifecycleWindowCompleted;
     private readonly Func<NullificationWindowFrame, bool>[] _beforeNullificationFinished;
     private readonly Action<List<TurnEndingBoundaryItem>>[] _appendTurnEndingItems;
+    private readonly Action<int, SkillRuleQuery, List<RuleQueryContribution>>[] _appendNumericRuleContributions;
     private readonly Func<bool>[] _resumeScheduledPhase,_cancelScheduledPhase;
     private readonly ProgramVirtualEquipmentProvider[] _virtualEquipment;
     private readonly ProgramParticipantPromptProvider[] _participantPrompt;
@@ -331,6 +335,7 @@ internal sealed class ProgramPipelineHooks
         _lifecycleWindowCompleted = Bind<Func<ProgramLifecycleTriggerWindowFrame, bool>>(ProgramPipelinePhase.LifecycleWindowCompleted);
         _beforeNullificationFinished = Bind<Func<NullificationWindowFrame, bool>>(ProgramPipelinePhase.BeforeNullificationFinished);
         _appendTurnEndingItems = Bind<Action<List<TurnEndingBoundaryItem>>>(ProgramPipelinePhase.AppendTurnEndingItems);
+        _appendNumericRuleContributions = Bind<Action<int, SkillRuleQuery, List<RuleQueryContribution>>>(ProgramPipelinePhase.AppendNumericRuleContributions);
         _resumeScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.ResumeScheduledPhase);
         _cancelScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.CancelScheduledPhase);
         _virtualEquipment = Bind<ProgramVirtualEquipmentProvider>(ProgramPipelinePhase.VirtualEquipment);
@@ -543,6 +548,10 @@ internal sealed class ProgramPipelineHooks
     internal void AppendTurnEndingItems(List<TurnEndingBoundaryItem> items)
     {
         foreach (var hook in _appendTurnEndingItems) hook(items);
+    }
+    internal void AppendNumericRuleContributions(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        foreach (var hook in _appendNumericRuleContributions) hook(seat, query, contributions);
     }
     internal bool ResumeScheduledPhase()
     {

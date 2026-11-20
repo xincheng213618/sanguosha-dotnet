@@ -117,6 +117,15 @@ internal sealed partial class CharacterCaoXiOlRuntime
             ExpireCaoXiGangshuUnits(death.VictimSeat, "owner-death", death.VictimSeat);
     }
 
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 10)]
+    internal void AddCaoXiGangshuDrawCountContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.DrawCount)
+            return;
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{seat}:cao-xi:gangshu:draw",
+            CaoXiGangshuBonus(_coreMatchParticipantsPlayersAccess._players[seat], query));
+    }
+
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 20)]
     internal void AddCaoXiGangshuBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:cao-xi:gangshu:attack-range", CaoXiGangshuBonus(player, SkillRuleQuery.AttackRange));
 }

@@ -1,3 +1,5 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 // Query ports live for one synchronous calculation. Values stay lazy so each
@@ -10,7 +12,6 @@ internal interface IMatchTurnNumericQuery : IProgramSelectionQuery
     IEnumerable<RuleQueryContribution> Contributions { get; }
     int MarketBonus { get; }
     int SharedRankBonus { get; }
-    int GangshuBonus { get; }
     int ShunshiBonus { get; }
     int HengyeGrowth { get; }
     int AdditiveTurnBonus { get; }
@@ -36,6 +37,7 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
 
 internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 {
+    int GangshuBonus { get; }
     int KuangguSlashBonus { get; }
     int CujunSlashBonus { get; }
     int XiezhiOverflowCount { get; }
@@ -58,7 +60,7 @@ internal interface IMatchSlashLimitQuery : IMatchTurnNumericQuery
 
 /// <summary>Composes draw counts and Slash quotas through their ordered numeric stages.</summary>
 [ProgramRuntimeModule]
-internal sealed class MatchTurnNumericQueries
+internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess pipelineHooks)
 {
     internal RuleQueryEvaluation EvaluateDrawCount<TQuery>(TQuery query) where TQuery : IMatchDrawCountQuery
     {
@@ -78,7 +80,7 @@ internal sealed class MatchTurnNumericQueries
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile-duliang:draw", query.DuliangNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shanhe-luanxin:draw", query.LuanxinNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:alternating-next-draw", query.AlternatingNextDrawBonus);
-        AddFiniteContribution(contributions, $"state:{query.Seat}:cao-xi:gangshu:draw", query.GangshuBonus);
+        pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.DrawCount, contributions);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shunshi:draw", query.ShunshiBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:kuangxiang:draw", -query.KuangxiangDrawPenalty);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mou-kongwu:draw", -query.KongwuDrawPenalty);
